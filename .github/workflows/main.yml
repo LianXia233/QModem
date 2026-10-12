@@ -398,3 +398,4 @@ jobs:
           tag_name: ${{ needs.job_prepare.outputs.tag_name }}
           prerelease: ${{ contains(needs.job_prepare.outputs.tag_name, '-beta') || contains(needs.job_prepare.outputs.tag_name, '-rc') || contains(needs.job_prepare.outputs.tag_name, '_beta') || contains(needs.job_prepare.outputs.tag_name, '_rc') }}
           files: releases/*
+          overwrite_files: true
