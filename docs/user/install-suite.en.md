@@ -46,6 +46,37 @@ opkg install luci-app-qmodem-voip   # or: apk add luci-app-qmodem-voip
 
 That frontend automatically pulls in `qmodem-voip` (call-control daemon voipd) and `qmodem-sipd` (SIP signaling gateway). voip is experimental, restricted by a hardware whitelist (currently RM520N-GL only) and maintained independently (decision basis: `docs/refactor/journal-retire-voip.md`), so it is not part of the single-package delivery.
 
+### Direct install from GitHub Release assets (no feed available)
+
+If your device has no QModem feed configured, download the **loose ipk/apk files**
+(no extraction needed) from [Releases](https://github.com/LianXia233/QModem/releases)
+and install them directly. Asset names carry an arch suffix — pick the one matching your device:
+
+| Asset name suffix | Arch | Typical devices |
+|---|---|---|
+| `_aarch64_cortex-a53` (ipk) / `_aarch64` (apk) | ARM 64-bit | Airpi AP3000M and other Cortex-A53 boards |
+| `_x86_64` | x86-64 | x64 routers / VMs |
+| `_mipsel_24kc` | MIPS little-endian 24Kc | MediaTek MT76xx/MT8621 etc. |
+| `_all` | arch-independent | LuCI apps and i18n — install once, works on every arch |
+
+```sh
+# OpenWrt (aarch64 example; apk filenames drop the ipk's `_cortex-a53` granularity)
+cd /tmp
+opkg install qmodem-suite_*_all.ipk
+opkg install qmodem_*_aarch64_cortex-a53.ipk
+opkg install qmodem-smsd_*_aarch64_cortex-a53.ipk
+opkg install qmodem_monitor_*_aarch64_cortex-a53.ipk
+opkg install luci-app-qmodem-next_*_all.ipk
+opkg install luci-app-qmodem-monitor_*_all.ipk
+opkg install luci-app-qmodem-ttlfw4_*_all.ipk
+
+# ImmortalWrt (apk)
+apk add --allow-untrusted qmodem-suite-*.apk   # the meta package pulls the deps above
+```
+
+> When installing package-by-package, make sure ALL suite dependencies (see the
+> one-command list above) are present, otherwise LuCI pages and monitoring will be incomplete.
+
 ## 2. Post-installation status checks
 
 ### Service status (/etc/init.d/)

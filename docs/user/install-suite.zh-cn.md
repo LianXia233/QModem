@@ -44,6 +44,34 @@ TTL 功能默认关闭（`/etc/config/qmodem_ttl` 的默认配置节随 `luci-ap
 opkg install luci-app-qmodem-voip   # 或 apk add luci-app-qmodem-voip
 ```
 
+### 从 GitHub Release 直接安装（无软件源时）
+
+若设备没有可用的 QModem 软件源，可从 [Releases](https://github.com/LianXia233/QModem/releases) 下载**散装 ipk/apk**（无需解压）后直接安装。资产名带架构后缀，请按设备架构选择：
+
+| 资产名后缀 | 架构 | 典型设备 |
+|---|---|---|
+| `_aarch64_cortex-a53`（ipk）/ `_aarch64`（apk） | ARM 64-bit | Airpi AP3000M 等 Cortex-A53 主板 |
+| `_x86_64` | x86-64 | x64 软路由 / 虚拟机 |
+| `_mipsel_24kc` | MIPS 小端 24Kc | MediaTek MT76xx/MT8621 等 |
+| `_all` | 架构无关 | LuCI 应用与 i18n，各架构通用，只需装一次 |
+
+```sh
+# OpenWrt（以 aarch64 为例；apk 文件名去掉了 ipk 的 `_cortex-a53` 细粒度）
+cd /tmp
+opkg install qmodem-suite_*_all.ipk
+opkg install qmodem_*_aarch64_cortex-a53.ipk
+opkg install qmodem-smsd_*_aarch64_cortex-a53.ipk
+opkg install qmodem_monitor_*_aarch64_cortex-a53.ipk
+opkg install luci-app-qmodem-next_*_all.ipk
+opkg install luci-app-qmodem-monitor_*_all.ipk
+opkg install luci-app-qmodem-ttlfw4_*_all.ipk
+
+# ImmortalWrt（apk）
+apk add --allow-untrusted qmodem-suite-*.apk   # 元包会自动拉起上述依赖
+```
+
+> 逐包安装时务必装齐 suite 的全部依赖（见上方"一键安装"清单），否则 LuCI 页面与监控会缺功能。
+
 该前端会自动拉起 `qmodem-voip`（呼叫控制守护 voipd）与 `qmodem-sipd`（SIP 信令网关）。voip 为实验性功能、硬件白名单受限（当前仅 RM520N-GL），且处于独立维护状态（决策依据 `docs/refactor/journal-retire-voip.md`），故不纳入单包交付。
 
 ## 2. 安装后状态核查
