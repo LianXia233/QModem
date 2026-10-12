@@ -13,6 +13,9 @@ on:
       - 'application/qmodem/files/usr/share/qmodem/**'
       - 'luci/luci-app-qmodem-next/htdocs/luci-static/resources/**'
 
+permissions:
+  contents: write
+
 jobs:
   extract-i18n:
     runs-on: ubuntu-latest

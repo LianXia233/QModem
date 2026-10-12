@@ -11,7 +11,7 @@
 
 ## [Unreleased]
 
-## [1.1.0-rc1] - 2026-10-12
+## [1.0.0] - 2026-10-12
 
 ### Phase 1 — 依赖精简与单包交付（`f874091`，2026-10-12）
 
@@ -174,7 +174,7 @@
 - 首轮基于证据的加固，覆盖 C 内存安全、shell 注入面、打包与 LuCI
   （27 个文件）；详情见 [docs/refactor/](docs/refactor/README.md) 各 journal。
 
-### 版本化建议 — [Unreleased] → v1.1.0-rc1 拆分
+### 版本化建议 — [Unreleased] → v1.0.0 拆分
 
 - **Feature（minor 升级动因，1.0.x → 1.1.0）**：
   - `qmodem-suite` 元包（单包交付 + uci-defaults 引导）

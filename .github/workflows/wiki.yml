@@ -25,10 +25,11 @@ jobs:
           WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
         run: |
           set -eu
-          [ -n "${WIKI_TOKEN:-}" ] || {
-            echo "WIKI_TOKEN must be a classic PAT with repo scope" >&2
-            exit 1
-          }
+          if [ -z "${WIKI_TOKEN:-}" ]; then
+            echo "::warning::WIKI_TOKEN secret not configured - wiki sync SKIPPED." >&2
+            echo "Set repo secret WIKI_TOKEN (classic PAT with repo scope) to enable." >&2
+            exit 0
+          fi
 
           wiki_url="https://x-access-token:${WIKI_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git"
           git clone "$wiki_url" wiki

@@ -11,7 +11,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
-## [1.1.0-rc1] - 2026-10-12
+## [1.0.0] - 2026-10-12
 
 ### Phase 1 — Dependency reduction & single-package delivery (`f874091`, 2026-10-12)
 
@@ -180,7 +180,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   injection surfaces, packaging and LuCI (27 files); details in
   [docs/refactor/](docs/refactor/README.md) journals.
 
-### 版本化建议 — [Unreleased] → v1.1.0-rc1 拆分
+### 版本化建议 — [Unreleased] → v1.0.0 拆分
 
 - **Feature（minor 升级动因，1.0.x → 1.1.0）**：
   - `qmodem-suite` 元包（单包交付 + uci-defaults 引导）

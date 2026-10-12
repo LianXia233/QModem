@@ -1,4 +1,4 @@
-# QModem v1.1.0-rc1 Release Notes (English)
+# QModem v1.0.0 Release Notes (English)
 
 - Release date: 2026-10-12
 - Release type: Release Candidate (pre-release, main branch)

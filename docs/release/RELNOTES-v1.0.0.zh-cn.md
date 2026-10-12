@@ -1,4 +1,4 @@
-# QModem v1.1.0-rc1 发布说明（中文）
+# QModem v1.0.0 发布说明（中文）
 
 - 发布日期：2026-10-12
 - 版本类型：Release Candidate（预发布，main 分支）

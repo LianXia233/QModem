@@ -131,7 +131,11 @@ stage_rust() {
     ( cd rust && cargo test --workspace >/tmp/check_all_cargo.log 2>&1 ) \
         || { record FAIL rust "cargo test 失败 (见 /tmp/check_all_cargo.log)"; return 0; }
     ( cd rust && cargo clippy --workspace -- -D warnings >>/tmp/check_all_cargo.log 2>&1 ) \
-        || { record FAIL rust "cargo clippy -D warnings 失败 (见 /tmp/check_all_cargo.log)"; return 0; }
+        || { record FAIL rust "cargo clippy -D warnings 失败 (见 /tmp/check_all_cargo.log)";
+             echo "---- clippy log tail ----" >&2
+             tail -n 40 /tmp/check_all_cargo.log >&2
+             echo "--------------------------" >&2
+             return 0; }
     record PASS rust "cargo test + clippy 通过"
     return 0
 }
