@@ -437,6 +437,10 @@ fn decode_ucs2(raw: Vec<u8>) -> Result<(String, Vec<u8>), PduError> {
     }
     let mut text = String::with_capacity(raw.len() / 2);
     let mut pending_high: Option<u16> = None;
+    // clippy >= 1.99 suggests as_chunks (stabilized 1.96); we keep chunks_exact
+    // for older toolchains (OpenWrt SDK rust versions may lag).
+    #[allow(unknown_lints)]
+    #[allow(clippy::chunks_exact_to_as_chunks)]
     for pair in raw.chunks_exact(2) {
         let unit = u16::from_be_bytes([pair[0], pair[1]]);
         match (pending_high.take(), unit) {
