@@ -11,6 +11,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+### Fixed
+- **Release assets are now directly installable** (`main.yml`,
+  `publish-existing-release.yml`): artifacts are no longer repacked into
+  `QModem-<arch>_*.tar.gz`; the Release ships loose `.ipk` / `.apk` files
+  instead. Per-arch `apk` asset names carry an arch suffix
+  (e.g. `qmodem-3.4.0_rc3-r1_aarch64.apk`) because OpenWrt apk filenames do
+  not encode the target arch. Download and install directly —
+  `opkg install *.ipk` / `apk add --allow-untrusted *.apk` — no extraction.
+  The v1.0.0 Release was migrated accordingly (6 tar.gz assets replaced by
+  80 loose packages).
+- **`qmodem-suite` meta-package is built again**: it was missing from the SDK
+  build list, so the "single install delivers the full stack" promise had no
+  shippable artifact. Added to `qmodem_package_generic` and to the
+  required-package gate in `main.yml` (its `DEPENDS`
+  `qmodem_monitor` / `luci-app-qmodem-monitor` / `luci-app-qmodem-ttlfw4`
+  are pulled in by the same compile).
+
 ## [1.0.0] - 2026-10-12
 
 ### Phase 1 — Dependency reduction & single-package delivery (`f874091`, 2026-10-12)

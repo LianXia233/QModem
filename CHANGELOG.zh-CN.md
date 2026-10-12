@@ -11,6 +11,20 @@
 
 ## [Unreleased]
 
+### 修复（Fixed）
+- **Release 资产改为可直接安装的散装包**（`main.yml`、
+  `publish-existing-release.yml`）：不再把构建产物二次打包为
+  `QModem-<arch>_*.tar.gz`，Release 直接上传散装 `.ipk` / `.apk`。
+  由于 OpenWrt apk 文件名不含架构，按架构构建的 apk 资产名追加架构后缀
+  （如 `qmodem-3.4.0_rc3-r1_aarch64.apk`）。下载后直接
+  `opkg install *.ipk` / `apk add --allow-untrusted *.apk`，无需解压。
+  v1.0.0 Release 已同步迁移（6 个 tar.gz 资产替换为 80 个散装包）。
+- **`qmodem-suite` 元包恢复构建**：该包此前不在 SDK 构建清单中，导致
+  "一次安装交付完整栈"的承诺没有可分发产物。已加入
+  `qmodem_package_generic` 与 `main.yml` 的必检清单（其依赖
+  `qmodem_monitor` / `luci-app-qmodem-monitor` / `luci-app-qmodem-ttlfw4`
+  由同一次编译自动拉入）。
+
 ## [1.0.0] - 2026-10-12
 
 ### Phase 1 — 依赖精简与单包交付（`f874091`，2026-10-12）

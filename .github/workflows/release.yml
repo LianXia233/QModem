@@ -104,8 +104,8 @@ jobs:
         env:
           TAG_NAME: ${{ github.ref_name }}
 
-      # 附加说明：不跨 workflow 拉取 artifact（Actions 产物会过期且需 token），
-      # 仅留下 rust-build.yml 的运行列表链接模板，用户可按 tag/分支筛选下载。
+      # 附加说明：本 workflow 只写 notes；可直接安装的散装 .ipk/.apk
+      # 由 main.yml 的 job_release_artifacts 直接上传到 Release（不做压缩包）。
       - name: Append artifact download hint
         run: |
           set -eu
@@ -114,13 +114,19 @@ jobs:
             echo ""
             echo "## Binary artifacts"
             echo ""
-            echo "固件/IPK/APK 由 \`main.yml\`（OpenWrt SDK）构建；Rust 二进制（\`x86_64-unknown-linux-musl\` / \`aarch64-unknown-linux-musl\`）由 \`rust-build.yml\` 构建。"
-            echo "产物不直接附在本 Release 上（避免跨 workflow 依赖），请从 Actions 产物页按对应 commit/tag 下载："
+            echo "Release 资产为**可直接安装的散装包**（\`.ipk\` / \`.apk\`，按架构命名），下载后无需解压："
             echo ""
-            echo "- SDK 固件: ${REPO_URL}/actions/workflows/main.yml"
+            echo '```sh'
+            echo "opkg install qmodem_*.ipk    # OpenWrt (ipk)"
+            echo "apk add --allow-untrusted qmodem_*.apk   # ImmortalWrt (apk)"
+            echo '```'
+            echo ""
+            echo "若本 Release 尚未附带包文件（例如纯 tag 触发时 SDK 构建未通过），可从 Actions 产物页按对应 commit/tag 下载："
+            echo ""
+            echo "- SDK 构建: ${REPO_URL}/actions/workflows/main.yml"
             echo "- Rust 二进制: ${REPO_URL}/actions/workflows/rust-build.yml"
             echo ""
-            echo "若 Release 上有 \`qmodem-<tag>.tar.gz\`，它由 \`publish-existing-release.yml\` 手动从指定构建 run 打包上传。"
+            echo "也可手动运行 \`publish-existing-release.yml\`，从指定构建 run 把散装 ipk/apk 补传到本 Release。"
           } >> release_notes.md
 
       - name: Create GitHub Release

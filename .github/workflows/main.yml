@@ -341,6 +341,7 @@ jobs:
           required_packages=(
             qmodem qmodem-smsd sms-forwarder-next
             luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
+            qmodem-suite
           )
           for package in "${required_packages[@]}"; do
             compgen -G "$package_dir/${package}[-_]*" >/dev/null || {
@@ -383,14 +384,20 @@ jobs:
       - name: Create releases directory
         run: mkdir -p releases
 
-      - name: Package artifacts into tar.gz
+      # 交付策略：Release 资产必须是可直接安装的散装包（.ipk / .apk），
+      # 绝不做 tar.gz/zip 二次打包——用户下载后应能直接
+      # `opkg install xxx.ipk` / `apk add xxx.apk`。
+      - name: Collect installable packages
         run: |
-          for dir in artifacts/*; do
-            if [ -d "$dir" ]; then
-              base_name=$(basename "$dir")
-              tar -czf "releases/${base_name}.tar.gz" -C "$dir" .
-            fi
-          done
+          set -eu
+          find artifacts -type f \( -name '*.ipk' -o -name '*.apk' \) -exec cp -v {} releases/ \;
+          # 兜底校验：至少要有 ipk 与 apk 两类，否则视为构建异常
+          ls releases/*.ipk releases/*.apk >/dev/null 2>&1 || {
+            echo "no installable package found under artifacts/" >&2
+            find artifacts -type f -print >&2
+            exit 1
+          }
+          ls -l releases/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.2.2

@@ -39,17 +39,23 @@ jobs:
             --dir releases/artifacts
           find releases/artifacts -type f -print
 
-      - name: Package release artifacts
-        env:
-          RELEASE_TAG: ${{ inputs.tag }}
+      # 交付策略：Release 资产必须是可直接安装的散装包（.ipk / .apk），
+      # 绝不做 tar.gz/zip 二次打包——用户下载后应能直接
+      # `opkg install xxx.ipk` / `apk add xxx.apk`。
+      - name: Collect installable packages
         run: |
           set -eu
-          tar -C releases/artifacts -czf "releases/qmodem-${RELEASE_TAG}.tar.gz" .
+          find releases/artifacts -type f \( -name '*.ipk' -o -name '*.apk' \) -exec cp -v {} releases/ \;
+          ls releases/*.ipk releases/*.apk >/dev/null 2>&1 || {
+            echo "no installable package found in downloaded artifacts" >&2
+            exit 1
+          }
+          ls -l releases/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.tag }}
           prerelease: false
-          files: releases/qmodem-${{ inputs.tag }}.tar.gz
+          files: releases/*.ipk releases/*.apk
           generate_release_notes: false

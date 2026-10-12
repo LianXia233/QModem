@@ -2,3 +2,4 @@ luci-app-qmodem-next
 qmodem
 qmodem_smsd
 sms_forwarder_next
+qmodem-suite
