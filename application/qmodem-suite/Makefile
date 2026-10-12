@@ -40,7 +40,6 @@ PKG_VERSION:=$(QMODEM_VERSION)
 include $(INCLUDE_DIR)/package.mk
 
 define Package/$(PKG_NAME)
-  PKGARCH:=all
   SECTION:=utils
   CATEGORY:=Utilities
   TITLE:=QModem complete management stack (meta-package)
