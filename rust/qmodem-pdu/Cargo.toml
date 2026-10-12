@@ -1,0 +1,9 @@
+[package]
+name = "qmodem-pdu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "3GPP TS 23.038 SMS PDU codec (Rust rewrite of libqmodem-sms/src/pdu.c with memory-safety fixes)"
+
+[dependencies]
+thiserror = { workspace = true }
