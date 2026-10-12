@@ -12,6 +12,15 @@
 | [journal-shell-pkg.md](journal-shell-pkg.md) | W2：modem_hook / modem_dial / rpcd 脚本安全修复与打包 Makefile 规范化明细 |
 | [journal-luci-next.md](journal-luci-next.md) | W3：luci-app-qmodem-next 前端修复明细（ACL 收敛、fallback、时区、CSS 等） |
 | [journal-rust-core.md](journal-rust-core.md) | W4：rust/ 工作区设计说明、C→Rust 逐项对照（P1-P7 / A1-A7）与测试结果 |
+| [journal-ci.md](journal-ci.md) | CI/DevOps 门禁固化（agent-ci） |
+| [journal-c-scan.md](journal-c-scan.md) | modem_scand + 打包/init 修复（agent-c-scan） |
+| [journal-c-smsd.md](journal-c-smsd.md) | C 层 smsd 收尾（C4/C10/C12，agent-c-smsd-v2 接手前任半成品） |
+| [journal-lua-retire.md](journal-lua-retire.md) | 旧 Lua 栈止血与退役准备（agent-lua-retire） |
+| [journal-luci-comp.md](journal-luci-comp.md) | luci-app-qmodem-next htdocs/** 组件修复（agent-luci-comp） |
+| [journal-monitor-dial.md](journal-monitor-dial.md) | qmodem_monitor + modem_dial 安全/健壮性修复（agent-monitor） |
+| [journal-pkg-suite.md](journal-pkg-suite.md) | qmodem-suite 元包（agent-pkg-suite） |
+| [journal-tests.md](journal-tests.md) | tests/ 轻量回归测试（agent-tests） |
+| [journal-vendor-lib.md](journal-vendor-lib.md) | 公共解析库与 vendor 试点迁移（agent-vendor-lib） |
 
 > 上表为 `ls docs/refactor/` 实际文件（截至 2026-10-12）。后续新增 journal（如 CI、cmd 库迁移）请同步补入本清单。
 

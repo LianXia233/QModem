@@ -18,13 +18,51 @@ at_port_instance_t *find_port_instance(const char *port_path) {
     return NULL;
 }
 
+// Reference counting for port instances (protected by ports_mutex).
+// Holders (sendat handler, port monitor snapshot) acquire a reference for
+// the whole duration they use the raw port pointer, so a concurrent
+// close/destroy cannot free an instance that is still in use.
+int port_instance_acquire(at_port_instance_t *port) {
+    int found = 0;
+
+    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
+    for (at_port_instance_t *current = g_daemon_ctx.ports; current; current = current->next) {
+        if (current == port) {
+            port->refcount++;
+            found = 1;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
+    return found ? 0 : -1;
+}
+
+void port_instance_release(at_port_instance_t *port) {
+    int do_destroy = 0;
+
+    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
+    if (port->refcount > 0)
+        port->refcount--;
+    if (port->refcount == 0 && port->pending_destroy)
+        do_destroy = 1;
+    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
+
+    if (do_destroy)
+        destroy_port_instance(port);
+}
+
 at_port_instance_t *create_port_instance(const char *port_path) {
-    at_port_instance_t *port = calloc(1, sizeof(at_port_instance_t));
+    at_port_instance_t *port;
+    pthread_condattr_t cond_attr;
+    int cond_ret;
+
+    port = calloc(1, sizeof(at_port_instance_t));
     if (!port) {
         return NULL;
     }
-    
-    strncpy(port->port_path, port_path, MAX_PORT_PATH_SIZE - 1);
+
+    strncpy(port->port_path, port_path, sizeof(port->port_path) - 1);
+    port->port_path[sizeof(port->port_path) - 1] = '\0';
     port->fd = -1;
     port->is_open = 0;
     port->should_stop = 0;
@@ -43,38 +81,61 @@ at_port_instance_t *create_port_instance(const char *port_path) {
     port->last_check_time = time(NULL);
     port->check_interval = DEFAULT_CHECK_INTERVAL;
     
-    pthread_mutex_init(&port->event_state_mutex, NULL);
-    pthread_mutex_init(&port->lifecycle_mutex, NULL);
-    pthread_mutex_init(&port->state_mutex, NULL);
-
-    // Initialize response handling
-    memset(&port->current_response, 0, sizeof(at_response_t));
-    port->waiting_for_response = 0;
-    port->num_end_flags = 0;
+    // Initialize response handling (calloc already zeroes current_response
+    // and the counters; restart_epoch must track the daemon epoch)
     port->restart_epoch = g_daemon_ctx.daemon_epoch;
-    port->line_sequence = 0;
-    port->next_command_id = 0;
-    port->active_command_id = 0;
-    
-    pthread_mutex_init(&port->queue_mutex, NULL);
-    pthread_mutex_init(&port->write_mutex, NULL);
-    pthread_mutex_init(&port->response_mutex, NULL);
-    pthread_cond_init(&port->queue_cond, NULL);
+
+    // Initialize synchronization primitives. Each step is checked so a
+    // partial failure rolls back everything already initialized instead of
+    // leaking a half-initialized object.
+    if (pthread_mutex_init(&port->event_state_mutex, NULL) != 0)
+        goto fail;
+    if (pthread_mutex_init(&port->lifecycle_mutex, NULL) != 0)
+        goto fail_event_state_mutex;
+    if (pthread_mutex_init(&port->state_mutex, NULL) != 0)
+        goto fail_lifecycle_mutex;
+    if (pthread_mutex_init(&port->queue_mutex, NULL) != 0)
+        goto fail_state_mutex;
+    if (pthread_mutex_init(&port->write_mutex, NULL) != 0)
+        goto fail_queue_mutex;
+    if (pthread_mutex_init(&port->response_mutex, NULL) != 0)
+        goto fail_write_mutex;
+    if (pthread_cond_init(&port->queue_cond, NULL) != 0)
+        goto fail_response_mutex;
     // response_cond uses CLOCK_MONOTONIC so timed waits are immune to
     // system clock jumps (see send_at_command_with_response)
-    pthread_condattr_t cond_attr;
     pthread_condattr_init(&cond_attr);
     pthread_condattr_setclock(&cond_attr, CLOCK_MONOTONIC);
-    pthread_cond_init(&port->response_cond, &cond_attr);
+    cond_ret = pthread_cond_init(&port->response_cond, &cond_attr);
     pthread_condattr_destroy(&cond_attr);
-    
+    if (cond_ret != 0)
+        goto fail_queue_cond;
+
     // Add to global ports list
     pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
     port->next = g_daemon_ctx.ports;
     g_daemon_ctx.ports = port;
     pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
-    
+
     return port;
+
+fail_queue_cond:
+    pthread_cond_destroy(&port->queue_cond);
+fail_response_mutex:
+    pthread_mutex_destroy(&port->response_mutex);
+fail_write_mutex:
+    pthread_mutex_destroy(&port->write_mutex);
+fail_queue_mutex:
+    pthread_mutex_destroy(&port->queue_mutex);
+fail_state_mutex:
+    pthread_mutex_destroy(&port->state_mutex);
+fail_lifecycle_mutex:
+    pthread_mutex_destroy(&port->lifecycle_mutex);
+fail_event_state_mutex:
+    pthread_mutex_destroy(&port->event_state_mutex);
+fail:
+    free(port);
+    return NULL;
 }
 
 void destroy_port_instance(at_port_instance_t *port) {
@@ -373,20 +434,56 @@ void check_and_reconnect_port(at_port_instance_t *port) {
 void *port_monitor_thread_func(void *arg) {
     (void)arg;
     while (!g_daemon_ctx.monitor_should_stop) {
+        // Phase 1: snapshot the ports to check while holding ports_mutex,
+        // taking a reference on each so they stay alive while we probe.
+        // Ports already marked pending_destroy are skipped (they are only
+        // waiting for their last user to release them).
+        // The critical section stays short: open_at_port/close_at_port
+        // (including the pthread_join inside stop_reader) run in phase 2
+        // without ports_mutex, so ubus list/close handlers are never
+        // blocked behind the monitor thread.
+        at_port_instance_t **snapshot = NULL;
+        int count = 0;
+        int n = 0;
+
         pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
-        
-        at_port_instance_t *current = g_daemon_ctx.ports;
-        while (current) {
-            check_and_reconnect_port(current);
-            current = current->next;
+        for (at_port_instance_t *current = g_daemon_ctx.ports; current; current = current->next) {
+            if (!current->pending_destroy)
+                count++;
         }
-        
+        if (count > 0)
+            snapshot = malloc((size_t)count * sizeof(*snapshot));
+        if (snapshot) {
+            for (at_port_instance_t *current = g_daemon_ctx.ports;
+                 current && n < count; current = current->next) {
+                if (current->pending_destroy)
+                    continue;
+                current->refcount++;
+                snapshot[n++] = current;
+            }
+        } else {
+            count = 0;
+        }
         pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
-        
+
+        // Phase 2: probe/reconnect without ports_mutex held
+        if (!snapshot && count > 0) {
+            fprintf(stderr, "Port monitor: out of memory for snapshot, skipping cycle\n");
+        }
+        for (int i = 0; i < n; i++) {
+            check_and_reconnect_port(snapshot[i]);
+        }
+
+        // Phase 3: drop the references (may trigger a deferred destroy)
+        for (int i = 0; i < n; i++) {
+            port_instance_release(snapshot[i]);
+        }
+        free(snapshot);
+
         // Sleep for monitoring interval
         sleep(PORT_MONITOR_INTERVAL);
     }
-    
+
     return NULL;
 }
 

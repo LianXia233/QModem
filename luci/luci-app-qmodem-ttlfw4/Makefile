@@ -7,13 +7,14 @@ include $(TOPDIR)/rules.mk
 include ../../version.mk
 
 PKG_NAME:=luci-app-qmodem-ttlfw4
-LUCI_TITLE:=LuCI App for QModem TTL Configuration (JS LuCI / fw4 Only)
+LUCI_TITLE:=LuCI App for QModem TTL Configuration (JS LuCI / fw4 Only) (legacy, maintenance mode)
 LUCI_DEPENDS:=+luci-base
 PKG_CONFLICTS:=luci-app-qmodem-ttl
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_RELEASE:=1
 PKG_LICENSE:=GPLv3
+PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tom <fjrcn@outlook.com>
 
 define Package/luci-app-qmodem-ttlfw4/conffiles

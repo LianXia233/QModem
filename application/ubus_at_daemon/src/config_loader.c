@@ -1,26 +1,58 @@
+/*
+ * config_loader.c — legacy JSON config loader.
+ *
+ * DORMANT CODE: load_config_from_json() is currently not referenced by any
+ * caller in the daemon (startup goes through the ubus `open` method and the
+ * config is applied per-port at runtime). The file is kept for API
+ * compatibility; the unused attribute below suppresses warnings until the
+ * entry point is either wired up or retired.
+ */
+
 #include "ubus_at_daemon.h"
 
 extern at_daemon_ctx_t g_daemon_ctx;
 
+__attribute__((unused))
 int load_config_from_json(const char *json_path) {
     FILE *file = fopen(json_path, "r");
     if (!file) {
         fprintf(stderr, "Failed to open config file: %s\n", json_path);
         return -1;
     }
-    
-    // Read file content
-    fseek(file, 0, SEEK_END);
+
+    // Determine file size; bail out on error instead of passing -1 down
+    // into malloc/fread (which used to trigger malloc(0)/fread(-1) and an
+    // out-of-bounds content[-1] write).
+    if (fseek(file, 0, SEEK_END) != 0) {
+        fprintf(stderr, "Failed to seek config file: %s\n", json_path);
+        fclose(file);
+        return -1;
+    }
     long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    
-    char *content = malloc(file_size + 1);
+    if (file_size < 0) {
+        fprintf(stderr, "Failed to determine config file size: %s\n", json_path);
+        fclose(file);
+        return -1;
+    }
+    if (fseek(file, 0, SEEK_SET) != 0) {
+        fprintf(stderr, "Failed to rewind config file: %s\n", json_path);
+        fclose(file);
+        return -1;
+    }
+
+    char *content = malloc((size_t)file_size + 1);
     if (!content) {
         fclose(file);
         return -1;
     }
-    
-    fread(content, 1, file_size, file);
+
+    size_t bytes_read = fread(content, 1, (size_t)file_size, file);
+    if (ferror(file) || bytes_read != (size_t)file_size) {
+        fprintf(stderr, "Failed to read config file: %s\n", json_path);
+        free(content);
+        fclose(file);
+        return -1;
+    }
     content[file_size] = '\0';
     fclose(file);
     

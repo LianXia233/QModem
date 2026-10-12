@@ -90,6 +90,31 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   byte (removes the hard-coded `−28800` hack); NaN progress bar; scan-reload
   inconsistency.
 
+### Phase 2 — Vendor migration completion & Rust integration (`T3`, 2026-10-12)
+
+#### Added
+- AT tool path 3: `qmodem.main.at_tool=2` routes AT commands through the Rust
+  `qmodem-atd` unix-socket JSON protocol (opt-in; defaults unchanged), with
+  matching developer docs ([AT tool selection](docs/developer/at-tool-selection.zh-cn.md)).
+- `scripts/cross-build-rust.sh`: aarch64/x86_64 musl static cross-builds of the
+  Rust core (+ `rust-build.yml` CI matrix, artifacts with sha256).
+- Legacy stack retirement Step 1: maintenance-mode markers on 7 legacy packages
+  and a feature-gap table feeding Phase 4 removal.
+
+#### Changed
+- All 12 vendor adapter scripts now use the shared `cmds/qmodem_lib.sh`
+  parsers (pilot in Phase 1 covered quectel/huawei; ~280 duplicated pipelines
+  retired repo-wide).
+- rpcd plugin: generic `eval` removed (whitelisted command dispatch), cache
+  writes made atomic (mktemp+mv), POSIX-safe throughout (dash verified),
+  repeated `ubus call` boilerplate consolidated.
+- `ubus_at_daemon`: monitor thread no longer holds the global lock while
+  probing ports; config loader bounds fixed; lease tokens now random.
+- `tom_modem`: SMS read paths de-duplicated, operation matching table-driven,
+  greedy read gets an absolute deadline.
+- LuCI next: dropdown reads via component API, list limit configurable,
+  parallel ubus polling (allSettled), i18n gaps closed.
+
 ### Phase 0 — Audit-driven hardening (`2568198`, 2026-10-12)
 
 - Initial evidence-based hardening pass covering C memory safety, shell

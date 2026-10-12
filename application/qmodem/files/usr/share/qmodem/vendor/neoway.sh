@@ -5,6 +5,7 @@ _Author="sfwtw"
 _Maintainer="sfwtw <unknown>"
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/neoway.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="neoway_ctrl"
 
 vendor_get_disabled_features(){
@@ -30,7 +31,7 @@ set_imei(){
 # $1:AT串口
 get_network_prefer()
 {
-    local response=$(cmd_mysysinfo_query "$at_port" | grep '$MYSYSINFO:' | awk -F',' '{print $1}' | awk '{print $2}' | sed 's/\r//g')
+    local response=$(cmd_mysysinfo_query "$at_port" | grep '$MYSYSINFO:' | ql_csv_field 1 | awk '{print $2}' | ql_at_clean)
 
     network_prefer_3g="0";
     network_prefer_4g="0";
@@ -141,13 +142,13 @@ base_info()
     m_debug  "Neoway base info"
 
     #Name（名称）
-    name=$(cmd_cgmm "$at_port" | sed -n '2p' | sed 's/\r//g')
+    name=$(cmd_cgmm "$at_port" | sed -n '2p' | ql_at_clean)
     #Manufacturer（制造商）
-    manufacturer=$(cmd_cgmi "$at_port" | grep "+CGMI:" | sed 's/+CGMI: //g' | sed 's/\r//g')
+    manufacturer=$(cmd_cgmi "$at_port" | grep "+CGMI:" | sed 's/+CGMI: //g' | ql_at_clean)
     #Revision（固件版本）
-    revision=$(cmd_ati "$at_port" | sed -n '5p' | sed 's/\r//g')
+    revision=$(cmd_ati "$at_port" | sed -n '5p' | ql_at_clean)
     # at_command="AT+CGMR"
-    # revision=$(at $at_port $at_command | sed -n '2p' | sed 's/\r//g')
+    # revision=$(at $at_port $at_command | sed -n '2p' | ql_at_clean)
     class="Base Information"
     add_plain_info_entry "name" "$name" "Name"
     add_plain_info_entry "manufacturer" "$manufacturer" "Manufacturer"
@@ -162,7 +163,7 @@ sim_info()
     m_debug  "Neoway sim info"
     
     #SIM Slot（SIM卡卡槽）
-    sim_slot=$(cmd_simcross_query "$at_port" | grep "+SIMCROSS:" | awk -F'[ ,]' '{print $2}' | sed 's/\r//g')
+    sim_slot=$(cmd_simcross_query "$at_port" | grep "+SIMCROSS:" | awk -F'[ ,]' '{print $2}' | ql_at_clean)
     # m_debug "SIM Slot: $sim_slot"
     #IMEI（国际移动设备识别码）
 	imei=$(cmd_cgsn "$at_port" | sed -n '3p' | awk -F'"' '{print $2}')
@@ -189,7 +190,7 @@ sim_info()
 	sim_number=$(cmd_cnum "$at_port" | sed -n '3p' | awk -F'"' '{print $4}')
 
     #IMSI（国际移动用户识别码）
-	imsi=$(cmd_cimi "$at_port" | sed -n '3p' | sed 's/\r//g')
+	imsi=$(cmd_cimi "$at_port" | sed -n '3p' | ql_at_clean)
 
     #ICCID（集成电路卡识别码）
     iccid=$(cmd_myccid "$at_port" | grep '$MYCCID:' | awk -F' "' '{print $2}' | sed 's/"//g')
@@ -252,7 +253,7 @@ network_info()
     m_debug  "Neoway network info"
 
     #CSQ（信号强度）
-    response=$(cmd_csq "$at_port" | grep "+CSQ:" | sed 's/+CSQ: //g' | sed 's/\r//g')
+    response=$(cmd_csq "$at_port" | grep "+CSQ:" | sed 's/+CSQ: //g' | ql_at_clean)
 
     #最大比特率，信道质量指示
     response=$(cmd_c5gqosrdp "$at_port" | grep "+C5GQOSRDP:")
@@ -262,8 +263,8 @@ network_info()
         # Format: +C5GQOSRDP: <cid>,<5QI>[,<DL_GFBR>,<UL_GFBR>[,<DL_MFBR>,<UL_MFBR>[,<DL_SAMBR>,<UL_SAMBR>[,<Averaging_window>]]]]] 
 
         # Extract DL_SAMBR (downlink session AMBR) and UL_SAMBR (uplink session AMBR) in kbit/s
-        ambr_dl=$(echo "$response" | awk -F',' '{print $7}' | sed 's/\r//g')
-        ambr_ul=$(echo "$response" | awk -F',' '{print $8}' | sed 's/\r//g')
+        ambr_dl=$(echo "$response" | ql_csv_field 7 | ql_at_clean)
+        ambr_ul=$(echo "$response" | ql_csv_field 8 | ql_at_clean)
 
         # Convert kbit/s to Mbit/s for display if values exist
         [ -n "$ambr_dl" ] && ambr_dl=$(rate_convert $ambr_dl)
@@ -316,7 +317,7 @@ get_lockband() {
     
     response=$(cmd_nwsetband_query "$at_port")
     
-    local band_num=$(echo "$response" | grep "+NWSETBAND:" | awk '{print $2}' | sed 's/\r//g')
+    local band_num=$(echo "$response" | grep "+NWSETBAND:" | awk '{print $2}' | ql_at_clean)
     m_debug "Band number: $band_num"
 
     json_add_object "UMTS"
@@ -340,7 +341,7 @@ get_lockband() {
     json_close_array
     json_close_object
 
-    available_bands=$(cmd_nwsetband_list_query "$at_port" | grep "+" | awk -F',' '{for(i=2;i<=NF;i++) print $i}' | sed 's/\r//g')
+    available_bands=$(cmd_nwsetband_list_query "$at_port" | grep "+" | awk -F',' '{for(i=2;i<=NF;i++) print $i}' | ql_at_clean)
     m_debug "Available bands: $available_bands"
     for band in $available_bands; do
         if [[ "$band" == WB* ]]; then
@@ -382,7 +383,7 @@ get_lockband() {
                 elif [[ "$band" == N* ]]; then
                     act="6"
                 fi
-                band_value=$(echo "$band_value" | awk -F' ' '{print $3}' | sed 's/\r//g')
+                band_value=$(echo "$band_value" | awk -F' ' '{print $3}' | ql_at_clean)
                 m_debug "Processing band: $band_value for act: $act"
                 if [ -n "$band_value" ]; then
                     case "$act" in
@@ -550,25 +551,25 @@ cell_info()
     
     if [ -n "$(echo "$response" | grep "+NETDMSGEX:")" ]; then
 
-        net_mode=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $1}' | sed 's/+NETDMSGEX: "//g' | sed 's/"//g')
+        net_mode=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 1 | sed 's/+NETDMSGEX: "//g' | sed 's/"//g')
         network_mode=$(get_network_mode "$net_mode")
 
-        mcc_mnc=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $2}' | sed 's/"//g')
+        mcc_mnc=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 2 | sed 's/"//g')
         mcc=$(echo "$mcc_mnc" | cut -d'+' -f1)
         mnc=$(echo "$mcc_mnc" | cut -d'+' -f2)
 
-        band=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $3}' | sed 's/"//g')
+        band=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 3 | sed 's/"//g')
 
-        arfcn=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $4}' | sed 's/\r//g')
+        arfcn=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 4 | ql_at_clean)
         
         case "$net_mode" in
             "NR to 5GCN"|"NR to EPS"|"NR-LTE ENDC"|"NR-LTE NEDC")
 
-                gnbid=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $5}' | sed 's/\r//g')
-                pci=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $6}' | sed 's/\r//g')
-                ss_rsrp=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $7}' | sed 's/\r//g')
-                ss_rsrq=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $8}' | sed 's/\r//g')
-                ss_sinr=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $9}' | sed 's/\r//g')
+                gnbid=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 5 | ql_at_clean)
+                pci=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 6 | ql_at_clean)
+                ss_rsrp=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 7 | ql_at_clean)
+                ss_rsrq=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 8 | ql_at_clean)
+                ss_sinr=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 9 | ql_at_clean)
 
                 [ -n "$ss_rsrp" ] && ss_rsrp_actual=$(printf "%.1f" $(echo "$ss_rsrp / 10" | bc -l 2>/dev/null))
                 
@@ -590,19 +591,19 @@ cell_info()
                 
             "TDD LTE"|"FDD LTE")
 
-                tac=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $5}')
-                cell_id=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $6}')
-                pci=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $7}')
-                rx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $8}')
-                tx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $9}')
-                rsrp=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $10}')
-                rsrq=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $11}')
-                sinr=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $12}')
-                rssi=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $13}')
+                tac=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 5)
+                cell_id=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 6)
+                pci=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 7)
+                rx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 8)
+                tx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 9)
+                rsrp=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 10)
+                rsrq=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 11)
+                sinr=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 12)
+                rssi=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 13)
 
                 if [ "$(echo "$response" | grep -o ',' | wc -l)" -ge 17 ]; then
-                    dl_bw_num=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $17}')
-                    ul_bw_num=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $18}' | sed 's/\r//g')
+                    dl_bw_num=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 17)
+                    ul_bw_num=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 18 | ql_at_clean)
 
                     dl_bandwidth=$(get_bandwidth "LTE" "$dl_bw_num")
                     ul_bandwidth=$(get_bandwidth "LTE" "$ul_bw_num")
@@ -638,23 +639,23 @@ cell_info()
                 
             "WCDMA"|"HSDPA"|"HSUPA"|"HSDPA and HSUPA"|"HSDPA+"|"HSDPA+ and HSUPA")
 
-                lac=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $5}')
-                cell_id=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $6}')
-                psc=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $7}')
-                rac=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $8}')
-                rx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $9}')
-                tx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $10}')
-                rscp=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $11}')
-                ecio=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $12}')
-                rssi=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $13}')
+                lac=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 5)
+                cell_id=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 6)
+                psc=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 7)
+                rac=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 8)
+                rx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 9)
+                tx_dbm=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 10)
+                rscp=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 11)
+                ecio=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 12)
+                rssi=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 13)
 
                 if [ "$(echo "$response" | grep -o ',' | wc -l)" -ge 17 ]; then
-                    srxlev=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $14}')
-                    squal=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $15}')
-                    phych_num=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $16}')
-                    sf_num=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $17}')
-                    slot_num=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $18}')
-                    is_commod=$(echo "$response" | grep "+NETDMSGEX:" | awk -F',' '{print $19}' | sed 's/\r//g')
+                    srxlev=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 14)
+                    squal=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 15)
+                    phych_num=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 16)
+                    sf_num=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 17)
+                    slot_num=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 18)
+                    is_commod=$(echo "$response" | grep "+NETDMSGEX:" | ql_csv_field 19 | ql_at_clean)
 
                     phych=$(get_phych "$phych_num")
                     sf=$(get_sf "$sf_num")

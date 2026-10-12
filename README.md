@@ -71,7 +71,9 @@ The detailed English manuals are currently maintained in the existing [user guid
 
 ## Rust async daemon (experimental)
 
-`rust/qmodem-atd` is a tokio-based rewrite of the C `ubus_at_daemon`: one actor task per port with an mpsc command queue, monotonic timeouts, and URC broadcast, plus a Unix-socket JSON test protocol. It ships as an experimental parallel option and does not replace any packaged component yet. See the [Rust async daemon architecture](docs/developer/async-daemon.zh-cn.md) and the [Rust workspace README](rust/README.md).
+`rust/qmodem-atd` is a zero-dependency rewrite of the C `ubus_at_daemon` (no third-party crates in `Cargo.lock`): one std-thread actor per port with an mpsc command queue, monotonic timeouts, URC broadcast, and a Unix-socket JSON test protocol. The release binary is about 731 KiB unstripped (-43.4% versus the earlier tokio build). It ships as an experimental parallel option and does not replace any packaged component yet. See the [Rust async daemon architecture](docs/developer/async-daemon.zh-cn.md) and the [Rust workspace README](rust/README.md).
+
+The AT command path is selectable via `qmodem.main.at_tool`: `0` tom_modem/ubus at-daemon, `1` sms_tool_q direct, or `2` (new in this version) qmodem-atd over a Unix socket. See [AT tool selection (Chinese)](docs/developer/at-tool-selection.zh-cn.md).
 
 ## One-package install (qmodem-suite) (experimental)
 

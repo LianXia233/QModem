@@ -227,6 +227,12 @@ void at_control_cleanup(void);
 at_port_instance_t *find_port_instance(const char *port_path);
 at_port_instance_t *create_port_instance(const char *port_path);
 void destroy_port_instance(at_port_instance_t *port);
+// Lifetime management (refcount protected by g_daemon_ctx.ports_mutex).
+// acquire fails (-1) if the instance is no longer in the ports list.
+int port_instance_acquire(at_port_instance_t *port);
+// Drops a reference; performs deferred destroy when it was requested
+// while the last reference was held.
+void port_instance_release(at_port_instance_t *port);
 
 int open_at_port(at_port_instance_t *port, int baudrate, int databits, int parity, int stopbits);
 void close_at_port(at_port_instance_t *port);

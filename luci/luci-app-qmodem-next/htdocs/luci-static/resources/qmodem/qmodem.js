@@ -268,10 +268,27 @@ function loadCss(href) {
 	}));
 }
 
+// SMS list fetch limit (passed to qmodem.sms list ubus call).
+// Default 500; may be raised/lowered at runtime via setListLimit().
+var smsListLimit = 500;
+
 return L.Class.extend({
 	// Load a stylesheet once (deduplicated by href)
 	loadCss: function(href) {
 		loadCss(href);
+	},
+
+	// Get SMS list fetch limit (default 500)
+	getListLimit: function() {
+		return smsListLimit;
+	},
+
+	// Set SMS list fetch limit (clamped to >= 1). View UI wiring reserved for later.
+	setListLimit: function(limit) {
+		limit = parseInt(limit, 10);
+		if (!isNaN(limit) && limit >= 1)
+			smsListLimit = limit;
+		return smsListLimit;
 	},
 
 	// Get modem base information
@@ -475,7 +492,7 @@ return L.Class.extend({
 
 	// Format signal strength
 	formatSignal: function(value, type) {
-		if (!value || value === 'N/A') return 'N/A';
+		if (!value || value === 'N/A') return _('N/A');
 		
 		var num = parseInt(value);
 		if (isNaN(num)) return value;

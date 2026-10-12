@@ -20,6 +20,35 @@ valid_section() {
     [ "${#1}" -le 64 ]
 }
 
+# Extract a field from an RPC JSON payload via jsonfilter.
+# Usage: _rpc_field <dot-key> <json>   e.g. _rpc_field config_section "$input"
+_rpc_field() {
+    printf '%s' "$2" | jsonfilter -e "@.$1"
+}
+
+# Extract a field from a JSON payload via jq -r.
+# Usage: _rpc_jq <filter> <json>   e.g. _rpc_jq .method "$params"
+_rpc_jq() {
+    printf '%s' "$2" | jq -r "$1"
+}
+
+# Undo one level of jq @sh quoting for a simple token: a bare word, or a
+# single-quoted string without embedded single quotes. Rejects anything else
+# (e.g. '\''-style sequences) so untrusted tokens can never smuggle shell code.
+_sh_unquote() {
+    _shu=$1
+    case "$_shu" in
+        "'"*"'"|"'")
+            _shu=${_shu#?}
+            _shu=${_shu%?}
+            ;;
+    esac
+    case "$_shu" in
+        *"'"*) return 1 ;;
+    esac
+    printf '%s' "$_shu"
+}
+
 # Helper function for caching
 try_cache() {
     cache_timeout=$1
@@ -29,18 +58,26 @@ try_cache() {
     file_time=$(stat -t "$cache_file" 2>/dev/null | awk '{print $14}')
     [ -z "$file_time" ] && file_time=0
     if [ ! -f "$cache_file" ] || [ $((current_time - file_time)) -gt $cache_timeout ]; then
-        touch "$cache_file"
-        json_add_array modem_info
-        $function_name
-        json_close_array
-        json_dump > "$cache_file"
-        cat "$cache_file"
+        # Write to a temp file in the same directory, then atomically rename:
+        # concurrent RPC calls can never observe a torn/partial cache file.
+        cache_tmp=$(mktemp "$cache_file.tmp.XXXXXX") || cache_tmp=""
+        if [ -n "$cache_tmp" ]; then
+            json_add_array modem_info
+            $function_name
+            json_close_array
+            if json_dump > "$cache_tmp" && mv "$cache_tmp" "$cache_file"; then
+                :
+            else
+                rm -f "$cache_tmp"
+            fi
+        fi
+        cat "$cache_file" 2>/dev/null
     else
         cat "$cache_file"
     fi
 }
 
-# Helper function for SMS retrieval
+# Helper function for SMS readback
 get_sms() {
     [ -n "$sms_at_port" ] && at_port=$sms_at_port
     cache_timeout=$1
@@ -50,8 +87,16 @@ get_sms() {
     [ -z "$file_time" ] && file_time=0
     get_sms_capabilities
     if [ ! -f "$cache_file" ] || [ $((current_time - file_time)) -gt $cache_timeout ]; then
-        touch "$cache_file"
-        tom_modem $use_ubus_flag -d "$at_port" -o r > "$cache_file"
+        # Atomic write: temp file + rename, so concurrent RPC reads never
+        # observe a partially written SMS cache.
+        sms_tmp=$(mktemp "$cache_file.tmp.XXXXXX") || sms_tmp=""
+        if [ -n "$sms_tmp" ]; then
+            if tom_modem $use_ubus_flag -d "$at_port" -o r > "$sms_tmp" && mv "$sms_tmp" "$cache_file"; then
+                :
+            else
+                rm -f "$sms_tmp"
+            fi
+        fi
         echo "$(cat "$cache_file" ; json_dump)" | jq -s 'add'
     else
         echo "$(cat "$cache_file" ; json_dump)" | jq -s 'add'
@@ -168,22 +213,36 @@ get_at_cfg() {
     # Fallback to default file if language-specific file doesn't exist
     [ ! -f "$at_commands_file" ] && at_commands_file="/usr/share/qmodem/at_commands.json"
     
-    general_cmd=$(jq -rc '.general[]|to_entries| .[] | @sh "key=\(.key) value=\(.value)"' "$at_commands_file" 2>/dev/null)
-    platform_cmd=$(jq -rc ".${vendor}.${platform}[]|to_entries| .[] | @sh \"key=\(.key) value=\(.value)\"" "$at_commands_file" 2>/dev/null)
-    [ -z "$platform_cmd" ] && platform_cmd=$(jq -rc ".$vendor.general[]|to_entries| .[] | @sh \"key=\(.key) value=\(.value)\"" "$at_commands_file" 2>/dev/null)
-    cmds=$(echo -e "$general_cmd\n$platform_cmd")
-    IFS=$'\n'
-    for cmd in $cmds; do
-        json_add_object cmd
-        eval $cmd
-        json_add_string "name" "$key"
-        json_add_string "value" "$value"
-        json_close_object
-    done
+    # Each line from jq is "<op>\t<key|@sh>\t<value|@sh>"; the only whitelisted
+    # operation is "at_cmd". Tokens are unwrapped by _sh_unquote (strict, no
+    # shell interpretation): anything that does not match the whitelist or the
+    # simple quoting form is skipped.
+    general_cmd=$(jq -rc '.general[]|to_entries| .[] | "at_cmd\t\(.key|@sh)\t\(.value|@sh)"' "$at_commands_file" 2>/dev/null)
+    platform_cmd=$(jq -rc ".${vendor}.${platform}[]|to_entries| .[] | \"at_cmd\\t\\(.key|@sh)\\t\\(.value|@sh)\"" "$at_commands_file" 2>/dev/null)
+    [ -z "$platform_cmd" ] && platform_cmd=$(jq -rc ".$vendor.general[]|to_entries| .[] | \"at_cmd\\t\\(.key|@sh)\\t\\(.value|@sh)\"" "$at_commands_file" 2>/dev/null)
+
+    tab=$(printf '\t')
+    while IFS="$tab" read -r op cmd_key cmd_value; do
+        case "$op" in
+            at_cmd)
+                key=$(_sh_unquote "${cmd_key:-}") || continue
+                value=$(_sh_unquote "${cmd_value:-}") || continue
+                json_add_object cmd
+                json_add_string "name" "$key"
+                json_add_string "value" "$value"
+                json_close_object
+                ;;
+            *)
+                # Unknown operation: ignored (whitelist dispatch, never executed)
+                ;;
+        esac
+    done <<EOF
+$general_cmd
+$platform_cmd
+EOF
     json_close_array
     json_close_object
     json_dump
-    unset IFS
 }
 
 traffic_reset_fail()
@@ -403,11 +462,11 @@ traffic_reset_set_schedule()
     local input_json="$1"
     local config_section enabled reset_type hour day line cron_backup
 
-    config_section=$(echo "$input_json" | jsonfilter -e '@.config_section')
-    enabled=$(traffic_reset_normalize_bool "$(echo "$input_json" | jsonfilter -e '@.enabled')")
-    reset_type=$(echo "$input_json" | jsonfilter -e '@.reset_type')
-    hour=$(echo "$input_json" | jsonfilter -e '@.hour')
-    day=$(echo "$input_json" | jsonfilter -e '@.day')
+    config_section=$(_rpc_field config_section "$input_json")
+    enabled=$(traffic_reset_normalize_bool "$(_rpc_field enabled "$input_json")")
+    reset_type=$(_rpc_field reset_type "$input_json")
+    hour=$(_rpc_field hour "$input_json")
+    day=$(_rpc_field day "$input_json")
 
     [ -n "$config_section" ] || traffic_reset_fail "Missing config_section"
     valid_section "$config_section" || traffic_reset_fail "Invalid config_section"
@@ -671,7 +730,7 @@ EOF
         ;;
     call)
         read -r input
-        config_section=$(echo "$input" | jsonfilter -e '@.config_section')
+        config_section=$(_rpc_field config_section "$input")
         if [ -n "$config_section" ] && ! valid_section "$config_section"; then
             printf '%s\n' '{"error":"invalid modem section"}'
             exit 1
@@ -728,11 +787,14 @@ EOF
                     dial_status)
                         status_output=$(/etc/init.d/qmodem_network modem_status "$config_section" 2>/dev/null)
                         json_init
-                        if [[ "$status_output" != *"Not Running"* ]]; then
-                            json_add_string running true
-                        else
-                            json_add_string running false
-                        fi
+                        case "$status_output" in
+                            *"Not Running"*)
+                                json_add_string running false
+                                ;;
+                            *)
+                                json_add_string running true
+                                ;;
+                        esac
                         json_dump
                         ;;
                     get_dial_log)
@@ -877,15 +939,33 @@ EOF
                 ;;
                 
             delete_sms)
-                index=$(echo "$input" | jsonfilter -e '@.index')
-                
+                index=$(_rpc_field index "$input")
+
+                # Validate first, split later: index from RPC must be a list of
+                # digits separated by commas or spaces (empty list is a no-op).
+                case "$index" in
+                    *[!0-9," "]*)
+                        json_init
+                        json_add_object result
+                        json_add_string status "0"
+                        json_add_string error "invalid index, must be comma/space separated digits"
+                        json_close_object
+                        json_dump
+                        exit 1
+                        ;;
+                esac
+
                 # Source helper functions and get configuration
                 . /usr/share/qmodem/modem_util.sh
                 get_at_port_config "$config_section" 1
-                
+
                 json_init
                 json_add_object result
+                index=$(printf '%s' "$index" | tr ',' ' ')
                 for i in $index; do
+                    case "$i" in
+                        ''|*[!0-9]*) continue ;;
+                    esac
                     tom_modem $use_ubus_flag -d "$at_port" -o d -i "$i"
                     if [ "$?" = "0" ]; then
                         json_add_string status "1"
@@ -906,8 +986,8 @@ EOF
                 ;;
                 
             do_reboot)
-                params=$(echo "$input" | jsonfilter -e '@.params')
-                reboot_method=$(echo "$params" | jq -r '.method')
+                params=$(_rpc_field params "$input")
+                reboot_method=$(_rpc_jq .method "$params")
                 
                 case "$reboot_method" in
                     "hard")
@@ -928,10 +1008,10 @@ EOF
                 
             send_at)
 
-                params=$(echo "$input" | jsonfilter -e '@.params')
-                cmd=$(echo "$params" | jq -r '.at')
-                port=$(echo "$params" | jq -r '.port')
-                use_ubus_flag=$(echo "$params" | jq -r '.use_ubus_flag')
+                params=$(_rpc_field params "$input")
+                cmd=$(_rpc_jq .at "$params")
+                port=$(_rpc_jq .port "$params")
+                use_ubus_flag=$(_rpc_jq .use_ubus_flag "$params")
                 if [ "$use_ubus_flag" = "1" ]; then
                     use_ubus_flag="-u"
                 else
@@ -954,7 +1034,7 @@ EOF
                 ;;
                 
             send_raw_pdu)
-                cmd=$(echo "$input" | jsonfilter -e '@.cmd')
+                cmd=$(_rpc_field cmd "$input")
                 
                 # Source helper functions and get configuration
                 . /usr/share/qmodem/modem_util.sh
@@ -977,9 +1057,9 @@ EOF
                 ;;
                 
             send_sms)
-                params=$(echo "$input" | jsonfilter -e '@.params')
-                phone_number=$(echo "$params" | jq -r '.phone_number')
-                message_content=$(echo "$params" | jq -r '.message_content')
+                params=$(_rpc_field params "$input")
+                phone_number=$(_rpc_jq .phone_number "$params")
+                message_content=$(_rpc_jq .message_content "$params")
                 
                 # Source helper functions and get configuration
                 . /usr/share/qmodem/modem_util.sh
@@ -1002,7 +1082,7 @@ EOF
                 ;;
                 
             set_imei)
-                imei=$(echo "$input" | jsonfilter -e '@.imei')
+                imei=$(_rpc_field imei "$input")
                 case "$imei" in
                     *[!0-9]*|"")
                         json_init
@@ -1033,14 +1113,14 @@ EOF
                 ;;
                 
             set_lockband|set_neighborcell|set_network_prefer)
-                config_section=$(echo "$input" | jsonfilter -e '@.config_section')
+                config_section=$(_rpc_field config_section "$input")
                 if ! valid_section "$config_section"; then
                     json_init
                     json_add_string error "invalid modem section"
                     json_dump
                     exit 1
                 fi
-                params=$(echo "$input" | jsonfilter -e '@.params')
+                params=$(_rpc_field params "$input")
                 
                 # Source helper functions and get configuration
                 . /usr/share/qmodem/modem_util.sh
@@ -1065,7 +1145,7 @@ EOF
                 ;;
                 
             set_mode)
-                mode=$(echo "$input" | jsonfilter -e '@.mode')
+                mode=$(_rpc_field mode "$input")
                 json_init
                 set_mode "$mode"
                 json_add_string result "$mode"
@@ -1073,7 +1153,7 @@ EOF
                 ;;
 
             set_5g_lan)
-                enabled=$(echo "$input" | jsonfilter -e '@.enabled')
+                enabled=$(_rpc_field enabled "$input")
                 [ "$enabled" = "true" ] && enabled=1
                 [ "$enabled" = "false" ] && enabled=0
                 json_init
@@ -1082,7 +1162,7 @@ EOF
                 ;;
                 
             set_sms_storage)
-                storage=$(echo "$input" | jsonfilter -e '@.storage')
+                storage=$(_rpc_field storage "$input")
                 json_init
                 set_sms_storage "$storage"
                 json_dump
@@ -1093,7 +1173,7 @@ EOF
                 ;;
 
             set_sim_slot)
-                slot=$(echo "$input" | jsonfilter -e '@.slot')
+                slot=$(_rpc_field slot "$input")
                 json_init
                 switch_status=1
                 redial_status=1
@@ -1324,21 +1404,26 @@ EOF
             get_tty_ports)
                 json_init
                 json_add_array "ports"
-                # Add ttyUSB ports (USB modems)
-                for i in 0 1 2 3 4 5 6 7; do
-                    if [ -e "/dev/ttyUSB$i" ]; then
+                # Add ttyUSB ports (USB modems): discover dynamically from
+                # /sys/class/tty instead of hardcoding an index range, so ports
+                # above ttyUSB7 are reported too (aligned with modem_scan
+                # dynamic discovery).
+                for dev_path in /sys/class/tty/ttyUSB*; do
+                    if [ -e "$dev_path" ]; then
+                        dev="/dev/$(basename "$dev_path")"
                         json_add_object
-                        json_add_string "id" "/dev/ttyUSB$i"
-                        json_add_string "label" "/dev/ttyUSB$i"
+                        json_add_string "id" "$dev"
+                        json_add_string "label" "$dev"
                         json_close_object
                     fi
                 done
-                # Add ttyACM ports (CDC ACM modems)
-                for i in 0 1 2 3; do
-                    if [ -e "/dev/ttyACM$i" ]; then
+                # Add ttyACM ports (CDC ACM modems): also discovered dynamically
+                for dev_path in /sys/class/tty/ttyACM*; do
+                    if [ -e "$dev_path" ]; then
+                        dev="/dev/$(basename "$dev_path")"
                         json_add_object
-                        json_add_string "id" "/dev/ttyACM$i"
-                        json_add_string "label" "/dev/ttyACM$i"
+                        json_add_string "id" "$dev"
+                        json_add_string "label" "$dev"
                         json_close_object
                     fi
                 done

@@ -14,5 +14,14 @@ config main 'main'
 	option add_retry_max '5'
 	option usage_stats_nvram_save '0'
 	option usage_stats_nvram_interval '300'
+	#AT command tool chain:
+	#  0 = tom_modem (ubus at-daemon, default)
+	#  1 = sms_tool_q (direct TTY)
+	#  2 = qmodem-atd (rust async AT daemon, unix socket JSON protocol, optional)
+	#Note: at_tool=2 does NOT fall back to 0/1 when the atd socket is absent;
+	#the AT call simply fails. Make sure qmodem-atd is running.
+	option at_tool '0'
+	#unix socket path of qmodem-atd, only used when at_tool=2
+	option at_socket '/var/run/qmodem/atd.sock'
 	#collect AT command fixtures to /tmp/qmodem/testcases for qmodem_collect pack
 	option testcase_collect '0'

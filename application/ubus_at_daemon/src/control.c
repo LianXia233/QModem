@@ -34,6 +34,28 @@ static int valid_component(const char *value, size_t maximum)
     return length > 0 && length < maximum;
 }
 
+// Fill buf with 8 bytes of kernel entropy from /dev/urandom so lease
+// tokens are not predictable (the previous realtime-clock + counter scheme
+// was guessable). Returns 0 on success, -1 if entropy is unavailable.
+static int read_random_token_bytes(unsigned char *buf, size_t len)
+{
+    int fd = open("/dev/urandom", O_RDONLY);
+    size_t got = 0;
+
+    if (fd < 0)
+        return -1;
+    while (got < len) {
+        ssize_t n = read(fd, buf + got, len - got);
+        if (n <= 0) {
+            close(fd);
+            return -1;
+        }
+        got += (size_t)n;
+    }
+    close(fd);
+    return 0;
+}
+
 int at_lease_acquire(const char *port, const char *owner, unsigned int ttl,
                      char *token, size_t token_size, uint64_t *expires_ms)
 {
@@ -59,9 +81,21 @@ int at_lease_acquire(const char *port, const char *owner, unsigned int ttl,
     }
     snprintf(lease->port, sizeof(lease->port), "%s", port);
     snprintf(lease->owner, sizeof(lease->owner), "%s", owner);
-    snprintf(lease->token, sizeof(lease->token), "%llx-%llx",
-             (unsigned long long)g_daemon_ctx.daemon_epoch,
-             (unsigned long long)++g_daemon_ctx.next_lease_id);
+    {
+        // Unpredictable token: 8 bytes from /dev/urandom (fall back to the
+        // daemon epoch if unavailable), disambiguated by a monotonically
+        // increasing counter which also guarantees uniqueness.
+        unsigned char rnd[8];
+        uint64_t random_part = g_daemon_ctx.daemon_epoch;
+
+        if (read_random_token_bytes(rnd, sizeof(rnd)) == 0) {
+            for (size_t i = 0; i < sizeof(rnd); i++)
+                random_part = (random_part << 8) | rnd[i];
+        }
+        snprintf(lease->token, sizeof(lease->token), "%llx-%llx",
+                 (unsigned long long)random_part,
+                 (unsigned long long)++g_daemon_ctx.next_lease_id);
+    }
     lease->expires_ms = now + (uint64_t)ttl * 1000U;
     lease->next = g_daemon_ctx.leases;
     g_daemon_ctx.leases = lease;

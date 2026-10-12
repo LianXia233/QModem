@@ -7,12 +7,13 @@ include $(TOPDIR)/rules.mk
 include ../../version.mk
 
 PKG_NAME:=luci-app-qmodem-hc
-LUCI_TITLE:=Luci qwrt modem sim switch
+LUCI_TITLE:=Luci qwrt modem sim switch (legacy, maintenance mode)
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tom <fjrcn@outlook.com>
+# legacy: 硬依赖 +luci-app-qmodem 仅为旧栈 UI 入口；Step 2 后切换为 +qmodem
 LUCI_DEPENDS:=@TARGET_mediatek_mt7981_DEVICE_hc-g80||TARGET_mediatek_filogic_DEVICE_hc-g80 +luci-app-qmodem
 		
 

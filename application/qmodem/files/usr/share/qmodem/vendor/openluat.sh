@@ -5,6 +5,7 @@ _Author="QModem contributors"
 _Maintainer="QModem contributors"
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/openluat.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 
 debug_subject="openluat_ctrl"
 
@@ -854,6 +855,7 @@ get_mode()
     local response mode_num mode available_modes available_mode
 
     response=$(cmd_openluat_setusb_query "$at_port")
+    # 不迁移 ql_regex_pick：模式含 ^...$ 锚点且需 head -n1，ql_regex_pick 的 .* 包裹会破坏锚点语义
     mode_num=$(printf '%s\n' "$response" | sed -n 's/^[[:space:]]*[Mm]ode:[[:space:]]*\([12]\)[[:space:]]*$/\1/p' | head -n1)
 
     case "$mode_num" in

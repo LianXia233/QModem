@@ -44,6 +44,11 @@ jobs:
       - name: Run check_all.sh
         run: bash scripts/check_all.sh
 
+      # shell 回归测试套件（存在才跑；退出码 0 = 通过，含 SKIP）
+      - name: Run shell regression tests
+        if: hashFiles('tests/sh/run_tests.sh') != ''
+        run: bash tests/sh/run_tests.sh
+
       # 体积门禁占位：上传 rust release 二进制清单供人工核对体积，不设硬阈值
       - name: Upload rust binary size listing
         if: hashFiles('rust/Cargo.toml') != ''

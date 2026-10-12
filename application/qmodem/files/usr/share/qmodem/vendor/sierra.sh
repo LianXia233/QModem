@@ -5,6 +5,7 @@ _Author="Fujr"
 _Maintainer="Fujr <fjrcn@outlook.com>"
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/sierra.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="quectel_ctrl"
 unlock_advance(){
     [ -z "$sierra_pass" ] && sierra_pass="A710"
@@ -197,13 +198,13 @@ sim_info()
 
 base_info(){
         #Name（名称）
-    name=$(cmd_cgmm "$at_port" | sed -n '2p' | sed 's/\r//g')
+    name=$(cmd_cgmm "$at_port" | sed -n '2p' | ql_at_clean)
     #Manufacturer（制造商）
-    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | sed 's/\r//g')
+    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | ql_at_clean)
     #Revision（固件版本）
-    revision=$(cmd_ati "$at_port" | grep "Revision:" | sed 's/Revision: //g' | sed 's/\r//g')
+    revision=$(cmd_ati "$at_port" | grep "Revision:" | sed 's/Revision: //g' | ql_at_clean)
     # at_command="AT+CGMR"
-    # revision=$(cmd_ati "$at_port" | sed -n '2p' | sed 's/\r//g')
+    # revision=$(cmd_ati "$at_port" | sed -n '2p' | ql_at_clean)
     class="Base Information"
     add_plain_info_entry "name" "$name" "Name"
     add_plain_info_entry "manufacturer" "$manufacturer" "Manufacturer"

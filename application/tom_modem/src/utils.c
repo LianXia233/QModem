@@ -178,187 +178,91 @@ int dump_sms(SMS_T *sms)
     dbg_msg("SMS Segment: %d/%d", sms->segment_number, sms->total_segments);
     return SUCCESS;
 }
+/* Table-driven option/operation matching: one entry per accepted token. */
+typedef struct {
+    char short_name;        /* single-char form ('\0' = none)   */
+    const char *long_name;  /* long form without leading "--"   */
+    int value;              /* enum OPTIONS / enum OPERATIONS   */
+} name_map_t;
+
+static const name_map_t g_option_map[] = {
+    { AT_CMD_S,       AT_CMD_L,       AT_CMD },
+    { TTY_DEV_S,      TTY_DEV_L,      TTY_DEV },
+    { BAUD_RATE_S,    BAUD_RATE_L,    BAUD_RATE },
+    { DATA_BITS_S,    DATA_BITS_L,    DATA_BITS },
+    { PARITY_S,       PARITY_L,       PARITY },
+    { STOP_BITS_S,    STOP_BITS_L,    STOP_BITS },
+    { FLOW_CONTROL_S, FLOW_CONTROL_L, FLOW_CONTROL },
+    { TIMEOUT_S,      TIMEOUT_L,      TIMEOUT },
+    { OPERATION_S,    OPERATION_L,    OPERATION },
+    { DEBUG_S,        DEBUG_L,        DEBUG },
+    { SMS_PDU_S,      SMS_PDU_L,      SMS_PDU },
+    { SMS_INDEX_S,    SMS_INDEX_L,    SMS_INDEX },
+    { GREEDY_READ_S,  GREEDY_READ_L,  GREEDY_READ },
+    { USE_UBUS_S,     USE_UBUS_L,     USE_UBUS },
+};
+
+static const name_map_t g_operation_map[] = {
+    { AT_OP_S,             AT_OP_L,             AT_OP },
+    { BINARY_AT_OP_S,      BINARY_AT_OP_L,      BINARY_AT_OP },
+    { SMS_READ_OP_S,       SMS_READ_OP_L,       SMS_READ_OP },
+    { SMS_SEND_OP_S,       SMS_SEND_OP_L,       SMS_SEND_OP },
+    { SMS_DELETE_OP_S,     SMS_DELETE_OP_L,     SMS_DELETE_OP },
+    { SMS_UNREAD_OP_S,     SMS_UNREAD_OP_L,     SMS_UNREAD_OP },
+    { SMS_MARK_READ_OP_S,  SMS_MARK_READ_OP_L,  SMS_MARK_READ_OP },
+#ifdef USE_SEMAPHORE
+    { CLEANUP_SEMAPHORE_OP_S, CLEANUP_SEMAPHORE_OP_L, CLEANUP_SEMAPHORE_OP },
+#endif
+};
+
+static int match_name_map(const name_map_t *map, size_t map_len,
+                          char short_name, const char *long_name)
+{
+    for (size_t i = 0; i < map_len; i++)
+    {
+        if (short_name != '\0' && map[i].short_name == short_name)
+            return map[i].value;
+        if (long_name != NULL && map[i].long_name != NULL &&
+            strcmp(long_name, map[i].long_name) == 0)
+            return map[i].value;
+    }
+    return -1;
+}
+
 int match_option(char *option_name)
 {
-    char short_option;
-    char *long_option;
     // if start with '-' then it is an single character option
     if (option_name[0] == '-' && option_name[1] != '-')
     {
-
-        short_option = option_name[1];
-        switch (short_option)
-        {
-        case AT_CMD_S:
-            return AT_CMD;
-        case TTY_DEV_S:
-            return TTY_DEV;
-        case BAUD_RATE_S:
-            return BAUD_RATE;
-        case DATA_BITS_S:
-            return DATA_BITS;
-        case PARITY_S:
-            return PARITY;
-        case STOP_BITS_S:
-            return STOP_BITS;
-        case FLOW_CONTROL_S:
-            return FLOW_CONTROL;
-        case TIMEOUT_S:
-            return TIMEOUT;
-        case OPERATION_S:
-            return OPERATION;
-        case DEBUG_S:
-            return DEBUG;
-        case SMS_PDU_S:
-            return SMS_PDU;
-        case SMS_INDEX_S:
-            return SMS_INDEX;
-        case GREEDY_READ_S:
-            return GREEDY_READ;
-        case USE_UBUS_S:
-            return USE_UBUS;
-        default:
-            return -1;
-        }
-    }
-    if (option_name[0] == '-' && option_name[1] == '-')
-    {
-        long_option = option_name + 2;
-        if (strcmp(long_option, AT_CMD_L) == 0)
-        {
-            return AT_CMD;
-        }
-        else if (strcmp(long_option, TTY_DEV_L) == 0)
-        {
-            return TTY_DEV;
-        }
-        else if (strcmp(long_option, BAUD_RATE_L) == 0)
-        {
-            return BAUD_RATE;
-        }
-        else if (strcmp(long_option, DATA_BITS_L) == 0)
-        {
-            return DATA_BITS;
-        }
-        else if (strcmp(long_option, PARITY_L) == 0)
-        {
-            return PARITY;
-        }
-        else if (strcmp(long_option, STOP_BITS_L) == 0)
-        {
-            return STOP_BITS;
-        }
-        else if (strcmp(long_option, FLOW_CONTROL_L) == 0)
-        {
-            return FLOW_CONTROL;
-        }
-        else if (strcmp(long_option, TIMEOUT_L) == 0)
-        {
-            return TIMEOUT;
-        }
-        else if (strcmp(long_option, OPERATION_L) == 0)
-        {
-            return OPERATION;
-        }
-        else if (strcmp(long_option, DEBUG_L) == 0)
-        {
-            return DEBUG;
-        }
-        else if (strcmp(long_option, SMS_PDU_L) == 0)
-        {
-            return SMS_PDU;
-        }
-        else if (strcmp(long_option, SMS_INDEX_L) == 0)
-        {
-            return SMS_INDEX;
-        }
-        else if (strcmp(long_option, GREEDY_READ_L) == 0)
-        {
-            return GREEDY_READ;
-        }
-        else if (strcmp(long_option, USE_UBUS_L) == 0)
-        {
-            return USE_UBUS;
-        }
-        else
-        {
-            return -1;
-        }
+        return match_name_map(g_option_map, sizeof(g_option_map) / sizeof(g_option_map[0]),
+                              option_name[1], NULL);
     }
     // if start with '--' then it is a long option
+    if (option_name[0] == '-' && option_name[1] == '-')
+    {
+        return match_name_map(g_option_map, sizeof(g_option_map) / sizeof(g_option_map[0]),
+                              '\0', option_name + 2);
+    }
     return -1;
 }
 int match_operation(char *operation_name)
 {
-
-    char short_op;
     int opstr_len = strlen(operation_name);
+    if (opstr_len == 0)
+    {
+        return SUCCESS;
+    }
     if (opstr_len == 1)
     {
-        short_op = operation_name[0];
-        switch (short_op)
-        {
-        case AT_OP_S:
-            return AT_OP;
-        case BINARY_AT_OP_S:
-            return BINARY_AT_OP;
-        case SMS_READ_OP_S:
-            return SMS_READ_OP;
-        case SMS_SEND_OP_S:
-            return SMS_SEND_OP;
-        case SMS_DELETE_OP_S:
-            return SMS_DELETE_OP;
-        case SMS_UNREAD_OP_S:
-            return SMS_UNREAD_OP;
-        case SMS_MARK_READ_OP_S:
-            return SMS_MARK_READ_OP;
-        case CLEANUP_SEMAPHORE_OP_S:
-            return CLEANUP_SEMAPHORE_OP;
-        default:
-            return INVALID_PARAM;
-            break;
-        }
+        int ret = match_name_map(g_operation_map, sizeof(g_operation_map) / sizeof(g_operation_map[0]),
+                                 operation_name[0], NULL);
+        return ret >= 0 ? ret : INVALID_PARAM;
     }
-    else if (opstr_len > 1)
     {
-        if (strcmp(operation_name, AT_OP_L) == 0)
-        {
-            return AT_OP;
-        }
-        else if (strcmp(operation_name, BINARY_AT_OP_L) == 0)
-        {
-            return BINARY_AT_OP;
-        }
-        else if (strcmp(operation_name, SMS_READ_OP_L) == 0)
-        {
-            return SMS_READ_OP;
-        }
-        else if (strcmp(operation_name, SMS_SEND_OP_L) == 0)
-        {
-            return SMS_SEND_OP;
-        }
-        else if (strcmp(operation_name, SMS_DELETE_OP_L) == 0)
-        {
-            return SMS_DELETE_OP;
-        }
-        else if (strcmp(operation_name, SMS_UNREAD_OP_L) == 0)
-        {
-            return SMS_UNREAD_OP;
-        }
-        else if (strcmp(operation_name, SMS_MARK_READ_OP_L) == 0)
-        {
-            return SMS_MARK_READ_OP;
-        }
-        else if (strcmp(operation_name, CLEANUP_SEMAPHORE_OP_L) == 0)
-        {
-            return CLEANUP_SEMAPHORE_OP;
-        }
-        else
-        {
-            return INVALID_PARAM;
-        }
+        int ret = match_name_map(g_operation_map, sizeof(g_operation_map) / sizeof(g_operation_map[0]),
+                                 '\0', operation_name);
+        return ret >= 0 ? ret : INVALID_PARAM;
     }
-    return SUCCESS;
 }
 void escape_json(char *input, char *output)
 {
@@ -455,7 +359,8 @@ int usage(char* name)
     #ifdef USE_SEMAPHORE
     err_msg("  %s -d /dev/mhi_DUN  -o C # force cleanup semaphore", name);
     #endif
-    exit(-1);
+    // Print help only; the caller decides the exit code and terminates.
+    return INVALID_PARAM;
 }
 
 int str_to_hex(char *str, char *hex)

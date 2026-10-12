@@ -1,0 +1,94 @@
+name: Rust cross build
+
+# 说明：scripts/cross-build-rust.sh 由并行任务创建，本 workflow 按以下接口约定调用：
+#   bash scripts/cross-build-rust.sh --target <rust-triple>
+#   - 支持 --target <triple> 参数（musl 交叉目标）
+#   - 构建失败时以非零退出码结束
+#   - 成功产物位于 scripts/dist/<target>/（原生构建时 <target> 为 host triple）
+# 在脚本合入前，构建步骤以 continue-on-error 允许失败（见 job 内注释）。
+
+on:
+  push:
+    paths:
+      - 'rust/**'
+      - 'scripts/cross-build-rust.sh'
+      - '.github/workflows/rust-build.yml'
+  pull_request:
+    paths:
+      - 'rust/**'
+      - 'scripts/cross-build-rust.sh'
+      - '.github/workflows/rust-build.yml'
+
+jobs:
+  cross-build:
+    name: cross build (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-musl
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install musl-tools
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Setup Rust stable (${{ matrix.target }})
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      # 接口假设：脚本支持 --target 且失败非零退出。
+      # 脚本可能尚未合入（并行任务创建中），此前允许本步失败；脚本合入并稳定后应移除 continue-on-error。
+      - name: Cross build via scripts/cross-build-rust.sh
+        continue-on-error: true
+        run: bash scripts/cross-build-rust.sh --target ${{ matrix.target }}
+
+      - name: Collect binaries + sha256
+        id: collect
+        run: |
+          set -e
+          # cross-build-rust.sh 产物约定：scripts/dist/<target>/；兼容回退 rust/target/<target>/release/
+          dir="scripts/dist/${{ matrix.target }}"
+          [ -d "$dir" ] || dir="rust/target/${{ matrix.target }}/release"
+          out="dist/${{ matrix.target }}"
+          mkdir -p "$out"
+          if [ -d "$dir" ]; then
+            for f in "$dir"/*; do
+              [ -f "$f" ] || continue
+              if [ -x "$f" ] && file "$f" | grep -q 'ELF'; then
+                cp "$f" "$out/"
+              fi
+            done
+          fi
+          if [ -n "$(ls -A "$out" 2>/dev/null)" ]; then
+            (cd "$out" && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+            echo "has_bins=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_bins=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload artifacts
+        if: steps.collect.outputs.has_bins == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-binaries-${{ matrix.target }}
+          path: dist/${{ matrix.target }}/
+          if-no-files-found: error
+
+  test:
+    name: cargo test (native)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: cargo test --workspace
+        working-directory: rust
+        run: cargo test --workspace

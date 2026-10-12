@@ -91,7 +91,9 @@ make menuconfig
 
 ## Rust 异步守护进程（实验性）
 
-`rust/qmodem-atd` 是 C 版 `ubus_at_daemon` 的 tokio 重写：每端口一个 actor 任务（mpsc 命令队列 + 单调超时 + URC 广播），并提供 Unix socket JSON 测试协议。当前以实验性并行可选项交付，不替换任何已打包组件。详见 [Rust 异步守护进程架构](docs/developer/async-daemon.zh-cn.md) 与 [Rust 工作区 README](rust/README.md)。
+`rust/qmodem-atd` 是 C 版 `ubus_at_daemon` 的零依赖重写（`Cargo.lock` 无任何第三方 crate）：每端口一个 std::thread actor（mpsc 命令队列 + 单调超时 + URC 广播），并提供 Unix socket JSON 测试协议。产物二进制约 731 KiB（未 strip，较早期 tokio 版本 -43.4%）。当前以实验性并行可选项交付，不替换任何已打包组件。详见 [Rust 异步守护进程架构](docs/developer/async-daemon.zh-cn.md) 与 [Rust 工作区 README](rust/README.md)。
+
+AT 命令通路可经 `qmodem.main.at_tool` 选择：`0` tom_modem/ubus at-daemon、`1` sms_tool_q 直连、`2`（本版本引入）qmodem-atd unix socket。详见 [AT 通路选择](docs/developer/at-tool-selection.zh-cn.md)。
 
 ## 单包安装 qmodem-suite（实验性）
 

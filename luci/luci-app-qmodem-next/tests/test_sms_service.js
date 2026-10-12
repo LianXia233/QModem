@@ -21,7 +21,12 @@ function createService(listResults, syncResult) {
 		}
 	};
 	const L = { Class: { extend: function(service) { return service; } } };
-	const service = new Function('rpc', 'L', '_', source)(rpc, L, function(value) { return value; });
+	// sms.js requires qmodem.qmodem for the configurable SMS list limit
+	const qmodem = {
+		getListLimit: function() { return 500; },
+		setListLimit: function(limit) { return limit; }
+	};
+	const service = new Function('rpc', 'L', '_', 'qmodem', source)(rpc, L, function(value) { return value; }, qmodem);
 	return { service: service, listCalls: function() { return listCalls; } };
 }
 

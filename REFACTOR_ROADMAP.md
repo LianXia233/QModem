@@ -72,3 +72,20 @@ Phase 1-4（后续，见评估报告）：vendor 层配置驱动下沉 → smsd/
   门禁复核（编排者）：check_all 6/6 PASS（sh 69、node 27、rust 37 tests、crlf 0）、tests/sh 18 PASS、lua smoke 16 PASS；rpcd `valid_section` 的 `${#$1}`→`${#1}`（dash 兼容）由编排者直接修复。
 
 ## Phase 2-4（后续）：vendor 全量迁移 → smsd/rpcd 迁 Rust → 旧 Lua 栈退役
+
+- **T3（2026-10-12 17:45）**：Phase 2 —— 10 个子代理并行（W17-W26），vendor 全量迁移 + Rust 接入链路落地：
+
+| # | 工作包 | 子代理 | 状态 |
+|---|--------|--------|------|
+| W17 | 剩余 10 个厂商脚本迁移 qmodem_lib（simcom 113 处/meig 64 处等） | agent-vendor-full | ✅ fixture 回归通过 |
+| W18 | rpcd 瘦身：去 eval/原子缓存/POSIX 化/ubus 样板收敛 | agent-rpcd | ✅ bash+dash 双语法检查 |
+| W19 | cross-build-rust.sh（aarch64/x86_64 musl）+ 产物 dist | agent-rust-cross | ✅ native 实测通过 |
+| W20 | at-daemon 剩余清理（monitor 持锁两阶段、config_loader 边界、token 随机化） | agent-atd-quality | ✅ |
+| W21 | tom_modem 去重（sms_read 合并、表驱动 match）+ C14 deadline | agent-tom-modem | ✅ |
+| W22 | LuCI next 收尾（Dropdown API 化、列表上限参数化、i18n 补齐、Promise.allSettled） | agent-luci-final | ✅ |
+| W23 | 旧栈退役 Step1（Makefile 标注 + gap 表，Phase 4 输入） | agent-retire-s1 | ✅ |
+| W24 | at_tool=2 接入 qmodem-atd unix socket（安装即用的 Rust AT 通路） | agent-atd-bridge | ✅ 端到端模拟验证 |
+| W25 | 文档：at-tool-selection 三通路对照 + install-suite 追加 | agent-docs-p2 | ✅ |
+| W26 | CI：rust-build.yml 交叉编译矩阵 + check_all 新 stage | agent-ci-p2 | ✅ |
+
+  门禁复核（编排者）：check_all 8 stage 全 PASS/SKIP 合规、cargo 37 tests、tests/sh 18 PASS、at_tool=2 端到端验证、vendor lib 调用覆盖 12/12 厂商文件；scripts/dist/ 构建产物已 gitignore。

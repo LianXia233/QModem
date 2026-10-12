@@ -98,73 +98,210 @@ qmodem_record_testcase_file()
     > "$file" 2>/dev/null || rm -f "$file"
 }
 
+# ---------------------------------------------------------------------------
+# at_tool=2: rust qmodem-atd unix socket JSON line protocol (optional path)
+# request : {"cmd":"sendat","port":...,"at":...,"timeout_ms":...}
+# response: {"status":"ok"|"timeout"|"error","lines":[...],"error":...}
+# see rust/qmodem-atd/README.md and docs/developer/async-daemon.zh-cn.md
+# ---------------------------------------------------------------------------
+
+qmodem_atd_socket()
+{
+	local sock
+	sock=$(uci -q get qmodem.main.at_socket 2>/dev/null)
+	[ -n "$sock" ] || sock="/var/run/qmodem/atd.sock"
+	printf '%s' "$sock"
+}
+
+#escape a string for manual JSON construction (jq-less fallback path)
+qmodem_atd_json_escape()
+{
+	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+# extract .status/.error scalar from a response json; jq first, jsonfilter fallback
+qmodem_atd_json_get()
+{
+	local json="$1" key="$2"
+	if command -v jq >/dev/null 2>&1; then
+		printf '%s' "$json" | jq -r "$key // empty" 2>/dev/null
+	else
+		jsonfilter -s "$json" -e "$key" 2>/dev/null
+	fi
+}
+
+# print response lines array one per line (empty if absent)
+qmodem_atd_json_lines()
+{
+	local json="$1"
+	if command -v jq >/dev/null 2>&1; then
+		printf '%s' "$json" | jq -r '.lines[]?' 2>/dev/null
+	else
+		jsonfilter -s "$json" -e '@.lines' 2>/dev/null
+	fi
+}
+
+#$1 port $2 atcmd $3 timeout_ms
+#sendat via qmodem-atd; maps the atd response to at()/fastat() semantics:
+#  status ok      -> print response lines, return 0
+#  status timeout -> print partial lines, return 1
+#  status error / transport failure -> log, return 1 (NO fallback to at_tool 0/1)
+qmodem_atd_sendat()
+{
+	local at_port="$1" atcmd="$2" timeout_ms="${3:-3000}"
+	local sock req res_file res status rc=1 bg poll budget
+
+	sock=$(qmodem_atd_socket)
+	if [ ! -S "$sock" ]; then
+		m_debug "atd_bridge: socket $sock not found, AT \"$atcmd\" failed"
+		return 1
+	fi
+
+	if command -v jq >/dev/null 2>&1; then
+		req=$(jq -cn --arg port "$at_port" --arg at "$atcmd" --argjson t "$timeout_ms" \
+			'{cmd:"sendat",port:$port,at:$at,timeout_ms:$t}')
+	else
+		req=$(printf '{"cmd":"sendat","port":"%s","at":"%s","timeout_ms":%s}' \
+			"$(qmodem_atd_json_escape "$at_port")" \
+			"$(qmodem_atd_json_escape "$atcmd")" "$timeout_ms")
+	fi
+
+	#qmodem-atd speaks JSON line protocol (NOT HTTP) and keeps the connection
+	#open after replying (service.rs handle_conn), so run the transport in
+	#background and poll for a complete line. nc -U is primary: curl's own
+	#HTTP header lines each trigger a "bad json" reply and the sendat response
+	#is not reliably readable through curl; it is only a last-resort fallback.
+	res_file=$(mktemp /tmp/qmodem_atd_res.XXXXXX) || return 1
+	budget=$(( (timeout_ms / 100) + 20 ))
+
+	if command -v nc >/dev/null 2>&1; then
+		printf '%s\n' "$req" | nc -U "$sock" >"$res_file" 2>/dev/null &
+		bg=$!
+		poll=0
+		while [ "$poll" -lt "$budget" ]; do
+			#complete when the last byte is a newline (one full json line received)
+			[ "$(tail -c1 "$res_file" 2>/dev/null | wc -l)" = "1" ] && break
+			kill -0 "$bg" 2>/dev/null || break
+			sleep 0.1
+			poll=$((poll + 1))
+		done
+		kill "$bg" 2>/dev/null
+		wait "$bg" 2>/dev/null
+	fi
+
+	#curl fallback (busybox nc built without FEATURE_UNIX_LOCAL lacks -U)
+	if [ ! -s "$res_file" ] && command -v curl >/dev/null 2>&1; then
+		: > "$res_file"
+		#HTTP/0.9 mode: accept the raw reply stream of the line protocol server
+		curl -s --http0.9 -m $(( (timeout_ms / 1000) + 2 )) \
+			--unix-socket "$sock" -d "$req" http://localhost/ >"$res_file" 2>/dev/null &
+		bg=$!
+		poll=0
+		while [ "$poll" -lt "$budget" ]; do
+			[ "$(tail -c1 "$res_file" 2>/dev/null | wc -l)" = "1" ] && break
+			kill -0 "$bg" 2>/dev/null || break
+			sleep 0.1
+			poll=$((poll + 1))
+		done
+		kill "$bg" 2>/dev/null
+		wait "$bg" 2>/dev/null
+	fi
+
+	#the last json line is our response (curl path also contains bad-json
+	#replies for its own HTTP header lines, which precede the real response)
+	res=$(tail -n 1 "$res_file" 2>/dev/null)
+	rm -f "$res_file"
+	case "$res" in
+		'{'*'}') ;;
+		*)
+			m_debug "atd_bridge: no response from $sock for AT \"$atcmd\""
+			return 1
+			;;
+	esac
+
+	status=$(qmodem_atd_json_get "$res" ".status")
+	case "$status" in
+		ok)
+			qmodem_atd_json_lines "$res"
+			return 0
+			;;
+		timeout)
+			qmodem_atd_json_lines "$res"
+			m_debug "atd_bridge: AT timeout \"$atcmd\""
+			return 1
+			;;
+		*)
+			m_debug "atd_bridge: AT error \"$atcmd\": $(qmodem_atd_json_get "$res" '.error')"
+			return 1
+			;;
+	esac
+}
+
+#at_tool dispatch shared by at()/fastat() and their testcase-collect branches
+#$1 port $2 atcmd
+qmodem_at_dispatch()
+{
+	local at_port="$1" atcmd="$2"
+	case "$(uci -q get qmodem.main.at_tool 2>/dev/null)" in
+		1) sms_tool_q -d "$at_port" at "$atcmd" ;;
+		2) qmodem_atd_sendat "$at_port" "$atcmd" 3000 ;;
+		*) tom_modem $use_ubus_flag -d "$at_port" -o a -c "$atcmd" $options ;;
+	esac
+}
+
+qmodem_fastat_dispatch()
+{
+	local at_port="$1" atcmd="$2"
+	case "$(uci -q get qmodem.main.at_tool 2>/dev/null)" in
+		1) sms_tool_q -t 1 -d "$at_port" at "$atcmd" ;;
+		2) qmodem_atd_sendat "$at_port" "$atcmd" 1000 ;;
+		*) tom_modem -d "$at_port" -o a -c "$atcmd" -t 1 ;;
+	esac
+}
+
 at()
 {
-  local at_port=$1
-  local new_str="${2/[$]/$}"
-  local atcmd="${new_str/\"/\"}"
-  [ "$clear_buffer" == "1" ] && options="$options -M"
-  #过滤空行
-  if qmodem_testcase_collect_enabled; then
-    local response_file rc
-    response_file=$(mktemp /tmp/qmodem_at_response.XXXXXX) || {
-      if [ "$(uci get qmodem.main.at_tool 2>/dev/null)" == "1" ]; then
-        sms_tool_q -d $at_port at "$atcmd"
-      else
-        tom_modem $use_ubus_flag -d $at_port -o a -c "$atcmd" $options
-      fi
-      return $?
-    }
-    if [ "$(uci get qmodem.main.at_tool 2>/dev/null)" == "1" ]; then
-     sms_tool_q -d $at_port at "$atcmd" > "$response_file"
-    else
-     tom_modem $use_ubus_flag -d $at_port -o a -c "$atcmd" $options > "$response_file"
-    fi
-    rc=$?
-    qmodem_record_testcase_file "at" "$atcmd" "$response_file" "$rc"
-    cat "$response_file"
-    rm -f "$response_file"
-    return $rc
-  fi
-  if [ "$(uci get qmodem.main.at_tool 2>/dev/null)" == "1" ]; then
-   sms_tool_q -d $at_port at "$atcmd"
-  else
-   tom_modem $use_ubus_flag  -d $at_port -o a -c "$atcmd" $options
-  fi
+	local at_port=$1
+	local new_str="${2/[$]/$}"
+	local atcmd="${new_str/\"/\"}"
+	[ "$clear_buffer" == "1" ] && options="$options -M"
+	#过滤空行
+	if qmodem_testcase_collect_enabled; then
+		local response_file rc
+		response_file=$(mktemp /tmp/qmodem_at_response.XXXXXX) || {
+			qmodem_at_dispatch "$at_port" "$atcmd"
+			return $?
+		}
+		qmodem_at_dispatch "$at_port" "$atcmd" > "$response_file"
+		rc=$?
+		qmodem_record_testcase_file "at" "$atcmd" "$response_file" "$rc"
+		cat "$response_file"
+		rm -f "$response_file"
+		return $rc
+	fi
+	qmodem_at_dispatch "$at_port" "$atcmd"
 }
 
 fastat()
 {
-  local at_port=$1
-  local new_str="${2/[$]/$}"
-  local atcmd="${new_str/\"/\"}"
-  #过滤空行
-  if qmodem_testcase_collect_enabled; then
-    local response_file rc
-    response_file=$(mktemp /tmp/qmodem_at_response.XXXXXX) || {
-      if [ "$(uci get qmodem.main.at_tool 2>/dev/null)" == "1" ]; then
-        sms_tool_q -t 1 -d $at_port at "$atcmd"
-      else
-        tom_modem -d $at_port -o a -c "$atcmd" -t 1
-      fi
-      return $?
-    }
-    if [ "$(uci get qmodem.main.at_tool 2>/dev/null)" == "1" ]; then
-     sms_tool_q -t 1 -d $at_port at "$atcmd" > "$response_file"
-    else
-     tom_modem -d $at_port -o a -c "$atcmd" -t 1 > "$response_file"
-    fi
-    rc=$?
-    qmodem_record_testcase_file "fastat" "$atcmd" "$response_file" "$rc"
-    cat "$response_file"
-    rm -f "$response_file"
-    return $rc
-  fi
-  if [ "$(uci get qmodem.main.at_tool 2>/dev/null)" == "1" ]; then
-   sms_tool_q -t 1 -d $at_port at "$atcmd"
-  else
-   tom_modem -d $at_port -o a -c "$atcmd" -t 1
-  fi
+	local at_port=$1
+	local new_str="${2/[$]/$}"
+	local atcmd="${new_str/\"/\"}"
+	#过滤空行
+	if qmodem_testcase_collect_enabled; then
+		local response_file rc
+		response_file=$(mktemp /tmp/qmodem_at_response.XXXXXX) || {
+			qmodem_fastat_dispatch "$at_port" "$atcmd"
+			return $?
+		}
+		qmodem_fastat_dispatch "$at_port" "$atcmd" > "$response_file"
+		rc=$?
+		qmodem_record_testcase_file "fastat" "$atcmd" "$response_file" "$rc"
+		cat "$response_file"
+		rm -f "$response_file"
+		return $rc
+	fi
+	qmodem_fastat_dispatch "$at_port" "$atcmd"
 }
 
 log2file()

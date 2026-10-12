@@ -2,8 +2,9 @@
 # check_all.sh - QModem 一站式本地质量门禁
 # 用法:
 #   bash scripts/check_all.sh                 # 全量跑所有 stage
-#   bash scripts/check_all.sh --only shell    # 只跑某个 stage (shell|node|js-test|rust|c|crlf)
+#   bash scripts/check_all.sh --only shell    # 只跑某个 stage (shell|node|js-test|rust|c|crlf|rust-cross|lua-smoke)
 #   bash scripts/check_all.sh --changed       # 仅检查 git diff 涉及的文件
+#   FAST=1 bash scripts/check_all.sh          # 或 --fast：额外跑 rust-cross native 构建冒烟（默认 SKIP）
 # 汇总各 stage 结果，任一 FAIL 则退出码非 0。
 set -u
 
@@ -12,10 +13,12 @@ cd "$REPO_ROOT"
 
 ONLY=""
 CHANGED=0
+FAST="${FAST:-0}"
 while [ $# -gt 0 ]; do
     case "$1" in
         --only) ONLY="${2:-}"; shift 2 ;;
         --changed) CHANGED=1; shift ;;
+        --fast) FAST=1; shift ;;
         -h|--help)
             grep '^#' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "未知参数: $1" >&2; exit 2 ;;
@@ -187,7 +190,41 @@ $files"
     return 0
 }
 
-STAGES=(shell node js-test rust c crlf)
+# ---------- stage: rust-cross (交叉构建冒烟，按需) ----------
+# cross-build-rust.sh 接口约定（该脚本可能由并行任务创建中，此处仅做调用假设）：
+#   bash scripts/cross-build-rust.sh --target <rust-triple>
+#   - 支持 --target <triple>；失败时非零退出；产物位于 scripts/dist/<triple>/
+# 默认 SKIP：交叉编译耗时长，仅当脚本存在且 FAST=1（或传 --fast）时跑本机 host triple 冒烟。
+stage_rust_cross() {
+    local script="scripts/cross-build-rust.sh"
+    [ -f "$script" ] || { record SKIP rust-cross "scripts/cross-build-rust.sh 不存在"; return 0; }
+    [ "$FAST" = "1" ] || { record SKIP rust-cross "未设置 FAST=1/--fast（交叉构建冒烟按需运行，避免拖慢本地门禁）"; return 0; }
+    have rustc || { record SKIP rust-cross "rustc 未安装"; return 0; }
+    local host
+    host="$(rustc -vV 2>/dev/null | sed -n 's/^host: //p')"
+    [ -n "$host" ] || { record SKIP rust-cross "无法确定 host triple"; return 0; }
+    if bash "$script" --target "$host" >/tmp/check_all_rust_cross.log 2>&1; then
+        record PASS rust-cross "native ($host) 构建冒烟通过"
+    else
+        record FAIL rust-cross "native ($host) 构建冒烟失败 (见 /tmp/check_all_rust_cross.log)"
+    fi
+    return 0
+}
+
+# ---------- stage: lua-smoke (旧栈 lua 语法冒烟) ----------
+# 委托 tests/lua/smoke.sh：退出码 0 = 通过或脚本内部 SKIP，1 = 有语法错误。
+stage_lua_smoke() {
+    local t="tests/lua/smoke.sh"
+    [ -f "$t" ] || { record SKIP lua-smoke "tests/lua/smoke.sh 不存在"; return 0; }
+    if sh "$t" >/tmp/check_all_lua_smoke.log 2>&1; then
+        record PASS lua-smoke "tests/lua/smoke.sh 通过"
+    else
+        record FAIL lua-smoke "tests/lua/smoke.sh 失败 (见 /tmp/check_all_lua_smoke.log)"
+    fi
+    return 0
+}
+
+STAGES=(shell node js-test rust c crlf rust-cross lua-smoke)
 for stage in "${STAGES[@]}"; do
     should_run "$stage" || continue
     "stage_${stage//-/_}"

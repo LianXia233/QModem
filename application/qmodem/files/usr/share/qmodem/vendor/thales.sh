@@ -20,6 +20,7 @@ _Maintainer="arlong2693@gmail.com"
 # - No voltage query command is exposed by this module.
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/thales.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="thales_ctrl"
 
 get_imei()
@@ -361,7 +362,7 @@ network_info()
 {
     class="Network Information"
     [ -z "$network_type" ] && {
-        local rat_num=$(cmd_cops_query "$at_port" | grep "+COPS:" | awk -F',' '{print $4}' | sed 's/\r//g')
+        local rat_num=$(cmd_cops_query "$at_port" | grep "+COPS:" | ql_csv_field 4 | ql_at_clean)
         network_type=$(get_rat ${rat_num})
     }
     add_plain_info_entry "Network Type" "$network_type" "Network Type"
@@ -377,7 +378,7 @@ cell_info()
 
     case $network_mode in
         "WCDMA")
-            wcdma_mcc=$(echo "$response" | awk -F'mcc:' '{print $2}' | awk -F',' '{print $1}' | xargs)
+            wcdma_mcc=$(echo "$response" | awk -F'mcc:' '{print $2}' | ql_csv_field 1 | xargs)
             wcdma_mnc=$(echo "$response" | awk -F'mnc:' '{print $2}' | xargs)
             wcdma_band=$(echo "$response" | awk -F'band:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
             wcdma_channel=$(echo "$response" | awk -F'channel:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
@@ -394,12 +395,12 @@ cell_info()
             add_bar_info_entry "RSSI" "$wcdma_rssi" "Received Signal Strength Indicator" -120 -20 dBm
             ;;
         "LTE"|"LTE+NR")
-            lte_mcc=$(echo "$response" | awk -F'mcc:' '{print $2}' | awk -F',' '{print $1}' | xargs)
+            lte_mcc=$(echo "$response" | awk -F'mcc:' '{print $2}' | ql_csv_field 1 | xargs)
             lte_mnc=$(echo "$response" | awk -F'mnc:' '{print $2}' | xargs)
             lte_earfcn=$(echo "$response" | awk -F'channel:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
             lte_physical_cell_id=$(echo "$response" | awk -F'pci:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
             lte_cell_id=$(echo "$response" | awk -F'lte_cell_id:' '{print $2}' | xargs)
-            lte_band=$(echo "$response" | awk -F'lte_band:' '{print $2}' | awk -F',' '{print $1}' | xargs)
+            lte_band=$(echo "$response" | awk -F'lte_band:' '{print $2}' | ql_csv_field 1 | xargs)
             lte_band_width=$(echo "$response" | awk -F'lte_band_width:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
             lte_sinr=$(echo "$response" | awk -F'lte_snr:' '{print $2}' | awk '{print $1}' | xargs)
             lte_sinr=$(process_signal_value "$lte_sinr")
@@ -407,7 +408,7 @@ cell_info()
             lte_rsrq=$(process_signal_value "$lte_rsrq")
             lte_rsrp=$(echo "$response" | awk -F'lte_rsrp:' '{print $2}' | awk '{print $1}' | xargs)
             lte_rsrp=$(process_signal_value "$lte_rsrp")
-            lte_rssi=$(echo "$response" | awk -F'lte_rssi:' '{print $2}' | awk -F',' '{print $1}' | xargs)
+            lte_rssi=$(echo "$response" | awk -F'lte_rssi:' '{print $2}' | ql_csv_field 1 | xargs)
             lte_rssi=$(process_signal_value "$lte_rssi")
             lte_tac=$(echo "$response" | awk -F'lte_tac:' '{print $2}' | xargs)
             lte_tx_power=$(echo "$response" | awk -F'lte_tx_pwr:' '{print $2}' | xargs)
@@ -427,12 +428,12 @@ cell_info()
             add_plain_info_entry "TX Power" "$lte_tx_power" "TX Power"
             ;;
         "NR5G_SA")
-            nr_mcc=$(echo "$response" | awk -F'mcc:' '{print $2}' | awk -F',' '{print $1}' | xargs)
+            nr_mcc=$(echo "$response" | awk -F'mcc:' '{print $2}' | ql_csv_field 1 | xargs)
             nr_mnc=$(echo "$response" | awk -F'mnc:' '{print $2}' | xargs)
             nr_earfcn=$(echo "$response" | awk -F'channel:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
             nr_physical_cell_id=$(echo "$response" | awk -F'pci:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
             nr_cell_id=$(echo "$response" | awk -F'nr_cell_id:' '{print $2}' | xargs)
-            nr_band=$(echo "$response" | awk -F'nr_band:' '{print $2}' | awk -F',' '{print $1}' | xargs)
+            nr_band=$(echo "$response" | awk -F'nr_band:' '{print $2}' | ql_csv_field 1 | xargs)
             nr_band_width=$(echo "$response" | awk -F'nr_band_width:' '{print $2}' | awk -F' ' '{print $1}' | xargs)
             nr_sinr=$(echo "$response" | awk -F'nr_snr:' '{print $2}' | awk '{print $1}' | xargs)
             nr_sinr=$(process_signal_value "$nr_sinr")
@@ -479,7 +480,7 @@ process_signal_value()
 # Temperature via AT^TEMP (manual 15.13): "TSENS: 33C"
 _get_temperature()
 {
-    temperature=$(cmd_temp_query "$at_port" | sed -n 's/.*TSENS: \([0-9]*\)C.*/\1/p')
+    temperature=$(cmd_temp_query "$at_port" | ql_regex_pick 'TSENS: ([0-9]*)C')
     [ -n "$temperature" ] && {
         add_plain_info_entry "temperature" "$temperature C" "Temperature"
     }

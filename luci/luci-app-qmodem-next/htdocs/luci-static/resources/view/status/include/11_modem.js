@@ -18,17 +18,19 @@ return baseclass.extend({
 	load: function() {
 		return qmodem.getModemSections().then(function(sections) {
 			var promises = sections.map(function(section) {
-				return Promise.all([
+				// allSettled: one failed source degrades to an empty section
+				// (renders as "No modem information available") instead of
+				// blanking every modem on the status page
+				return Promise.allSettled([
 					qmodem.getBaseInfo(section.id),
 					qmodem.getCellInfo(section.id)
 				]).then(function(results) {
 					var allInfo = [];
-					if (results[0] && results[0].modem_info) {
-						allInfo = allInfo.concat(results[0].modem_info);
-					}
-					if (results[1] && results[1].modem_info) {
-						allInfo = allInfo.concat(results[1].modem_info);
-					}
+					results.forEach(function(result) {
+						if (result.status === 'fulfilled' && result.value && result.value.modem_info) {
+							allInfo = allInfo.concat(result.value.modem_info);
+						}
+					});
 					return {
 						section: section,
 						info: allInfo
@@ -93,11 +95,11 @@ return baseclass.extend({
 					var type = entry.type;
 					var value;
 					if (type == 'progress_bar') {
-						value = E('td', { 'class': 'td left' }, [
-							(entry.value != null) ? qmUI.progressbar(entry.value, entry.max_value, entry.min_value, entry.unit) : '?'
-						]);
-					} else {
-						value = E('td', { 'class': 'td left' }, [ (entry.value != null) ? entry.value : '?' ]);
+					value = E('td', { 'class': 'td left' }, [
+						(entry.value != null) ? qmUI.progressbar(entry.value, entry.max_value, entry.min_value, entry.unit) : _('N/A')
+					]);
+				} else {
+					value = E('td', { 'class': 'td left' }, [ (entry.value != null) ? entry.value : _('N/A') ]);
 					}
 
 					table.appendChild(E('tr', { 'class': 'tr' }, [

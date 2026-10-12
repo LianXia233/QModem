@@ -5,6 +5,7 @@ _Author="x-shark"
 _Maintainer="x-shark <unknown>"
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/foxconn.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="foxconn_ctrl"
 
 name=$(uci -q get qmodem.$config_section.name)
@@ -265,10 +266,10 @@ sim_info()
     sim_number=$(cmd_cnum "$at_port" | awk -F'"' '{print $2}'|xargs)
 
     #IMSI（国际移动用户识别码）
-    imsi=$(cmd_cimi "$at_port" | sed -n '2p' | sed 's/\r//g')
+    imsi=$(cmd_cimi "$at_port" | sed -n '2p' | ql_at_clean)
 
     #ICCID（集成电路卡识别码）
-    iccid=$(cmd_iccid "$at_port" | sed -n '2p' | sed 's/\r//g'|sed 's/[^0-9]*//g')
+    iccid=$(cmd_iccid "$at_port" | sed -n '2p' | ql_at_clean|sed 's/[^0-9]*//g')
     case "$sim_status" in
         "ready")
             add_plain_info_entry "SIM Status" "$sim_status" "SIM Status" 
@@ -316,7 +317,7 @@ base_info(){
 network_info() {
     class="Network Information"
     [ -z "$network_type" ] && {
-        local rat_num=$(cmd_cops_query "$at_port" | grep "+COPS:" | awk -F',' '{print $4}' | sed 's/\r//g')
+        local rat_num=$(cmd_cops_query "$at_port" | grep "+COPS:" | ql_csv_field 4 | ql_at_clean)
         network_type=$(get_rat ${rat_num})
     }
     #at_command='AT+debug?'
@@ -463,7 +464,7 @@ _get_voltage(){
 }
 
 _get_temperature(){
-    temperature=$(cmd_temp_query "$at_port" "$at_pre" | sed -n 's/.*TSENS: \([0-9]*\)C.*/\1/p' )
+    temperature=$(cmd_temp_query "$at_port" "$at_pre" | ql_regex_pick 'TSENS: ([0-9]*)C')
     [ -n "$temperature" ] && {
         add_plain_info_entry "temperature" "$temperature C" "Temperature" 
     }
@@ -553,7 +554,7 @@ cell_info(){
 
     case $network_mode in
     "LTE")
-        lte_mcc=$(echo "$response"|awk -F'mcc:' '{print $2}'|awk -F',' '{print $1}'|xargs)
+        lte_mcc=$(echo "$response"|awk -F'mcc:' '{print $2}'|ql_csv_field 1|xargs)
         lte_mnc=$(echo "$response"|awk -F'mnc:' '{print $2}'|xargs)
         lte_earfcn=$(echo "$response"|awk -F'channel:' '{print $2}'|awk -F' ' '{print $1}'|xargs)
         lte_physical_cell_id=$(echo "$response"|awk -F'pci:' '{print $2}'|awk -F' ' '{print $1}'|xargs)
@@ -564,7 +565,7 @@ cell_info(){
         lte_sinr=$(process_signal_value "$lte_sinr")
         lte_rsrq=$(echo "$response"|awk -F'rsrq:' '{print $2}'|xargs)
         lte_rsrq=$(process_signal_value "$lte_rsrq")
-        lte_rssi=$(echo "$response"|awk -F'lte_rssi:' '{print $2}'|awk -F',' '{print $1}'|xargs)
+        lte_rssi=$(echo "$response"|awk -F'lte_rssi:' '{print $2}'|ql_csv_field 1|xargs)
         lte_rssi=$(process_signal_value "$lte_rssi")
         lte_tac=$(echo "$response"|awk -F'lte_tac:' '{print $2}'|xargs)
         lte_tx_power=$(echo "$response"|awk -F'lte_tx_pwr:' '{print $2}'|xargs)
@@ -593,7 +594,7 @@ cell_info(){
         has_ca=$(echo "$response" | grep -c "nr_scc1:")
         nr_display_mode="$network_mode"
         
-        nr_mcc=$(echo "$response"|awk -F'mcc:' '{print $2}'|awk -F',' '{print $1}'|xargs)
+        nr_mcc=$(echo "$response"|awk -F'mcc:' '{print $2}'|ql_csv_field 1|xargs)
         nr_mnc=$(echo "$response"|awk -F'mnc:' '{print $2}'|xargs)
         nr_earfcn=$(echo "$response"|awk -F'channel:' '{print $2}'|awk -F' ' '{print $1}'|xargs)
         nr_physical_cell_id=$(echo "$response"|awk -F'pci:' '{print $2}'|awk -F' ' '{print $1}'|xargs)
@@ -607,7 +608,7 @@ cell_info(){
         nr_rsrq=$(process_signal_value "$nr_rsrq")
         nr_rsrp=$(echo "$response"|awk -F'rsrp:' '{print $2}'|awk '{print $1}'|xargs)
         nr_rsrp=$(process_signal_value "$nr_rsrp")
-        nr_rssi=$(echo "$response"|awk -F'nr_rssi:' '{print $2}'|awk -F',' '{print $1}'|xargs)
+        nr_rssi=$(echo "$response"|awk -F'nr_rssi:' '{print $2}'|ql_csv_field 1|xargs)
         nr_rssi=$(process_signal_value "$nr_rssi")
         nr_tac=$(echo "$response"|awk -F'nr_tac:' '{print $2}'|xargs)
         nr_tx_power=$(echo "$response"|awk -F'nr_tx_pwr:' '{print $2}'|xargs)

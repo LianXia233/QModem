@@ -1,6 +1,7 @@
 'use strict';
 'require rpc';
 'require qmodem.ui as qmUI';
+'require qmodem.qmodem as qmodem';
 
 var callList = rpc.declare({ object: 'qmodem.sms', method: 'list', params: [ 'modem_id', 'limit', 'offset' ], expect: { } });
 var callSync = rpc.declare({ object: 'qmodem.sms', method: 'sync', params: [ 'modem_id' ], expect: { } });
@@ -37,20 +38,21 @@ function conversations(messages) {
 
 function requireModem(configSection) {
 	if (!configSection)
-		return Promise.reject(new Error('configSection (modem_id) is required'));
+		return Promise.reject(new Error(_('configSection (modem_id) is required')));
 	return configSection;
 }
 
 function listRaw(modem) {
-	return callList(modem, 500, 0).then(function(result) {
-		if (result.status === 'error') return Promise.reject(new Error(result.error || 'SMS backend error'));
+	// Fetch limit is configurable via qmodem.setListLimit()/getListLimit() (default 500)
+	return callList(modem, qmodem.getListLimit(), 0).then(function(result) {
+		if (result.status === 'error') return Promise.reject(new Error(result.error || _('SMS backend error')));
 		return result;
 	});
 }
 
 function syncRaw(modem) {
 	return callSync(modem).then(function(result) {
-		if (result.status === 'error') return Promise.reject(new Error(result.error || 'SMS synchronization failed'));
+		if (result.status === 'error') return Promise.reject(new Error(result.error || _('SMS synchronization failed')));
 		return result;
 	});
 }
@@ -88,7 +90,7 @@ return L.Class.extend({
 			return callConfigure(modem, mode, pollInterval,
 				forwarding == null ? !!current.forwarding : forwarding, autoDelete);
 		}).then(function(result) {
-			if (result.status === 'error') return Promise.reject(new Error(result.error || 'SMS configuration failed'));
+			if (result.status === 'error') return Promise.reject(new Error(result.error || _('SMS configuration failed')));
 			return result;
 		});
 	},

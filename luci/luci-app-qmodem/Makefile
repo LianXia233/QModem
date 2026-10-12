@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 include ../../version.mk
 
 PKG_NAME:=luci-app-qmodem
-LUCI_TITLE:=LuCI support for QWRT Modem
+LUCI_TITLE:=LuCI support for QWRT Modem (legacy, maintenance mode)
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_RELEASE:=$(QMODEM_RELEASE)

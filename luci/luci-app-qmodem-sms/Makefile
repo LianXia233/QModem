@@ -13,6 +13,8 @@ LUCI_PKGARCH:=all
 PKG_LICENSE:=GPLv3
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tom <fjrcn@outlook.com>
+# legacy: 硬依赖 +luci-app-qmodem 仅为旧栈 UI 页面入口；Step 2 将在
+# luci-app-qmodem-next 提供 get_modem_cfg 端点后切换为 +qmodem 并移除 UI 依赖
 LUCI_DEPENDS:=+luci-app-qmodem +qmodem-smsd +sms-forwarder-next +libubus-lua
 
 include $(TOPDIR)/feeds/luci/luci.mk

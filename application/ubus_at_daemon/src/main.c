@@ -5,37 +5,8 @@
 
 at_daemon_ctx_t g_daemon_ctx;
 
-// Reference counting for port instances (protected by ports_mutex).
-// The sendat handler holds a reference for the whole duration it uses the
-// raw port pointer, so a concurrent close/destroy cannot free it in use.
-static int port_instance_acquire(at_port_instance_t *port) {
-    int found = 0;
-
-    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
-    for (at_port_instance_t *current = g_daemon_ctx.ports; current; current = current->next) {
-        if (current == port) {
-            port->refcount++;
-            found = 1;
-            break;
-        }
-    }
-    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
-    return found ? 0 : -1;
-}
-
-static void port_instance_release(at_port_instance_t *port) {
-    int do_destroy = 0;
-
-    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
-    if (port->refcount > 0)
-        port->refcount--;
-    if (port->refcount == 0 && port->pending_destroy)
-        do_destroy = 1;
-    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
-
-    if (do_destroy)
-        destroy_port_instance(port);
-}
+// Port instance reference counting (port_instance_acquire/release) lives in
+// port_manager.c next to the destroy logic it interacts with.
 
 // Policy for open method
 enum {
@@ -654,15 +625,20 @@ int main(int argc, char **argv) {
     
     server_main();
     
-    // Cleanup
-    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
-    at_port_instance_t *current = g_daemon_ctx.ports;
-    while (current) {
-        at_port_instance_t *next = current->next;
+    // Cleanup: destroy_port_instance() takes ports_mutex internally, so the
+    // list must NOT be walked under the lock (it would self-deadlock). Pop
+    // one head entry at a time, then destroy outside the critical section.
+    for (;;) {
+        pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
+        at_port_instance_t *current = g_daemon_ctx.ports;
+        if (current)
+            g_daemon_ctx.ports = current->next;
+        pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
+        if (!current)
+            break;
+        current->next = NULL;
         destroy_port_instance(current);
-        current = next;
     }
-    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
     
     pthread_mutex_destroy(&g_daemon_ctx.ports_mutex);
     at_line_events_cleanup(&g_daemon_ctx.line_events);

@@ -105,3 +105,27 @@ config modem-device 'modem1'
 | 适用场景 | 首次部署、整机交付 | 定制固件、存储受限设备 |
 
 逐包手动安装的包清单与构建来源见[安装指南](installation.zh-cn.md)。
+
+## 6. AT 通路选择
+
+QModem 的 AT 命令走哪条底层通路由 `qmodem.main.at_tool` 全局决定：`0`/未配置为默认的 tom_modem（可经 ubus `at-daemon`），`1` 为 sms_tool_q 直连，`2`（本版本引入）为 `qmodem-atd` unix socket（配套选项 `qmodem.main.at_socket` 指定 socket 路径，默认 `/var/run/qmodem-atd.sock`）。三通路的适用场景、超时语义、故障切换与排查命令见 [AT 通路选择](../developer/at-tool-selection.zh-cn.md)。
+
+安装 qmodem-suite 后，无需任何额外配置即使用通路 0；通路 2 需按下一节启用 Rust 组件后再切换。
+
+## 7. Rust 组件可选启用（qmodem-atd）
+
+`qmodem-suite` 默认不包含 Rust 异步 AT 守护进程 `qmodem-atd`。如需启用通路 2，自行交叉编译二进制并放入固件或 suite 安装目录：
+
+1. **交叉编译**：使用统一入口脚本 `scripts/cross-build-rust.sh`——
+
+   ```sh
+   # aarch64（路由器常见目标）
+   bash scripts/cross-build-rust.sh --target aarch64-unknown-linux-musl
+   # 产物：scripts/dist/aarch64-unknown-linux-musl/qmodem-atd
+   ```
+
+   产物为全静态 musl 二进制（零外部 crate，约 731 KiB，未 strip），`file` 确认 `statically linked` 后可直接拷入目标机。构建细节与手动等价命令见 [Rust 异步守护进程架构](../developer/async-daemon.zh-cn.md) 第 4 节。
+
+2. **部署**：将二进制放入设备 PATH（如 `/usr/bin/qmodem-atd`），启动时指定 socket 路径与端口（见 async-daemon 文档第 3 节），默认 socket 路径与 `qmodem.main.at_socket` 一致。
+
+3. **切换通路**：按上一节把 `at_tool` 置为 `2` 并重启 `qmodem_init`；socket 不可达时自动回落 tom_modem 通路。

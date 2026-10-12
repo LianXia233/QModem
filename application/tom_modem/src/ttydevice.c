@@ -159,6 +159,9 @@ int tty_read_keyword(FILE *fdi, AT_MESSAGE_T *message, char *key_word, PROFILE_T
     char *dynamic_buffer = NULL;
     int buffer_size = 0;
     int read_flag = 0;
+    // Absolute deadline: start_time is never reset, so the total duration of
+    // this read is hard-capped at profile->timeout even in greedy mode when
+    // data keeps arriving (previously greedy mode could loop forever).
     time_t start_time = time(NULL);
     int exitcode = TIMEOUT_WAITING_NEWLINE;
 
@@ -167,9 +170,6 @@ int tty_read_keyword(FILE *fdi, AT_MESSAGE_T *message, char *key_word, PROFILE_T
         if (fgets(tmp, LINE_BUF, fdi)) {
             read_flag = 1;
             dbg_msg("%s", tmp);
-            if (profile->greedy_read && strlen(tmp) > 0) {
-                start_time = time(NULL);
-            }
             if (message != NULL) {
                 int tmp_len = strlen(tmp);
                 char *new_buffer = realloc(dynamic_buffer, buffer_size + tmp_len + 1);
@@ -202,18 +202,6 @@ int tty_read_keyword(FILE *fdi, AT_MESSAGE_T *message, char *key_word, PROFILE_T
                 break;
             }
         }
-#ifdef EARLY_RETURN
-        else {
-            if (read_flag > 500) {
-                dbg_msg("early return");
-                exitcode = TIMEOUT_WAITING_NEWLINE;
-                break;
-            }
-            if (read_flag) {
-                read_flag++;
-            }
-        }
-#endif
         usleep(5000);
     }
 

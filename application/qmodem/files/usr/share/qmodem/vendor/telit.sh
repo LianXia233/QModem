@@ -5,6 +5,7 @@ _Author="sfwtw"
 _Maintainer="sfwtw <sfwtw@qq.com>"
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/telit.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="telit_ctrl"
 
 vendor_get_disabled_features()
@@ -53,7 +54,7 @@ set_mode()
 
 get_network_prefer()
 {
-    local response=$(cmd_ws46_query "$at_port" | grep "+WS46:" | awk -F': ' '{print $2}' | sed 's/\r//g')
+    local response=$(cmd_ws46_query "$at_port" | grep "+WS46:" | awk -F': ' '{print $2}' | ql_at_clean)
     
     network_prefer_3g="0";
     network_prefer_4g="0";
@@ -121,7 +122,7 @@ set_network_prefer()
 
 get_voltage()
 {
-    local voltage=$(cmd_cbc "$at_port" | grep "#CBC:" | awk -F',' '{print $2}' | sed 's/\r//g')
+    local voltage=$(cmd_cbc "$at_port" | grep "#CBC:" | ql_csv_field 2 | ql_at_clean)
     [ -n "$voltage" ] && {
         voltage=$(awk "BEGIN {printf \"%.2f\", $voltage / 100}")
         add_plain_info_entry "voltage" "$voltage V" "Voltage" 
@@ -132,7 +133,7 @@ get_temperature()
 {   
     local temp
     QTEMP=$(cmd_tempsens "$at_port" | grep "#TEMPSENS: TSENS,")
-    temp=$(echo $QTEMP | awk -F',' '{print $2}' | sed 's/\r//g')
+    temp=$(echo $QTEMP | ql_csv_field 2 | ql_at_clean)
     if [ -n "$temp" ]; then
         temp="${temp}$(printf "\xc2\xb0")C"
     fi
@@ -144,11 +145,11 @@ base_info()
     m_debug  "Telit base info"
 
     #Name（名称）
-    name=$(cmd_cgmm "$at_port" | sed -n '3p' | sed 's/\r//g')
+    name=$(cmd_cgmm "$at_port" | sed -n '3p' | ql_at_clean)
     #Manufacturer（制造商）
-    manufacturer=$(cmd_cgmi "$at_port" | sed -n '3p' | sed 's/\r//g')
+    manufacturer=$(cmd_cgmi "$at_port" | sed -n '3p' | ql_at_clean)
     #Revision（固件版本）
-    revision=$(cmd_cgmr "$at_port" | sed -n '3p' | sed 's/\r//g')
+    revision=$(cmd_cgmr "$at_port" | sed -n '3p' | ql_at_clean)
     class="Base Information"
     add_plain_info_entry "name" "$name" "Name"
     add_plain_info_entry "manufacturer" "$manufacturer" "Manufacturer"
@@ -164,14 +165,14 @@ sim_info()
     m_debug  "Telit sim info"
     
     #SIM Slot（SIM卡卡槽）
-    sim_slot=$(cmd_qss_query "$at_port" | grep "#QSS:" | awk -F',' '{print $3}' | sed 's/\r//g')
+    sim_slot=$(cmd_qss_query "$at_port" | grep "#QSS:" | ql_csv_field 3 | ql_at_clean)
     if [ "$sim_slot" = "0" ]; then
         sim_slot="1"
     elif [ "$sim_slot" = "1" ]; then
         sim_slot="2"
     fi
     #IMEI（国际移动设备识别码）
-    imei=$(cmd_cgsn "$at_port" | sed -n '3p' | sed 's/\r//g')
+    imei=$(cmd_cgsn "$at_port" | sed -n '3p' | ql_at_clean)
 
     #SIM Status（SIM状态）
     sim_status_flag=$(cmd_cpin_query "$at_port" | sed -n '3p')
@@ -194,7 +195,7 @@ sim_info()
     # fi
 
     #IMSI（国际移动用户识别码）
-    imsi=$(cmd_cimi "$at_port" | sed -n '3p' | sed 's/\r//g')
+    imsi=$(cmd_cimi "$at_port" | sed -n '3p' | ql_at_clean)
 
     #ICCID（集成电路卡识别码）
     iccid=$(cmd_iccid "$at_port" | grep -o "+ICCID:[ ]*[-0-9]\+" | grep -o "[-0-9]\{1,4\}")
@@ -229,9 +230,9 @@ network_info()
 {
     m_debug  "Telit network info"
 
-    network_type=$(cmd_cametrics "$at_port" | grep "#CAMETRICS:" | awk -F',' '{print $3}')
+    network_type=$(cmd_cametrics "$at_port" | grep "#CAMETRICS:" | ql_csv_field 3)
 
-    response=$(cmd_cqi "$at_port" | grep "#CQI:" | sed 's/#CQI: //g' | sed 's/\r//g')
+    response=$(cmd_cqi "$at_port" | grep "#CQI:" | sed 's/#CQI: //g' | ql_at_clean)
 
     if [ -n "$response" ]; then
         cqi=$(echo "$response" | cut -d',' -f1)
@@ -378,9 +379,9 @@ get_lockband()
     nsa_nr_band_65_128=$(echo $get_lockband_config_res | awk -F "," '{print $6}')
     nsa_nr_band="$(nr_hex_to_bands "$nsa_nr_band_1_64" "1_64") $(nr_hex_to_bands "$nsa_nr_band_65_128" "65_128")"
     sa_nr_band_1_64=$(echo $get_lockband_config_res | awk -F "," '{print $7}')
-    sa_nr_band_65_128=$(echo $get_lockband_config_res | awk -F "," '{print $8}' | sed 's/\r//g' | sed 's/ OK//g')
+    sa_nr_band_65_128=$(echo $get_lockband_config_res | awk -F "," '{print $8}' | ql_at_clean | sed 's/ OK//g')
     sa_nr_band="$(nr_hex_to_bands "$sa_nr_band_1_64" "1_64") $(nr_hex_to_bands "$sa_nr_band_65_128" "65_128")"
-    for i in $(echo "$lte_band" | cut -d, -f2|tr -d '\r' | awk -F" " '{for(j=1; j<=NF; j++) print $j}'); do
+    for i in $(echo "$lte_band" | cut -d, -f2|ql_at_clean | awk -F" " '{for(j=1; j<=NF; j++) print $j}'); do
         if [ -n "$i" ]; then
             json_select "LTE"
             json_select "lock_band"
@@ -389,7 +390,7 @@ get_lockband()
             json_select ..
         fi
     done
-    for i in $(echo "$nsa_nr_band" | cut -d, -f2|tr -d '\r' | awk -F" " '{for(j=1; j<=NF; j++) print $j}'); do
+    for i in $(echo "$nsa_nr_band" | cut -d, -f2|ql_at_clean | awk -F" " '{for(j=1; j<=NF; j++) print $j}'); do
         if [ -n "$i" ]; then
             json_select "NR_NSA"
             json_select "lock_band"
@@ -398,7 +399,7 @@ get_lockband()
             json_select ..
         fi
     done
-    for i in $(echo "$sa_nr_band" | cut -d, -f2|tr -d '\r' | awk -F" " '{for(j=1; j<=NF; j++) print $j}'); do
+    for i in $(echo "$sa_nr_band" | cut -d, -f2|ql_at_clean | awk -F" " '{for(j=1; j<=NF; j++) print $j}'); do
         if [ -n "$i" ]; then
             json_select "NR"
             json_select "lock_band"
@@ -455,7 +456,7 @@ set_lockband()
             orig_nsa_nr_1_64=$(echo $orig | awk -F "," '{print $5}')
             orig_nsa_nr_65_128=$(echo $orig | awk -F "," '{print $6}')
             orig_sa_nr_1_64=$(echo $orig | awk -F "," '{print $7}')
-            orig_sa_nr_65_128=$(echo $orig | awk -F "," '{print $8}' | sed 's/\r//g' | sed 's/ OK//g')
+            orig_sa_nr_65_128=$(echo $orig | awk -F "," '{print $8}' | ql_at_clean | sed 's/ OK//g')
             nr_bands_1_64=""
             nr_bands_65_128=""
             for band in $lock_band; do
@@ -610,8 +611,8 @@ cell_info()
     ca_response=$(cmd_cainfoext_query "$at_port")
 
     info_line=$(echo "$ca_response" | grep -o "#CAINFOEXT: [^$]*" | head -1)
-    ca_count=$(echo "$info_line" | awk -F',' '{print $1}' | awk -F': ' '{print $2}')
-    network_type_raw=$(echo "$info_line" | awk -F',' '{print $2}')
+    ca_count=$(echo "$info_line" | ql_csv_field 1 | awk -F': ' '{print $2}')
+    network_type_raw=$(echo "$info_line" | ql_csv_field 2)
     network_mode=$(echo "$network_type_raw" | tr -d ' ')
 
     [ "$ca_count" -gt 1 ] && network_mode="$network_mode with $ca_count CA"

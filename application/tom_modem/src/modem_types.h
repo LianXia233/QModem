@@ -137,13 +137,17 @@ typedef struct _AT_MESSAGE {
 enum ERROR_CODES {
     COMM_ERROR = -1,
     SUCCESS = 0,
-    KEYWORD_NOT_MATCH,
-    TIMEOUT_WAITING_NEWLINE,
-    INVALID_PARAM,
-    INVALID_HEX,
-    UNKNOWN_ERROR,
-    BUFFER_OVERFLOW,
-    SEND_SMS_FAILED
+    KEYWORD_NOT_MATCH = 1,
+    TIMEOUT_WAITING_NEWLINE = 2,
+    INVALID_HEX = 4,
+    UNKNOWN_ERROR = 5,
+    BUFFER_OVERFLOW = 6,
+    SEND_SMS_FAILED = 7,
+    /* INVALID_PARAM used to be 3, colliding with SMS_READ_OP in
+     * enum OPERATIONS: an invalid -o argument returned 3 from
+     * match_operation() and silently executed sms_read. Moved into its
+     * own value space so it can never alias an operation code again. */
+    INVALID_PARAM = 200
 };
 
 enum SMS_CHARSET {

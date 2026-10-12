@@ -108,6 +108,12 @@ int parse_user_input(int argc, char *argv[], PROFILE_T *profile)
                 return INVALID_PARAM;
             }
             profile->op = match_operation(argv[opt++]);
+            if (profile->op == INVALID_PARAM)
+            {
+                err_msg("Invalid operation: %s", argv[opt - 1]);
+                usage(argv[0]);
+                return INVALID_PARAM;
+            }
             break;
         case DEBUG:
             profile->debug = 1;
@@ -250,7 +256,12 @@ int main(int argc, char *argv[])
 {
     PROFILE_T *profile = &s_profile;
     int result;
-    parse_user_input(argc, argv, profile);
+    result = parse_user_input(argc, argv, profile);
+    if (result != SUCCESS)
+    {
+        // usage()/error message already printed by parse_user_input
+        return result;
+    }
     dump_profile();
     
     // Initialize transport layer

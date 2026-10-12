@@ -26,7 +26,7 @@ return view.extend({
 		
 		sections.forEach(function(section) {
 			if (section.state !== 'disabled' && section.at_port) {
-				var name = section.name ? section.name.toUpperCase() : 'Unknown';
+				var name = section.name ? section.name.toUpperCase() : _('Unknown');
 				var displayName = section.alias ? section.alias + ' (' + name + ')' : name;
 				
 				modems.push({
@@ -155,24 +155,49 @@ return view.extend({
 			dom.content(infoContainer, E('div', { 'class': 'spinning' }, _('Loading modem information...')));
 		}
 		
-		// Fetch all modem info
-		Promise.all([
+		// Fetch all modem info in parallel; a single failed source must not
+		// blank the whole page, so use allSettled with per-item placeholders
+		Promise.allSettled([
 			qmodem.getBaseInfo(modemId),
 			qmodem.getSimInfo(modemId),
 			qmodem.getNetworkInfo(modemId),
 			qmodem.getCellInfo(modemId),
 			qmodem.getCopyright(modemId)
 		]).then(function(results) {
-			// Merge all modem_info arrays (exclude copyright)
+			// Merge fulfilled modem_info arrays (exclude copyright)
 			var all_info = [];
+			var failed = 0;
 			for (var i = 0; i < results.length - 1; i++) {
-				if (results[i] && results[i].modem_info) {
-					all_info = all_info.concat(results[i].modem_info);
+				if (results[i].status === 'fulfilled' && results[i].value && results[i].value.modem_info) {
+					all_info = all_info.concat(results[i].value.modem_info);
+				} else {
+					failed++;
 				}
 			}
+
+			// All info sources failed: fall back to the full-page error
+			if (failed === results.length - 1) {
+				var firstError = results.find(function(r) { return r.status === 'rejected'; });
+				var message = firstError && firstError.reason ? firstError.reason.message : 'unknown error';
+				console.error('Error fetching modem info:', message);
+				dom.content(infoContainer, E('div', { 'class': 'alert-message warning' },
+					_('Error loading modem information: %s').format(message)));
+				return;
+			}
+
+			// Partial failure: keep the successful sections and add a placeholder row
+			if (failed > 0) {
+				all_info.push({
+					type: 'plain_text',
+					'class': 'General',
+					full_name: _('Some data sources failed to load'),
+					value: _('Will retry on next refresh')
+				});
+			}
 			
-			// Handle copyright (last result)
-			var copyrightData = results[results.length - 1];
+			// Handle copyright (last result); failure just hides the section
+			var copyrightResult = results[results.length - 1];
+			var copyrightData = copyrightResult.status === 'fulfilled' ? copyrightResult.value : null;
 			if (copyrightElement && copyrightData && copyrightData.copyright) {
 				// Format copyright object into display string
 				var copyrightInfo = copyrightData.copyright;

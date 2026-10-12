@@ -84,12 +84,14 @@ return view.extend({
 		container.appendChild(resultSection);
 
 		// Load SIM switch support and current slot
-		Promise.all([
-			qmodem.callGetSimSwitchCapabilities(modem.id),
-			qmodem.getSimSlot(modem.id)
-		]).then(function(results) {
-			var supportResult = results[0];
-			var slotResult = results[1];
+			// allSettled: one failed source degrades to placeholder status
+			// instead of killing the whole panel
+			Promise.allSettled([
+				qmodem.callGetSimSwitchCapabilities(modem.id),
+				qmodem.getSimSlot(modem.id)
+			]).then(function(results) {
+				var supportResult = results[0].status === 'fulfilled' ? results[0].value : null;
+				var slotResult = results[1].status === 'fulfilled' ? results[1].value : null;
 			
 			var supported = supportResult && supportResult.supportSwitch === '1';
 			var currentSlot = slotResult && slotResult.sim_slot ? slotResult.sim_slot : 'N/A';
@@ -108,8 +110,14 @@ return view.extend({
 				E('span', {}, self.formatSlotDisplay(currentSlot))
 			]));
 			
+			// Placeholder for partially failed sources (panel stays usable)
+			if (results[0].status === 'rejected' || results[1].status === 'rejected') {
+				statusInfo.push(E('div', { 'style': 'margin-top: 5px; color: #999;' },
+					_('Some SIM switch data failed to load; will retry on next refresh')));
+			}
+
 			dom.content(statusField, statusInfo);
-			
+
 			// Create SIM slot buttons dynamically based on capabilities
 			var btns = [];
 			if (!hideButtons) {
@@ -154,7 +162,7 @@ return view.extend({
 
 	formatSlotDisplay: function(slot) {
 		if (!slot)
-			return 'N/A';
+			return _('N/A');
 		return _('Slot %s').format(slot);
 	},
 

@@ -71,7 +71,15 @@ int sms_delete(PROFILE_T *profile, void *transport_ptr)
     return result;
 }
 
-int sms_read(PROFILE_T *profile, void *transport_ptr)
+/*
+ * Common implementation of sms_read / sms_read_unread.
+ * read_sms_cmd: AT+CMGL command selecting which messages to read.
+ * label:        message class name used verbatim in debug output
+ *               ("SMS" / "unread SMS") so both entry points keep
+ *               byte-identical logs.
+ */
+static int sms_read_impl(PROFILE_T *profile, void *transport_ptr,
+                         const char *read_sms_cmd, const char *label)
 {
     transport_t *transport = (transport_t *)transport_ptr;
     SMS_T *sms_list[SMS_LIST_SIZE];
@@ -88,11 +96,11 @@ int sms_read(PROFILE_T *profile, void *transport_ptr)
     }
     dbg_msg("Set PDU format success");
 
-    // Read all SMS
-    result = transport_send_at_with_response(transport, profile, READ_ALL_SMS, "OK", 0, &response_text);
+    // Read SMS (all or unread only, depending on the caller)
+    result = transport_send_at_with_response(transport, profile, read_sms_cmd, "OK", 0, &response_text);
     if (result != SUCCESS)
     {
-        dbg_msg("Error reading SMS, error code: %d", result);
+        dbg_msg("Error reading %s, error code: %d", label, result);
         return result;
     }
 
@@ -109,7 +117,7 @@ int sms_read(PROFILE_T *profile, void *transport_ptr)
             {
                 sms = (SMS_T *)malloc(sizeof(SMS_T));
                 memset(sms, 0, sizeof(SMS_T));
-                
+
                 pdu = strtok(NULL, "\r\n");
                 if (pdu == NULL || strlen(pdu) < 3) {
                     dbg_msg("No PDU found for line: %s", line);
@@ -150,8 +158,13 @@ int sms_read(PROFILE_T *profile, void *transport_ptr)
             return COMM_ERROR;
     }
 
-    dbg_msg("Read SMS success");
+    dbg_msg("Read %s success", label);
     return SUCCESS;
+}
+
+int sms_read(PROFILE_T *profile, void *transport_ptr)
+{
+    return sms_read_impl(profile, transport_ptr, READ_ALL_SMS, "SMS");
 }
 
 int sms_send(PROFILE_T *profile, void *transport_ptr) 
@@ -239,82 +252,7 @@ int sms_send(PROFILE_T *profile, void *transport_ptr)
 
 int sms_read_unread(PROFILE_T *profile, void *transport_ptr)
 {
-    transport_t *transport = (transport_t *)transport_ptr;
-    SMS_T *sms_list[SMS_LIST_SIZE];
-    SMS_T *sms;
-    char *response_text = NULL;
-    int result;
-
-    // Set PDU format
-    result = transport_send_at_with_response(transport, profile, SET_PDU_FORMAT, "OK", 0, NULL);
-    if (result != SUCCESS)
-    {
-        dbg_msg("Error setting PDU format, error code: %d", result);
-        return result;
-    }
-    dbg_msg("Set PDU format success");
-
-    // Read unread SMS only
-    result = transport_send_at_with_response(transport, profile, READ_UNREAD_SMS, "OK", 0, &response_text);
-    if (result != SUCCESS)
-    {
-        dbg_msg("Error reading unread SMS, error code: %d", result);
-        return result;
-    }
-
-    if (response_text)
-    {
-        char *line = strtok(response_text, "\r\n");
-        int sms_count = 0;
-        int decode_errors = 0;
-        char *pdu;
-        while (line != NULL)
-        {
-            if (strncmp(line, "+CMGL:", 6) == 0)
-            {
-                sms = (SMS_T *)malloc(sizeof(SMS_T));
-                memset(sms, 0, sizeof(SMS_T));
-                pdu = strtok(NULL, "\r\n");
-                if (pdu == NULL || strlen(pdu) < 3) {
-                    dbg_msg("No PDU found for line: %s", line);
-                    destroy_sms(sms);
-                    decode_errors++;
-                    break;
-                }
-                sms->sms_pdu = strdup(pdu);
-                sms->sender = (char *)malloc(PHONE_NUMBER_SIZE);
-                sms->sms_text = (char *)malloc(SMS_TEXT_SIZE);
-                memset(sms->sms_text, 0, SMS_TEXT_SIZE);
-                sms->sms_index = get_sms_index(line);
-                int sms_len = decode_pdu(sms);
-                if (sms_len > 0)
-                {
-                    if (sms_count < SMS_LIST_SIZE)
-                        sms_list[sms_count++] = sms;
-                    else {
-                        err_msg("SMS result exceeds list capacity");
-                        destroy_sms(sms);
-                        decode_errors++;
-                    }
-                }
-                else
-                {
-                    dbg_msg("Error decoding SMS in line: %s", line);
-                    destroy_sms(sms);
-                    decode_errors++;
-                }
-            }
-            line = strtok(NULL, "\r\n");
-        }
-
-        display_sms_in_json(sms_list, sms_count);
-        free(response_text);
-        if (decode_errors > 0)
-            return COMM_ERROR;
-    }
-
-    dbg_msg("Read unread SMS success");
-    return SUCCESS;
+    return sms_read_impl(profile, transport_ptr, READ_UNREAD_SMS, "unread SMS");
 }
 
 int sms_mark_read(PROFILE_T *profile, void *transport_ptr)

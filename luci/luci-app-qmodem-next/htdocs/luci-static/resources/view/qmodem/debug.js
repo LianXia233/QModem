@@ -75,7 +75,7 @@ return view.extend({
 			var info = [];
 			info.push(E('div', {}, [
 				E('strong', {}, _('Current Port') + ': '),
-				E('span', {}, cfg.at_cfg.using_port || 'N/A')
+				E('span', {}, cfg.at_cfg.using_port || _('N/A'))
 			]));
 
 			if (cfg.at_cfg.ports && cfg.at_cfg.ports.length > 0) {
@@ -103,7 +103,7 @@ return view.extend({
 			portSelectSection.appendChild(E('label', { 'class': 'cbi-value-title' }, _('Select AT Port')));
 			var portSelectField = E('div', { 'class': 'cbi-value-field' });
 			
-			var select = new ui.Dropdown(cfg.at_cfg.using_port || (ports.length > 0 ? ports[0] : ''),
+			var portDropdown = new ui.Dropdown(cfg.at_cfg.using_port || (ports.length > 0 ? ports[0] : ''),
 				ports.reduce(function(obj, port) {
 					obj[port] = port;
 					return obj;
@@ -111,8 +111,18 @@ return view.extend({
 					id: 'at_port_' + modem.id,
 					sort: false
 				});
-			
-			portSelectField.appendChild(select.render());
+			/* 持有实例与渲染节点引用：取值走实例 API，回退走节点内查询，
+			 * 不依赖 LuCI cbi-dropdown 内部渲染结构，也避免全局 getElementById 多实例串扰 */
+			var portDropdownNode = portDropdown.render();
+
+			var getSelectedPort = function() {
+				if (portDropdown && typeof portDropdown.getValue === 'function')
+					return portDropdown.getValue();
+				var sel = portDropdownNode.querySelector('li[data-selected], li.selected');
+				return sel ? (sel.getAttribute('data-value') || sel.textContent.trim()) : '';
+			};
+
+			portSelectField.appendChild(portDropdownNode);
 			portSelectSection.appendChild(portSelectField);
 			container.appendChild(portSelectSection);
 
@@ -162,7 +172,7 @@ return view.extend({
 			var sendBtn = E('button', {
 				'class': 'btn cbi-button-action',
 				'click': function() {
-					var port = document.getElementById('at_port_' + modem.id).value;
+					var port = getSelectedPort();
 					var cmd = document.getElementById('at_command_' + modem.id).value.trim();
 					var useUbus = document.getElementById('use_ubus_' + modem.id).checked ? '1' : '0';
 

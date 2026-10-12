@@ -5,6 +5,7 @@ _Author="Fujr"
 _Maintainer="Fujr <fjrcn@outlook.com>"
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/gosuncn.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="gosuncn_ctrl"
 
 #获取LTE带宽
@@ -591,7 +592,7 @@ sim_info()
     sim_number=$(cmd_cnum "$at_port" | grep "+CNUM:" | grep -o "[0-9]\{9,\}")
 
     #IMSI
-    imsi=$(cmd_cimi "$at_port" | sed -n '2p' | sed 's/\r//g')
+    imsi=$(cmd_cimi "$at_port" | sed -n '2p' | ql_at_clean)
 
     #ICCID
     iccid=$(cmd_iccid "$at_port" | grep -o "+\?ICCID:[ ]*[-0-9A-Fa-f]\+" | awk -F': ' '{print $2}' | tr -d ' ')
@@ -612,13 +613,13 @@ base_info()
     class="Base Information"
 
     #Name
-    name=$(cmd_cgmm "$at_port" | sed -n '2p' | sed 's/\r//g')
+    name=$(cmd_cgmm "$at_port" | sed -n '2p' | ql_at_clean)
 
     #Manufacturer
-    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | sed 's/\r//g')
+    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | ql_at_clean)
 
     #Revision
-    revision=$(cmd_cgmr "$at_port" | sed -n '2p' | sed 's/\r//g')
+    revision=$(cmd_cgmr "$at_port" | sed -n '2p' | ql_at_clean)
 
     add_plain_info_entry "name" "$name" "Name"
     add_plain_info_entry "manufacturer" "$manufacturer" "Manufacturer"
@@ -636,11 +637,11 @@ network_info()
     #Network Type（网络类型）
     local cops_response=$(cmd_cops_query "$at_port" | grep "+COPS:")
     local carrier=$(echo "$cops_response" | awk -F'"' '{print $2}')
-    local rat_num=$(echo "$cops_response" | awk -F',' '{print $4}' | sed 's/\r//g')
+    local rat_num=$(echo "$cops_response" | ql_csv_field 4 | ql_at_clean)
     local network_type=$(get_rat $rat_num)
 
     #CSQ
-    response=$(cmd_csq "$at_port" | grep "+CSQ:" | sed 's/+CSQ: //g' | sed 's/\r//g')
+    response=$(cmd_csq "$at_port" | grep "+CSQ:" | sed 's/+CSQ: //g' | ql_at_clean)
 
     class="Network Information"
     add_plain_info_entry "Network Type" "$network_type" "Network Type"
@@ -670,7 +671,7 @@ cell_info_lte()
     # AT+ZCELLINFO? 返回 +ZCELLINFO: <TAC>,cellid:<CellID>,pci:<PCI>,band:<Band>
     local zcellinfo=$(cmd_zcellinfo_query "$at_port" | grep '+ZCELLINFO:' | cut -d: -f2-)
     local cops_response=$(cmd_cops_query "$at_port" | grep "+COPS:")
-    local rat_num=$(echo "$cops_response" | awk -F',' '{print $4}' | sed 's/\r//g')
+    local rat_num=$(echo "$cops_response" | ql_csv_field 4 | ql_at_clean)
     local network_type=$(get_rat $rat_num)
 
     if [ -z "$zcellinfo" ]; then
@@ -681,15 +682,15 @@ cell_info_lte()
     local tac=$(echo "$zcellinfo" | cut -d',' -f1 | tr -d ' ')
     local cell_id=$(echo "$zcellinfo" | cut -d',' -f2 | tr -d ' ')
     local pci=$(echo "$zcellinfo" | cut -d',' -f3 | tr -d ' ')
-    local band=$(echo "$zcellinfo" | cut -d',' -f4 | tr -d '\r' | tr -d '\n')
+    local band=$(echo "$zcellinfo" | cut -d',' -f4 | ql_at_clean | tr -d '\n')
 
     # 获取信号质量
     local cesq_response=$(cmd_cesq "$at_port" | grep "+CESQ:")
     local rsrp="" rsrq="" sinr=""
     if [ -n "$cesq_response" ]; then
         # +CESQ: rxlev,ber,rscp,ecno,rsrq,rsrp
-        rsrq=$(echo "$cesq_response" | awk -F',' '{print $5}' | tr -d ' ')
-        rsrp=$(echo "$cesq_response" | awk -F',' '{print $6}' | tr -d ' \r')
+        rsrq=$(echo "$cesq_response" | ql_csv_field 5 | tr -d ' ')
+        rsrp=$(echo "$cesq_response" | ql_csv_field 6 | tr -d ' \r')
         # 转换 RSRP: 实际值 = 报告值 - 141
         if [ -n "$rsrp" ] && [ "$rsrp" != "255" ]; then
             rsrp=$(($rsrp - 141))
