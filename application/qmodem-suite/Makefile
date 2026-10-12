@@ -50,7 +50,7 @@ define Package/$(PKG_NAME)
 	+qmodem-smsd \
 	+qmodem_monitor \
 	+luci-app-qmodem-monitor \
-	+luci-app-qmodem-ttlfw4 \
+	+luci-app-qmodem-ttlfw4
 endef
 
 define Package/$(PKG_NAME)/description
