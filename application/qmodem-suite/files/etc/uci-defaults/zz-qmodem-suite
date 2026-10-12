@@ -1,0 +1,11 @@
+#!/bin/sh
+# uci-defaults bootstrap for qmodem-suite.
+# Runs once after install/first boot, then is deleted by the system.
+
+# Enable daemons shipped by the suite (ignore failures on partial installs).
+[ -x /etc/init.d/qmodem-smsd ] && /etc/init.d/qmodem-smsd enable
+[ -x /etc/init.d/qmodem_monitor ] && /etc/init.d/qmodem_monitor enable
+
+echo "qmodem-suite installed: core + LuCI UI + SMS daemon + monitor."
+echo "Open LuCI -> Services/Status to configure. See /etc/config/qmodem."
+exit 0

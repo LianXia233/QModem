@@ -17,7 +17,7 @@ valid_section() {
     case "$1" in
         ''|*[!A-Za-z0-9_]*) return 1 ;;
     esac
-    [ "${#$1}" -le 64 ]
+    [ "${#1}" -le 64 ]
 }
 
 # Helper function for caching

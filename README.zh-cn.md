@@ -89,6 +89,14 @@ make menuconfig
 - [rpcd 接口](docs/qmodem-rpcd-interface.zh-cn.md)
 - [AT fixture 格式与回放](testcases/README.md)
 
+## Rust 异步守护进程（实验性）
+
+`rust/qmodem-atd` 是 C 版 `ubus_at_daemon` 的 tokio 重写：每端口一个 actor 任务（mpsc 命令队列 + 单调超时 + URC 广播），并提供 Unix socket JSON 测试协议。当前以实验性并行可选项交付，不替换任何已打包组件。详见 [Rust 异步守护进程架构](docs/developer/async-daemon.zh-cn.md) 与 [Rust 工作区 README](rust/README.md)。
+
+## 单包安装 qmodem-suite（实验性）
+
+`qmodem-suite` 是元包：一条命令（opkg 或 apk）装齐 `qmodem` 核心、推荐的 `luci-app-qmodem-next` 前端、短信守护进程与网络监控，并覆盖安装后服务状态核查、最小 UCI 配置与故障排查。详见[单包安装指南](docs/user/install-suite.zh-cn.md)。
+
 ## 反馈问题
 
 提交 Issue 前，请先阅读[故障排查](docs/user/troubleshooting.zh-cn.md)。至少提供路由器型号、固件版本、QModem 版本、模组完整型号、USB/PCIe 连接方式、拨号协议和复现步骤。日志、配置和 AT 响应可能包含 IMEI、IMSI、ICCID、手机号、APN 或短信内容，公开前必须脱敏。

@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <grp.h>
 #include <json-c/json.h>
 #include <pthread.h>
 #include <signal.h>
@@ -101,6 +102,7 @@ struct daemon_state {
 	int active_jobs;
 	int stop;
 	int scan_workers;
+	int scan_workers_started;
 	int at_probe_workers;
 	int at_timeout_fast;
 	int at_timeout_model;
@@ -419,14 +421,55 @@ static void get_slot_option(const char *slot, const char *opt, char *out, size_t
 	uci_get(key, out, len);
 }
 
-static void section_from_slot(const char *slot, char *out, size_t len)
+/*
+ * Derive a UCI section name from a slot identifier.
+ * Only [A-Za-z0-9_] is allowed ('.', ':', '-' map to '_'), max 64 chars.
+ * Returns -1 and leaves out empty when the slot cannot be safely mapped.
+ */
+static int section_from_slot(const char *slot, char *out, size_t len)
 {
 	size_t j = 0;
-	for (size_t i = 0; slot[i] && j + 1 < len; i++) {
+
+	out[0] = '\0';
+	if (!slot || !*slot)
+		return -1;
+	for (size_t i = 0; slot[i]; i++) {
 		char c = slot[i];
-		out[j++] = (c == '.' || c == ':' || c == '-') ? '_' : c;
+		if (c == '.' || c == ':' || c == '-')
+			c = '_';
+		if (!isalnum((unsigned char)c) && c != '_')
+			return -1;
+		if (j >= 64 || j + 1 >= len)
+			return -1;
+		out[j++] = c;
 	}
+	if (!j)
+		return -1;
 	out[j] = '\0';
+	return 0;
+}
+
+/* UCI section names accepted over the control socket. */
+static int valid_section_name(const char *s)
+{
+	size_t n;
+
+	if (!s)
+		return 0;
+	n = strlen(s);
+	if (!n || n > 64)
+		return 0;
+	for (size_t i = 0; i < n; i++) {
+		if (!isalnum((unsigned char)s[i]) && s[i] != '_')
+			return 0;
+	}
+	return 1;
+}
+
+/* Known scan types accepted over the control socket. */
+static int valid_slot_type(const char *s)
+{
+	return s && (!strcmp(s, "usb") || !strcmp(s, "pcie") || !strcmp(s, "all"));
 }
 
 static int basename_of(const char *path, char *out, size_t len)
@@ -865,10 +908,17 @@ static void validate_ports(struct scan_result *res)
 			end = n;
 		for (size_t i = start; i < end; i++) {
 			ctx[i].port = res->at_ports.items[i];
-			pthread_create(&threads[i], NULL, probe_port_thread, &ctx[i]);
+			ctx[i].ok = 0;
+			if (pthread_create(&threads[i], NULL, probe_port_thread, &ctx[i]) != 0) {
+				/* mark slot as threadless so it is skipped by the join loop */
+				log_msg(LOG_L_ERR, "pthread_create failed for port %s: %s",
+					res->at_ports.items[i], strerror(errno));
+				ctx[i].port = NULL;
+			}
 		}
 		for (size_t i = start; i < end; i++) {
-			pthread_join(threads[i], NULL);
+			if (ctx[i].port)
+				pthread_join(threads[i], NULL);
 			if (ctx[i].ok) {
 				sl_add(&res->valid_at_ports, res->at_ports.items[i]);
 				if (!res->preferred_at[0])
@@ -1058,7 +1108,10 @@ static int add_modem(const char *slot, const char *slot_type)
 	sl_init(&res.at_ports);
 	sl_init(&res.pcie_at_ports);
 	sl_init(&res.valid_at_ports);
-	section_from_slot(slot, section, sizeof(section));
+	if (section_from_slot(slot, section, sizeof(section)) != 0) {
+		log_msg(LOG_L_WARN, "rejected add: invalid slot identifier '%s'", slot ? slot : "");
+		goto out_fail;
+	}
 
 	snprintf(key, sizeof(key), "qmodem.%s.fixed_device", section);
 	uci_get(key, fixed, sizeof(fixed));
@@ -1234,7 +1287,10 @@ static void disable_slot(const char *slot)
 {
 	char section[128], key[256];
 	char *argv_reorder[] = { "uci", "-q", "reorder", key, NULL };
-	section_from_slot(slot, section, sizeof(section));
+	if (section_from_slot(slot, section, sizeof(section)) != 0) {
+		log_msg(LOG_L_WARN, "rejected disable: invalid slot identifier '%s'", slot ? slot : "");
+		return;
+	}
 	pthread_mutex_lock(&uci_lock);
 	snprintf(key, sizeof(key), "qmodem.%s=1", section);
 	run_exec(argv_reorder, 3);
@@ -1532,15 +1588,39 @@ static void handle_client(int fd)
 	cmd[0] = a[0] = b[0] = c[0] = '\0';
 	sscanf(buf, "%63s %127s %127s %127s", cmd, a, b, c);
 	if (!strcmp(cmd, "add") && a[0] && b[0]) {
+		char sec[128];
+
+		/* whitelist: slot must map to a clean section, type must be usb/pcie */
+		if ((strcmp(b, "usb") && strcmp(b, "pcie")) || section_from_slot(a, sec, sizeof(sec)) != 0) {
+			syslog(LOG_WARNING, "rejected client request: add slot='%s' type='%s'", a, b);
+			dprintf(fd, "{\"code\":1,\"message\":\"invalid request\"}\n");
+			return;
+		}
 		delay_sec = c[0] ? atoi(c) : 0;
 		rc = enqueue_event(EV_ADD, a, b, delay_sec);
 	} else if (!strcmp(cmd, "remove") && a[0]) {
+		if (!valid_section_name(a)) {
+			syslog(LOG_WARNING, "rejected client request: remove section='%s'", a);
+			dprintf(fd, "{\"code\":1,\"message\":\"invalid request\"}\n");
+			return;
+		}
 		delay_sec = b[0] ? atoi(b) : 0;
 		rc = enqueue_event(EV_REMOVE, a, NULL, delay_sec);
 	} else if (!strcmp(cmd, "disable") && a[0]) {
+		if (!valid_section_name(a)) {
+			syslog(LOG_WARNING, "rejected client request: disable section='%s'", a);
+			dprintf(fd, "{\"code\":1,\"message\":\"invalid request\"}\n");
+			return;
+		}
 		delay_sec = b[0] ? atoi(b) : 0;
 		rc = enqueue_event(EV_DISABLE, a, NULL, delay_sec);
 	} else if (!strcmp(cmd, "scan")) {
+		/* empty type means "all"; otherwise restrict to the known set */
+		if (a[0] && !valid_slot_type(a)) {
+			syslog(LOG_WARNING, "rejected client request: scan type='%s'", a);
+			dprintf(fd, "{\"code\":1,\"message\":\"invalid request\"}\n");
+			return;
+		}
 		delay_sec = b[0] ? atoi(b) : 0;
 		rc = enqueue_event(EV_SCAN, a[0] ? a : "all", NULL, delay_sec);
 	}
@@ -1561,6 +1641,28 @@ static void handle_client(int fd)
 		dprintf(fd, "{\"code\":1,\"message\":\"invalid request\"}\n");
 }
 
+/*
+ * Restrict the control socket: 0660 + chown to group "qmodem".
+ * A world-writable socket would let any local user trigger privileged
+ * uci set/commit and network restarts via this root daemon.
+ */
+static void apply_socket_permissions(void)
+{
+	struct group *gr;
+	gid_t gid = 0; /* fallback: root:root */
+
+	gr = getgrnam("qmodem");
+	if (gr) {
+		gid = gr->gr_gid;
+	} else {
+		syslog(LOG_WARNING, "group qmodem not found, control socket falls back to root:root");
+	}
+	if (chown(QMODEM_SCAND_SOCKET, 0, gid) < 0)
+		syslog(LOG_ERR, "chown %s failed: %s", QMODEM_SCAND_SOCKET, strerror(errno));
+	if (chmod(QMODEM_SCAND_SOCKET, 0660) < 0)
+		syslog(LOG_ERR, "chmod 0660 %s failed: %s", QMODEM_SCAND_SOCKET, strerror(errno));
+}
+
 static int setup_socket(void)
 {
 	int fd;
@@ -1577,7 +1679,7 @@ static int setup_socket(void)
 		close(fd);
 		return -1;
 	}
-	chmod(QMODEM_SCAND_SOCKET, 0666);
+	apply_socket_permissions();
 	if (listen(fd, 32) < 0) {
 		close(fd);
 		return -1;
@@ -1654,8 +1756,26 @@ int main(int argc, char **argv)
 	threads = calloc((size_t)g.scan_workers, sizeof(*threads));
 	if (!threads)
 		return 1;
-	for (int i = 0; i < g.scan_workers; i++)
-		pthread_create(&threads[i], NULL, worker_thread, NULL);
+	{
+		int nworkers = 0;
+
+		for (int i = 0; i < g.scan_workers; i++) {
+			if (pthread_create(&threads[i], NULL, worker_thread, NULL) != 0) {
+				syslog(LOG_ERR, "failed to create worker thread %d: %s", i, strerror(errno));
+				break;
+			}
+			nworkers++;
+		}
+		if (nworkers == 0) {
+			syslog(LOG_ERR, "no worker thread could be created, aborting");
+			free(threads);
+			close(sockfd);
+			unlink(QMODEM_SCAND_SOCKET);
+			closelog();
+			return 1;
+		}
+		g.scan_workers_started = nworkers;
+	}
 
 	log_msg(LOG_L_NOTICE, "modem_scand started workers=%d at_timeout_fast=%d at_timeout_model=%d add_retry_delay=%d add_retry_max=%d",
 		g.scan_workers, g.at_timeout_fast, g.at_timeout_model, g.add_retry_delay, g.add_retry_max);
@@ -1677,7 +1797,7 @@ int main(int argc, char **argv)
 	g.stop = 1;
 	pthread_cond_broadcast(&g.queue_cond);
 	pthread_mutex_unlock(&g.queue_lock);
-	for (int i = 0; i < g.scan_workers; i++)
+	for (int i = 0; i < g.scan_workers_started; i++)
 		pthread_join(threads[i], NULL);
 	free(threads);
 	if (g.support_json)

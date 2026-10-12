@@ -176,11 +176,12 @@ return view.extend({
 			return callScanPcie()
 				.then(function(res) {
 					ui.hideModal();
-					if (res.code === 0) {
+					// Defensive: ubus may return an empty/null payload
+					if (res && res.code === 0) {
 						ui.addNotification(null, E('p', res.message || _('PCIe scan completed successfully')), 'info');
 					} else {
-						var msg = res.message || _('PCIe scan failed');
-						if (res.output) msg += ' - ' + res.output;
+						var msg = (res && res.message) || _('PCIe scan failed');
+						if (res && res.output) msg += ' - ' + res.output;
 						ui.addNotification(null, E('p', msg), 'warning');
 					}
 					window.location.reload();
@@ -200,11 +201,12 @@ return view.extend({
 			return callScanUsb()
 				.then(function(res) {
 					ui.hideModal();
-					if (res.code === 0) {
+					// Defensive: ubus may return an empty/null payload
+					if (res && res.code === 0) {
 					ui.addNotification(null, E('p', res.message || _('USB scan completed successfully')), 'info');
 				} else {
-					var msg = res.message || _('USB scan failed');
-					if (res.output) msg += ' - ' + res.output;
+					var msg = (res && res.message) || _('USB scan failed');
+					if (res && res.output) msg += ' - ' + res.output;
 					ui.addNotification(null, E('p', msg), 'warning');
 				}
 				window.location.reload();
@@ -224,11 +226,12 @@ return view.extend({
 			return callScanAll()
 				.then(function(res) {
 					ui.hideModal();
-					if (res.code === 0) {
+					// Defensive: ubus may return an empty/null payload
+					if (res && res.code === 0) {
 					ui.addNotification(null, E('p', res.message || _('Full scan completed successfully')), 'info');
 				} else {
-					var msg = res.message || _('Full scan failed');
-					if (res.output) msg += ' - ' + res.output;
+					var msg = (res && res.message) || _('Full scan failed');
+					if (res && res.output) msg += ' - ' + res.output;
 					ui.addNotification(null, E('p', msg), 'warning');
 				}
 				window.location.reload();
@@ -280,11 +283,18 @@ return view.extend({
 					E('button', {
 						'class': 'btn cbi-button-positive',
 						'click': L.bind(function() {
-							var select = document.getElementById('device-select');
-							var selectedKey = select.value;
-							var deviceInfo = availableDevices[selectedKey];
-							
-							// Create new section with selected device name
+						var select = document.getElementById('device-select');
+						var selectedKey = select.value;
+						var deviceInfo = availableDevices[selectedKey];
+
+						// Defensive: selected key missing from ubus device list
+						if (!deviceInfo) {
+							ui.hideModal();
+							ui.addNotification(null, E('p', _('No data available for the selected device. Please rescan and try again.')), 'error');
+							return;
+						}
+
+						// Create new section with selected device name
 							var sid = uci.add('qmodem', 'modem-device', selectedKey);
 							
 							// Set type and path automatically

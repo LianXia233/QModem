@@ -16,7 +16,7 @@
 //!      --config 'target.xxx.linker="staging_dir/...-gcc"' \
 //!      --config 'rustflags=["-L", "staging_dir/usr/lib", ...]'`
 //! 3. Implement `register_ubus_object` using the declared FFI prototypes,
-//!     mirroring the C methods: open/close/sendat/list/event_callback*.
+//!    mirroring the C methods: open/close/sendat/list/event_callback*.
 
 #![allow(non_camel_case_types)]
 
@@ -52,8 +52,8 @@ extern "C" {
 /// ```ignore
 /// pub unsafe fn register_ubus_object(ctx: *mut ubus_context) -> i32 {
 ///     // 1. build ubus_object with method table:
-///     //    "sendat" -> handler that spawns on the tokio runtime via
-///     //    std::sync::mpsc bridge (ubus handlers are not async).
+///     //    "sendat" -> handler that forwards to the per-port std mpsc
+///     //    queue (ubus handlers are not async).
 ///     // 2. ubus_add_object(ctx, &mut obj)
 ///     UBUS_STATUS_OK
 /// }
@@ -61,8 +61,8 @@ extern "C" {
 ///
 /// Design note: the C daemon marshals ubus calls into the per-port queue;
 /// the Rust daemon keeps that shape — the ubus handler only formats an
-/// [`crate::port::AtRequest`] and awaits the oneshot on a blocking-safe
-/// bridge task, never touching transport state directly.
+/// [`crate::port::AtRequest`] and blocks on the request's oneshot reply
+/// channel, never touching transport state directly.
 pub struct UbusSkeleton;
 
 impl UbusSkeleton {

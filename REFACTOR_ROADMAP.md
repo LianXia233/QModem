@@ -52,3 +52,23 @@ Phase 1-4（后续，见评估报告）：vendor 层配置驱动下沉 → smsd/
 - **T1（2026-10-12 11:45）**：W1-W4 全部完成并复核；编排者复跑全部门禁通过；分两个提交经 git 原生推送（hosts 直连）至 `LianXia233/QModem` main：
   - commit A `fix: ...`——W1/W2/W3（C 层 + Shell + 打包 + LuCI next，27 文件）
   - commit B `feat(rust): ...`——W4 + 重构文档（rust/ 工作区、REFACTOR_ROADMAP、docs/refactor/*）
+- **T2（2026-10-12 12:50）**：Phase 1 —— 11 个子代理并行（W6-W16），**依赖收缩与单包交付**战略落地：
+
+| # | 工作包 | 子代理 | 状态 |
+|---|--------|--------|------|
+| W6 | Rust 零依赖改造（去 tokio/serde/thiserror/libc → 纯 std 线程-actor + 自研 JSON） | agent-rust-zero | ✅ 37 tests；二进制 -43.4%（748KB） |
+| W7 | 单包交付 qmodem-suite meta 包 + 依赖审计（qmodem 补 +jsonfilter） | agent-pkg-suite | ✅ |
+| W8 | 厂商解析公共库 cmds/qmodem_lib.sh + quectel/huawei 试点（46 处管道） | agent-vendor-lib | ✅ fixture 回归 30/30 |
+| W9 | smsd C4/C10/C12/COMMIT 修复（agent-c-smsd 中断后由 -v2 续完） | agent-c-smsd-v2 | ✅ ASan 自测 17/17 |
+| W10 | modem_scand 安全加固（socket 0660+组、白名单）+ init.d/hotplug 修正 | agent-c-scan | ✅ |
+| W11 | LuCI next 组件化（ui.js 共享组件、pollGuard、CSS 收敛） | agent-luci-comp | ✅ |
+| W12 | 旧栈止血（H5-H8 注入/XSS/全局泄漏）+ 解除互斥依赖 | agent-lua-retire | ✅ luac 16/16 |
+| W13 | legacy monitor 白名单 + dial 脚本 S9/S12/S13 收尾 | agent-monitor | ✅ 18/18 断言 |
+| W14 | CI 统一门禁 scripts/check_all.sh + quality.yml | agent-ci | ✅ 全绿 |
+| W15 | 文档：async-daemon 开发文档、install-suite 指南、README 双语小节 | agent-docs | ✅ |
+| W16 | 无依赖测试体系 tests/sh + tests/lua | agent-tests | ✅ 18+16 用例 |
+
+  教训记录：agent-c-smsd 首轮因命令失败后原样重试陷入循环，留下 `&db->` 半成品；由 agent-c-smsd-v2 按「绝对路径 + 失败先分析再重试」纪律续完。
+  门禁复核（编排者）：check_all 6/6 PASS（sh 69、node 27、rust 37 tests、crlf 0）、tests/sh 18 PASS、lua smoke 16 PASS；rpcd `valid_section` 的 `${#$1}`→`${#1}`（dash 兼容）由编排者直接修复。
+
+## Phase 2-4（后续）：vendor 全量迁移 → smsd/rpcd 迁 Rust → 旧 Lua 栈退役

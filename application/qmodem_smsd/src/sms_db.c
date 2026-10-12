@@ -81,9 +81,11 @@ static int apply_migrations(sqlite3 *sql)
     if (version < 2) {
         if (sqlite3_prepare_v2(sql, "PRAGMA table_info(modems)", -1, &stmt, NULL) != SQLITE_OK)
             return -1;
-        while (sqlite3_step(stmt) == SQLITE_ROW)
-            if (!strcmp((const char *)sqlite3_column_text(stmt, 1), "last_event_epoch"))
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            const char *column = (const char *)sqlite3_column_text(stmt, 1);
+            if (column && !strcmp(column, "last_event_epoch"))
                 has_epoch = 1;
+        }
         sqlite3_finalize(stmt); stmt = NULL;
         if (exec_sql(sql, "BEGIN IMMEDIATE") != 0)
             return -1;
@@ -335,8 +337,12 @@ static int publish_group(sqlite3 *sql, int64_t group_id, int64_t now,
         sqlite3_finalize(stmt);
         return -1;
     }
-    snprintf(modem_id, sizeof(modem_id), "%s", sqlite3_column_text(stmt, 0));
-    snprintf(sender, sizeof(sender), "%s", sqlite3_column_text(stmt, 1));
+    {
+        const char *value = (const char *)sqlite3_column_text(stmt, 0);
+        snprintf(modem_id, sizeof(modem_id), "%s", value ? value : "");
+        value = (const char *)sqlite3_column_text(stmt, 1);
+        snprintf(sender, sizeof(sender), "%s", value ? value : "");
+    }
     total_parts = sqlite3_column_int(stmt, 2);
     sqlite3_finalize(stmt);
     content = group_content(sql, group_id, &part_count, &timestamp);
@@ -482,8 +488,10 @@ int sms_db_import_segment(sms_db_t *db, const sms_segment_t *segment,
             goto rollback;
         sqlite3_finalize(stmt);
         stmt = NULL;
-        if (exec_sql(db->sql, "COMMIT") != 0)
+        if (exec_sql(db->sql, "COMMIT") != 0) {
+            exec_sql(db->sql, "ROLLBACK");
             return -1;
+        }
         return 0;
     }
     sqlite3_finalize(stmt);
@@ -556,8 +564,10 @@ int sms_db_import_segment(sms_db_t *db, const sms_segment_t *segment,
         goto rollback;
     sqlite3_finalize(stmt);
     stmt = NULL;
-    if (exec_sql(db->sql, "COMMIT") != 0)
+    if (exec_sql(db->sql, "COMMIT") != 0) {
+        exec_sql(db->sql, "ROLLBACK");
         return -1;
+    }
     result->safe_to_delete = 1;
     return 0;
 
@@ -601,15 +611,18 @@ int sms_db_publish_expired(sms_db_t *db, const char *modem_id, int64_t now,
         if (result.published)
             (*published_count)++;
     }
-    if (exec_sql(db->sql, "COMMIT") != 0)
-        goto out_no_rollback;
-    rc = 0;
-    goto out_no_rollback;
+    if (exec_sql(db->sql, "COMMIT") == 0) {
+        rc = 0;
+    } else {
+        exec_sql(db->sql, "ROLLBACK");
+    }
+    sqlite3_finalize(stmt);
+    free(groups);
+    return rc;
 
 out:
     sqlite3_finalize(stmt);
     exec_sql(db->sql, "ROLLBACK");
-out_no_rollback:
     free(groups);
     return rc;
 }
@@ -648,8 +661,11 @@ int sms_db_record_sync(sms_db_t *db, const char *modem_id, const char *trigger,
         goto rollback;
     sqlite3_finalize(stmt);
     stmt = NULL;
-    if (exec_sql(db->sql, "COMMIT") == 0)
+    if (exec_sql(db->sql, "COMMIT") == 0) {
         rc = 0;
+        return rc;
+    }
+    exec_sql(db->sql, "ROLLBACK");
     return rc;
 rollback:
     sqlite3_finalize(stmt);
@@ -762,8 +778,10 @@ int sms_db_prune(sms_db_t *db, const char *modem_id,
             "DELETE FROM sync_runs WHERE finished_at IS NOT NULL "
             "AND finished_at < strftime('%s','now')-2592000;") != 0)
         goto fail;
-    if (exec_sql(db->sql, "COMMIT") != 0)
+    if (exec_sql(db->sql, "COMMIT") != 0) {
+        exec_sql(db->sql, "ROLLBACK");
         return -1;
+    }
     return 0;
 
 fail:
@@ -832,7 +850,11 @@ int sms_db_delete_message(sms_db_t *db, const char *modem_id, int64_t message_id
             goto fail;
     }
     sqlite3_finalize(stmt);
-    return exec_sql(db->sql, "COMMIT");
+    if (exec_sql(db->sql, "COMMIT") != 0) {
+        exec_sql(db->sql, "ROLLBACK");
+        return -1;
+    }
+    return 0;
 fail:
     sqlite3_finalize(stmt);
     exec_sql(db->sql, "ROLLBACK");
@@ -861,7 +883,11 @@ int sms_db_delete_modem_messages(sms_db_t *db, const char *modem_id, int *delete
         sqlite3_finalize(stmt);
         stmt = NULL;
     }
-    return exec_sql(db->sql, "COMMIT");
+    if (exec_sql(db->sql, "COMMIT") != 0) {
+        exec_sql(db->sql, "ROLLBACK");
+        return -1;
+    }
+    return 0;
 fail:
     sqlite3_finalize(stmt);
     exec_sql(db->sql, "ROLLBACK");

@@ -5,6 +5,7 @@
 'require dom';
 'require qmodem.qmodem as qmodem';
 'require qmodem.sms as smsService';
+'require qmodem.ui as qmUI';
 
 // Load CSS (deduplicated)
 qmodem.loadCss(L.resource('qmodem/qmodem-next.css'));
@@ -35,7 +36,8 @@ return view.extend({
 			]);
 		}
 
-		// Filter enabled modems
+		// Filter enabled modems (defensive: backend may return no list)
+		modems = modems || [];
 		modems = modems.filter(function(m) { return m.enabled; });
 
 		if (modems.length === 0) {
@@ -45,52 +47,29 @@ return view.extend({
 
 		var container = E('div', { 'class': 'cbi-map' });
 
-		// Modem selector
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
-		
-		var select = E('select', {
-			'class': 'cbi-input-select',
-			'id': 'sms_modem_selector'
-		});
-		
-		modems.forEach(function(modem) {
-			select.appendChild(E('option', { 'value': modem.id }, modem.name));
-		});
-		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
-
-		selectorTable.appendChild(selectorBody);
-		selectorSection.appendChild(selectorTable);
-		container.appendChild(selectorSection);
+		// Modem selector (shared component)
+		var selector = qmUI.ModemSelector(modems, { id: 'sms_modem_selector' });
+		var select = selector.select;
+		container.appendChild(selector.section);
 
 		// Header with back button
 		var headerDiv = E('div', { 'class': 'sms-conversation-header' }, [
 			E('button', {
 				'class': 'cbi-button cbi-button-neutral',
-				'style': 'margin-right: 10px;',
 				'click': function(ev) {
 					ev.preventDefault();
 					window.location.href = L.url('admin/modem/qmodem/sms');
 				}
 			}, '← ' + _('Back')),
-			E('h2', { 'style': 'display: inline-block; margin: 0;' }, 
+			E('h2', {},
 				_('Conversation with ') + smsService.formatPhoneNumber(contact))
 		]);
 		container.appendChild(headerDiv);
 
 		// Messages area
-		var messagesArea = E('div', { 
+		var messagesArea = E('div', {
 			'id': 'sms-messages-area',
-			'class': 'sms-messages-area',
-			'style': 'margin-top: 20px;'
+			'class': 'sms-messages-area'
 		});
 		container.appendChild(messagesArea);
 
@@ -126,9 +105,8 @@ return view.extend({
 	createReplyForm: function(contact, configSection, messagesArea, loadingDiv, select) {
 		var self = this;
 
-		var formDiv = E('div', { 
-			'class': 'cbi-section',
-			'style': 'margin-top: 20px;'
+		var formDiv = E('div', {
+			'class': 'cbi-section sms-reply-form'
 		});
 
 		var fieldset = E('fieldset', { 'class': 'cbi-section' });
@@ -167,9 +145,8 @@ return view.extend({
 		fieldset.appendChild(encodingDiv);
 
 		// Character counter
-		var counterDiv = E('div', { 
-			'class': 'cbi-value',
-			'style': 'font-size: 12px; color: #666;'
+		var counterDiv = E('div', {
+			'class': 'cbi-value sms-counter-row'
 		});
 		var counter = E('span', { 'id': 'sms-char-counter' }, '0/160');
 		counterDiv.appendChild(E('label', { 'class': 'cbi-value-title' }, _('Length')));
@@ -315,14 +292,12 @@ return view.extend({
 
 	pollConversation: function(messagesArea, configSection, contact) {
 		var self = this;
-		
+
 		smsService.getConversation(configSection, contact).then(function(result) {
 			if (!result.error && result.messages) {
 				self.renderMessages(messagesArea, result.messages, configSection);
 			}
-		}).catch(function(err) {
-			console.error('Poll error:', err);
-		});
+		}).catch(qmUI.pollGuard('sms_conversation'));
 	},
 
 	renderMessages: function(messagesArea, messages, configSection) {
@@ -358,7 +333,7 @@ return view.extend({
 			// Message metadata
 			var metaDiv = E('div', { 'class': 'sms-message-meta' });
 			
-			var timeStr = this.formatFullTimestamp(msg.timestamp);
+			var timeStr = qmUI.formatTime(msg.timestamp);
 			var timeSpan = E('span', { 'class': 'sms-message-time' }, timeStr);
 			metaDiv.appendChild(timeSpan);
 
@@ -456,16 +431,7 @@ return view.extend({
 		});
 	},
 
-	formatFullTimestamp: function(timestamp) {
-		var date = new Date(timestamp * 1000);
-		
-		return String(date.getFullYear()) + '-' + 
-		       String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-		       String(date.getDate()).padStart(2, '0') + ' ' +
-		       String(date.getHours()).padStart(2, '0') + ':' + 
-		       String(date.getMinutes()).padStart(2, '0') + ':' + 
-		       String(date.getSeconds()).padStart(2, '0');
-	},
+	// Full timestamp formatting is provided by qmUI.formatTime (qmodem/ui.js)
 
 	handleSaveApply: null,
 	handleSave: null,

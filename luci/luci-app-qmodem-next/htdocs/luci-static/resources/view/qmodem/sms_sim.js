@@ -5,6 +5,7 @@
 'require dom';
 'require qmodem.sms as smsService';
 'require qmodem.qmodem as qmodem';
+'require qmodem.ui as qmUI';
 
 // Load CSS (deduplicated)
 qmodem.loadCss(L.resource('qmodem/qmodem-next.css'));
@@ -27,30 +28,10 @@ return view.extend({
 			return container;
 		}
 
-		// Modem selector
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
-		
-		var select = E('select', {
-			'class': 'cbi-input-select',
-			'id': 'sms_sim_modem_selector'
-		});
-		
-		modems.forEach(function(modem) {
-			select.appendChild(E('option', { 'value': modem.id }, modem.name));
-		});
-		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
-		selectorTable.appendChild(selectorBody);
-		selectorSection.appendChild(selectorTable);
-		container.appendChild(selectorSection);
+		// Modem selector (shared component)
+		var selector = qmUI.ModemSelector(modems, { id: 'sms_sim_modem_selector' });
+		var select = selector.select;
+		container.appendChild(selector.section);
 
 		// Title
 		var title = E('h2', { 'name': 'content' }, _('SIM Card SMS Management'));
@@ -116,14 +97,12 @@ return view.extend({
 
 	pollSimSmsList: function(contentArea, configSection) {
 		var self = this;
-		
+
 		smsService.getSimSms(configSection).then(function(result) {
 			if (!result.error && result.messages) {
 				self.renderSimSmsList(contentArea, result.messages, configSection);
 			}
-		}).catch(function(err) {
-			console.error('Poll error:', err);
-		});
+		}).catch(qmUI.pollGuard('sms_sim'));
 	},
 
 	renderSimSmsList: function(contentArea, messages, configSection) {
@@ -192,7 +171,7 @@ return view.extend({
 					E('td', { 'class': 'td' }, index),
 					E('td', { 'class': 'td' }, sender),
 					E('td', { 'class': 'td' }, time),
-					E('td', { 'class': 'td', 'style': 'word-break: break-word;' }, content),
+					E('td', { 'class': 'td sms-sim-content-cell' }, content),
 					E('td', { 'class': 'td' }, type),
 					E('td', { 'class': 'td' }, deleteBtn)
 				]);

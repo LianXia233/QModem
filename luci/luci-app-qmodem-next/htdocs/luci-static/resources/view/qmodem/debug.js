@@ -3,6 +3,7 @@
 'require ui';
 'require dom';
 'require qmodem.qmodem as qmodem';
+'require qmodem.ui as qmUI';
 
 return view.extend({
 	load: function() {
@@ -19,33 +20,13 @@ return view.extend({
 		var title = E('h2', { 'class': 'cbi-map-caption' }, _('AT Debug'));
 		container.appendChild(title);
 
-		// Create modem selector section (similar to overview)
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td left', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
-		
-		// Create select dropdown
-		var select = E('select', {
-			'class': 'cbi-input-select',
-			'id': 'modem_selector'
-		});
-		
-		modems.forEach(function(modem) {
-			if (modem.enabled) {
-				select.appendChild(E('option', { 'value': modem.id }, modem.name));
-			}
-		});
-		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
-		selectorTable.appendChild(selectorBody);
-		selectorSection.appendChild(selectorTable);
-		container.appendChild(selectorSection);
+	// Create modem selector section (shared component)
+	var selector = qmUI.ModemSelector(modems, {
+		leftAlignLabel: true,
+		filter: function(modem) { return modem.enabled; }
+	});
+	var select = selector.select;
+	container.appendChild(selector.section);
 
 		// Create AT interface container
 		var interfaceContainer = E('div', { 'id': 'at_interface_container' });

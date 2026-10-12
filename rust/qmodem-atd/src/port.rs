@@ -1,26 +1,30 @@
-//! Per-port AT command actor.
+//! Per-port AT command actor (std::thread edition).
 //!
 //! Replaces the C `reader_thread_func` + `send_at_command_with_response`
-//! pair (at_handler.c:123-236,299-465):
+//! pair (at_handler.c:123-236,299-465) and the previous tokio actor:
 //!
-//! * one task exclusively owns the transport — no cross-thread `fd` use,
+//! * one thread exclusively owns the transport — no cross-thread `fd` use,
 //!   no UAF;
-//! * commands arrive on a per-port mpsc queue and run strictly serially;
-//!   each caller gets a private oneshot instead of racing on the single
-//!   `current_response` slot;
-//! * the deadline is a `tokio::time::sleep` (monotonic), not
+//! * commands arrive on a per-port bounded mpsc queue and run strictly
+//!   serially; each caller gets a private std-mpsc oneshot instead of
+//!   racing on the single `current_response` slot;
+//! * the deadline is plain `Instant` arithmetic (monotonic clock) and the
+//!   in-flight wait is bounded `recv_timeout`/read slices, never
 //!   `CLOCK_REALTIME`;
 //! * on timeout the partial response collected so far is returned with
-//!   [`ResponseStatus::Timeout`].
+//!   [`ResponseStatus::Timeout`];
+//! * URC/data lines are published on the hand-written broadcast hub with
+//!   `seq`/`epoch` counters mirroring the C line_events queue semantics
+//!   (line_events.c / ubus_at_daemon.h:66-89).
 
-use std::pin::Pin;
+use std::fmt;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc::{self, Sender, SyncSender};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use tokio::sync::watch;
-use tokio::sync::{broadcast, mpsc, oneshot};
-
-use crate::line::AtLine;
-use crate::transport::SerialPort;
+use crate::line::{AtLine, LineHub, LineReceiver};
+use crate::transport::{ReadOutcome, SerialPort};
 
 /// Outcome of a queued AT command.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,12 +49,21 @@ pub struct AtResponse {
 }
 
 /// Error returned to a waiting caller.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AtError {
-    /// The port task is gone (transport closed or daemon shutting down).
-    #[error("port closed")]
+    /// The port thread is gone (transport closed or daemon shutting down).
     PortClosed,
 }
+
+impl fmt::Display for AtError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AtError::PortClosed => write!(f, "port closed"),
+        }
+    }
+}
+
+impl std::error::Error for AtError {}
 
 /// A queued AT command request.
 #[derive(Debug, Clone)]
@@ -67,17 +80,17 @@ pub struct AtRequest {
 #[derive(Clone)]
 pub struct AtHandle {
     name: String,
-    tx: mpsc::Sender<PortMsg>,
-    line_tx: broadcast::Sender<AtLine>,
-    shutdown: std::sync::Arc<watch::Sender<bool>>,
+    tx: SyncSender<PortMsg>,
+    hub: Arc<LineHub>,
+    shutdown: Arc<AtomicBool>,
 }
 
-type PortMsg = (AtRequest, oneshot::Sender<Result<AtResponse, AtError>>);
+type PortMsg = (AtRequest, Sender<Result<AtResponse, AtError>>);
 
 /// Configuration knobs for a port actor.
 #[derive(Debug, Clone)]
 pub struct AtPortConfig {
-    /// Broadcast channel capacity (C: AT_LINE_QUEUE_CAPACITY ring).
+    /// Broadcast queue capacity per subscriber (C: AT_LINE_QUEUE_CAPACITY).
     pub line_queue_capacity: usize,
     /// Command queue depth.
     pub command_queue_depth: usize,
@@ -94,7 +107,12 @@ impl Default for AtPortConfig {
 
 const DEFAULT_END_FLAGS: [&str; 5] = ["OK", "ERROR", "+CMS ERROR:", "+CME ERROR:", "NO CARRIER"];
 
-/// Spawn the port actor. Returns the client handle immediately.
+/// Idle wait slice: bounds command pickup and shutdown latency.
+const IDLE_SLICE: Duration = Duration::from_millis(50);
+/// In-flight read slice: bounds deadline/shutdown overshoot.
+const READ_SLICE: Duration = Duration::from_millis(20);
+
+/// Spawn the port actor thread. Returns the client handle immediately.
 pub fn spawn_port(
     name: impl Into<String>,
     port: Box<dyn SerialPort>,
@@ -102,46 +120,48 @@ pub fn spawn_port(
     config: AtPortConfig,
 ) -> AtHandle {
     let name = name.into();
-    let (tx, rx) = mpsc::channel(config.command_queue_depth);
-    let (line_tx, _) = broadcast::channel(config.line_queue_capacity);
-    let (shutdown, sh_rx) = watch::channel(false);
+    let (tx, rx) = mpsc::sync_channel(config.command_queue_depth);
+    let hub = Arc::new(LineHub::with_capacity(config.line_queue_capacity));
+    let shutdown = Arc::new(AtomicBool::new(false));
     let actor_name = name.clone();
-    let actor_line_tx = line_tx.clone();
-    tokio::spawn(async move {
-        run_actor(actor_name, port, rx, actor_line_tx, sh_rx, epoch).await;
-    });
+    let actor_hub = hub.clone();
+    let actor_shutdown = shutdown.clone();
+    // On actor panic its locals (including pending resp_tx values) drop,
+    // so waiting callers observe PortClosed instead of hanging.
+    let _ = std::thread::Builder::new()
+        .name(format!("at-port:{actor_name}"))
+        .spawn(move || {
+            run_actor(actor_name, port, rx, actor_hub, actor_shutdown, epoch);
+        });
     AtHandle {
         name,
         tx,
-        line_tx,
-        shutdown: std::sync::Arc::new(shutdown),
+        hub,
+        shutdown,
     }
 }
 
 impl AtHandle {
-    /// Queue an AT command and await its response.
-    pub async fn send_at(
+    /// Queue an AT command and block until its response arrives.
+    pub fn send_at(
         &self,
         at: &str,
         timeout_ms: u64,
         end_flag: Option<&str>,
     ) -> Result<AtResponse, AtError> {
-        let (tx, rx) = tokio::sync::oneshot::channel();
+        let (rtx, rrx) = mpsc::channel();
         let req = AtRequest {
             at: at.to_string(),
             timeout_ms,
             end_flag: end_flag.map(str::to_string),
         };
-        self.tx
-            .send((req, tx))
-            .await
-            .map_err(|_| AtError::PortClosed)?;
-        rx.await.map_err(|_| AtError::PortClosed)?
+        self.tx.send((req, rtx)).map_err(|_| AtError::PortClosed)?;
+        rrx.recv().map_err(|_| AtError::PortClosed)?
     }
 
     /// Subscribe to the line broadcast (URC + response lines).
-    pub fn subscribe(&self) -> broadcast::Receiver<AtLine> {
-        self.line_tx.subscribe()
+    pub fn subscribe(&self) -> LineReceiver {
+        self.hub.subscribe()
     }
 
     pub fn name(&self) -> &str {
@@ -150,23 +170,21 @@ impl AtHandle {
 
     /// Request actor shutdown; pending requests fail with
     /// [`AtError::PortClosed`].
-    pub async fn close(&self) {
-        let _ = self.shutdown.send(true);
-        // Give the actor a chance to observe it.
-        tokio::task::yield_now().await;
+    pub fn close(&self) {
+        self.shutdown.store(true, Ordering::Release);
     }
 }
 
 struct Pending {
     lines: Vec<String>,
     end_flags: Vec<String>,
-    resp_tx: oneshot::Sender<Result<AtResponse, AtError>>,
+    resp_tx: Sender<Result<AtResponse, AtError>>,
     started: Instant,
-    deadline: Pin<Box<tokio::time::Sleep>>,
+    deadline: Instant,
 }
 
 impl Pending {
-    fn new(req: &AtRequest, resp_tx: oneshot::Sender<Result<AtResponse, AtError>>) -> Pending {
+    fn new(req: &AtRequest, resp_tx: Sender<Result<AtResponse, AtError>>) -> Pending {
         let end_flags = match &req.end_flag {
             Some(f) if !f.trim().is_empty() => vec![f.clone()],
             _ => DEFAULT_END_FLAGS.iter().map(|s| s.to_string()).collect(),
@@ -176,9 +194,8 @@ impl Pending {
             end_flags,
             resp_tx,
             started: Instant::now(),
-            deadline: Box::pin(tokio::time::sleep(Duration::from_millis(
-                req.timeout_ms.max(1),
-            ))),
+            deadline: Instant::now()
+                + Duration::from_millis(req.timeout_ms.max(1)),
         }
     }
 
@@ -218,12 +235,12 @@ impl Pending {
     }
 }
 
-async fn run_actor(
+fn run_actor(
     name: String,
     mut port: Box<dyn SerialPort>,
-    mut rx: mpsc::Receiver<PortMsg>,
-    line_tx: broadcast::Sender<AtLine>,
-    mut shutdown: watch::Receiver<bool>,
+    rx: mpsc::Receiver<PortMsg>,
+    hub: Arc<LineHub>,
+    shutdown: Arc<AtomicBool>,
     epoch: u64,
 ) {
     let mut seq: u64 = 0;
@@ -233,108 +250,100 @@ async fn run_actor(
     // Last written command text, used to suppress its echo.
     let mut last_cmd: String = String::new();
 
-    enum Stop {
-        Shutdown,
-        Eof,
-        QueueClosed,
-    }
+    loop {
+        if shutdown.load(Ordering::Acquire) {
+            break;
+        }
 
-    let _stop: Stop = loop {
-        tokio::select! {
-            biased;
-
-            _ = shutdown.changed() => {
-                if *shutdown.borrow() {
-                    break Stop::Shutdown;
-                }
+        // Monotonic deadline for the in-flight command.
+        if pending.as_ref().is_some_and(|p| Instant::now() >= p.deadline) {
+            if let Some(p) = pending.take() {
+                p.finish(ResponseStatus::Timeout, String::new());
             }
+            continue;
+        }
 
-            // Accept a new command only when idle; while a command is in
-            // flight further requests simply queue in the mpsc buffer.
-            msg = rx.recv(), if pending.is_none() => {
-                match msg {
-                    None => break Stop::QueueClosed,
-                    Some((req, resp_tx)) => {
-                        let mut data = req.at.clone().into_bytes();
-                        data.push(b'\r');
-                        if let Err(_e) = port.write_all(&data).await {
-                            let _ = resp_tx.send(Err(AtError::PortClosed));
-                            break Stop::Eof;
-                        }
-                        last_cmd = req.at.trim().to_string();
-                        pending = Some(Pending::new(&req, resp_tx));
+        // Accept a new command only when idle; while a command is in
+        // flight further requests simply queue in the bounded channel.
+        if pending.is_none() {
+            match rx.try_recv() {
+                Ok((req, resp_tx)) => {
+                    let mut data = req.at.clone().into_bytes();
+                    data.push(b'\r');
+                    if port.write_all(&data).is_err() {
+                        let _ = resp_tx.send(Err(AtError::PortClosed));
+                        break;
                     }
+                    last_cmd = req.at.trim().to_string();
+                    pending = Some(Pending::new(&req, resp_tx));
                 }
+                Err(mpsc::TryRecvError::Empty) => {}
+                Err(mpsc::TryRecvError::Disconnected) => break,
             }
+        }
 
-            res = port.read_chunk(&mut buf) => {
-                match res {
-                    Ok(0) => break Stop::Eof,
-                    Ok(n) => {
-                        for b in &buf[..n] {
-                            line_buf.push(*b);
-                            if *b == b'\n' {
-                                let mut line = std::mem::take(&mut line_buf);
-                                while matches!(line.last(), Some(b'\r') | Some(b'\n')) {
-                                    line.pop();
+        // Read the port with a bounded slice so deadlines and shutdown
+        // stay responsive; the blocking read lives inside this dedicated
+        // thread (single owner, no cross-thread fd use).
+        let slice = match pending.as_ref() {
+            Some(p) => p
+                .deadline
+                .saturating_duration_since(Instant::now())
+                .min(READ_SLICE),
+            None => IDLE_SLICE,
+        };
+        match port.read_chunk(&mut buf, slice) {
+            Ok(ReadOutcome::Data(n)) => {
+                for b in &buf[..n] {
+                    line_buf.push(*b);
+                    if *b == b'\n' {
+                        let mut line = std::mem::take(&mut line_buf);
+                        while matches!(line.last(), Some(b'\r') | Some(b'\n')) {
+                            line.pop();
+                        }
+                        if line.is_empty() {
+                            continue;
+                        }
+                        let text = String::from_utf8_lossy(&line).into_owned();
+                        // Suppress the command echo: the modem
+                        // repeats exactly the command text (C
+                        // suppressed any "AT"-prefixed line,
+                        // at_handler.c:354, which would also eat
+                        // legitimate response lines like
+                        // "AT+... ECHO").
+                        if text == last_cmd {
+                            continue;
+                        }
+                        seq += 1;
+                        let _ = hub.send(AtLine {
+                            port: name.clone(),
+                            line: text.clone(),
+                            seq,
+                            epoch,
+                        });
+                        if let Some(p) = pending.as_mut() {
+                            if let Some(flag) = p.matches_end_flag(&text) {
+                                p.lines.push(text);
+                                if let Some(p) = pending.take() {
+                                    p.finish(ResponseStatus::Ok, flag);
                                 }
-                                if line.is_empty() {
-                                    continue;
-                                }
-                                let text = String::from_utf8_lossy(&line).into_owned();
-                                // Suppress the command echo: the modem
-                                // repeats exactly the command text (C
-                                // suppressed any "AT"-prefixed line,
-                                // at_handler.c:354, which would also eat
-                                // legitimate response lines like
-                                // "AT+... ECHO").
-                                if text == last_cmd {
-                                    continue;
-                                }
-                                seq += 1;
-                                let _ = line_tx.send(AtLine {
-                                    port: name.clone(),
-                                    line: text.clone(),
-                                    seq,
-                                    epoch,
-                                });
-                                if let Some(p) = pending.as_mut() {
-                                    if let Some(flag) = p.matches_end_flag(&text) {
-                                        p.lines.push(text);
-                                        if let Some(p) = pending.take() {
-                                            p.finish(ResponseStatus::Ok, flag);
-                                        }
-                                    } else {
-                                        p.lines.push(text);
-                                    }
-                                }
+                            } else {
+                                p.lines.push(text);
                             }
                         }
                     }
-                    Err(_) => break Stop::Eof,
                 }
             }
-
-            // Monotonic deadline for the in-flight command.
-            _ = async {
-                match pending.as_mut() {
-                    Some(p) => p.deadline.as_mut().await,
-                    None => std::future::pending::<()>().await,
-                }
-            }, if pending.is_some() => {
-                if let Some(p) = pending.take() {
-                    p.finish(ResponseStatus::Timeout, String::new());
-                }
-            }
+            Ok(ReadOutcome::TimedOut) => {}
+            Ok(ReadOutcome::Eof) | Err(_) => break,
         }
-    };
+    }
 
     // Drain: fail any queued/pending request so callers see PortClosed
     // instead of hanging (C version leaves waiters on a dead condvar).
     if let Some(p) = pending.take() {
         p.fail();
     }
-    rx.close();
     while let Ok((_, resp_tx)) = rx.try_recv() {
         let _ = resp_tx.send(Err(AtError::PortClosed));
     }

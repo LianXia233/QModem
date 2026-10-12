@@ -24,6 +24,24 @@ sq()
     printf "'%s'" "$(printf "%s" "$1" | sed "s/'/'\\\\''/g")"
 }
 
+# Derive the mbim control device from the at port name.
+# Assumption: the mbim char device mirrors the at port name with the
+# "at" prefix replaced by "mbim" (vendor specific, e.g. mtk_pcie modems).
+# The result is verified to be a character device; on mismatch we log an
+# error and still return the derived name so callers fail on umbim itself.
+resolve_mbim_port()
+{
+    local port
+    port=$(printf '%s' "$at_port" | sed 's/at/mbim/g')
+    if [ -c "$port" ]; then
+        printf '%s' "$port"
+        return 0
+    fi
+    logger -t qmodem "error: derived mbim port $port from at_port $at_port is not a character device"
+    printf '%s' "$port"
+    return 1
+}
+
 get_led()
 {
     config_foreach get_led_by_slot modem-slot
@@ -648,7 +666,7 @@ check_ip()
         esac
 
         if [ "$driver" = "mtk_pcie" ]; then
-            mbim_port=$(echo "$at_port" | sed 's/at/mbim/g')
+            mbim_port=$(resolve_mbim_port)
             local config=$(umbim -d $mbim_port config)
             ipaddr=$(echo "$config" | grep "ipv4address:" | awk '{print $2}' | cut -d'/' -f1)
             ipaddr="$ipaddr $(echo "$config" | grep "ipv6address:" | awk '{print $2}' | cut -d'/' -f1)"
@@ -690,7 +708,14 @@ append_to_fw_zone()
     local if_name=$2
     local fw_zone_path
     source /etc/os-release
-    local os_version=${VERSION_ID:0:2}
+    # snapshot builds ship without VERSION_ID; strip minor and coerce any
+    # non-numeric value (snapshot/rolling) to 99 so the numeric test below
+    # always sees a valid integer
+    local os_version="${VERSION_ID:-snapshot}"
+    os_version=${os_version%%.*}
+    case "$os_version" in
+        ''|*[!0-9]*) os_version="99" ;;
+    esac
     case "$fw_zone" in
         ''|*[!0-9]*) fw_zone_path="firewall.${fw_zone}" ;;
         *) fw_zone_path="firewall.@zone[${fw_zone}]" ;;
@@ -892,7 +917,7 @@ set_if()
         m_debug "no netcard found"
     fi
     ethernet_check=$(handle_5gethernet)
-    if [ -n "$ethernet_check" ] && [ -n "/sys/class/net/$ethernet_5g" ] && [ -n "$ethernet_5g" ];then
+    if [ -n "$ethernet_check" ] && [ -d "/sys/class/net/$ethernet_5g" ] && [ -n "$ethernet_5g" ];then
         set_modem_netcard=$ethernet_5g
     fi
     if [ "$bridge_manager" = "misectel-interface-v1" ]; then
@@ -950,25 +975,40 @@ set_if()
         uci commit qmodem
     fi
     if [ "$network_reload_flag" -eq 1 ] || [ "$interface_update_flag" -eq 1 ] || [ "$bridge_network_dirty" -eq 1 ];then
-        uci commit network
+        if ! uci commit network; then
+            logger -t qmodem "error: uci commit network failed for $interface_name"
+        fi
         if [ "$bridge_network_dirty" -eq 1 ]; then
-            /etc/init.d/network restart
-            m_debug "network restart"
+            if /etc/init.d/network restart; then
+                m_debug "network restart"
+            else
+                logger -t qmodem "error: /etc/init.d/network restart failed for $interface_name"
+            fi
         else
-            ifup ${interface_name}
-            ifup ${interface6_name}
+            ifup ${interface_name} || logger -t qmodem "error: ifup ${interface_name} failed"
+            ifup ${interface6_name} || logger -t qmodem "error: ifup ${interface6_name} failed"
             m_debug "network reload"
         fi
     fi
     if [ "$firewall_reload_flag" -eq 1 ];then
-        uci commit firewall
-        /etc/init.d/firewall restart
-        m_debug "firewall reload"
+        if ! uci commit firewall; then
+            logger -t qmodem "error: uci commit firewall failed for $interface_name"
+        fi
+        if /etc/init.d/firewall restart; then
+            m_debug "firewall reload"
+        else
+            logger -t qmodem "error: /etc/init.d/firewall restart failed for $interface_name"
+        fi
     fi
     if [ "$dhcp_reload_flag" -eq 1 ];then
-        uci commit dhcp
-        /etc/init.d/dhcp restart
-        m_debug "dhcp reload"
+        if ! uci commit dhcp; then
+            logger -t qmodem "error: uci commit dhcp failed for $interface_name"
+        fi
+        if /etc/init.d/dhcp restart; then
+            m_debug "dhcp reload"
+        else
+            logger -t qmodem "error: /etc/init.d/dhcp restart failed for $interface_name"
+        fi
     fi
 }
 
@@ -992,15 +1032,21 @@ flush_if()
     set_led "net" $modem_config
     set_led "sim" $modem_config 0
     m_debug "delete interface $interface_name"
-    uci commit network
-    uci commit dhcp
+    if ! uci commit network; then
+        logger -t qmodem "error: uci commit network failed during flush_if for $interface_name"
+    fi
+    if ! uci commit dhcp; then
+        logger -t qmodem "error: uci commit dhcp failed during flush_if for $interface_name"
+    fi
     [ "$qmodem_reload_needed" -eq 1 ] && uci commit qmodem
     if [ "$firewall_reload_flag" -eq 1 ]; then
-        uci commit firewall
-        /etc/init.d/firewall restart
+        if ! uci commit firewall; then
+            logger -t qmodem "error: uci commit firewall failed during flush_if for $interface_name"
+        fi
+        /etc/init.d/firewall restart || logger -t qmodem "error: firewall restart failed during flush_if"
     fi
     if [ "$network_reload_needed" -eq 1 ]; then
-        /etc/init.d/network restart
+        /etc/init.d/network restart || logger -t qmodem "error: network restart failed during flush_if"
     fi
 }
 
@@ -1060,8 +1106,8 @@ wwan_hang()
 {
     pid=$(cat "${MODEM_RUNDIR}/${modem_config}_dir/$modem_config.pid")
     m_debug "wwan_hang, pid = $pid"
-    if [ -n $pid ]; then
-        kill $pid
+    if [ -n "$pid" ]; then
+        kill "$pid"
     fi
 }
 
@@ -1214,13 +1260,22 @@ qmi_dial()
         [ -n "$metric" ] && cmd_line="$cmd_line"
     fi
     cmd_line="$cmd_line -f $log_file"
+    qmi_dial_fail_count=0
     while true; do
         m_debug "dialing: $cmd_line"
         $cmd_line &
-        echo "$!" > "${MODEM_RUNDIR}/${modem_config}_dir/$modem_config.pid"
-        m_debug "pid: $!"
-        wait
-        m_debug "quectel-CM exited, retrying dial"
+        qmi_dial_pid=$!
+        echo "$qmi_dial_pid" > "${MODEM_RUNDIR}/${modem_config}_dir/$modem_config.pid"
+        m_debug "pid: $qmi_dial_pid"
+        # wait only for our own dial job, not unrelated background tasks
+        wait "$qmi_dial_pid"
+        qmi_dial_fail_count=$((qmi_dial_fail_count + 1))
+        m_debug "quectel-CM exited (consecutive failures: $qmi_dial_fail_count), retrying dial"
+        if [ "$qmi_dial_fail_count" -ge 3 ]; then
+            logger -t qmodem "qmi_dial failed $qmi_dial_fail_count consecutive times for $modem_config, backing off 30s"
+            sleep 30
+            qmi_dial_fail_count=0
+        fi
     done
 }
 
@@ -1403,7 +1458,7 @@ at_dial()
     m_debug "dial_cmd: $at_command; cgdcont_cmd: $cgdcont_command; ppp_auth_cmd: $ppp_auth_command"
 	case $driver in
         "mtk_pcie")
-            mbim_port=$(echo "$at_port" | sed 's/at/mbim/g')
+            mbim_port=$(resolve_mbim_port)
             [ -n "$apn" ] || apn="auto"
         	rf_status=$(umbim -d  $mbim_port radio|sed -n 's/.*swradiostate: *//p')
         	[ "$rf_status" = "off" ] && umbim -d  $mbim_port radio on
@@ -1540,12 +1595,12 @@ auto_dial_hang(){
 ip_change_fm350()
 {
     m_debug "ip_change_fm350"
-    local public_dns1_ipv4="223.5.5.5"
-    local public_dns2_ipv4="119.29.29.29"
+    local public_dns1_ipv4="${QMODEM_FALLBACK_DNS1_IPV4}"
+    local public_dns2_ipv4="${QMODEM_FALLBACK_DNS2_IPV4}"
     local netmask="255.255.255.0"
 
     if [ "$driver" = "mtk_pcie" ]; then
-        mbim_port=$(echo "$at_port" | sed 's/at/mbim/g')
+        mbim_port=$(resolve_mbim_port)
 
         local config=$(umbim -d $mbim_port config)
         ipv4_config=$(echo "$config" | grep "ipv4address:" | awk '{print $2}' | cut -d'/' -f1)

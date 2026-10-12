@@ -1,0 +1,59 @@
+name: Quality gate
+
+on:
+  push:
+    paths:
+      - 'application/**'
+      - 'luci/**'
+      - 'rust/**'
+      - 'driver/**'
+      - 'files/**'
+      - 'scripts/check_all.sh'
+      - '.github/workflows/quality.yml'
+  pull_request:
+    paths:
+      - 'application/**'
+      - 'luci/**'
+      - 'rust/**'
+      - 'driver/**'
+      - 'files/**'
+      - 'scripts/check_all.sh'
+      - '.github/workflows/quality.yml'
+
+jobs:
+  check-all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      # 尽力而为：lua 语法检查失败不阻塞门禁
+      - name: Install lua5.1 (best effort)
+        continue-on-error: true
+        run: sudo apt-get update && sudo apt-get install -y lua5.1
+
+      - name: Run check_all.sh
+        run: bash scripts/check_all.sh
+
+      # 体积门禁占位：上传 rust release 二进制清单供人工核对体积，不设硬阈值
+      - name: Upload rust binary size listing
+        if: hashFiles('rust/Cargo.toml') != ''
+        run: |
+          cd rust
+          cargo build --release --workspace || true
+          ls -l target/release/ | tee ../rust-binary-size.txt
+      - uses: actions/upload-artifact@v4
+        if: hashFiles('rust/Cargo.toml') != ''
+        with:
+          name: rust-binary-size
+          path: rust-binary-size.txt
+          if-no-files-found: ignore

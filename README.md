@@ -69,6 +69,14 @@ The detailed English manuals are currently maintained in the existing [user guid
 - [rpcd API](docs/qmodem-rpcd-interface.md)
 - [AT fixture development](testcases/README.md)
 
+## Rust async daemon (experimental)
+
+`rust/qmodem-atd` is a tokio-based rewrite of the C `ubus_at_daemon`: one actor task per port with an mpsc command queue, monotonic timeouts, and URC broadcast, plus a Unix-socket JSON test protocol. It ships as an experimental parallel option and does not replace any packaged component yet. See the [Rust async daemon architecture](docs/developer/async-daemon.zh-cn.md) and the [Rust workspace README](rust/README.md).
+
+## One-package install (qmodem-suite) (experimental)
+
+`qmodem-suite` is an all-arch metapackage that installs the `qmodem` core together with the recommended `luci-app-qmodem-next` frontend, the SMS daemon, and the network monitor in one command (opkg or apk); the guide also covers post-install service checks, minimal UCI configuration, and troubleshooting. See the [one-package install guide](docs/user/install-suite.zh-cn.md).
+
 ## Important boundaries
 
 - Do not let multiple management applications read and write the same AT port concurrently.

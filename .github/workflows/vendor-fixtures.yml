@@ -27,24 +27,7 @@ jobs:
             -o /tmp/qmodem-seal application/qmodem-seal/src/qmodem-seal.c -lsodium
           application/qmodem-seal/tests/test_qmodem_seal.sh /tmp/qmodem-seal
       - name: Check shell syntax
-        run: |
-          find application/qmodem/files/usr/share/qmodem/cmds \
-               application/qmodem/files/usr/share/qmodem/vendor \
-               application/qmodem/tests/lib \
-               -type f -name '*.sh' -exec sh -n {} +
-          sh -n application/qmodem/files/usr/share/qmodem/generic.sh
-          sh -n application/qmodem/files/usr/share/qmodem/modem_util.sh
-          sh -n application/qmodem/files/usr/sbin/qmodem_collect
-          sh -n application/qmodem/tests/test_core_cmds.sh
-          sh -n application/qmodem/tests/test_sms_forwarder_conflicts.sh
-          sh -n application/qmodem/tests/test_sms_transport_modes.sh
-          bash -n application/qmodem/tests/test_collect_encryption.sh
-          bash -n application/qmodem/tests/test_fixture_profiles.sh
-          sh -n application/qmodem/tests/test_vendor_cmds_boundary.sh
-          bash -n application/qmodem/tests/test_fixture_collection_bytes.sh
-          bash -n application/qmodem/tests/test_recognition_collection.sh
-          bash -n application/qmodem/tests/test_recognition_fixtures.sh
-          bash -n application/qmodem/tests/test_vendor_fixtures.sh
+        run: bash scripts/check_all.sh --only shell
       - name: Enforce command boundary
         run: |
           application/qmodem/tests/test_vendor_cmds_boundary.sh

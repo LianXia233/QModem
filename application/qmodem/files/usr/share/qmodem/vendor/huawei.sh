@@ -5,6 +5,7 @@ _Author="Lean"
 _Maintainer="Lean <coolsnowwolf@gmail.com>"
 . "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 . "${QMODEM_HOME:-/usr/share/qmodem}/cmds/huawei.sh"
+. "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="huawei_ctrl"
 
 vendor_get_disabled_features(){
@@ -41,7 +42,7 @@ get_mode(){
             esac
             ;;
         *)
-            local mode_num=$(echo -e "$cfg" | sed -n '2p' | sed 's/\r//g')
+            local mode_num=$(echo -e "$cfg" | sed -n '2p' | ql_at_clean)
             case "$mode_num" in
             "0"|"2") mode="ecm" ;;
             "1"|"3"|"4"|"5") mode="ncm" ;;
@@ -244,10 +245,10 @@ sim_info()
     }
     
     #IMSI（国际移动用户识别码）
-    imsi=$(cmd_cimi "$at_port" | sed -n '2p' | sed 's/\r//g')
+    imsi=$(cmd_cimi "$at_port" | sed -n '2p' | ql_at_clean)
     
     #IMEI（国际移动设备识别码）
-    imei=$(cmd_cgsn "$at_port" | sed -n '2p' | sed 's/\r//g')
+    imei=$(cmd_cgsn "$at_port" | sed -n '2p' | ql_at_clean)
     
     add_plain_info_entry "SIM Status" "$sim_status" "SIM Status" 
     add_plain_info_entry "SIM Slot" "$sim_slot" "SIM Slot"
@@ -258,11 +259,11 @@ sim_info()
 
 base_info(){
      #Name（名称）
-    name=$(cmd_cgmm "$at_port" | grep -v "OK" | sed -n '2p' | sed 's/\r//g')
+    name=$(cmd_cgmm "$at_port" | grep -v "OK" | sed -n '2p' | ql_at_clean)
     #Manufacturer（制造商）
-    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | sed 's/\r//g')
+    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | ql_at_clean)
     #Revision（固件版本）
-    revision=$(cmd_ati "$at_port" | grep "Revision:" | sed 's/Revision: //g' | sed 's/\r//g')
+    revision=$(cmd_ati "$at_port" | grep "Revision:" | sed 's/Revision: //g' | ql_at_clean)
     # at_command="AT+CGMR"
     # revision=$(at $at_port $at_command | sed -n '2p' | sed 's/\r//g')
     class="Base Information"
@@ -282,7 +283,7 @@ cell_info()
             second_cell_response=$(cmd_cserssi_query "$at_port" | grep "CSERSSI")
             hfreqinfo_response=$(cmd_hfreqinfo_query "$at_port" | grep "HFREQINFO:")
             _parse_hfreqinfo "$hfreqinfo_response"
-            cell_rat=$(echo "$monsc_response" | awk -F',' '{print $1}')
+            cell_rat=$(echo "$monsc_response" | ql_csv_field 1)
             [ -n "$second_cell_response" ] && cell_rat="LTE-NR"
             case "$cell_rat" in
                 "NR"|"NR-5GC")
@@ -301,7 +302,7 @@ cell_info()
                     tac=$(echo "$monsc_response" | awk -F',' '{print $8}')
                     nr_rsrp=$(echo "$monsc_response" | awk -F',' '{print $9}')
                     nr_rsrq=$(echo "$monsc_response" | awk -F',' '{print $10}')
-                    nr_sinr=$(echo "$monsc_response" | awk -F',' '{print $11}' | sed 's/\r//g')
+                    nr_sinr=$(echo "$monsc_response" | ql_csv_field 11 | ql_at_clean)
                 ;;
                 "LTE-NR")
                     network_mode="EN-DC Mode"
@@ -318,11 +319,11 @@ cell_info()
                     tac=$(echo "$monsc_response" | awk -F',' '{print $7}')
                     lte_rsrp=$(echo "$monsc_response" | awk -F',' '{print $8}')
                     lte_rsrq=$(echo "$monsc_response" | awk -F',' '{print $9}')
-                    lte_rxlev=$(echo "$monsc_response" | awk -F',' '{print $10}' | sed 's/\r//g')
+                    lte_rxlev=$(echo "$monsc_response" | ql_csv_field 10 | ql_at_clean)
                     #NR second_cell_response RSRP(12)/RSRQ(13)/SINR(14)
                     second_nr_rsrp=$(echo "$second_cell_response" | awk -F',' '{print $12}')
                     second_nr_rsrq=$(echo "$second_cell_response" | awk -F',' '{print $13}')
-                    second_nr_sinr=$(echo "$second_cell_response" | awk -F',' '{print $14}' | sed 's/\r//g')
+                    second_nr_sinr=$(echo "$second_cell_response" | ql_csv_field 14 | ql_at_clean)
                 ;;
                 "LTE"|"eMTC"|"NB-IoT")
                     network_mode="LTE Mode"
@@ -338,7 +339,7 @@ cell_info()
                     tac=$(echo "$monsc_response" | awk -F',' '{print $7}')
                     lte_rsrp=$(echo "$monsc_response" | awk -F',' '{print $8}')
                     lte_rsrq=$(echo "$monsc_response" | awk -F',' '{print $9}')
-                    lte_rxlev=$(echo "$monsc_response" | awk -F',' '{print $10}' | sed 's/\r//g')
+                    lte_rxlev=$(echo "$monsc_response" | ql_csv_field 10 | ql_at_clean)
                 ;;
                 "WCDMA"|"TD-SCDMA"|"UMTS")
                     network_mode="WCDMA Mode"

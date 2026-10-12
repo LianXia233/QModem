@@ -6,6 +6,7 @@ _Author="Siriling,Fujr"
 _Maintainer="Fujr <fjrcn@outlook.com>"
 source "${QMODEM_HOME:-/usr/share/qmodem}/generic.sh"
 source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/quectel.sh"
+source "${QMODEM_HOME:-/usr/share/qmodem}/cmds/qmodem_lib.sh"
 debug_subject="quectel_ctrl"
 
 get_5g_lan()
@@ -67,7 +68,7 @@ set_imei(){
 # $2:平台
 get_mode()
 {
-    local mode_num=$(cmd_qcfg_usbnet_query "$at_port" | grep "+QCFG:" | sed 's/+QCFG: "usbnet",//g' | sed 's/\r//g')
+    local mode_num=$(cmd_qcfg_usbnet_query "$at_port" | grep "+QCFG:" | sed 's/+QCFG: "usbnet",//g' | ql_at_clean)
     local mode
     case "$platform" in
         "qualcomm")
@@ -220,7 +221,7 @@ get_network_prefer()
 
 get_network_prefer_lte()
 {
-    response=$(cmd_qcfg_nwscanmode_query "$at_port" | grep "+QCFG:" | awk -F'",' '{print $2}' | sed 's/\r//g' |grep -o "[0-9]")
+    response=$(cmd_qcfg_nwscanmode_query "$at_port" | grep "+QCFG:" | awk -F'",' '{print $2}' | ql_at_clean |grep -o "[0-9]")
     network_prefer_3g="0";
     network_prefer_4g="0";
     case "$response" in
@@ -231,7 +232,7 @@ get_network_prefer_lte()
 
 get_network_prefer_nr()
 {
-    local response=$(cmd_qnwprefcfg_mode_pref_query "$at_port" | grep "+QNWPREFCFG:" | awk -F',' '{print $2}' | sed 's/\r//g')
+    local response=$(cmd_qnwprefcfg_mode_pref_query "$at_port" | grep "+QNWPREFCFG:" | ql_csv_field 2 | ql_at_clean)
     
     network_prefer_3g="0";
     network_prefer_4g="0";
@@ -339,7 +340,7 @@ set_network_prefer_nr()
 # $1:AT串口
 get_voltage()
 {
-	local voltage=$(cmd_cbc "$at_port" | grep "+CBC:" | awk -F',' '{print $3}' | sed 's/\r//g')
+	local voltage=$(cmd_cbc "$at_port" | grep "+CBC:" | ql_csv_field 3 | ql_at_clean)
     [ -n "$voltage" ] && {
         add_plain_info_entry "voltage" "$voltage mV" "Voltage" 
     }
@@ -376,11 +377,11 @@ base_info()
     m_debug  "Quectel base info"
 
     #Name（名称）
-    name=$(cmd_cgmm "$at_port" | sed -n '2p' | sed 's/\r//g')
+    name=$(cmd_cgmm "$at_port" | sed -n '2p' | ql_at_clean)
     #Manufacturer（制造商）
-    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | sed 's/\r//g')
+    manufacturer=$(cmd_cgmi "$at_port" | sed -n '2p' | ql_at_clean)
     #Revision（固件版本）
-    revision=$(cmd_ati "$at_port" | grep "Revision:" | sed 's/Revision: //g' | sed 's/\r//g')
+    revision=$(cmd_ati "$at_port" | grep "Revision:" | sed 's/Revision: //g' | ql_at_clean)
     # at_command="AT+CGMR"
     # revision=$(at $at_port $at_command | sed -n '2p' | sed 's/\r//g')
     class="Base Information"
@@ -422,7 +423,7 @@ sim_info()
     sim_slot=$(quectel_get_sim_slot_value)
 
     #IMEI（国际移动设备识别码）
-	imei=$(cmd_cgsn "$at_port" | sed -n '2p' | sed 's/\r//g')
+	imei=$(cmd_cgsn "$at_port" | sed -n '2p' | ql_at_clean)
 
     #SIM Status（SIM状态）
 	sim_status_flag=$(cmd_cpin_query "$at_port" | sed -n '2p')
@@ -449,7 +450,7 @@ sim_info()
 	sim_number=$(cmd_cnum "$at_port" | sed -n '2p' | awk -F'"' '{print $4}')
 
     #IMSI（国际移动用户识别码）
-	imsi=$(cmd_cimi "$at_port" | sed -n '2p' | sed 's/\r//g')
+	imsi=$(cmd_cimi "$at_port" | sed -n '2p' | ql_at_clean)
 
     #ICCID（集成电路卡识别码）
 	iccid=$(cmd_iccid "$at_port" | grep -o "+ICCID:[ ]*[-0-9A-F]\+" | cut -d " " -f 2 )
@@ -493,12 +494,12 @@ network_info()
     network_type=$(cmd_qnwinfo "$at_port" | grep "+QNWINFO:" | awk -F'"' '{print $2}')
 
     [ -z "$network_type" ] && {
-        local rat_num=$(cmd_cops_query "$at_port" | grep "+COPS:" | awk -F',' '{print $4}' | sed 's/\r//g')
+        local rat_num=$(cmd_cops_query "$at_port" | grep "+COPS:" | ql_csv_field 4 | ql_at_clean)
         network_type=$(get_rat ${rat_num})
     }
 
     #CSQ（信号强度）
-    response=$(cmd_csq "$at_port" | grep "+CSQ:" | sed 's/+CSQ: //g' | sed 's/\r//g')
+    response=$(cmd_csq "$at_port" | grep "+CSQ:" | sed 's/+CSQ: //g' | ql_at_clean)
 
     #RSSI（信号强度指示）
     # rssi_num=$(echo $response | awk -F',' '{print $1}')
@@ -521,7 +522,7 @@ network_info()
             #CQI DL（下行信道质量指示）
             cqi_dl=$(echo "$context" | awk -F',' '{print $3}')
             #AMBR UL（上行签约速率，单位，Mbps）
-            ambr_ul=$(echo "$context" | awk -F',' '{print $6}' | sed 's/\r//g')
+            ambr_ul=$(echo "$context" | ql_csv_field 6 | ql_at_clean)
             #AMBR DL（下行签约速率，单位，Mbps）
             ambr_dl=$(echo "$context" | awk -F',' '{print $4}')
             break
@@ -529,7 +530,7 @@ network_info()
     done
 
     #速率统计
-    response=$(cmd_qnwcfg_updown_query "$at_port" | grep "+QNWCFG:" | sed 's/+QNWCFG: "up\/down",//g' | sed 's/\r//g')
+    response=$(cmd_qnwcfg_updown_query "$at_port" | grep "+QNWCFG:" | sed 's/+QNWCFG: "up\/down",//g' | ql_at_clean)
 
     #当前上传速率（单位，Byte/s）
     tx_rate=$(echo $response | awk -F',' '{print $1}')
@@ -958,15 +959,15 @@ set_lockband()
 
 get_neighborcell_qualcomm(){
     lte_status=$(cmd_qnwlock_query "$at_port" "common/4g" | grep "+QNWLOCK:")
-    lte_lock_status=$(echo $lte_status | awk -F',' '{print $2}' | sed 's/\r//g')
-    lte_lock_freq=$(echo $lte_status | awk -F',' '{print $3}' | sed 's/\r//g')
-    lte_lock_pci=$(echo $lte_status | awk -F',' '{print $4}' | sed 's/\r//g')
+    lte_lock_status=$(echo $lte_status | ql_csv_field 2 | ql_at_clean)
+    lte_lock_freq=$(echo $lte_status | ql_csv_field 3 | ql_at_clean)
+    lte_lock_pci=$(echo $lte_status | ql_csv_field 4 | ql_at_clean)
     nr_status=$(cmd_qnwlock_query "$at_port" "common/5g" | grep "+QNWLOCK:")
-    nr_lock_status=$(echo $nr_status | awk -F',' '{print $2}' | sed 's/\r//g')
-    nr_lock_pci=$(echo $nr_status | awk -F',' '{print $2}' | sed 's/\r//g')
-    nr_lock_freq=$(echo $nr_status | awk -F',' '{print $3}' | sed 's/\r//g')
-    nr_lock_scs=$(echo $nr_status | awk -F',' '{print $4}' | sed 's/\r//g')
-    nr_lock_band=$(echo $nr_status | awk -F',' '{print $5}' | sed 's/\r//g')
+    nr_lock_status=$(echo $nr_status | ql_csv_field 2 | ql_at_clean)
+    nr_lock_pci=$(echo $nr_status | ql_csv_field 2 | ql_at_clean)
+    nr_lock_freq=$(echo $nr_status | ql_csv_field 3 | ql_at_clean)
+    nr_lock_scs=$(echo $nr_status | ql_csv_field 4 | ql_at_clean)
+    nr_lock_band=$(echo $nr_status | ql_csv_field 5 | ql_at_clean)
     if [ "$lte_lock_status" != "0" ]; then
         lte_lock_status="locked"
     else
@@ -1067,10 +1068,10 @@ get_neighborcell_qualcomm(){
 
 get_neighborcell_lte(){
     lte_status=$(cmd_qnwlock_query "$at_port" "common/lte" | grep "+QNWLOCK:")
-    lte_lock_status=$(echo $lte_status | awk -F',' '{print $2}')
-    lte_lock_freq=$(echo $lte_status | awk -F',' '{print $3}')
-    lte_lock_pci=$(echo $lte_status | awk -F',' '{print $4}')
-    lte_lock_finish=$(echo $lte_status | awk -F',' '{print $5}' | sed 's/\r//g')
+    lte_lock_status=$(echo $lte_status | ql_csv_field 2)
+    lte_lock_freq=$(echo $lte_status | ql_csv_field 3)
+    lte_lock_pci=$(echo $lte_status | ql_csv_field 4)
+    lte_lock_finish=$(echo $lte_status | ql_csv_field 5 | ql_at_clean)
     if [ "$lte_lock_finish" == "0" ]; then
         lte_lock_finish="finish"
     else
@@ -1117,10 +1118,10 @@ get_neighborcell_lte(){
                 *LTE*)
                     type="LTE"
                     neighbourcell=$(echo $line | awk -F',' '{print $1}' | tr -d '"')
-                    arfcn=$(echo $line | awk -F',' '{print $3}')
-                    pci=$(echo $line | awk -F',' '{print $4}')
-                    rsrq=$(echo $line | awk -F',' '{print $5}')
-                    rsrp=$(echo $line | awk -F',' '{print $6}')
+                    arfcn=$(echo $line | ql_csv_field 3)
+                    pci=$(echo $line | ql_csv_field 4)
+                    rsrq=$(echo $line | ql_csv_field 5)
+                    rsrp=$(echo $line | ql_csv_field 6)
 
                     ;;
             esac
@@ -1551,7 +1552,7 @@ cell_info()
         endc_lte_sinr=$(echo "$lte" | awk -F',' '{print $15}')
         endc_lte_cql=$(echo "$lte" | awk -F',' '{print $16}')
         endc_lte_tx_power=$(echo "$lte" | awk -F',' '{print $17}')
-        endc_lte_srxlev=$(echo "$lte" | awk -F',' '{print $18}' | sed 's/\r//g')
+        endc_lte_srxlev=$(echo "$lte" | ql_csv_field 18 | ql_at_clean)
         #NR5G-NSA
         endc_nr_mcc=$(echo "$nr5g_nsa" | awk -F',' '{print $2}')
         endc_nr_mnc=$(echo "$nr5g_nsa" | awk -F',' '{print $3}')
@@ -1564,7 +1565,7 @@ cell_info()
         endc_nr_band=$(get_band "NR" $endc_nr_band_num)
         nr_dl_bandwidth_num=$(echo "$nr5g_nsa" | awk -F',' '{print $10}')
         endc_nr_dl_bandwidth=$(get_bandwidth "NR" $nr_dl_bandwidth_num)
-        scs_num=$(echo "$nr5g_nsa" | awk -F',' '{print $16}' | sed 's/\r//g')
+        scs_num=$(echo "$nr5g_nsa" | ql_csv_field 16 | ql_at_clean)
         endc_nr_scs=$(get_scs $scs_num)
     else
         #SA，LTE，WCDMA模式
@@ -1634,7 +1635,7 @@ EOF
                 nr_sinr=$(echo "$response" | awk -F',' '{print $15}')
                 nr_scs_num=$(echo "$response" | awk -F',' '{print $16}')
                 nr_scs=$(get_scs $nr_scs_num)
-                nr_srxlev=$(echo "$response" | awk -F',' '{print $17}' | sed 's/\r//g')
+                nr_srxlev=$(echo "$response" | ql_csv_field 17 | ql_at_clean)
             ;;
             "LTE"|"CAT-M"|"CAT-NB")
                 network_mode="LTE Mode"
@@ -1657,7 +1658,7 @@ EOF
                 lte_sinr=$(echo "$response" | awk -F',' '{print $17}')
                 lte_cql=$(echo "$response" | awk -F',' '{print $18}')
                 lte_tx_power=$(echo "$response" | awk -F',' '{print $19}')
-                lte_srxlev=$(echo "$response" | awk -F',' '{print $20}' | sed 's/\r//g')
+                lte_srxlev=$(echo "$response" | ql_csv_field 20 | ql_at_clean)
             ;;
             "WCDMA")
                 network_mode="WCDMA Mode"
@@ -1677,7 +1678,7 @@ EOF
                 wcdma_slot_num=$(echo "$response" | awk -F',' '{print $15}')
                 wcdma_slot=$(get_slot $wcdma_slot_num)
                 wcdma_speech_code=$(echo "$response" | awk -F',' '{print $16}')
-                wcdma_com_mod=$(echo "$response" | awk -F',' '{print $17}' | sed 's/\r//g')
+                wcdma_com_mod=$(echo "$response" | ql_csv_field 17 | ql_at_clean)
             ;;
         esac
     fi
@@ -1776,7 +1777,7 @@ get_current_band()
             "$(echo "$nr5g_nsa" | awk -F',' '{print $4}')" \
             "" \
             "$(get_bandwidth "NR" "$(echo "$nr5g_nsa" | awk -F',' '{print $10}')")" \
-            "$(get_scs "$(echo "$nr5g_nsa" | awk -F',' '{print $16}' | sed 's/\r//g')")"
+            "$(get_scs "$(echo "$nr5g_nsa" | ql_csv_field 16 | ql_at_clean)")"
 
         json_close_array
     else

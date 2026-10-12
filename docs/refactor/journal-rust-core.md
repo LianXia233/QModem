@@ -77,3 +77,61 @@ feature 矩阵：`service`（默认）、`tty`（libc/termios，无串口可编�
 2. **vendor 规则引擎 / smsd**：`qmodem-pdu::Udh` 复用为分片重组核心；在 atd 上层加消息组装/去重/持久化 actor，替代 `qmodem_smsd` 轮询模型。
 3. **TtyPort 加固**：O_NONBLOCK 轮询 → `AsyncFd` epoll；端口监控线程改周期任务（对齐 port_manager.c 的重连逻辑）。
 4. **配置**：对齐 config_loader.c 的端口/回调 JSON，事件回调以 `tokio::process` 参数数组执行（消除 C event_callback.c 的命令注入面，C 侧已在 journal-c-core.md 中同步修复）。
+
+## 6. 零依赖改造（agent-rust-zero，2026-10-12）
+
+目标：去除全部外部 crate 依赖，改为纯 std 实现，作为"减少外部依赖、单包交付"战略的核心一步。语义与既有测试全部保持不变。
+
+### 6.1 改造内容
+
+| 原依赖 | 替代实现 | 位置 |
+|---|---|---|
+| thiserror（pdu + atd） | `PduError`/`AtError` 手写 `impl std::fmt::Display` + `impl std::error::Error`，错误文案逐条对齐原 `#[error(...)]` | qmodem-pdu/src/lib.rs, qmodem-atd/src/port.rs |
+| tokio（actor/select!/timeout） | 每端口一个 `std::thread` actor：命令用 `try_recv`（仅 idle 时收取，在飞请求排队于有界 `sync_channel`）；端口读为带超时的阻塞读（单线程独占 fd，无跨线程使用）；单调时钟 = `Instant` 截止时间 + `recv_timeout`/读切片（IDLE 50ms / READ 20ms）限定唤醒延迟；超时返回部分响应 + `Timeout` | qmodem-atd/src/port.rs |
+| tokio oneshot/mpsc | 每请求一个 `std::sync::mpsc::channel` 作 oneshot（Sender 移入 actor，随队列销毁自动回 `PortClosed`）；命令队列 `sync_channel(depth)` 保背压语义 | port.rs |
+| tokio broadcast | 自研轻量 hub：`Mutex<Vec<Arc<SubQueue>>>` + `Condvar`；满队列丢最旧并计 `dropped`，recv 先报 `RecvError::Lagged(n)`（保持 drop_count 语义）；receiver drop 即退订，hub drop 通知 `Closed` | qmodem-atd/src/line.rs |
+| tokio watch（shutdown） | `Arc<AtomicBool>`，actor 每轮循环检查（延迟 ≤50ms） | port.rs |
+| serde/serde_json | 自研最小 JSON（`src/json.rs`）：递归下降 parse（对象保序、全转义集、`\uXXXX` 代理对、lone surrogate 拒绝、整型/浮点区分、带字节偏移的错误）+ 紧凑 serialize（控制字符 `\u00XX` 转义、非有限浮点→null）；`json!` 宏 + `Value` 索引/比较 helpers 覆盖原 `serde_json::json!` 用法 | qmodem-atd/src/json.rs |
+| tokio UnixListener | `std::os::unix::net::UnixListener` + 每连接一线程（`BufReader::read_line` 行协议不变）；协议响应字段/错误文案逐字保持 | qmodem-atd/src/service.rs |
+| libc（tty feature，gated） | 本就未实际使用 libc crate——tty 模块为内联 `extern "C"` termios 声明；同步化 `read_chunk(buf, timeout)`（O_NONBLOCK + WouldBlock 轮询）与 `write_all` | qmodem-atd/src/transport.rs |
+
+行为差异说明（均为内部实现细节，外部语义不变）：
+- idle 状态下 URC 读取延迟上界为 IDLE_SLICE=50ms（单线程 actor 无法同时阻塞在 channel 与 fd；tokio select! 可双路等待）。命令收取延迟同样 ≤50ms；在飞命令超时精度由 READ_SLICE=20ms 保证。1-4 模组场景完全够用。
+- 旧版 port 线程 panic 时（unwind 默认）pending 的 resp_tx 随栈展开销毁，调用方 recv 报 `PortClosed`，与 drain 路径一致。
+
+### 6.2 测试改写与新增
+
+- 原有 24 个测试语义不变改写为 std 线程版（顺序/并发排队不串响应/超时部分响应/自定义 end flag/URC 订阅/PortClosed 不 panic/JSON 服务集成/boxed 分发）。
+- 新增：json 模块 7 个单测（转义与往返、代理对、数字形态、错误路径、宏构造与索引）；broadcast hub 4 个单测（fanout/Lagged 丢最旧/Closed/退订）；transport 超时单测；`tests/zero_dep.rs` 零依赖守卫（断言三个 Cargo.toml 不含 tokio/serde/thiserror/libc 且无 `[dependencies]` 节）。
+- 合计 37 个测试。
+
+### 6.3 依赖矩阵（改造后）
+
+| crate | 外部依赖 |
+|---|---|
+| qmodem-pdu | 0 |
+| qmodem-atd（含全部 feature：service/tty/ubus） | 0 |
+
+`Cargo.lock` 仅含 workspace 自身两个包；CI 可另行在流水线断言 `grep -r "tokio\|serde\|thiserror" rust/*/Cargo.toml` 为空。
+
+### 6.4 验证记录（本机 cargo 1.93.0）
+
+```
+$ cargo test --workspace
+test result: ok. 14 passed  (qmodem-atd lib 单测: json 7 + line/broadcast 4 + transport 3)
+test result: ok.  8 passed  (atd 集成测试)
+test result: ok.  1 passed  (zero_dep 守卫)
+test result: ok. 14 passed  (qmodem-pdu)
+—— 合计 37 通过，0 失败
+
+$ cargo test -p qmodem-atd --no-default-features   → 36 通过（service 测试按 feature 关闭），0 warning
+$ cargo check -p qmodem-atd --features tty,ubus    → ok
+$ cargo clippy --workspace --all-targets           → 0 warning 0 error
+$ cargo clippy -p qmodem-atd --no-default-features --all-targets → 0
+$ cargo clippy -p qmodem-atd --features tty,ubus --all-targets   → 0
+$ grep -r "tokio\|serde\|thiserror\|libc" rust/*/Cargo.toml → 无残留
+
+$ cargo build --release
+target/release/qmodem-atd          748,176 B（未 strip；tokio 版 1,322,696 B，-43.4%）
+target/release/libqmodem_pdu.rlib     94,954 B
+```

@@ -404,10 +404,10 @@ get_dns()
         pdp_index="1"
     }
 
-    local public_dns1_ipv4="223.5.5.5"
-    local public_dns2_ipv4="119.29.29.29"
-    local public_dns1_ipv6="2400:3200::1" #下一代互联网北京研究中心：240C::6666，阿里：2400:3200::1，腾讯：2402:4e00::
-    local public_dns2_ipv6="2402:4e00::"
+    local public_dns1_ipv4="${QMODEM_FALLBACK_DNS1_IPV4}"
+    local public_dns2_ipv4="${QMODEM_FALLBACK_DNS2_IPV4}"
+    local public_dns1_ipv6="${QMODEM_FALLBACK_DNS1_IPV6}"
+    local public_dns2_ipv6="${QMODEM_FALLBACK_DNS2_IPV6}"
 
     #获取DNS地址
     local response=$(cmd_gtdns "$at_port" "$pdp_index" | grep "+GTDNS: ")

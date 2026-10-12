@@ -5,6 +5,7 @@
 'require dom';
 'require qmodem.qmodem as qmodem';
 'require qmodem.sms as smsService';
+'require qmodem.ui as qmUI';
 
 // Load CSS (deduplicated)
 qmodem.loadCss(L.resource('qmodem/qmodem-next.css'));
@@ -18,7 +19,8 @@ return view.extend({
 		var self = this;
 		var container = E('div', { 'class': 'cbi-map' });
 
-		// Filter enabled modems
+		// Filter enabled modems (defensive: backend may return no list)
+		modems = modems || [];
 		modems = modems.filter(function(m) { return m.enabled; });
 
 		if (modems.length === 0) {
@@ -27,27 +29,13 @@ return view.extend({
 			return container;
 		}
 
-		// Modem selector
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
-		
-		var select = E('select', {
-			'class': 'cbi-input-select',
-			'id': 'sms_modem_selector'
-		});
-		
-		modems.forEach(function(modem) {
-			select.appendChild(E('option', { 'value': modem.id }, modem.name));
-		});
-		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
+		// Modem selector (shared component; extra rows are appended to the
+		// same table body, keeping the original DOM structure)
+		var selector = qmUI.ModemSelector(modems, { id: 'sms_modem_selector' });
+		var select = selector.select;
+		var selectorBody = selector.body;
+		var selectorTable = selector.section.querySelector('table');
+		var selectorSection = selector.section;
 
 		// SMS mode setting row
 	var smsModeRow = E('tr', { 'class': 'tr' });
@@ -93,8 +81,6 @@ return view.extend({
 	smsAutoDeleteRow.appendChild(smsAutoDeleteCell);
 	selectorBody.appendChild(smsAutoDeleteRow);
 
-	selectorTable.appendChild(selectorBody);
-	selectorSection.appendChild(selectorTable);
 	container.appendChild(selectorSection);
 
 	// SMS Storage Section
@@ -268,9 +254,7 @@ return view.extend({
 			if (!result.error && result.conversations) {
 				self.renderConversationsList(contentArea, result.conversations, configSection);
 			}
-		}).catch(function(err) {
-			console.error('Poll error:', err);
-		});
+		}).catch(qmUI.pollGuard('sms_list'));
 	},
 
 	renderConversationsList: function(contentArea, conversations, configSection) {
@@ -321,16 +305,14 @@ return view.extend({
 			// Use unread_count from backend
 			var unreadCount = conv.unread_count || 0;
 
-			var row = E('tr', { 
-				'class': 'tr cbi-section-table-row' + (unreadCount > 0 ? ' sms-unread-conversation' : ''),
-				'style': 'cursor: pointer;' + (unreadCount > 0 ? ' font-weight: bold;' : ''),
+			var row = E('tr', {
+				'class': 'tr cbi-section-table-row sms-conversation-row' + (unreadCount > 0 ? ' sms-unread-conversation' : ''),
 				'data-contact': conv.contact
 			}, [
 				E('td', { 'class': 'td' }, [
 					contact,
-					unreadCount > 0 ? E('span', { 
-						'class': 'sms-unread-badge',
-						'style': 'background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; margin-left: 8px; font-size: 11px;'
+					unreadCount > 0 ? E('span', {
+						'class': 'sms-unread-badge'
 					}, String(unreadCount)) : ''
 				]),
 				E('td', { 'class': 'td' }, preview),
@@ -419,9 +401,8 @@ return view.extend({
 					])
 				])
 			]),
-			E('div', { 
-				'class': 'cbi-value',
-				'style': 'font-size: 12px; color: #666;'
+			E('div', {
+				'class': 'cbi-value sms-counter-row'
 			}, [
 				E('label', { 'class': 'cbi-value-title' }, _('Length')),
 				E('div', { 'class': 'cbi-value-field' }, [

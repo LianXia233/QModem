@@ -1,19 +1,16 @@
 'use strict';
 'require baseclass';
 'require qmodem.qmodem as qmodem';
+'require qmodem.ui as qmUI';
 
-function progressbar(value, max, min, unit) {
-	var val = parseInt(value) || 0,
-		maximum = parseInt(max) || 100,
-		minimum = parseInt(min) || 0,
-		unit = unit || '',
-		pc = Math.floor((100 / (maximum - minimum)) * (val - minimum));
+// Load CSS (deduplicated) so compat-progressbar styles are available when the
+// active theme does not provide .cbi-progressbar.
+qmodem.loadCss(L.resource('qmodem/qmodem-next.css'));
 
-	return E('div', {
-		'class': 'cbi-progressbar',
-		'title': '%s / %s%s (%d%%)'.format(val, maximum, unit, pc)
-	}, E('div', { 'style': 'width:%.2f%%'.format(pc) }));
-}
+// Note: the legacy luci-app-qmodem package ships its own 11_modem.js with a
+// duplicated progressbar/table implementation. It is intentionally untouched
+// here and will be consolidated during the legacy-package retirement phase;
+// the shared rendering helpers now live in qmodem/ui.js.
 
 return baseclass.extend({
 	title: _('Modem Info'),
@@ -97,7 +94,7 @@ return baseclass.extend({
 					var value;
 					if (type == 'progress_bar') {
 						value = E('td', { 'class': 'td left' }, [
-							(entry.value != null) ? progressbar(entry.value, entry.max_value, entry.min_value, entry.unit) : '?'
+							(entry.value != null) ? qmUI.progressbar(entry.value, entry.max_value, entry.min_value, entry.unit) : '?'
 						]);
 					} else {
 						value = E('td', { 'class': 'td left' }, [ (entry.value != null) ? entry.value : '?' ]);

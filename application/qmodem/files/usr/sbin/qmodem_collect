@@ -26,6 +26,7 @@ trap 'exit 1' HUP INT TERM
 usage()
 {
     echo "usage: qmodem_collect <status|pack [--raw] [--unencrypted]|clear>" >&2
+    echo "WARNING: --raw keeps unmasked IMEI/IMSI/ICCID identifiers; use only when explicitly required" >&2
     exit 1
 }
 
@@ -133,6 +134,11 @@ cmd_pack()
         echo "nothing collected in $COLLECT_DIR" >&2
         exit 1
     }
+    # --raw must be explicit; without it masking is always enforced
+    if [ "$raw" = "1" ]; then
+        echo "WARNING: raw pack requested: IMEI/IMSI identifiers will NOT be masked" >&2
+        logger -t qmodem_collect "raw pack requested: identifiers (IMEI/IMSI/ICCID) will NOT be masked"
+    fi
     local work out_file file count timestamp inner_file seal_work seal_bin
     local rel resolved target_rel expected_vendor expected_platform expected_model prepared
     local recipient recipient_id seal_output review_key wrapped_key_hex
@@ -205,7 +211,12 @@ cmd_pack()
     }
     rm -rf "$work"
     PACK_WORK=
-    [ "$raw" = "1" ] || echo "sanitized: long digit sequences (including expected snapshots) are masked"
+    if [ "$raw" = "1" ]; then
+        echo "WARNING: raw mode: IMEI/IMSI/ICCID identifiers are NOT masked in this archive" >&2
+        logger -t qmodem_collect "packed raw archive with unmasked identifiers"
+    else
+        echo "sanitized: long digit sequences (including expected snapshots) are masked"
+    fi
 
     seal_bin="${QMODEM_SEAL_BIN:-qmodem-seal}"
     if [ "$unencrypted" = "0" ] && ! command -v "$seal_bin" >/dev/null 2>&1; then

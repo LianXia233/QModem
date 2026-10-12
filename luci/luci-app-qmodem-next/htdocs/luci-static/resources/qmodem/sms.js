@@ -1,5 +1,6 @@
 'use strict';
 'require rpc';
+'require qmodem.ui as qmUI';
 
 var callList = rpc.declare({ object: 'qmodem.sms', method: 'list', params: [ 'modem_id', 'limit', 'offset' ], expect: { } });
 var callSync = rpc.declare({ object: 'qmodem.sms', method: 'sync', params: [ 'modem_id' ], expect: { } });
@@ -131,11 +132,8 @@ return L.Class.extend({
 		return this.getReceivedHistory(modem).then(function(result) { return deleteMany(modem, result.messages.map(function(message) { return message.id; })); });
 	},
 	formatTimestamp: function(timestamp) {
-		var date = new Date(timestamp * 1000), now = new Date(), days = Math.floor((now - date) / 86400000);
-		if (days === 0) return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
-		if (days === 1) return _('Yesterday');
-		if (days < 7) return [ _('Sunday'), _('Monday'), _('Tuesday'), _('Wednesday'), _('Thursday'), _('Friday'), _('Saturday') ][date.getDay()];
-		return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+		// Delegates to the shared implementation in qmodem/ui.js
+		return qmUI.relativeTime(timestamp);
 	},
 	formatPhoneNumber: function(number) {
 		if (!number) return '';

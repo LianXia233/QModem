@@ -3,22 +3,15 @@ name = "qmodem-atd"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Async AT command daemon (Rust rewrite of application/ubus_at_daemon with a tokio actor model)"
-
-[dependencies]
-tokio = { workspace = true, features = ["full"] }
-serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }
-thiserror = { workspace = true }
-libc = { workspace = true, optional = true }
+description = "AT command daemon on std::thread actors (Rust rewrite of application/ubus_at_daemon, zero external crates)"
 
 [features]
 default = ["service"]
 # Unix-socket JSON line protocol service (pre-ubus test interface).
 service = []
-# Raw tty transport via libc/termios; needs a real serial device at runtime
-# but compiles anywhere.
-tty = ["dep:libc"]
+# Raw tty transport via inline termios FFI; needs a real serial device at
+# runtime but compiles anywhere (no external crate involved).
+tty = []
 # libubus C FFI skeleton; requires libubus headers/libs when linking,
 # intended for cross-compile OpenWrt builds.
 ubus = []

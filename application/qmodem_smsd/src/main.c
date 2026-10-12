@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <poll.h>
+#include <pthread.h>
 #include <time.h>
 #include <uci.h>
 #include <unistd.h>
@@ -421,7 +422,7 @@ static int apply_modem_settings(const char *section)
     return result;
 }
 
-static int sync_modem(const char *section, const char *trigger, int *imported,
+static int sync_modem(sms_db_t *db, const char *section, const char *trigger, int *imported,
                       int *deleted)
 {
     struct modem_config cfg;
@@ -450,7 +451,7 @@ static int sync_modem(const char *section, const char *trigger, int *imported,
         snprintf(app.last_sync_error, sizeof(app.last_sync_error), "legacy SMS database migration failed");
         return -1;
     }
-    sms_db_set_multipart_windows(&app.db, app.multipart_wait,
+    sms_db_set_multipart_windows(db, app.multipart_wait,
                                  app.late_fragment_window);
     (void)trigger;
     if (run_tom(&cfg, "r", NULL, -1, NULL, &output) != 0)
@@ -488,7 +489,7 @@ static int sync_modem(const char *section, const char *trigger, int *imported,
             segment.total_parts = json_object_get_int(field);
         if (json_object_object_get_ex(entry, "part", &field))
             segment.part_number = json_object_get_int(field);
-        if (sms_db_import_segment(&app.db, &segment, time(NULL), cfg.forwarding,
+        if (sms_db_import_segment(db, &segment, time(NULL), cfg.forwarding,
                                   &import_result) != 0)
             goto out;
         if (!import_result.duplicate)
@@ -496,20 +497,20 @@ static int sync_modem(const char *section, const char *trigger, int *imported,
         if (cfg.auto_delete && import_result.safe_to_delete &&
             run_tom(&cfg, "d", NULL, segment.source_index, NULL, &delete_output) == 0) {
             (*deleted)++;
-            (void)sms_db_mark_source_deleted(&app.db, import_result.source_id, time(NULL));
+            (void)sms_db_mark_source_deleted(db, import_result.source_id, time(NULL));
         }
         free(delete_output);
     }
     {
         int expired;
-        if (sms_db_publish_expired(&app.db, section, time(NULL), cfg.forwarding,
+        if (sms_db_publish_expired(db, section, time(NULL), cfg.forwarding,
                                    &expired) != 0)
             goto out;
     }
-    if (sms_db_finish_scan(&app.db, section, cfg.storage, started_at) != 0)
+    if (sms_db_finish_scan(db, section, cfg.storage, started_at) != 0)
         goto out;
     app.last_sync_imported = *imported;
-    if (sms_db_prune(&app.db, section, app.received_retention,
+    if (sms_db_prune(db, section, app.received_retention,
                      app.sent_retention) != 0)
         goto out;
     result = 0;
@@ -519,13 +520,13 @@ out:
     if (root)
         json_object_put(root);
     free(output);
-    if (sms_db_record_sync(&app.db, section, trigger, started_at, *imported,
+    if (sms_db_record_sync(db, section, trigger, started_at, *imported,
                            result == 0 ? NULL : app.last_sync_error) != 0 && result == 0) {
         snprintf(app.last_sync_error, sizeof(app.last_sync_error),
                  "failed to record synchronization result");
         result = -1;
     }
-    if (sms_db_checkpoint(&app.db) != 0 && result == 0) {
+    if (sms_db_checkpoint(db) != 0 && result == 0) {
         snprintf(app.last_sync_error, sizeof(app.last_sync_error),
                  "failed to checkpoint SMS database");
         result = -1;
@@ -588,7 +589,8 @@ static int sync_method(struct ubus_context *ctx, struct ubus_object *obj,
     blobmsg_parse(policy, __ARG_MAX, tb, blob_data(msg), blob_len(msg));
     if (!tb[ARG_MODEM])
         return UBUS_STATUS_INVALID_ARGUMENT;
-    if (sync_modem(blobmsg_get_string(tb[ARG_MODEM]), "manual", &imported, &deleted) != 0) {
+    if (sync_modem(&app.db, blobmsg_get_string(tb[ARG_MODEM]), "manual", &imported,
+                   &deleted) != 0) {
         reply_error(ctx, req, app.last_sync_error);
         return UBUS_STATUS_OK;
     }
@@ -1260,6 +1262,61 @@ error:
     sqlite3_finalize(stmt); reply_error(ctx, req, "delivery completion failed"); return UBUS_STATUS_OK;
 }
 
+/*
+ * C10: urc_event runs on the ubus/uloop dispatch thread; running
+ * sync_modem() there blocks dispatch for up to 15s per child command.
+ * Instead the handler only records a pending job under a mutex and wakes
+ * the worker thread below. Events arriving while a job is pending are
+ * merged (dropped) since the in-flight sync covers them. All database
+ * access from this path (sms_db_record_event + sync_modem) is kept
+ * serial inside the worker thread; the connection itself is opened with
+ * SQLITE_OPEN_FULLMUTEX in sms_db_open() so concurrent use from the
+ * uloop thread (ubus methods) stays safe.
+ */
+static pthread_mutex_t urc_sync_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t urc_sync_cond = PTHREAD_COND_INITIALIZER;
+static int urc_sync_pending;
+static int urc_sync_stop;
+static int urc_sync_has_epoch;
+static uint64_t urc_sync_epoch;
+static uint64_t urc_sync_sequence;
+static char urc_sync_section[64];
+
+static void *urc_sync_worker(void *arg)
+{
+    (void)arg;
+    pthread_mutex_lock(&urc_sync_mutex);
+    while (!urc_sync_stop) {
+        char section[64];
+        uint64_t epoch, sequence;
+        int has_epoch;
+
+        while (!urc_sync_pending && !urc_sync_stop)
+            pthread_cond_wait(&urc_sync_cond, &urc_sync_mutex);
+        if (urc_sync_stop)
+            break;
+        snprintf(section, sizeof(section), "%s", urc_sync_section);
+        has_epoch = urc_sync_has_epoch;
+        epoch = urc_sync_epoch;
+        sequence = urc_sync_sequence;
+        urc_sync_pending = 0;
+        pthread_mutex_unlock(&urc_sync_mutex);
+
+        {
+            int gap = 0, imported, deleted;
+            if (has_epoch)
+                (void)sms_db_record_event(&app.db, section, (int64_t)epoch,
+                                          (int64_t)sequence, &gap);
+            (void)sync_modem(&app.db, section, gap ? "urc_gap" : "urc",
+                             &imported, &deleted);
+        }
+
+        pthread_mutex_lock(&urc_sync_mutex);
+    }
+    pthread_mutex_unlock(&urc_sync_mutex);
+    return NULL;
+}
+
 static void urc_event(struct ubus_context *ctx, struct ubus_event_handler *handler,
                       const char *type, struct blob_attr *msg)
 {
@@ -1282,16 +1339,22 @@ static void urc_event(struct ubus_context *ctx, struct ubus_event_handler *handl
     if (!uci || uci_load(uci, "qmodem", &package) != UCI_OK) goto out;
     uci_foreach_element(&package->sections, element) {
         struct uci_section *section = uci_to_section(element);
-        int imported, deleted, gap = 0;
         if (!strcmp(option_string(uci, section, "override_at_port",
                 option_string(uci, section, "sms_at_port",
                 option_string(uci, section, "at_port", ""))),
                 blobmsg_get_string(tb[URC_PORT])) &&
             !strcmp(option_string(uci, section, "sms_mode", "database_poll"), "database_urc")) {
-            if (tb[URC_EPOCH] && tb[URC_SEQUENCE])
-                (void)sms_db_record_event(&app.db, section->e.name,
-                    blobmsg_get_u64(tb[URC_EPOCH]), blobmsg_get_u64(tb[URC_SEQUENCE]), &gap);
-            sync_modem(section->e.name, gap ? "urc_gap" : "urc", &imported, &deleted);
+            pthread_mutex_lock(&urc_sync_mutex);
+            if (!urc_sync_pending) {
+                snprintf(urc_sync_section, sizeof(urc_sync_section),
+                         "%s", section->e.name);
+                urc_sync_has_epoch = tb[URC_EPOCH] && tb[URC_SEQUENCE];
+                urc_sync_epoch = tb[URC_EPOCH] ? blobmsg_get_u64(tb[URC_EPOCH]) : 0;
+                urc_sync_sequence = tb[URC_SEQUENCE] ? blobmsg_get_u64(tb[URC_SEQUENCE]) : 0;
+                urc_sync_pending = 1;
+                pthread_cond_signal(&urc_sync_cond);
+            }
+            pthread_mutex_unlock(&urc_sync_mutex);
             break;
         }
     }
@@ -1312,8 +1375,8 @@ static void control_event(struct ubus_context *ctx, struct ubus_event_handler *h
     (void)ctx; (void)handler; (void)type;
     blobmsg_parse(control_policy, __CONTROL_MAX, tb, blob_data(msg), blob_len(msg));
     if (tb[CONTROL_MODEM] && valid_id(blobmsg_get_string(tb[CONTROL_MODEM])))
-        (void)sync_modem(blobmsg_get_string(tb[CONTROL_MODEM]), "settings_reapplied",
-                         &imported, &deleted);
+            (void)sync_modem(&app.db, blobmsg_get_string(tb[CONTROL_MODEM]),
+                             "settings_reapplied", &imported, &deleted);
 }
 
 static void scheduler_cb(struct uloop_timeout *timeout)
@@ -1351,7 +1414,7 @@ static void scheduler_cb(struct uloop_timeout *timeout)
         }
         sqlite3_finalize(stmt);
         if (last_sync + cfg.poll_interval <= now)
-            (void)sync_modem(section->e.name, "poll", &imported, &deleted);
+            (void)sync_modem(&app.db, section->e.name, "poll", &imported, &deleted);
     }
 out:
     if (package)
@@ -1412,7 +1475,19 @@ int main(int argc, char **argv)
     ubus_register_event_handler(app.ubus, &app.control_handler, "qmodem.sms.control");
     app.scheduler.cb = scheduler_cb;
     uloop_timeout_set(&app.scheduler, 1000);
-    uloop_run();
+    {
+        pthread_t worker;
+        if (pthread_create(&worker, NULL, urc_sync_worker, NULL) == 0) {
+            uloop_run();
+            pthread_mutex_lock(&urc_sync_mutex);
+            urc_sync_stop = 1;
+            pthread_cond_signal(&urc_sync_cond);
+            pthread_mutex_unlock(&urc_sync_mutex);
+            pthread_join(worker, NULL);
+        } else {
+            uloop_run();
+        }
+    }
     ubus_free(app.ubus); sms_db_close(&app.db); uloop_done();
     return 0;
 }

@@ -26,6 +26,7 @@ define Package/$(PKG_NAME)
 		+ubus-at-daemon +qmodem-settings +tom_modem +terminfo +sms-tool_q \
 		+modem_scan \
 		+jq +bc\
+		+jsonfilter \
 		+coreutils +coreutils-stat +xxd \
 		+PACKAGE_qmodem_INCLUDE_SEAL:qmodem-seal \
 		+usbutils \

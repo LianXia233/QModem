@@ -17,23 +17,33 @@
 //! * UCS-2 decoded messages are converted to UTF-8 (the C version copies
 //!   raw UCS-2 bytes into the output buffer, pdu.c:616-617).
 
-use thiserror::Error;
-
 /// SMS PDU codec error.
-#[derive(Debug, Clone, PartialEq, Eq, Error)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PduError {
     /// Input buffer ended earlier than the PDU structure requires.
-    #[error("pdu truncated")]
     Truncated,
     /// Field content is malformed (bad digit, bad BCD, bad UTF-16, ...).
-    #[error("invalid pdu: {0}")]
     Invalid(&'static str),
     /// Encoded message exceeds 3GPP length limits (160 septets / 70 UCS-2 units).
-    #[error("message too long")]
-    TooLong,    /// Phone number contains characters other than ASCII digits.
-    #[error("phone number must contain ASCII digits only")]
+    TooLong,
+    /// Phone number contains characters other than ASCII digits.
     InvalidNumber,
 }
+
+impl std::fmt::Display for PduError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PduError::Truncated => write!(f, "pdu truncated"),
+            PduError::Invalid(s) => write!(f, "invalid pdu: {s}"),
+            PduError::TooLong => write!(f, "message too long"),
+            PduError::InvalidNumber => {
+                write!(f, "phone number must contain ASCII digits only")
+            }
+        }
+    }
+}
+
+impl std::error::Error for PduError {}
 
 /// Data coding scheme of the user data.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

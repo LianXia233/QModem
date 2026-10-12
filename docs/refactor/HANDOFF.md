@@ -43,4 +43,15 @@ gcc -fsyntax-only -I application/ubus_at_daemon/inc application/ubus_at_daemon/s
 | docs/refactor/journal-c-core.md | W1：at-daemon / tom_modem / libqmodem-sms 的 C 层修复明细 |
 | docs/refactor/journal-shell-pkg.md | W2：modem_hook / modem_dial / rpcd / 打包 Makefile 修复明细 |
 | docs/refactor/journal-luci-next.md | W3：前端修复明细（死代码、fallback、ACL、时区等） |
-| docs/refactor/journal-rust-core.md | W4：rust/ 工作区设计说明与测试结果 |
+| docs/refactor/journal-rust-core.md | W4+W6：rust/ 设计、C→Rust 对照表、零依赖改造（0 外部 crate，二进制 -43.4%） |
+| docs/refactor/journal-pkg-suite.md | W7：qmodem-suite 单包交付 meta 包 + 全仓依赖审计表 |
+| docs/refactor/journal-vendor-lib.md | W8：cmds/qmodem_lib.sh 公共解析库 + quectel/huawei 试点迁移 |
+| docs/refactor/journal-c-smsd.md | W9：smsd C4/C10/C12 修复（含 ASan 自测） |
+| docs/refactor/journal-c-scan.md | W10：modem_scand 权限/白名单 + init.d/hotplug 修正 |
+| docs/refactor/journal-luci-comp.md | W11：LuCI next 组件化（ui.js / pollGuard） |
+| docs/refactor/journal-lua-retire.md | W12：旧栈 H5-H8 止血 + 互斥解除 |
+| docs/refactor/journal-monitor-dial.md | W13：monitor/dial 收尾修复 |
+| docs/refactor/journal-ci.md | W14：check_all.sh 统一门禁 + quality.yml |
+| docs/refactor/journal-tests.md | W16：tests/sh + tests/lua 无依赖测试体系 |
+
+总索引另见 docs/refactor/README.md。

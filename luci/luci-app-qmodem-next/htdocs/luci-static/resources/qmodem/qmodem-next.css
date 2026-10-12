@@ -122,6 +122,55 @@
 	margin-bottom: 10px;
 }
 
+.sms-conversation-header button {
+	margin-right: 10px;
+}
+
+.sms-conversation-header h2 {
+	display: inline-block;
+	margin: 0;
+}
+
+.sms-reply-form {
+	margin-top: 20px;
+}
+
+/* SMS conversation list rows */
+.sms-conversation-row {
+	cursor: pointer;
+}
+
+.sms-unread-conversation {
+	font-weight: bold;
+}
+
+.sms-unread-badge {
+	background: #e74c3c;
+	color: white;
+	border-radius: 10px;
+	padding: 2px 6px;
+	margin-left: 8px;
+	font-size: 11px;
+}
+
+/* Character counter rows (sms compose modal + conversation reply form) */
+.sms-counter-row {
+	font-size: 12px;
+	color: #666;
+}
+
+/* SIM SMS list content cell */
+.sms-sim-content-cell {
+	word-break: break-word;
+}
+
+/* Overview: last update timestamp */
+.qmodem-update-time {
+	text-align: right;
+	padding: 5px;
+	color: #888;
+}
+
 .sms-messages-area {
 	max-height: 500px;
 	overflow-y: auto;
@@ -129,6 +178,7 @@
 	border-radius: 4px;
 	padding: 15px;
 	background: var(--background-color-high, #f9f9f9);
+	margin-top: 20px;
 }
 
 .sms-messages-list {

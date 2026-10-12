@@ -11,9 +11,9 @@
 
 use std::sync::Arc;
 
+use qmodem_atd::line::LineHub;
 use qmodem_atd::port::{spawn_port, AtPortConfig};
 use qmodem_atd::registry::Registry;
-use qmodem_atd::transport::LoopbackPort;
 #[cfg(feature = "tty")]
 use qmodem_atd::transport::SerialPort;
 
@@ -55,19 +55,11 @@ fn main() {
         std::process::exit(2);
     });
 
-    tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(async_main(socket, loopbacks, ports));
-}
-
-async fn async_main(socket: String, loopbacks: Vec<String>, ports: Vec<String>) {
     let registry = Arc::new(Registry::new());
-    let (hub, _) = tokio::sync::broadcast::channel::<qmodem_atd::AtLine>(256);
+    let hub = Arc::new(LineHub::with_capacity(256));
 
     for name in &loopbacks {
-        let port = LoopbackPort::new();
+        let port = qmodem_atd::transport::LoopbackPort::new();
         let handle = spawn_port(name.clone(), Box::new(port), 0, AtPortConfig::default());
         registry.insert(name.clone(), handle);
         println!("registered loopback port {name}");
@@ -101,9 +93,9 @@ async fn async_main(socket: String, loopbacks: Vec<String>, ports: Vec<String>) 
     {
         // Bind the unix socket, removing any stale file first.
         let _ = std::fs::remove_file(&socket);
-        let listener = tokio::net::UnixListener::bind(&socket).expect("bind unix socket");
+        let listener = std::os::unix::net::UnixListener::bind(&socket).expect("bind unix socket");
         println!("qmodem-atd listening on {socket}");
-        qmodem_atd::service::serve(listener, registry, hub).await;
+        qmodem_atd::service::serve(listener, registry, hub);
     }
     #[cfg(not(feature = "service"))]
     {

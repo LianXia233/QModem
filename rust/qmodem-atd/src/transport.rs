@@ -2,47 +2,55 @@
 //!
 //! The C daemon hands a raw `int fd` to a reader pthread while the command
 //! path writes to the same fd under a mutex (at_handler.c:193-195,
-//! port_manager.c). Here the actor owns the transport exclusively; the
-//! [`SerialPort`] trait exists so tests can substitute a [`LoopbackPort`]
-//! and the `tty` feature can supply a real [`TtyPort`](self).
+//! port_manager.c). Here the port actor thread owns the transport
+//! exclusively; the [`SerialPort`] trait is synchronous with an explicit
+//! read timeout, so the single actor thread can interleave command-queue
+//! polling, deadline checks and shutdown signalling without any external
+//! runtime. Tests substitute a [`LoopbackPort`]; the `tty` feature supplies
+//! a real [`TtyPort`](self) built on raw `extern "C"` termios declarations
+//! (no libc crate).
 
 use std::collections::VecDeque;
-use std::future::Future;
-use std::pin::Pin;
-use std::sync::{Arc, Mutex};
+use std::io;
+use std::sync::{Arc, Condvar, Mutex};
+use std::time::{Duration, Instant};
 
-use tokio::sync::Notify;
-
-/// Boxed future type used by [`SerialPort`] (hand-written instead of
-/// `#[async_trait]` to stay dependency-light).
-pub type PortFut<'a, T> = Pin<Box<dyn Future<Output = T> + Send + 'a>>;
+/// Outcome of a [`SerialPort::read_chunk`] call.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReadOutcome {
+    /// `n` bytes were read into the caller's buffer.
+    Data(usize),
+    /// No bytes arrived before `timeout` elapsed.
+    TimedOut,
+    /// Port closed / EOF (buffered bytes are drained before Eof).
+    Eof,
+}
 
 /// Scripted response callback: AT command text -> response lines.
 pub type Responder = Box<dyn FnMut(&str) -> Vec<String> + Send>;
 
-/// Async serial transport owned by one port actor.
+/// Serial transport owned by one port actor thread.
 pub trait SerialPort: Send + 'static {
-    /// Write a whole buffer; resolves when all bytes are accepted.
-    fn write_all<'a>(&'a mut self, data: &'a [u8]) -> PortFut<'a, std::io::Result<()>>;
+    /// Write a whole buffer.
+    fn write_all(&mut self, data: &[u8]) -> io::Result<()>;
 
-    /// Read into `buf`; resolves with bytes read (0 = EOF / port closed).
-    fn read_chunk<'a>(&'a mut self, buf: &'a mut [u8]) -> PortFut<'a, std::io::Result<usize>>;
+    /// Read into `buf`, waiting at most `timeout`.
+    fn read_chunk(&mut self, buf: &mut [u8], timeout: Duration) -> io::Result<ReadOutcome>;
 }
 
 #[cfg(feature = "tty")]
 pub mod tty {
-    //! Raw tty transport via libc/termios (`feature = "tty"`).
+    //! Raw tty transport via termios (`feature = "tty"`).
     //!
-    //! Uses `O_NONBLOCK` + short sleeps inside the read future so the
-    //! executor thread is never blocked; a production hardening step would
-    //! switch to an epoll/AsyncFd integration.
+    //! Uses `O_NONBLOCK` plus short sleeps inside the read call so the port
+    //! thread never blocks indefinitely; the FFI is declared inline with
+    //! `extern "C"`, keeping the build free of external crates.
 
-    use super::SerialPort;
-    use std::future::Future;
+    use super::{ReadOutcome, SerialPort};
     use std::io;
     use std::os::fd::RawFd;
-    use std::pin::Pin;
-    use std::time::Duration;
+    use std::thread;
+    use std::time::{Duration, Instant};
 
     extern "C" {
         fn open(path: *const u8, flags: i32, ...) -> i32;
@@ -102,7 +110,7 @@ pub mod tty {
     }
 
     // Safety: the fd is exclusively owned by this value, which the port
-    // actor moves into its single task.
+    // actor moves into its single thread.
     unsafe impl Send for TtyPort {}
 
     impl TtyPort {
@@ -154,53 +162,47 @@ pub mod tty {
     }
 
     impl SerialPort for TtyPort {
-        fn write_all<'a>(
-            &'a mut self,
-            data: &'a [u8],
-        ) -> Pin<Box<dyn Future<Output = io::Result<()>> + Send + 'a>> {
-            Box::pin(async move {
-                let mut off = 0;
-                while off < data.len() {
-                    // SAFETY: fd valid; slice outlives the call.
-                    let n = unsafe { write(self.fd, data[off..].as_ptr(), data.len() - off) };
-                    if n < 0 {
-                        let err = io::Error::last_os_error();
-                        if err.kind() == io::ErrorKind::WouldBlock {
-                            tokio::time::sleep(Duration::from_millis(5)).await;
-                            continue;
-                        }
-                        return Err(err);
+        fn write_all(&mut self, data: &[u8]) -> io::Result<()> {
+            let mut off = 0;
+            while off < data.len() {
+                // SAFETY: fd valid; slice outlives the call.
+                let n = unsafe { write(self.fd, data[off..].as_ptr(), data.len() - off) };
+                if n < 0 {
+                    let err = io::Error::last_os_error();
+                    if err.kind() == io::ErrorKind::WouldBlock {
+                        thread::sleep(Duration::from_millis(5));
+                        continue;
                     }
-                    off += n as usize;
+                    return Err(err);
                 }
-                Ok(())
-            })
+                off += n as usize;
+            }
+            Ok(())
         }
 
-        fn read_chunk<'a>(
-            &'a mut self,
-            buf: &'a mut [u8],
-        ) -> Pin<Box<dyn Future<Output = io::Result<usize>> + Send + 'a>> {
-            Box::pin(async move {
-                loop {
-                    // SAFETY: fd valid; buf outlives the call.
-                    let n = unsafe { read(self.fd, buf.as_mut_ptr(), buf.len()) };
-                    if n > 0 {
-                        return Ok(n as usize);
-                    }
-                    if n == 0 {
-                        return Ok(0);
-                    }
-                    let err = io::Error::last_os_error();
-                    match err.kind() {
-                        io::ErrorKind::WouldBlock => {
-                            tokio::time::sleep(Duration::from_millis(10)).await;
-                        }
-                        io::ErrorKind::Interrupted => continue,
-                        _ => return Err(err),
-                    }
+        fn read_chunk(&mut self, buf: &mut [u8], timeout: Duration) -> io::Result<ReadOutcome> {
+            let deadline = Instant::now() + timeout;
+            loop {
+                // SAFETY: fd valid; buf outlives the call.
+                let n = unsafe { read(self.fd, buf.as_mut_ptr(), buf.len()) };
+                if n > 0 {
+                    return Ok(ReadOutcome::Data(n as usize));
                 }
-            })
+                if n == 0 {
+                    return Ok(ReadOutcome::Eof);
+                }
+                let err = io::Error::last_os_error();
+                match err.kind() {
+                    io::ErrorKind::WouldBlock => {
+                        if Instant::now() >= deadline {
+                            return Ok(ReadOutcome::TimedOut);
+                        }
+                        thread::sleep(Duration::from_millis(5));
+                    }
+                    io::ErrorKind::Interrupted => continue,
+                    _ => return Err(err),
+                }
+            }
         }
     }
 }
@@ -212,7 +214,7 @@ pub mod tty {
 struct LoopInner {
     /// Bytes queued for the reader.
     rx: VecDeque<u8>,
-    ///Responder invoked for each written command line (without CR).
+    /// Responder invoked for each written command line (without CR).
     responder: Option<Responder>,
     closed: bool,
     /// Commands seen by the transport (test assertions).
@@ -222,14 +224,14 @@ struct LoopInner {
 /// Test double: echoes nothing, feeds scripted responses, injects URCs.
 ///
 /// The handle side (tests) and the actor side share state via
-/// `Arc<Mutex<..>>` plus a `Notify` for wakeup; no raw pointers escape.
+/// `Arc<Mutex<..>>` plus a `Condvar` for wakeup; no raw pointers escape.
 pub struct LoopbackPort {
     shared: Arc<LoopShared>,
 }
 
 struct LoopShared {
     inner: Mutex<LoopInner>,
-    notify: Notify,
+    cv: Condvar,
 }
 
 /// Control side of a [`LoopbackPort`], usable from tests.
@@ -254,7 +256,7 @@ impl LoopbackPort {
                     closed: false,
                     tx_log: Vec::new(),
                 }),
-                notify: Notify::new(),
+                cv: Condvar::new(),
             }),
         }
     }
@@ -293,7 +295,7 @@ impl LoopbackHandle {
         let mut g = self.shared.inner.lock().unwrap();
         g.closed = true;
         drop(g);
-        self.shared.notify.notify_waiters();
+        self.shared.cv.notify_all();
     }
 
     /// Commands written so far (without CR terminators).
@@ -306,84 +308,66 @@ impl LoopbackHandle {
         g.rx.extend(s.as_bytes());
         g.rx.extend(b"\r\n");
         drop(g);
-        self.shared.notify.notify_waiters();
+        self.shared.cv.notify_all();
     }
 }
 
 impl SerialPort for LoopbackPort {
-    fn write_all<'a>(
-        &'a mut self,
-        data: &'a [u8],
-    ) -> PortFut<'a, std::io::Result<()>> {
-        let shared = self.shared.clone();
-        let data = data.to_vec();
-        Box::pin(async move {
-            let lines = String::from_utf8_lossy(&data).into_owned();
-            let mut g = shared.inner.lock().unwrap();
-            if g.closed {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::BrokenPipe,
-                    "loopback closed",
-                ));
+    fn write_all(&mut self, data: &[u8]) -> io::Result<()> {
+        let lines = String::from_utf8_lossy(data).into_owned();
+        let mut g = self.shared.inner.lock().unwrap();
+        if g.closed {
+            return Err(io::Error::new(
+                io::ErrorKind::BrokenPipe,
+                "loopback closed",
+            ));
+        }
+        for cmd in lines.trim_end_matches('\r').split('\r') {
+            if cmd.is_empty() {
+                continue;
             }
-            for cmd in lines.trim_end_matches('\r').split('\r') {
-                if cmd.is_empty() {
-                    continue;
-                }
-                g.tx_log.push(cmd.to_string());
-                let resp = match g.responder.as_mut() {
-                    Some(f) => f(cmd),
-                    None => vec!["OK".to_string()],
-                };
-                for line in resp {
-                    g.rx.extend(line.as_bytes());
-                    g.rx.extend(b"\r\n");
-                }
+            g.tx_log.push(cmd.to_string());
+            let resp = match g.responder.as_mut() {
+                Some(f) => f(cmd),
+                None => vec!["OK".to_string()],
+            };
+            for line in resp {
+                g.rx.extend(line.as_bytes());
+                g.rx.extend(b"\r\n");
             }
-            drop(g);
-            shared.notify.notify_waiters();
-            Ok(())
-        })
+        }
+        drop(g);
+        self.shared.cv.notify_all();
+        Ok(())
     }
 
-    fn read_chunk<'a>(
-        &'a mut self,
-        buf: &'a mut [u8],
-    ) -> PortFut<'a, std::io::Result<usize>> {
-        let shared = self.shared.clone();
-        Box::pin(async move {
-            loop {
-                // Register for wakeup BEFORE re-checking state to avoid a
-                // lost-wakeup race (Notify::enable pattern).
-                let notified = shared.notify.notified();
-                tokio::pin!(notified);
-                notified.as_mut().enable();
-
-                // Guard must drop before the await (std MutexGuard is !Send).
-                let outcome = {
-                    let mut g = shared.inner.lock().unwrap();
-                    if g.closed && g.rx.is_empty() {
-                        Some(0usize)
-                    } else {
-                        let mut n = 0;
-                        while n < buf.len() {
-                            match g.rx.pop_front() {
-                                Some(b) => {
-                                    buf[n] = b;
-                                    n += 1;
-                                }
-                                None => break,
-                            }
-                        }
-                        if n > 0 { Some(n) } else { None }
-                    }
-                };
-                if let Some(n) = outcome {
-                    return Ok(n);
-                }
-                notified.await;
+    fn read_chunk(&mut self, buf: &mut [u8], timeout: Duration) -> io::Result<ReadOutcome> {
+        let deadline = Instant::now() + timeout;
+        let mut g = self.shared.inner.lock().unwrap();
+        loop {
+            if g.closed && g.rx.is_empty() {
+                return Ok(ReadOutcome::Eof);
             }
-        })
+            let mut n = 0;
+            while n < buf.len() {
+                match g.rx.pop_front() {
+                    Some(b) => {
+                        buf[n] = b;
+                        n += 1;
+                    }
+                    None => break,
+                }
+            }
+            if n > 0 {
+                return Ok(ReadOutcome::Data(n));
+            }
+            let now = Instant::now();
+            if now >= deadline {
+                return Ok(ReadOutcome::TimedOut);
+            }
+            let (ng, _) = self.shared.cv.wait_timeout(g, deadline - now).unwrap();
+            g = ng;
+        }
     }
 }
 
@@ -391,24 +375,42 @@ impl SerialPort for LoopbackPort {
 mod tests {
     use super::*;
 
-    #[tokio::test]
-    async fn loopback_eof_on_close() {
+    #[test]
+    fn loopback_eof_on_close() {
         let mut p = LoopbackPort::new();
         let h = p.handle();
         h.close();
         let mut buf = [0u8; 16];
-        assert_eq!(p.read_chunk(&mut buf).await.unwrap(), 0);
+        assert_eq!(
+            p.read_chunk(&mut buf, Duration::from_millis(100)).unwrap(),
+            ReadOutcome::Eof
+        );
     }
 
-    #[tokio::test]
-    async fn loopback_write_triggers_responder() {
+    #[test]
+    fn loopback_write_triggers_responder() {
         let mut p = LoopbackPort::new();
         let h = p.handle();
         h.set_response(vec!["hello".into(), "OK".into()]);
-        p.write_all(b"AT+TEST\r").await.unwrap();
+        p.write_all(b"AT+TEST\r").unwrap();
         let mut buf = [0u8; 64];
-        let n = p.read_chunk(&mut buf).await.unwrap();
+        let n = match p.read_chunk(&mut buf, Duration::from_millis(100)).unwrap() {
+            ReadOutcome::Data(n) => n,
+            other => panic!("expected data, got {other:?}"),
+        };
         assert_eq!(&buf[..n], b"hello\r\nOK\r\n");
         assert_eq!(h.written(), vec!["AT+TEST".to_string()]);
+    }
+
+    #[test]
+    fn loopback_read_times_out_when_silent() {
+        let mut p = LoopbackPort::new();
+        let mut buf = [0u8; 16];
+        let t0 = Instant::now();
+        assert_eq!(
+            p.read_chunk(&mut buf, Duration::from_millis(40)).unwrap(),
+            ReadOutcome::TimedOut
+        );
+        assert!(t0.elapsed() >= Duration::from_millis(35));
     }
 }

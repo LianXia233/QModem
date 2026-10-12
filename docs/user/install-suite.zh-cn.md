@@ -1,0 +1,107 @@
+# qmodem-suite 单包安装指南
+
+> 状态：**新增元包**。`qmodem-suite` 是元包（metapackage，`PKGARCH:=all`，见 `application/qmodem-suite/Makefile`），用于把 QModem 核心与推荐前端一次装齐。若你的固件源中尚无该包，请直接参考本文末尾的"逐包手动安装"一节；安装后各服务的状态核查与故障排查命令在任何安装方式下都适用。
+
+## 1. 一键安装
+
+qmodem-suite 会自动拉起以下组件（依赖关系由包管理器解析）：
+
+- `qmodem`：核心控制与拨号栈（含 modem_scand、rpcd 脚本）
+- `luci-app-qmodem-next`：推荐的纯 JavaScript LuCI 前端
+- `qmodem-smsd`：短信守护进程
+- `qmodem_monitor` + `luci-app-qmodem-monitor`：网络监控及其 LuCI 页面
+
+### opkg（OpenWrt 21.02 / 23.05）
+
+```sh
+opkg update
+opkg install qmodem-suite
+```
+
+### apk（OpenWrt 24.10 起默认）
+
+```sh
+apk update
+apk add qmodem-suite
+```
+
+> 注意：两套 LuCI 主界面不应同时安装。suite 已指向 `luci-app-qmodem-next`，请勿再手动安装旧版 `luci-app-qmodem`。
+
+## 2. 安装后状态核查
+
+### 服务状态（/etc/init.d/）
+
+```sh
+# 开机自启是否注册
+/etc/init.d/qmodem_init enabled && echo enabled
+
+# 各服务状态
+/etc/init.d/qmodem_init status      # 主服务：modem_scand 扫描 + 初始化
+/etc/init.d/qmodem_network status   # 拨号网络
+/etc/init.d/qmodem_led status       # 信号/状态 LED
+/etc/init.d/qmodem_reboot status    # 定时/条件重启
+/etc/init.d/qmodem_usage_stats status  # 流量统计持久化
+```
+
+### ubus 对象
+
+```sh
+ubus list | grep qmodem
+
+# 示例：查询 modem1 的基础信息（节名见 /etc/config/qmodem 的 modem-device 节）
+ubus call qmodem base_info '{"config_section":"modem1"}'
+ubus call qmodem network_info '{"config_section":"modem1"}'
+```
+
+完整方法表见 [rpcd 接口](../qmodem-rpcd-interface.zh-cn.md)。
+
+### LuCI 菜单路径
+
+安装 `luci-app-qmodem-next` 后，Web 界面出现独立菜单：**Modem → QModem → Overview**（路由 `admin/modem`）。看不到菜单时，先确认浏览器账号已获得 `luci-app-qmodem-next` 的 ACL，然后重新登录。
+
+## 3. 最小可用配置
+
+QModem 支持自动扫描发现模组；多数场景下安装后重启即可在 LuCI 中看到模组。手动写一个最小 `modem-device` 节用于固定配置（写入 `/etc/config/qmodem`）：
+
+```uci
+config modem-device 'modem1'
+    option enabled '1'
+    option data_interface 'usb'
+    option slot '/sys/bus/usb/devices/2-1.2'
+    option at_port '/dev/ttyUSB2'
+    option manufacturer 'Quectel'
+    option enable_dial '1'
+    option pdp_type 'IPv4/IPv6'
+    option apn ''          # 留空自动匹配运营商
+```
+
+字段说明与更多选项（锁频、SIM 切换、自定义初始化命令等）见[旧版完整用户手册](../user-guide.zh-cn.md)的"模组设备配置"一节。修改后执行：
+
+```sh
+/etc/init.d/qmodem_init restart
+```
+
+## 4. 故障排查速查
+
+| 现象 | 命令 / 位置 |
+|---|---|
+| 服务日志 | `logread -t qmodem`（也可 `logread -e qmodem` 过滤 QModem 全部条目） |
+| 扫描器日志 | `logread -e modem_scand` |
+| 拨号日志 | LuCI：Modem → QModem → Overview 内的拨号日志面板；或 rpcd `ubus call qmodem get_dial_log '{"config_section":"modem1"}'` |
+| 内核/驱动层 | `logread -e usb -e mhi -e tty -e qmi -e mbim` |
+| 端口枚举 | `ubus call qmodem get_tty_ports '{}'` |
+
+日志与 AT 响应可能包含 IMEI、IMSI、ICCID、手机号、APN 或短信内容，公开前必须脱敏。更完整的排查流程见[故障排查](troubleshooting.zh-cn.md)。
+
+## 5. 与逐包手动安装的对比
+
+| 维度 | qmodem-suite（单包） | 逐包手动安装 |
+|---|---|---|
+| 命令数 | 1 条（`opkg install qmodem-suite`） | 每个包一条，需自行确定清单 |
+| 依赖解析 | 包管理器自动 | 手动按顺序：`qmodem` → 前端 → 可选包 |
+| 前端选择 | 固定为推荐的 `luci-app-qmodem-next` | 可自选，但容易误装两套主界面 |
+| 升级 | 元包整体升级，依赖随之更新 | 需逐个 `upgrade`，易漏 |
+| 精细裁剪 | 弱（多余的可选包也会被拉入） | 强（只装所需，如仅 `qmodem` + SMS 包） |
+| 适用场景 | 首次部署、整机交付 | 定制固件、存储受限设备 |
+
+逐包手动安装的包清单与构建来源见[安装指南](installation.zh-cn.md)。

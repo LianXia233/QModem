@@ -3,6 +3,14 @@
 . "${QMODEM_LIB_FUNCTIONS:-/lib/functions.sh}"
 . "${QMODEM_HOME:-/usr/share/qmodem}/cmds/modem_util.sh"
 
+# Fallback public DNS servers, single source of truth for dial/util scripts.
+# generic.sh and modem_dial.sh both (indirectly) source this file, so these
+# constants are always defined before use.
+QMODEM_FALLBACK_DNS1_IPV4="223.5.5.5"
+QMODEM_FALLBACK_DNS2_IPV4="119.29.29.29"
+QMODEM_FALLBACK_DNS1_IPV6="2400:3200::1" #阿里
+QMODEM_FALLBACK_DNS2_IPV6="2402:4e00::" #腾讯
+
 #testcase collection (fixture) support
 #switch: uci set qmodem.main.testcase_collect=1 (cached per process)
 #env overrides (used by tests): QMODEM_COLLECT_TESTCASE / QMODEM_COLLECT_DIR

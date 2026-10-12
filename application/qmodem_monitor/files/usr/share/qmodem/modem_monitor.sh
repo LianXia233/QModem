@@ -223,8 +223,20 @@ run_scripts(){
 _run_script(){
     local script_path=$1
     shift
+    # script_path comes from UCI config; only allow trusted prefix and existing files
+    case "$script_path" in
+        /usr/share/qmodem/*) ;;
+        *)
+            log "Refusing to run script outside /usr/share/qmodem: $script_path"
+            return 1
+            ;;
+    esac
+    if [ ! -f "$script_path" ]; then
+        log "Script not found: $script_path"
+        return 1
+    fi
     log "Run script: $script_path $@"
-    $script_path $@
+    "$script_path" "$@"
 }
 
 
@@ -247,11 +259,14 @@ _send_at_command(){
 # Usage: switch_sim_slot <Modem_ID>
 switch_sim_slot() {
   local capabilities current_slot available_slots new_slot response success redial
+  # build ubus payload with jq --arg to avoid shell injection into JSON
+  local payload
+  payload=$(jq -nc --arg s "$Modem_ID" '{config_section:$s}')
 
-  capabilities=$(ubus call qmodem get_sim_switch_capabilities '{"config_section": "'$Modem_ID'"}' 2>/dev/null)
+  capabilities=$(ubus call qmodem get_sim_switch_capabilities "$payload" 2>/dev/null)
   is_supported=$(printf '%s\n' "$capabilities" | jq -r '.supportSwitch // "0"')
   if [ "$is_supported" = "1" ]; then
-    current_slot=$(ubus call qmodem get_sim_slot '{"config_section": "'$Modem_ID'"}' 2>/dev/null | jq -r '.sim_slot // empty')
+    current_slot=$(ubus call qmodem get_sim_slot "$payload" 2>/dev/null | jq -r '.sim_slot // empty')
     available_slots=$(printf '%s\n' "$capabilities" | jq -r '.simSlots[]?')
     new_slot=""
     for slot in $available_slots; do
@@ -264,7 +279,8 @@ switch_sim_slot() {
         log "Cannot determine SIM slot: current=$current_slot available=$available_slots"
         return 1
     fi
-    response=$(ubus call qmodem set_sim_slot '{"config_section": "'$Modem_ID'", "slot": "'$new_slot'"}' 2>/dev/null)
+    payload=$(jq -nc --arg s "$Modem_ID" --arg t "$new_slot" '{config_section:$s,slot:$t}')
+    response=$(ubus call qmodem set_sim_slot "$payload" 2>/dev/null)
     success=$(printf '%s\n' "$response" | jq -r '.success // false')
     redial=$(printf '%s\n' "$response" | jq -r '.redial // empty')
     if [ "$success" = "true" ] && [ "$redial" = "0" ]; then
