@@ -1,5 +1,12 @@
 # 增加模组支持文档
 
+> 推荐先阅读快速上手清单：[developer/new-modem-quickstart.zh-cn.md](developer/new-modem-quickstart.zh-cn.md)
+> （English: [new-modem-quickstart.en.md](developer/new-modem-quickstart.en.md)）。
+> 它给出从 VID/PID 到合入的 6 步操作（modem_support.json 登记 → 识别
+> fixture 采集 → 复制 `cmds/vendor_template.sh` 起步 → fixture 回放验证 →
+> support_list.md 登记 → PR 检查单），每步附自动化工具与验证命令；
+> 本文档保留为背景与细节说明。
+
 ## 添加已有Vendor
 
 ### 已支持Vendor

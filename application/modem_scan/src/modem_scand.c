@@ -1161,8 +1161,19 @@ static int add_modem(const char *slot, const char *slot_type)
 		goto out_fail;
 	}
 	if (detect_profile(slot_type, &res, &profile) != 0) {
-		log_msg(LOG_L_WARN, "slot=%s type=%s modem profile not matched", slot, slot_type);
-		goto out_fail;
+		/*
+		 * Unknown/new modem: the model name and the VID:PID both failed
+		 * to match modem_support.json. Instead of dropping the whole
+		 * device (which used to leave the slot unusable), register a
+		 * generic profile so the baseline feature set — discovery,
+		 * basic_info, AT passthrough and dial config — stays available.
+		 * "generic" resolves to generic.sh via dynamic_load.json.
+		 */
+		log_msg(LOG_L_WARN, "slot=%s type=%s modem profile not matched, using generic fallback", slot, slot_type);
+		sl_init(&profile.modes);
+		snprintf(profile.name, sizeof(profile.name), "%s", "generic");
+		snprintf(profile.manufacturer, sizeof(profile.manufacturer), "%s", "generic");
+		snprintf(profile.pdp_index, sizeof(profile.pdp_index), "%s", "1");
 	}
 
 	join_list(&res.net_devices, net_join, sizeof(net_join));

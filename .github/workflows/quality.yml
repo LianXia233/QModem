@@ -9,6 +9,8 @@ on:
       - 'driver/**'
       - 'files/**'
       - 'scripts/check_all.sh'
+      - 'scripts/check_modem_registry.py'
+      - 'docs/support_list.md'
       - '.github/workflows/quality.yml'
   pull_request:
     paths:
@@ -18,6 +20,8 @@ on:
       - 'driver/**'
       - 'files/**'
       - 'scripts/check_all.sh'
+      - 'scripts/check_modem_registry.py'
+      - 'docs/support_list.md'
       - '.github/workflows/quality.yml'
 
 jobs:
@@ -56,6 +60,14 @@ jobs:
       - name: Run shell regression tests
         if: hashFiles('tests/sh/run_tests.sh') != ''
         run: bash tests/sh/run_tests.sh
+
+      # 模组注册一致性门禁（存在才跑）：核对 modem_support.json / support_list.md /
+      # vendor 函数 / recognition fixture 三处登记齐全。
+      # 当前为 --baseline 模式：存量 vendor 函数缺口只报告不 FAIL，
+      # 转严格方法见 docs/refactor/modem-registry-baseline.md（移除 --baseline 即严格，退出码 0/1）。
+      - name: modem-registry consistency gate
+        if: hashFiles('scripts/check_modem_registry.py') != ''
+        run: python3 scripts/check_modem_registry.py --baseline
 
       # 体积门禁占位：上传 rust release 二进制清单供人工核对体积，不设硬阈值
       - name: Upload rust binary size listing

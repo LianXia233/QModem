@@ -31,6 +31,7 @@
 | [journal-atd-bridge.md](journal-atd-bridge.md) | W24：at_tool=2 接入 Rust atd（agent-atd-bridge） |
 | [journal-ci-p2.md](journal-ci-p2.md) | W26：rust-build.yml 交叉编译矩阵（agent-ci-p2） |
 | [journal-vendor-residue.md](journal-vendor-residue.md) | vendor 残留症状清理与字段复核（agent-vendor-residue） |
+| [../developer/upstream-compat.zh-cn.md](../developer/upstream-compat.zh-cn.md)（[en](../developer/upstream-compat.en.md)） | 与上游（FUjr/QModem 及 modem_feeds）长期同步策略：文件所有权分类（REFACTORED_OWNED 表附 journal 证据）、模组吸收流程、feed/SDK 代际匹配 |
 
 > 上表为 `ls docs/refactor/` 实际文件（截至 2026-10-12）。后续新增 journal（如 CI、cmd 库迁移）请同步补入本清单。
 

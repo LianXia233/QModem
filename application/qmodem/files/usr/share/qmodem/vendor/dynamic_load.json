@@ -1,4 +1,5 @@
 {
+    "generic" : "../generic.sh",
     "tdtech" : "tdtech.sh",
     "quectel" : "quectel.sh",
     "fibocom" : "fibocom.sh",

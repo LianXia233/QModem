@@ -1,3 +1,4 @@
 tests/browser/test-results/
 tests/browser/node_modules/
 scripts/dist/
+scripts/__pycache__/
