@@ -24,6 +24,10 @@ define Package/$(PKG_NAME)
 	+kmod-usb-serial +kmod-usb-serial-option
 endef
 
+define Package/$(PKG_NAME)/conffiles
+/etc/config/qmodem_voip
+endef
+
 define Package/$(PKG_NAME)/description
   Experimental QModem voice daemon. Owns the exclusive modem audio PCM fd and
   drives call control through module profiles. SIP and web consumers attach to

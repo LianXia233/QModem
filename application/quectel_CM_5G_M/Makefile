@@ -32,10 +32,14 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-		$(INSTALL_DIR) $(1)/usr/bin $(1)/lib/netifd/proto $(1)/lib/netifd
-		$(INSTALL_BIN) $(PKG_BUILD_DIR)/quectel-CM $(1)/usr/bin/quectel-CM-M
-		$(INSTALL_DIR) $(1)/usr/share/qmodem
-		$(INSTALL_DATA) ./files/apns.json $(1)/usr/share/qmodem/apns.json
+	$(INSTALL_DIR) $(1)/usr/bin $(1)/lib/netifd/proto $(1)/lib/netifd
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/quectel-CM $(1)/usr/bin/quectel-CM-M
+	$(INSTALL_BIN) ./files/rmnet.sh ./files/rmnet6.sh $(1)/lib/netifd/proto/
+	$(INSTALL_BIN) ./files/rmnet.script ./files/rmnet6.script $(1)/lib/netifd/
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/rmnet_init.sh $(1)/etc/uci-defaults/99-rmnet-init
+	$(INSTALL_DIR) $(1)/usr/share/qmodem
+	$(INSTALL_DATA) ./files/apns.json $(1)/usr/share/qmodem/apns.json
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

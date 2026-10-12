@@ -88,6 +88,7 @@ make menuconfig
 - [测试与验证](docs/developer/testing.zh-cn.md)
 - [rpcd 接口](docs/qmodem-rpcd-interface.zh-cn.md)
 - [AT fixture 格式与回放](testcases/README.md)
+- [更新日志](CHANGELOG.zh-CN.md) ([English](CHANGELOG.md))
 
 ## Rust 异步守护进程（实验性）
 

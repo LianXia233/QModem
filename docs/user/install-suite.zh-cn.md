@@ -12,6 +12,7 @@ qmodem-suite 会自动拉起以下组件（依赖关系由包管理器解析）�
 - `luci-app-qmodem-next`：推荐的纯 JavaScript LuCI 前端
 - `qmodem-smsd`：短信守护进程
 - `qmodem_monitor` + `luci-app-qmodem-monitor`：网络监控及其 LuCI 页面
+- `luci-app-qmodem-ttlfw4`：TTL 管理（fw4/nft 现代防火墙栈），默认关闭，LuCI 中按需开启
 
 ### opkg（OpenWrt 21.02 / 23.05）
 
@@ -28,6 +29,22 @@ apk add qmodem-suite
 ```
 
 > 注意：两套 LuCI 主界面不应同时安装。suite 已指向 `luci-app-qmodem-next`，请勿再手动安装旧版 `luci-app-qmodem`。
+
+### TTL 组件说明
+
+suite 内置的 TTL 组件为 `luci-app-qmodem-ttlfw4`（fw4/nft 现代栈）。它与旧版 iptables 变体 `luci-app-qmodem-ttl` **互斥**（两者共用 `/etc/config/qmodem_ttl`），因此 suite 不包含也不依赖 `luci-app-qmodem-ttl`；OpenWrt 包管理器会在依赖解析层面拒绝二者共存，若设备上已装旧版 `luci-app-qmodem-ttl`，请先执行 `opkg remove luci-app-qmodem-ttl`（或 `apk del luci-app-qmodem-ttl`）再安装 suite。
+
+TTL 功能默认关闭（`/etc/config/qmodem_ttl` 的默认配置节随 `luci-app-qmodem-ttlfw4` 包自带，安装 suite 即就位），无需额外配置；在 LuCI 中按需开启即可。启用后会改写 br-lan 出站报文的 TTL/Hop Limit 并关闭硬件流量分载，详见该包 LuCI 页面说明。
+
+### 语音（voip）组件需单独安装
+
+实验性语音栈（`qmodem-voip` + `qmodem-sipd` + `luci-app-qmodem-voip`）**不包含在 suite 中**，需单独安装：
+
+```sh
+opkg install luci-app-qmodem-voip   # 或 apk add luci-app-qmodem-voip
+```
+
+该前端会自动拉起 `qmodem-voip`（呼叫控制守护 voipd）与 `qmodem-sipd`（SIP 信令网关）。voip 为实验性功能、硬件白名单受限（当前仅 RM520N-GL），且处于独立维护状态（决策依据 `docs/refactor/journal-retire-voip.md`），故不纳入单包交付。
 
 ## 2. 安装后状态核查
 

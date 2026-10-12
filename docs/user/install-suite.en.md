@@ -12,6 +12,7 @@ qmodem-suite automatically pulls in the following components (dependencies are r
 - `luci-app-qmodem-next`: the recommended pure-JavaScript LuCI frontend
 - `qmodem-smsd`: SMS daemon
 - `qmodem_monitor` + `luci-app-qmodem-monitor`: network monitoring and its LuCI pages
+- `luci-app-qmodem-ttlfw4`: TTL management (modern fw4/nft firewall stack), disabled by default, enable on demand in LuCI
 
 ### opkg (OpenWrt 21.02 / 23.05)
 
@@ -28,6 +29,22 @@ apk add qmodem-suite
 ```
 
 > Note: the two LuCI main interfaces should not be installed at the same time. The suite already points to `luci-app-qmodem-next`; do not additionally install the legacy `luci-app-qmodem`.
+
+### TTL component notes
+
+The TTL component shipped in the suite is `luci-app-qmodem-ttlfw4` (modern fw4/nft stack). It is **mutually exclusive** with the legacy iptables variant `luci-app-qmodem-ttl` (both share `/etc/config/qmodem_ttl`), so the suite does not include or depend on `luci-app-qmodem-ttl`. If the legacy `luci-app-qmodem-ttl` is already installed on the device, remove it first with `opkg remove luci-app-qmodem-ttl` (or `apk del luci-app-qmodem-ttl`) before installing the suite.
+
+The TTL feature is disabled by default (the default `/etc/config/qmodem_ttl` section ships inside the `luci-app-qmodem-ttlfw4` package itself, so it is in place once the suite is installed); no extra configuration is needed — just enable it in LuCI when required. When enabled it rewrites the TTL/Hop Limit of outbound br-lan traffic and disables hardware flow offloading; see the LuCI page of that app for details.
+
+### Voice (voip) component requires separate installation
+
+The experimental voice stack (`qmodem-voip` + `qmodem-sipd` + `luci-app-qmodem-voip`) is **not included in the suite** and must be installed separately:
+
+```sh
+opkg install luci-app-qmodem-voip   # or: apk add luci-app-qmodem-voip
+```
+
+That frontend automatically pulls in `qmodem-voip` (call-control daemon voipd) and `qmodem-sipd` (SIP signaling gateway). voip is experimental, restricted by a hardware whitelist (currently RM520N-GL only) and maintained independently (decision basis: `docs/refactor/journal-retire-voip.md`), so it is not part of the single-package delivery.
 
 ## 2. Post-installation status checks
 

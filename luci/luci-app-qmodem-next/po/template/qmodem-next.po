@@ -3621,3 +3621,59 @@ msgstr ""
 #: view/qmodem/debug.js:83
 msgid "Not registered"
 msgstr ""
+
+#: view/qmodem/ttl.js:17
+msgid "TTL Configuration"
+msgstr ""
+
+#: view/qmodem/ttl.js:18
+msgid "Configure TTL/Hop Limit settings to modify outgoing packet TTL values. This can help bypass carrier restrictions on tethering."
+msgstr ""
+
+#: view/qmodem/ttl.js:21
+msgid "Global TTL Settings"
+msgstr ""
+
+#: view/qmodem/ttl.js:24
+msgid "Enable TTL Modification"
+msgstr ""
+
+#: view/qmodem/ttl.js:27
+msgid "Enable or disable TTL/Hop Limit modification for outgoing packets."
+msgstr ""
+
+#: view/qmodem/ttl.js:31
+msgid "TTL Value"
+msgstr ""
+
+#: view/qmodem/ttl.js:34
+msgid "Set the TTL (Time To Live) value for IPv4 packets and Hop Limit for IPv6 packets. Common values: 64 (Linux default), 128 (Windows default)."
+msgstr ""
+
+#: view/qmodem/ttl.js:40
+msgid "Important Notes"
+msgstr ""
+
+#: view/qmodem/ttl.js:46
+msgid "Warning:"
+msgstr ""
+
+#: view/qmodem/ttl.js:48
+msgid "TTL rewriting is implemented with the fw4/nftables backend (/etc/nftables.d/99-reset-ttl-from-br-lan.nft)."
+msgstr ""
+
+#: view/qmodem/ttl.js:49
+msgid "Enabling TTL modification will disable hardware flow offloading for proper packet modification."
+msgstr ""
+
+#: view/qmodem/ttl.js:50
+msgid "NSS ECM, SFE, and other acceleration modules will be disabled when TTL modification is active."
+msgstr ""
+
+#: view/qmodem/ttl.js:51
+msgid "This may affect network performance on some devices."
+msgstr ""
+
+#: view/qmodem/ttl.js:52
+msgid "Settings will take effect after saving and applying changes."
+msgstr ""

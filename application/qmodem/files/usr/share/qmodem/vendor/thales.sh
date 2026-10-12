@@ -480,7 +480,9 @@ process_signal_value()
 # Temperature via AT^TEMP (manual 15.13): "TSENS: 33C"
 _get_temperature()
 {
-    temperature=$(cmd_temp_query "$at_port" | ql_regex_pick 'TSENS: ([0-9]*)C')
+    # ql_regex_pick prints one line per match; keep only the first TSENS
+    # value so multi-sensor AT^TEMP responses stay single-valued.
+    temperature=$(cmd_temp_query "$at_port" | ql_regex_pick 'TSENS: ([0-9]*)C' | head -n1)
     [ -n "$temperature" ] && {
         add_plain_info_entry "temperature" "$temperature C" "Temperature"
     }

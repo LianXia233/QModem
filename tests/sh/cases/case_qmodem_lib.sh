@@ -17,6 +17,7 @@ t test_ql_csv_field_empty_fields
 t test_ql_csv_field_quotes_not_special
 t test_ql_regex_pick_multiline_all_matches
 t test_ql_regex_pick_match_on_later_line
+t test_ql_regex_pick_single_value_consumer
 
 QMODEM_LIB="$REPO_ROOT/application/qmodem/files/usr/share/qmodem/cmds/qmodem_lib.sh"
 
@@ -143,4 +144,23 @@ test_ql_regex_pick_match_on_later_line() {
         | ql_regex_pick '"NR5G-NSA",([0-9]+)')
     assert_rc "match beyond first line rc 0" 0 $?
     assert_eq "later-line capture group returned" "42" "$out"
+}
+
+# Pins the vendor call-site contract (foxconn.sh/_get_temperature,
+# thales.sh/_get_temperature): ql_regex_pick emits one line PER matching
+# line, so single-value consumers must pipe through `head -n1`. Multi-
+# sensor temperature responses (cf. testcases AT+QTEMP fixture: one
+# +QTEMP line per sensor) make multi-line matching the realistic case;
+# `head -n1` must be byte-transparent for single-line input.
+test_ql_regex_pick_single_value_consumer() {
+    _qlib_load
+    declare -F ql_regex_pick >/dev/null || skip "ql_regex_pick not present"
+    # multi-sensor style response: only the first TSENS value is kept
+    out=$(printf 'AT^TEMP?\r\n^TEMP: TSENS: 45C\r\n^TEMP: PA: 50C\r\nOK\r\n' \
+        | ql_regex_pick 'TSENS: ([0-9]*)C' | head -n1)
+    assert_rc "single-value pipe rc 0" 0 $?
+    assert_eq "head -n1 keeps first match only" "45" "$out"
+    # byte-transparency: single matching line passes through unchanged
+    out=$(printf 'TSENS: 33C\n' | ql_regex_pick 'TSENS: ([0-9]*)C' | head -n1)
+    assert_eq "head -n1 transparent for single line" "33" "$out"
 }

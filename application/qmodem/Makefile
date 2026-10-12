@@ -139,6 +139,7 @@ define Package/$(PKG_NAME)/description
 endef
 
 define Package/$(PKG_NAME)/conffiles
+/etc/config/qmodem
 /etc/config/qmodem_led
 endef
 
@@ -156,8 +157,8 @@ define Package/$(PKG_NAME)/install
 		./files/etc/init.d/qmodem_reboot \
 		./files/etc/init.d/qmodem_usage_stats $(1)/etc/init.d/
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_DATA) ./files/etc/config/qmodem $(1)/etc/config/
-	$(INSTALL_DATA) ./files/etc/config/qmodem_led $(1)/etc/config/
+	$(INSTALL_CONF) ./files/etc/config/qmodem $(1)/etc/config/
+	$(INSTALL_CONF) ./files/etc/config/qmodem_led $(1)/etc/config/
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
 	$(INSTALL_DATA) ./files/etc/hotplug.d/iface/80-wwan-led $(1)/etc/hotplug.d/iface/
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/net
@@ -208,6 +209,7 @@ define Package/$(PKG_NAME)/install
 		./files/usr/share/qmodem/cmds/modem_util.sh \
 		./files/usr/share/qmodem/cmds/neoway.sh \
 		./files/usr/share/qmodem/cmds/openluat.sh \
+		./files/usr/share/qmodem/cmds/qmodem_lib.sh \
 		./files/usr/share/qmodem/cmds/quectel.sh \
 		./files/usr/share/qmodem/cmds/sierra.sh \
 		./files/usr/share/qmodem/cmds/simcom.sh \

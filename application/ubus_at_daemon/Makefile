@@ -20,6 +20,10 @@ define Package/$(PKG_NAME)/description
   A ubus daemon for handling AT commands with OpenWRT
 endef
 
+define Package/$(PKG_NAME)/conffiles
+/etc/config/ubus-at-daemon
+endef
+
 define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)
 	$(CP) src/* $(PKG_BUILD_DIR)/

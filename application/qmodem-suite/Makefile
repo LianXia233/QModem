@@ -17,6 +17,16 @@
 #     (zz-qmodem-suite) enables the rest: qmodem_init (mkdir /var/run/qmodem
 #     + modem scan), qmodem_network (dial), qmodem_led, ubus-at-daemon,
 #     qmodem-smsd, qmodem_monitor. Verified: docs/refactor/journal-pkg-verify.md
+#   - luci-app-qmodem-ttlfw4 (TTL mgmt, fw4/nft stack) added for full-stack
+#     delivery; it CONFLICTS with the legacy iptables variant luci-app-qmodem-ttl
+#     (shared /etc/config/qmodem_ttl), so the suite intentionally does NOT
+#     pull ttl -- users with ttl installed must remove it first.
+#     The uci default section (config main 'main', enable=0) ships inside the
+#     ttlfw4 package itself (root/etc/config/qmodem_ttl, conffile), so the
+#     suite uci-defaults needs no TTL supplement.
+#   - voip stack (qmodem-voip + qmodem-sipd + luci-app-qmodem-voip) is
+#     experimental and NOT included; see docs/refactor/journal-retire-voip.md
+#     (independent retention, separate install). Verified: docs/refactor/journal-suite-full.md
 #
 include $(TOPDIR)/rules.mk
 
@@ -39,14 +49,18 @@ define Package/$(PKG_NAME)
 	+luci-app-qmodem-next \
 	+qmodem-smsd \
 	+qmodem_monitor \
-	+luci-app-qmodem-monitor
+	+luci-app-qmodem-monitor \
+	+luci-app-qmodem-ttlfw4 \
 endef
 
 define Package/$(PKG_NAME)/description
 	One-shot install of the full QModem modem management stack:
-	core scripts, LuCI modern UI, SMS daemon and network monitor.
+	core scripts, LuCI modern UI, SMS daemon, network monitor and
+	TTL management (fw4/nft). The experimental voice (voip) stack is
+	not included and must be installed separately.
 	一键安装完整 QModem 模组管理栈：核心脚本 + LuCI 现代界面 +
-	短信守护进程 + 网络监控，安装即用，无需逐个挑选软件包。
+	短信守护进程 + 网络监控 + TTL 管理（fw4/nft），安装即用，无需
+	逐个挑选软件包。实验性语音（voip）组件不包含在内，需单独安装。
 endef
 
 define Build/Prepare

@@ -114,3 +114,18 @@ Phase 1-4（后续，见评估报告）：vendor 层配置驱动下沉 → smsd/
 
   编排者收尾：pdu README SCTS 语义更新、ql_regex_pick 注释失实修正。
   门禁复核：check_all 7 PASS+1 SKIP 合规、cargo test 113（pdu 64/atd 39/smsd 10）、tests/sh 35 PASS、lua 16 PASS。
+
+- **T5（2026-10-12 20:00）**：Phase 4 决策落地 + rc1 发布准备 —— 7 个子代理（W48-W54）：
+
+| # | 工作包 | 子代理 | 关键产出 |
+|---|--------|--------|----------|
+| W48 | 更新日志汉化 CHANGELOG.zh-CN.md + 双语互链 | agent-changelog-zh | 章节 EN/ZH 9:9 对齐 |
+| W49 | suite 全量单包化（+ttlfw4，voip 不入，文档同步） | agent-suite-full | DEPENDS/uci-defaults/双语 docs |
+| W50 | ADR-0001：Phase 4 七项最优决策（中英） | agent-adr | docs/adr/ |
+| W51 | next TTL 视图合入（form.Map + ACL/menu/po） | agent-next-ttl | gap「TTL 管理」闭环 |
+| W52 | 26 包安装完整性审计（修复 6 项漏装） | agent-pkg-audit-all | qmodem 补装 cmds/qmodem_lib.sh、CM 补装 proto 脚本等 |
+| W53 | ql_regex_pick 多行语义调用点修复（foxconn/thales +head -n1） | agent-regex-pick | fixture 双行对比证据 |
+| W54 | v1.1.0-rc1 发版准备（CHANGELOG 版本段 + RELNOTES 中英） | agent-release-rc1 | 与 release.yml 提取规则兼容 |
+
+  门禁复核：check_all 7 PASS+1 SKIP、cargo test 121、tests/sh 36、lua 16。
+  发版：v1.1.0-rc1 tag + GitHub Release 由编排者经 API 执行。

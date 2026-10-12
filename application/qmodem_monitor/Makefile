@@ -29,7 +29,10 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-		$(CP) ./files/* $(1)/
+	$(INSTALL_DIR) $(1)/etc/init.d $(1)/usr/share/qmodem
+	$(INSTALL_BIN) ./files/etc/init.d/qmodem_monitor $(1)/etc/init.d/
+	$(INSTALL_BIN) ./files/usr/share/qmodem/modem_monitor.sh \
+		./files/usr/share/qmodem/monitor_recovery.sh $(1)/usr/share/qmodem/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

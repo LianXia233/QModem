@@ -18,9 +18,9 @@
 					"status", "config_get", "sync_status", "list", "get", "modem_list", "storage_get"
 				],
 				"rc" : [ "list" ,"init"],
-				"uci": [ "qmodem", "sms_forwarder" ]
+				"uci": [ "qmodem", "sms_forwarder", "qmodem_ttl" ]
 			},
-			"uci": [ "qmodem", "sms_forwarder" ]
+			"uci": [ "qmodem", "sms_forwarder", "qmodem_ttl" ]
 		},
 		"write": {
 			"ubus": {
@@ -51,9 +51,9 @@
 					"configure", "sync", "send", "delete", "mark_read",
 					"modem_delete", "storage_set"
 				],
-				"uci": [ "qmodem", "sms_forwarder" ]
+				"uci": [ "qmodem", "sms_forwarder", "qmodem_ttl" ]
 			},
-			"uci": [ "qmodem", "sms_forwarder" ]
+			"uci": [ "qmodem", "sms_forwarder", "qmodem_ttl" ]
 		}
 	},
 	"luci-mod-status-index": {

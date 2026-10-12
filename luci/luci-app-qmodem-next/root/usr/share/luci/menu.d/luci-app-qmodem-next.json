@@ -114,6 +114,17 @@
 			"acl": [ "luci-app-qmodem-next" ]
 		}
 	},
+	"admin/modem/qmodem/ttl": {
+		"title": "TTL",
+		"order": 5.7,
+		"action": {
+			"type": "view",
+			"path": "qmodem/ttl"
+		},
+		"depends": {
+			"acl": [ "luci-app-qmodem-next" ]
+		}
+	},
 	"admin/modem/qmodem/settings": {
 		"title": "QModem Settings",
 		"order": 6,

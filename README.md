@@ -66,7 +66,7 @@ The detailed English manuals are currently maintained in the existing [user guid
 - [One-package install guide (qmodem-suite)](docs/user/install-suite.zh-cn.md) ([English](docs/user/install-suite.en.md))
 - [Rust async daemon architecture](docs/developer/async-daemon.zh-cn.md) ([English](docs/developer/async-daemon.en.md))
 - [AT tool selection](docs/developer/at-tool-selection.zh-cn.md) ([English](docs/developer/at-tool-selection.en.md))
-- [Changelog](CHANGELOG.md) - [Branch and release policy](docs/release/branch-policy.zh-cn.md)
+- [Changelog](CHANGELOG.md) ([简体中文](CHANGELOG.zh-CN.md)) - [Branch and release policy](docs/release/branch-policy.zh-cn.md)
 - [Version migration and issue reporting](docs/release/version-migration.zh-cn.md)
 - [Supported hardware](docs/support_list.md)
 - [rpcd API](docs/qmodem-rpcd-interface.md)

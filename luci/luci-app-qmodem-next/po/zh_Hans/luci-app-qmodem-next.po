@@ -2702,3 +2702,59 @@ msgstr "厂商未支持"
 # Source: view/qmodem/debug.js
 msgid "Not registered"
 msgstr "未注册"
+
+# Source: view/qmodem/ttl.js
+msgid "TTL Configuration"
+msgstr "TTL 配置"
+
+# Source: view/qmodem/ttl.js
+msgid "Configure TTL/Hop Limit settings to modify outgoing packet TTL values. This can help bypass carrier restrictions on tethering."
+msgstr "配置 TTL/Hop Limit 以修改出站报文的 TTL 值。有助于绕过运营商对共享上网的限制。"
+
+# Source: view/qmodem/ttl.js
+msgid "Global TTL Settings"
+msgstr "全局 TTL 设置"
+
+# Source: view/qmodem/ttl.js
+msgid "Enable TTL Modification"
+msgstr "启用 TTL 修改"
+
+# Source: view/qmodem/ttl.js
+msgid "Enable or disable TTL/Hop Limit modification for outgoing packets."
+msgstr "启用或禁用出站报文的 TTL/Hop Limit 修改。"
+
+# Source: view/qmodem/ttl.js
+msgid "TTL Value"
+msgstr "TTL 值"
+
+# Source: view/qmodem/ttl.js
+msgid "Set the TTL (Time To Live) value for IPv4 packets and Hop Limit for IPv6 packets. Common values: 64 (Linux default), 128 (Windows default)."
+msgstr "设置 IPv4 报文的 TTL（Time To Live）值与 IPv6 报文的 Hop Limit 值。常用值：64（Linux 默认）、128（Windows 默认）。"
+
+# Source: view/qmodem/ttl.js
+msgid "Important Notes"
+msgstr "重要说明"
+
+# Source: view/qmodem/ttl.js
+msgid "Warning:"
+msgstr "警告："
+
+# Source: view/qmodem/ttl.js
+msgid "TTL rewriting is implemented with the fw4/nftables backend (/etc/nftables.d/99-reset-ttl-from-br-lan.nft)."
+msgstr "TTL 改写通过 fw4/nftables 后端实现（/etc/nftables.d/99-reset-ttl-from-br-lan.nft）。"
+
+# Source: view/qmodem/ttl.js
+msgid "Enabling TTL modification will disable hardware flow offloading for proper packet modification."
+msgstr "启用 TTL 修改将关闭硬件流量分载，以便正确改写报文。"
+
+# Source: view/qmodem/ttl.js
+msgid "NSS ECM, SFE, and other acceleration modules will be disabled when TTL modification is active."
+msgstr "TTL 修改生效期间，NSS ECM、SFE 等加速模块将被停用。"
+
+# Source: view/qmodem/ttl.js
+msgid "This may affect network performance on some devices."
+msgstr "这可能影响部分设备的网络性能。"
+
+# Source: view/qmodem/ttl.js
+msgid "Settings will take effect after saving and applying changes."
+msgstr "设置将在保存并应用更改后生效。"

@@ -1,5 +1,7 @@
 # Changelog
 
+[English](CHANGELOG.md) | [简体中文](CHANGELOG.zh-CN.md)
+
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows
 `version.mk` (main branch: pre-release, stable branch: release).
@@ -8,6 +10,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 > 详细工程记录见 [docs/refactor/](docs/refactor/README.md)，问题依据见各 journal。
 
 ## [Unreleased]
+
+## [1.1.0-rc1] - 2026-10-12
 
 ### Phase 1 — Dependency reduction & single-package delivery (`f874091`, 2026-10-12)
 
