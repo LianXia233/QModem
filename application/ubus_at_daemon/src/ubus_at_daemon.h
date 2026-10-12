@@ -271,36 +271,11 @@ void check_and_reconnect_port(at_port_instance_t *port);
 void start_port_monitor(void);
 void stop_port_monitor(void);
 
-#ifndef QMODEM_HOST_TEST
-// Ubus method handlers
-static int ubus_open_method(struct ubus_context *ctx, struct ubus_object *obj,
-                           struct ubus_request_data *req, const char *method,
-                           struct blob_attr *msg);
-static int ubus_sendat_method(struct ubus_context *ctx, struct ubus_object *obj,
-                             struct ubus_request_data *req, const char *method,
-                             struct blob_attr *msg);
-static int ubus_list_method(struct ubus_context *ctx, struct ubus_object *obj,
-                           struct ubus_request_data *req, const char *method,
-                           struct blob_attr *msg);
-static int ubus_close_method(struct ubus_context *ctx, struct ubus_object *obj,
-                            struct ubus_request_data *req, const char *method,
-                            struct blob_attr *msg);
-static int ubus_event_callback_method(struct ubus_context *ctx, struct ubus_object *obj,
-                                     struct ubus_request_data *req, const char *method,
-                                     struct blob_attr *msg);
-static int ubus_event_callback_list_method(struct ubus_context *ctx, struct ubus_object *obj,
-                                          struct ubus_request_data *req, const char *method,
-                                          struct blob_attr *msg);
-static int ubus_event_callback_remove_method(struct ubus_context *ctx, struct ubus_object *obj,
-                                            struct ubus_request_data *req, const char *method,
-                                            struct blob_attr *msg);
-static int ubus_event_callback_clear_method(struct ubus_context *ctx, struct ubus_object *obj,
-                                           struct ubus_request_data *req, const char *method,
-                                           struct blob_attr *msg);
-static int ubus_load_conf_method(struct ubus_context *ctx, struct ubus_object *obj,
-                                struct ubus_request_data *req, const char *method,
-                                struct blob_attr *msg);
-#endif
+// Ubus method handlers are static functions local to main.c; they are not
+// declared here (a static declaration without a definition in every TU
+// triggers -Wunused-function). Unregistered legacy handlers
+// (ubus_event_callback_method, ubus_load_conf_method) were dormant code and
+// are intentionally absent.
 
 extern at_daemon_ctx_t g_daemon_ctx;
 

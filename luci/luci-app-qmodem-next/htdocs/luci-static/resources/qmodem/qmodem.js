@@ -115,6 +115,27 @@ var callGetCopyright = rpc.declare({
 	expect: { }
 });
 
+var callGetStats = rpc.declare({
+	object: 'qmodem',
+	method: 'get_stats',
+	params: ['config_section'],
+	expect: { }
+});
+
+var callGetCurrentBand = rpc.declare({
+	object: 'qmodem',
+	method: 'get_current_band',
+	params: ['config_section'],
+	expect: { }
+});
+
+var callClearStats = rpc.declare({
+	object: 'qmodem',
+	method: 'clear_stats',
+	params: ['config_section'],
+	expect: { }
+});
+
 var callSendAt = rpc.declare({
 	object: 'qmodem',
 	method: 'send_at',
@@ -369,6 +390,21 @@ return L.Class.extend({
 	// Get copyright information
 	getCopyright: function(section) {
 		return callGetCopyright(section);
+	},
+
+	// Get traffic statistics (Quectel only; unavailable vendors return available:false)
+	getStats: function(section) {
+		return callGetStats(section);
+	},
+
+	// Get current serving band
+	getCurrentBand: function(section) {
+		return callGetCurrentBand(section);
+	},
+
+	// Clear traffic statistics
+	clearStats: function(section) {
+		return callClearStats(section);
 	},
 
 	// Send AT command

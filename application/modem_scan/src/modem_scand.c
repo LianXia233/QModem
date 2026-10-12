@@ -384,8 +384,14 @@ static int find_slot_section(const char *slot, char *section, size_t len)
 	if (rc != 0)
 		return -1;
 
+	/*
+	 * Only parse the KEY part of "uci show" lines; the value is read
+	 * back via "uci -q get", which returns the raw (unquoted) string.
+	 * Parsing values out of show output breaks when the value itself
+	 * contains quotes (uci show re-quotes/escapes them).
+	 */
 	for (line = strtok_r(out, "\n", &save); line; line = strtok_r(NULL, "\n", &save)) {
-		char prefix[160], value[160];
+		char key[256], value[256];
 		char *p;
 
 		if (strncmp(line, "qmodem.", 7))
@@ -393,18 +399,13 @@ static int find_slot_section(const char *slot, char *section, size_t len)
 		p = strstr(line, ".slot=");
 		if (!p)
 			continue;
-		snprintf(value, sizeof(value), "%s", p + 6);
-		trim(value);
-		if ((value[0] == '\'' || value[0] == '"') && strlen(value) >= 2) {
-			size_t n = strlen(value);
-			memmove(value, value + 1, n);
-			value[n - 2] = '\0';
-		}
+		*p = '\0';
+		snprintf(key, sizeof(key), "%s.slot", line + 7);
+		if (uci_get(key, value, sizeof(value)) != 0)
+			continue;
 		if (strcmp(value, slot))
 			continue;
-		*p = '\0';
-		snprintf(prefix, sizeof(prefix), "%s", line + 7);
-		snprintf(section, len, "%s", prefix);
+		snprintf(section, len, "%s", line + 7);
 		return 0;
 	}
 
@@ -873,6 +874,22 @@ struct probe_ctx {
 	int ok;
 };
 
+/*
+ * Ports are spliced into ubus JSON payload strings without escaping,
+ * so restrict them to [A-Za-z0-9_/] up front (covers /dev/ttyUSB0,
+ * /dev/mhi_TTY_... style names); anything else is rejected.
+ */
+static int valid_port_name(const char *s)
+{
+	if (!s || !*s || strlen(s) > 64)
+		return 0;
+	for (size_t i = 0; s[i]; i++) {
+		if (!isalnum((unsigned char)s[i]) && s[i] != '_' && s[i] != '/')
+			return 0;
+	}
+	return 1;
+}
+
 static void *probe_port_thread(void *arg)
 {
 	struct probe_ctx *ctx = arg;
@@ -880,6 +897,10 @@ static void *probe_port_thread(void *arg)
 	ctx->ok = 0;
 	if (!path_exists(ctx->port))
 		return NULL;
+	if (!valid_port_name(ctx->port)) {
+		log_msg(LOG_L_WARN, "probe skipped, unexpected port name: %s", ctx->port);
+		return NULL;
+	}
 	{
 		char json[256];
 		char *argv[] = { "ubus", "call", "at-daemon", "close", json, NULL };
@@ -1655,12 +1676,23 @@ static void apply_socket_permissions(void)
 	if (gr) {
 		gid = gr->gr_gid;
 	} else {
-		syslog(LOG_WARNING, "group qmodem not found, control socket falls back to root:root");
+		/*
+		 * Fallback: keep root:root so the socket is at least not
+		 * world-writable, but say so loudly (with errno) — on this
+		 * path only root processes can talk to the daemon.
+		 */
+		syslog(LOG_WARNING,
+		       "group qmodem not found (errno=%d), control socket %s falls back to root:root; only root clients will be able to connect",
+		       errno, QMODEM_SCAND_SOCKET);
 	}
-	if (chown(QMODEM_SCAND_SOCKET, 0, gid) < 0)
+	if (chown(QMODEM_SCAND_SOCKET, 0, gid) < 0) {
 		syslog(LOG_ERR, "chown %s failed: %s", QMODEM_SCAND_SOCKET, strerror(errno));
-	if (chmod(QMODEM_SCAND_SOCKET, 0660) < 0)
+	} else if (chmod(QMODEM_SCAND_SOCKET, 0660) < 0) {
 		syslog(LOG_ERR, "chmod 0660 %s failed: %s", QMODEM_SCAND_SOCKET, strerror(errno));
+	} else {
+		syslog(LOG_INFO, "control socket %s set to root:%u mode 0660",
+		       QMODEM_SCAND_SOCKET, (unsigned)gid);
+	}
 }
 
 static int setup_socket(void)

@@ -1,3 +1,4 @@
+-- legacy: superseded by luci-app-qmodem-next (no mwan page there); scheduled for removal in Phase 4
 module("luci.controller.qmodem_mwan", package.seeall)
 
 function index()

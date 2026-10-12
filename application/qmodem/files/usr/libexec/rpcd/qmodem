@@ -551,6 +551,244 @@ traffic_reset_set_schedule()
     traffic_reset_dump_set_json "true" "$config_section" "$enabled" "$reset_type" "$hour" "$day" "$TRAFFIC_RESET_DEFAULT_MINUTE" "$line"
 }
 
+# ---------------------------------------------------------------------------
+# Modem network-interface traffic stats (next-frontend gap endpoints)
+# ---------------------------------------------------------------------------
+
+# Locate the modem network interface for a UCI config section. Uses the same
+# mapping as modem_dial.sh (modem path -> net/ subdirectory) and validates the
+# candidate against /sys/class/net like get_network_interfaces.
+# Sets QMODEM_NETIF (empty when not found).
+find_modem_netif()
+{
+    local section="$1" modem_path net_dir cand
+    QMODEM_NETIF=""
+    modem_path=$(uci -q get "qmodem.${section}.path" 2>/dev/null)
+    [ -n "$modem_path" ] && [ -d "$modem_path" ] || return 0
+    net_dir=$(find "$modem_path" -name net 2>/dev/null | tail -n 1)
+    [ -n "$net_dir" ] || return 0
+    for cand in "$net_dir"/*; do
+        [ -e "$cand" ] || continue
+        [ -d "/sys/class/net/$(basename "$cand")" ] || continue
+        QMODEM_NETIF=$(basename "$cand")
+        return 0
+    done
+}
+
+# Read cumulative counters + uptime for an interface. Sets stats_rx/stats_tx/
+# stats_uptime (empty when unavailable or not plain digits).
+stats_read_counters()
+{
+    local iface="$1" up
+    stats_rx=$(cat "/sys/class/net/$iface/statistics/rx_bytes" 2>/dev/null)
+    stats_tx=$(cat "/sys/class/net/$iface/statistics/tx_bytes" 2>/dev/null)
+    case "$stats_rx" in ''|*[!0-9]*) stats_rx="" ;; esac
+    case "$stats_tx" in ''|*[!0-9]*) stats_tx="" ;; esac
+    stats_uptime=""
+    up=$(cut -d ' ' -f 1 /proc/uptime 2>/dev/null)
+    up=${up%%.*}
+    case "$up" in ''|*[!0-9]*) up="" ;; esac
+    stats_uptime="$up"
+}
+
+# Read the clear_stats baseline file. Format: "<rx_base> <tx_base> <epoch>".
+# Sets stats_base_rx/stats_base_tx (empty when missing/invalid).
+stats_read_baseline()
+{
+    local base_file="/var/run/qmodem/${1}_stats_reset"
+    stats_base_rx=""
+    stats_base_tx=""
+    [ -f "$base_file" ] || return 0
+    read stats_base_rx stats_base_tx _ < "$base_file" 2>/dev/null
+    case "${stats_base_rx:-}" in ''|*[!0-9]*) stats_base_rx="" ;; esac
+    case "${stats_base_tx:-}" in ''|*[!0-9]*) stats_base_tx="" ;; esac
+}
+
+# Delta since baseline. Counter wraps (current < baseline, e.g. interface
+# rebind or reboot) yield 0 to avoid double counting; a missing baseline
+# counts from boot (base 0).
+stats_delta()
+{
+    local cur="$1" base="$2"
+    [ -n "$base" ] || { printf '%s' "$cur"; return; }
+    if [ "$cur" -ge "$base" ] 2>/dev/null; then
+        printf '%s' $((cur - base))
+    else
+        printf '%s' 0
+    fi
+}
+
+# get_stats implementation: cumulative values from
+# /sys/class/net/<if>/statistics/{rx,tx}_bytes + /proc/uptime timestamp, plus
+# increments since the clear_stats baseline (computed here so the frontend
+# only renders plain numbers).
+get_netif_stats()
+{
+    local section="$1"
+    valid_section "$section" || section=""
+    [ -n "$section" ] && find_modem_netif "$section"
+    if [ -z "$QMODEM_NETIF" ]; then
+        json_add_boolean available 0
+        json_add_string interface ""
+        return
+    fi
+    stats_read_counters "$QMODEM_NETIF"
+    if [ -z "$stats_rx" ] || [ -z "$stats_tx" ]; then
+        json_add_boolean available 0
+        json_add_string interface "$QMODEM_NETIF"
+        return
+    fi
+    stats_read_baseline "$section"
+    json_add_boolean available 1
+    json_add_string interface "$QMODEM_NETIF"
+    json_add_int uptime "${stats_uptime:-0}"
+    json_add_int updated_at "$(date +%s)"
+    json_add_int total_rx_bytes "$stats_rx"
+    json_add_int total_tx_bytes "$stats_tx"
+    json_add_int rx_bytes "$(stats_delta "$stats_rx" "$stats_base_rx")"
+    json_add_int tx_bytes "$(stats_delta "$stats_tx" "$stats_base_tx")"
+}
+
+# clear_stats implementation: write the baseline file atomically (mktemp +
+# rename), so get_stats deltas restart from the current counters.
+clear_netif_stats()
+{
+    local section="$1" base_file base_tmp
+    if ! valid_section "$section"; then
+        json_add_boolean result 0
+        json_add_string error "invalid config_section"
+        return
+    fi
+    find_modem_netif "$section"
+    stats_read_counters "$QMODEM_NETIF"
+    if [ -z "$QMODEM_NETIF" ] || [ -z "$stats_rx" ] || [ -z "$stats_tx" ]; then
+        json_add_boolean result 0
+        json_add_string error "modem interface not found"
+        return
+    fi
+    if ! mkdir -p /var/run/qmodem; then
+        json_add_boolean result 0
+        json_add_string error "cannot create /var/run/qmodem"
+        return
+    fi
+    base_file="/var/run/qmodem/${section}_stats_reset"
+    base_tmp=$(mktemp "$base_file.tmp.XXXXXX") || base_tmp=""
+    if [ -n "$base_tmp" ] &&
+       printf '%s %s %s\n' "$stats_rx" "$stats_tx" "$(date +%s)" > "$base_tmp" &&
+       mv "$base_tmp" "$base_file"; then
+        json_add_boolean result 1
+        json_add_string interface "$QMODEM_NETIF"
+        json_add_int uptime "${stats_uptime:-0}"
+        json_add_int total_rx_bytes "$stats_rx"
+        json_add_int total_tx_bytes "$stats_tx"
+        json_add_int rx_bytes 0
+        json_add_int tx_bytes 0
+    else
+        [ -n "$base_tmp" ] && rm -f "$base_tmp"
+        json_add_boolean result 0
+        json_add_string error "failed to write baseline"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# get_current_band (next-frontend flat shape: {rat,band,earfcn,nr_arfcn})
+# ---------------------------------------------------------------------------
+
+# Extract one comma-separated field from a QENG line; strips CR, quotes and
+# surrounding spaces.
+_qeng_field()
+{
+    printf '%s' "$1" | awk -F',' -v idx="$2" \
+        '{ f = $idx; gsub(/\r/, "", f); gsub(/"/, "", f); gsub(/^ +| +$/, "", f); print f }'
+}
+
+_qeng_numeric()
+{
+    case "$1" in
+        ''|*[!0-9]*) printf '%s' "" ;;
+        *) printf '%s' "$1" ;;
+    esac
+}
+
+# Parse the QENG "servingcell" response into flat globals (best effort):
+# band_rat/band_val/band_earfcn/band_nr_arfcn/band_supported.
+# Field layouts follow vendor/quectel.sh and the unisoc testcases fixture:
+#   servingcell,"CONNECT","NR5G-SA",<duplex>,<mcc>,<mnc>,<cellid>,<pci>,<x>,
+#       <nr-arfcn>,$10,<band>,$11   (unisoc RM500U fixture)
+#   servingcell,..,"LTE",<tdd|fdd>,<mcc>,<mnc>,<pci>,<earfcn>,<band>
+#   NR5G-NSA line: nr-arfcn at $4, band at $9 (vendor/quectel.sh layout)
+parse_current_band()
+{
+    local resp lte_line sa_line nsa_line wcdma_line f4 f8 f9 f10 f11 nr_arfcn nr_band
+    band_rat=""; band_val=""; band_earfcn=""; band_nr_arfcn=""
+    band_supported=0
+    [ -n "$at_port" ] || return 0
+    # Vendor capability gate: only stacks shipping cmd_qeng_servingcell
+    # (cmds/quectel.sh) provide the QENG "servingcell" wrapper.
+    type cmd_qeng_servingcell >/dev/null 2>&1 || return 0
+    resp=$(cmd_qeng_servingcell "$at_port" 2>/dev/null) || return 0
+    lte_line=$(printf '%s\n' "$resp" | grep '+QENG: "servingcell"' | grep '"LTE"' | head -n 1)
+    sa_line=$(printf '%s\n' "$resp" | grep '+QENG: "servingcell"' | grep '"NR5G-SA"' | head -n 1)
+    nsa_line=$(printf '%s\n' "$resp" | grep '+QENG: "NR5G-NSA"' | head -n 1)
+    if [ -n "$sa_line" ]; then
+        band_rat="NR5G-SA"
+        f10=$(_qeng_numeric "$(_qeng_field "$sa_line" 10)")
+        f11=$(_qeng_numeric "$(_qeng_field "$sa_line" 11)")
+        f8=$(_qeng_numeric "$(_qeng_field "$sa_line" 8)")
+        f9=$(_qeng_numeric "$(_qeng_field "$sa_line" 9)")
+        if [ -n "$f10" ] && [ -n "$f11" ]; then
+            band_nr_arfcn=$f10; band_val=$f11
+        else
+            band_nr_arfcn=$f8; band_val=$f9
+        fi
+        band_supported=1
+    elif [ -n "$lte_line" ]; then
+        band_rat="LTE"
+        f4=$(_qeng_field "$lte_line" 4)
+        case "$f4" in
+            TDD|FDD)
+                band_earfcn=$(_qeng_numeric "$(_qeng_field "$lte_line" 8)")
+                band_val=$(_qeng_field "$lte_line" 9)
+                ;;
+            *)
+                band_earfcn=$(_qeng_numeric "$(_qeng_field "$lte_line" 7)")
+                band_val=$(_qeng_field "$lte_line" 8)
+                ;;
+        esac
+        band_supported=1
+    else
+        wcdma_line=$(printf '%s\n' "$resp" | grep '+QENG: "servingcell"' | grep '"WCDMA"' | head -n 1)
+        if [ -n "$wcdma_line" ]; then
+            band_rat="WCDMA"
+            # vendor/quectel.sh WCDMA layout: band at $8, UARFCN at $9
+            band_val=$(_qeng_field "$wcdma_line" 8)
+            band_earfcn=$(_qeng_numeric "$(_qeng_field "$wcdma_line" 9)")
+            band_supported=1
+        fi
+    fi
+    if [ -n "$nsa_line" ]; then
+        [ -n "$band_rat" ] && band_rat="EN-DC" || band_rat="NR5G-NSA"
+        nr_arfcn=$(_qeng_numeric "$(_qeng_field "$nsa_line" 4)")
+        nr_band=$(_qeng_field "$nsa_line" 9)
+        [ -n "$nr_arfcn" ] && band_nr_arfcn=$nr_arfcn
+        [ -n "$nr_band" ] && [ -z "$band_val" ] && band_val=$nr_band
+        band_supported=1
+    fi
+}
+
+# try_cache callback: append the flat band object as a modem_info element.
+current_band_query()
+{
+    parse_current_band
+    json_add_object ""
+    json_add_boolean supported "$band_supported"
+    json_add_string rat "$band_rat"
+    json_add_string band "$band_val"
+    json_add_string earfcn "$band_earfcn"
+    json_add_string nr_arfcn "$band_nr_arfcn"
+    json_close_object
+}
+
 case "$1" in
     list)
         cat <<EOF
@@ -819,8 +1057,8 @@ EOF
                         ;;
                     get_current_band)
                         json_init
-                        get_current_band
-                        json_dump
+                        cache_file="/tmp/cache_current_band_$config_section"
+                        try_cache 10 "$cache_file" current_band_query
                         ;;
                     get_current_band_capabilities)
                         json_init
@@ -878,7 +1116,7 @@ EOF
                         ;;
                     get_stats)
                         json_init
-                        get_usage_stats
+                        get_netif_stats "$config_section"
                         json_dump
                         ;;
                     save_stats)
@@ -981,7 +1219,7 @@ EOF
 
             clear_stats)
                 json_init
-                clear_usage_stats
+                clear_netif_stats "$config_section"
                 json_dump
                 ;;
                 

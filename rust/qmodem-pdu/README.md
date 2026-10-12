@@ -29,7 +29,11 @@ pub fn encode_scts(ts: &Timestamp) -> [u8; 7];
 | `DecodePDUMessage_GSM_7bit` 中 `buffer[i-1]` 可为 -1 下标 | pdu.c:115 | 位流重写为累加器式 pack/unpack，无负下标 |
 | SMSC/时间戳半八位组无边界检查 | pdu.c:548-577 | 每个字段独立长度校验 |
 
-时区半字节语义：低半字节为 15 分钟步长偏移数，高半字节 bit 0x80 表示负偏移（`Timestamp::timezone_quarters`，含正负偏移往返测试）。
+时区半字节语义（TS 23.040 §9.2.3.11 semi-octet）：低半字节为十位（含符号位
+`0x08` = 西半球负偏移），高半字节为个位，步长 15 分钟，偏移 = (十位 + 个位) × 15
+分钟（`Timestamp::timezone_quarters`，含 ±5:30 / +8:00 / ±12:45 往返测试）。
+早期版本曾按「低半字节 = 步长数」错误实现，已在一致性测试扩展中修正
+（docs/refactor/journal-pdu-conform.md）。
 
 ## 测试
 

@@ -1,5 +1,7 @@
 # qmodem-suite 单包安装指南
 
+[简体中文](install-suite.zh-cn.md) | [English](install-suite.en.md)
+
 > 状态：**新增元包**。`qmodem-suite` 是元包（metapackage，`PKGARCH:=all`，见 `application/qmodem-suite/Makefile`），用于把 QModem 核心与推荐前端一次装齐。若你的固件源中尚无该包，请直接参考本文末尾的"逐包手动安装"一节；安装后各服务的状态核查与故障排查命令在任何安装方式下都适用。
 
 ## 1. 一键安装

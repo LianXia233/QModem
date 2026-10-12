@@ -28,6 +28,14 @@
 			"path": "qmodem/overview"
 		}
 	},
+	"admin/modem/qmodem/stats": {
+		"title": "Statistics",
+		"order": 1.5,
+		"action": {
+			"type": "view",
+			"path": "qmodem/stats"
+		}
+	},
 	"admin/modem/qmodem/network_config": {
 		"title": "NetworkConfiguration",
 		"order": 2,

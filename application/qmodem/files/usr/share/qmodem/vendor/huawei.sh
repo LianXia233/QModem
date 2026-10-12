@@ -356,7 +356,7 @@ cell_info()
                     wcdma_rxlev=$(echo "$monsc_response" | awk -F',' '{print $9}')
                     ecn0=$(echo "$monsc_response" | awk -F',' '{print $10}')
                     drx=$(echo "$monsc_response" | awk -F',' '{print $11}')
-                    ura=$(echo "$monsc_response" | awk -F',' '{print $12}' | sed 's/\r//g')
+                    ura=$(echo "$monsc_response" | awk -F',' '{print $12}' | ql_at_clean)
                 ;;
                 "GSM")
                     network_mode="GSM Mode"
@@ -425,7 +425,7 @@ cell_info()
                     nr_tac=$(echo "$response" | awk -F',' '{print $8}')
                     nr_rsrp=$(echo "$response" | awk -F',' '{print $9}')
                     nr_rsrq=$(echo "$response" | awk -F',' '{print $10}')
-                    nr_sinr=$(echo "$response" | awk -F',' '{print $11}' | sed 's/\r//g')
+                    nr_sinr=$(echo "$response" | awk -F',' '{print $11}' | ql_at_clean)
                 ;;
                 "LTE-NR")
                     nr_response=$(cmd_cserssi_query "$at_port")
@@ -441,11 +441,11 @@ cell_info()
                     endc_lte_tac=$(echo "$response" | awk -F',' '{print $7}')
                     endc_lte_rsrp=$(echo "$response" | awk -F',' '{print $8}')
                     endc_lte_rsrq=$(echo "$response" | awk -F',' '{print $9}')
-                    endc_lte_rxlev=$(echo "$response" | awk -F',' '{print $10}' | sed 's/\r//g')
+                    endc_lte_rxlev=$(echo "$response" | awk -F',' '{print $10}' | ql_at_clean)
                     #NR5G-NSA
                     endc_nr_rsrp=$(echo "$nr_response" | awk -F',' '{print $12}')
                     endc_nr_rsrq=$(echo "$nr_response" | awk -F',' '{print $13}')
-                    endc_nr_sinr=$(echo "$nr_response" | awk -F',' '{print $14}' | sed 's/\r//g')
+                    endc_nr_sinr=$(echo "$nr_response" | awk -F',' '{print $14}' | ql_at_clean)
                 ;;
                 "LTE"|"eMTC"|"NB-IoT")
                     network_mode="LTE Mode"
@@ -459,7 +459,7 @@ cell_info()
                     lte_tac=$(echo "$response" | awk -F',' '{print $7}')
                     lte_rsrp=$(echo "$response" | awk -F',' '{print $8}')
                     lte_rsrq=$(echo "$response" | awk -F',' '{print $9}')
-                    lte_rxlev=$(echo "$response" | awk -F',' '{print $10}' | sed 's/\r//g')
+                    lte_rxlev=$(echo "$response" | awk -F',' '{print $10}' | ql_at_clean)
                 ;;
                 "WCDMA"|"TD-SCDMA"|"UMTS")
                     network_mode="WCDMA Mode"
@@ -474,7 +474,7 @@ cell_info()
                     wcdma_rxlev=$(echo "$response" | awk -F',' '{print $9}')
                     wcdma_ecn0=$(echo "$response" | awk -F',' '{print $10}')
                     wcdma_drx=$(echo "$response" | awk -F',' '{print $11}')
-                    wcdma_ura=$(echo "$response" | awk -F',' '{print $12}' | sed 's/\r//g')
+                    wcdma_ura=$(echo "$response" | awk -F',' '{print $12}' | ql_at_clean)
                 ;;
                 "GSM")
                     network_mode="GSM Mode"
@@ -489,7 +489,7 @@ cell_info()
                     gsm_lac=$(echo "$response" | awk -F',' '{print $8}')
                     gsm_rxlev=$(echo "$response" | awk -F',' '{print $9}')
                     gsm_rx_quality=$(echo "$response" | awk -F',' '{print $10}')
-                    gsm_ta=$(echo "$response" | awk -F',' '{print $11}' | sed 's/\r//g')
+                    gsm_ta=$(echo "$response" | awk -F',' '{print $11}' | ql_at_clean)
                 ;;
             esac
             
@@ -688,7 +688,7 @@ _set_lockband_nr(){
 }
 
 _get_temperature(){
-    response=$(cmd_chiptemp_query "$at_port" | grep "\^CHIPTEMP" | awk -F',' '{print $6}' | sed 's/\r//g' )
+    response=$(cmd_chiptemp_query "$at_port" | grep "\^CHIPTEMP" | awk -F',' '{print $6}' | ql_at_clean)
     
     local temperature
     case $platform in

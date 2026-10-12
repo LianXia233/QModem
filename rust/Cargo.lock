@@ -9,3 +9,10 @@ version = "0.1.0"
 [[package]]
 name = "qmodem-pdu"
 version = "0.1.0"
+
+[[package]]
+name = "qmodem-smsd"
+version = "0.1.0"
+dependencies = [
+ "qmodem-pdu",
+]

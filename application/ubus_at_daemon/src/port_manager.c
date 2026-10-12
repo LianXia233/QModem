@@ -3,6 +3,13 @@
 extern at_daemon_ctx_t g_daemon_ctx;
 
 at_port_instance_t *find_port_instance(const char *port_path) {
+    // A path of MAX_PORT_PATH_SIZE chars or more would have been truncated
+    // by create_port_instance(), so it can never match a stored instance.
+    // Reject it up front instead of silently behaving as "not found" and
+    // triggering a duplicate create with a truncated (mismatching) path.
+    if (!port_path || strlen(port_path) >= MAX_PORT_PATH_SIZE)
+        return NULL;
+
     pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
     
     at_port_instance_t *current = g_daemon_ctx.ports;
@@ -55,6 +62,12 @@ at_port_instance_t *create_port_instance(const char *port_path) {
     at_port_instance_t *port;
     pthread_condattr_t cond_attr;
     int cond_ret;
+
+    // Refuse to create an instance whose path cannot be stored verbatim:
+    // strncpy() below would truncate it and the truncated port_path would
+    // never be found again by find_port_instance() with the original path.
+    if (!port_path || strlen(port_path) >= MAX_PORT_PATH_SIZE)
+        return NULL;
 
     port = calloc(1, sizeof(at_port_instance_t));
     if (!port) {

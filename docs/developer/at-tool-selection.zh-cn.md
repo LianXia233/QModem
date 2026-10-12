@@ -1,5 +1,7 @@
 # AT 通路选择：tom_modem / sms_tool_q / qmodem-atd
 
+[简体中文](at-tool-selection.zh-cn.md) | [English](at-tool-selection.en.md)
+
 > 范围说明：通路 0（tom_modem/ubus at-daemon）与通路 1（sms_tool_q）为既有实现，代码入口见 `application/qmodem/files/usr/share/qmodem/modem_util.sh` 的 `at()`/`fastat()`。**通路 2（qmodem-atd unix socket）为本版本引入的新通路**，其 shell 侧接线与实测记录对应 journal 尚在发布流程中，发布后将补入 [docs/refactor/](../refactor/README.md) 索引；以本文为准的描述在 journal 发布前以设计口径阅读。
 
 ## 1. 三通路对照表

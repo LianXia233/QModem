@@ -1,3 +1,4 @@
+-- legacy: superseded by luci-app-qmodem-next (no ttl page there); scheduled for removal in Phase 4
 local uci = luci.model.uci.cursor()
 m = Map("qmodem_ttl", translate("TTL Config"))
 s = m:section(NamedSection, "main", "main", translate("Global Config"))

@@ -115,11 +115,81 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 - LuCI next: dropdown reads via component API, list limit configurable,
   parallel ubus polling (allSettled), i18n gaps closed.
 
+### Phase 2.5 — Wrap-up review & deliverable finalization (`02b4c70`..`777620d`, 2026-10-12)
+
+> Evidence base: `ls docs/refactor/` + `git log` 核对。journal 尚未落库/未合入 main 的
+> 条目（rpcd gap 端点、vendor 残留清理专项、rust FFI/bench/smsd-rs/pdu-conform）
+> 有意不记录，留给编排者合入后补充。
+
+#### Added
+- **Rust cross-build deliverables finalized** (`02b4c70`):
+  [journal-rust-cross.md](docs/refactor/journal-rust-cross.md) 落库（musl linker
+  兜底链 musl-tools → musl.cc、产物 450,544 B stripped 实测、SDK 源码构建 /
+  CI 预编译注入两条集成路线）；`rust/README.md` 增加 Cross compilation 章节。
+- **旧栈退役 Step 1 审查结论**（[journal-retire-s1.md](docs/refactor/journal-retire-s1.md)，
+  随 `ebb90dd` 合入）：7 个 legacy 包 Makefile 审查 + 维护模式标注，6 个旧栈 htm
+  首行退役注释；端点 gap 表（Phase 4 输入）——`get_modem_cfg` luad 端点是子包
+  DEPENDS 切 `+qmodem`（Step 2）的关键阻塞；HC SIM 切换、频段/流量统计端点、
+  mwan/TTL/voip 页面在 next 栈暂无对应物。
+
+#### Fixed
+- `scripts/cross-build-rust.sh`：`+crt-static` 改为仅对 `*-musl` target 注入
+  （无条件注入曾使原生 gnu 产物 450 KB → 1.4 MB）(`02b4c70`)；可执行位恢复
+  `100644 → 100755` (`777620d`)。
+- `luci-app-qmodem-ttlfw4`：补缺失的 `PKG_LICENSE_FILES:=LICENSE`（Makefile
+  审查发现，随 `ebb90dd` 合入）。
+- `ubus_at_daemon`：退出清理路径自死锁修复（持 `ports_mutex` 期间递归加锁
+  销毁端口；改为弹出链表头后锁外销毁，见 journal-atd-quality.md C7 收尾）。
+
+### Phase 3 — Rust deepening, gap closure, retirement review (`T4`, 2026-10-12)
+
+#### Added
+- Rust `ubus_ffi`: pure-Rust blobmsg codec (byte-compatible with libubox,
+  12 golden/robustness tests) + feature-gated libubus FFI + mock-transport
+  integration tests; `qmodem-smsd` Rust skeleton (Storage trait, claim/ack,
+  backoff, scheduler, URC hub — zero deps); PDU conformance suite 14→64 tests
+  (TS 23.038 vectors, C-cross-checked semantics, property robustness) —
+  **found & fixed a real SCTS timezone bug** (semi-octet per TS 23.040
+  9.2.3.11; +5:30/+8:00/±12:45 were all wrong); atd micro-benchmarks
+  (p50 50ms roundtrip, 31.4k cmd/s, broadcast 6.8µs).
+- rpcd endpoints `get_stats` / `clear_stats` / `get_current_band` + LuCI next
+  Statistics view (ACL/menu/po) — closes the traffic-stats & current-band gaps.
+- Retirement review conclusions for mwan (keep), ttl/ttlfw4 (merge later),
+  voip (keep standalone), hc (needs on-device verification) — see journals.
+- `docs/security/vendored-audit.md`: qfirehose has 3 high-risk findings
+  (system() injection via upgrade package paths, XML-driven overflow,
+  unauthenticated TCP→USB passthrough) — patch/isolate upstream.
+- UCI options reference (73 options, zh/en), docs EN translations ×3,
+  release.yml (changelog-driven releases), CI markdownlint.
+
+#### Changed / Fixed
+- Vendor residue cleanup (huawei.sh 8 CR-cleanups folded into ql_at_clean);
+  dial: deterministic wan-zone lookup, qmi_dial backoff counter reset fix;
+  at-daemon & scand: -Wall -Wextra clean, bounded pdu_decoder, uci-get parsing;
+  sms-tool_q: fixed same-origin C5/C6-class PDU overflows (ASan fuzz 200k, 0);
+  monitor: heartbeat schema version, per-modem flock, process-group kill;
+  **single-package delivery fixed**: qmodem was shipping without installing 5
+  init.d scripts; qmodem-suite uci-defaults now enables all services.
 ### Phase 0 — Audit-driven hardening (`2568198`, 2026-10-12)
 
 - Initial evidence-based hardening pass covering C memory safety, shell
   injection surfaces, packaging and LuCI (27 files); details in
   [docs/refactor/](docs/refactor/README.md) journals.
+
+### 版本化建议 — [Unreleased] → v1.1.0-rc1 拆分
+
+- **Feature（minor 升级动因，1.0.x → 1.1.0）**：
+  - `qmodem-suite` 元包（单包交付 + uci-defaults 引导）
+  - `rust/` 异步核心（`qmodem-pdu` / `qmodem-atd`）与 `at_tool=2` AT 通路
+  - `cmds/qmodem_lib.sh` 公共解析库 + 12 厂商脚本全量迁移
+  - `scripts/cross-build-rust.sh` + `rust-build.yml` 交叉编译矩阵
+  - `scripts/check_all.sh` 统一门禁 + `tests/sh` / `tests/lua` 回归体系
+- **Fix（随 rc1 一并发布）**：Phase 0/1/2 全部安全与内存安全修复（注入、
+  路径穿越、XSS、socket 权限、UAF/死锁）及打包修正（`PKG_LICENSE_FILES`、
+  `INSTALL_*` 宏、可执行位）。
+- **不纳入 rc1**：退役 Step 2（`get_modem_cfg` 等价端点与 DEPENDS 切换）与
+  Phase 4 旧栈删除属 v1.2.0 范围；尚未合入 main 的 Phase 2.5+ 条目（rpcd gap
+  端点、rust FFI/bench/smsd-rs/pdu-conform）在合入前不写入发布说明。
 
 ## [Base] — main@c49654e (2026-09-19)
 

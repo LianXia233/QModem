@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["qmodem-pdu", "qmodem-atd"]
+members = ["qmodem-pdu", "qmodem-atd", "qmodem-smsd"]
 
 [workspace.package]
 version = "0.1.0"

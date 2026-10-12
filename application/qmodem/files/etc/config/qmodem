@@ -1,18 +1,33 @@
 config main 'main'
+	# 全局拨号总开关（qmodem_network/modem_dial.sh 读取）；0/1，默认 1
 	option enable_dial '1'
+	# 扫描时尝试对 USB slot 预设（qmodem_init 读取）；0/1，默认 1
 	option try_preset_usb "1"
+	# 扫描时尝试对 PCIe slot 预设（qmodem_init 读取）；0/1，默认 1
 	option try_preset_pcie "1"
+	# 启动时是否扫描 PCIe 设备（qmodem_init 读取）；0/1，默认 1
 	option enable_pcie_scan '1'
+	# 启动前延迟秒数（qmodem_init 读取）；>=0，默认 0
 	option start_delay '0'
+	# modem_scand 日志级别（经环境变量 QMODEM_SCAN_LOG_LEVEL 透传）
 	option scan_log_level 'info'
+	# 扫描工作线程数（modem_scand 读取）；>0，默认 4
 	option scan_workers '4'
+	# AT 探测并发数（modem_scand 读取）；>0，默认 4
 	option at_probe_workers '4'
+	# ATI 快速探测超时秒数（modem_scand 读取）；>0，默认 2
 	option at_timeout_fast '2'
+	# 型号识别命令超时秒数（modem_scand 读取）；>0，默认 8
 	option at_timeout_model '8'
+	# USB/Net hotplug 新增后的延迟秒数（20-modem-usb/20-modem-net 读取）；>=0，默认 8
 	option hotplug_add_delay '8'
+	# 设备 add 事件重试间隔秒数（modem_scand 读取）；>=0，默认 8
 	option add_retry_delay '8'
+	# 设备 add 事件最大重试次数（modem_scand 读取）；>=0，默认 5
 	option add_retry_max '5'
+	# 是否将用量统计写入 NVRAM（qmodem_usage_stats 读取）；0/1，默认 0
 	option usage_stats_nvram_save '0'
+	# 用量统计 NVRAM 保存间隔秒数（qmodem_usage_stats 读取）；正整数，默认 300
 	option usage_stats_nvram_interval '300'
 	#AT command tool chain:
 	#  0 = tom_modem (ubus at-daemon, default)
@@ -24,4 +39,5 @@ config main 'main'
 	#unix socket path of qmodem-atd, only used when at_tool=2
 	option at_socket '/var/run/qmodem/atd.sock'
 	#collect AT command fixtures to /tmp/qmodem/testcases for qmodem_collect pack
+	#用例采集开关（modem_util.sh/qmodem_collect 读取）；0/1，默认 0
 	option testcase_collect '0'

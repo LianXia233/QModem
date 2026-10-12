@@ -1,0 +1,155 @@
+name: Release
+
+# 职责边界：本 workflow 只负责"发版"（release notes + GitHub Release），
+# 不构建固件/SDK/二进制——那些由 main.yml（SDK 构建）与 rust-build.yml 负责，
+# 因此不会与 main.yml 的 tag push 构建冲突（main.yml 对 .github/** paths-ignore）。
+# 产物不跨 workflow 拉取，仅在 release notes 中保留 rust-build.yml 的下载链接模板。
+
+on:
+  push:
+    tags:
+      - 'v*'
+    # 注意：tag push 事件下 paths 过滤不可靠（diff 计算语义不明确），故不加 paths；
+    # 与 main.yml 不冲突——其 push 触发已 paths-ignore '.github/**'。
+  workflow_dispatch:
+    branches:
+      - main
+    inputs:
+      prerelease:
+        description: 'Mark as prerelease (main branch pre-release)'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 从 CHANGELOG.md 提取对应版本段落作为 release notes。
+      # 段落格式为 Keep a Changelog 风格的 `## [<version>]`（如 [3.4.0_rc3]）；
+      # 找不到对应段落时回退到 [Unreleased]（补一行说明），再不行用 tag 名兜底。
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          set -eu
+          TAG_NAME="${GITHUB_REF_NAME}"
+          python3 - <<'PY'
+          import os
+          import re
+          import sys
+
+          tag = os.environ.get("TAG_NAME", "").strip()
+          # 规范化：v3.4.0_rc3 -> 3.4.0_rc3；同时兼容连字符变体 3.4.0-rc3
+          ver = tag[1:] if tag.startswith("v") else tag
+          variants = {ver, ver.replace("_", "-")}
+
+          with open("CHANGELOG.md", encoding="utf-8") as f:
+              lines = f.read().splitlines()
+
+          # 匹配 `## [xxx]` 标题行（允许标题带后缀如 `## [Base] — main@c49654e`）
+          heading = re.compile(r"^##\s+\[([^\]]+)\](.*)$")
+
+          sections = []  # (版本号, 起始行号)
+          for i, line in enumerate(lines):
+              m = heading.match(line)
+              if m:
+                  sections.append((m.group(1).strip(), i))
+
+          def extract(name):
+              for idx, (sec, start) in enumerate(sections):
+                  if sec == name:
+                      end = sections[idx + 1][1] if idx + 1 < len(sections) else len(lines)
+                      body = lines[start + 1:end]
+                      # 去掉段首/段尾空行
+                      while body and not body[0].strip():
+                          body.pop(0)
+                      while body and not body[-1].strip():
+                          body.pop()
+                      return "\n".join(body).strip()
+              return None
+
+          notes = None
+          for v in variants:
+              notes = extract(v)
+              if notes:
+                  break
+
+          if notes:
+              header = f"## Changes in {tag}"
+          else:
+              notes = extract("Unreleased")
+              if notes:
+                  header = f"## Changes in {tag} (from [Unreleased]; CHANGELOG 段落待补充)"
+              else:
+                  header = f"## {tag}"
+                  notes = "本版本没有对应的 CHANGELOG 段落，请查阅完整 [CHANGELOG.md](https://github.com/%s/blob/%s/CHANGELOG.md)。" % (
+                      os.environ.get("GITHUB_REPOSITORY", ""), tag)
+
+          with open("release_notes.md", "w", encoding="utf-8") as f:
+              f.write(header + "\n\n" + notes + "\n")
+          print("--- release_notes.md ---")
+          sys.stdout.write(open("release_notes.md", encoding="utf-8").read())
+          PY
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+
+      # 附加说明：不跨 workflow 拉取 artifact（Actions 产物会过期且需 token），
+      # 仅留下 rust-build.yml 的运行列表链接模板，用户可按 tag/分支筛选下载。
+      - name: Append artifact download hint
+        run: |
+          set -eu
+          REPO_URL="https://github.com/${GITHUB_REPOSITORY}"
+          {
+            echo ""
+            echo "## Binary artifacts"
+            echo ""
+            echo "固件/IPK/APK 由 \`main.yml\`（OpenWrt SDK）构建；Rust 二进制（\`x86_64-unknown-linux-musl\` / \`aarch64-unknown-linux-musl\`）由 \`rust-build.yml\` 构建。"
+            echo "产物不直接附在本 Release 上（避免跨 workflow 依赖），请从 Actions 产物页按对应 commit/tag 下载："
+            echo ""
+            echo "- SDK 固件: ${REPO_URL}/actions/workflows/main.yml"
+            echo "- Rust 二进制: ${REPO_URL}/actions/workflows/rust-build.yml"
+            echo ""
+            echo "若 Release 上有 \`qmodem-<tag>.tar.gz\`，它由 \`publish-existing-release.yml\` 手动从指定构建 run 打包上传。"
+          } >> release_notes.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -eu
+          # 预发布判定：手动 dispatch 且勾选 prerelease 输入 -> 预发布；
+          # tag push 一律按正式发布处理。
+          PRERELEASE_FLAGS=()
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            if [ "${DISPATCH_PRERELEASE}" = "true" ]; then
+              PRERELEASE_FLAGS+=(--prerelease)
+            fi
+          fi
+          if gh release view "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "Release ${TAG_NAME} 已存在，更新 notes"
+            gh release edit "${TAG_NAME}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --notes-file release_notes.md \
+              "${PRERELEASE_FLAGS[@]+"${PRERELEASE_FLAGS[@]}"}"
+          else
+            gh release create "${TAG_NAME}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${TAG_NAME}" \
+              --notes-file release_notes.md \
+              --verify-tag \
+              "${PRERELEASE_FLAGS[@]+"${PRERELEASE_FLAGS[@]}"}"
+          fi

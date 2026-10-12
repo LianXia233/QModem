@@ -12,6 +12,7 @@
 
 extern at_daemon_ctx_t g_daemon_ctx;
 
+/* dormant: not registered in ubus method table */
 __attribute__((unused))
 int load_config_from_json(const char *json_path) {
     FILE *file = fopen(json_path, "r");

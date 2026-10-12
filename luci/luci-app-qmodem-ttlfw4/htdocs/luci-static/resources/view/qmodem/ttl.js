@@ -1,3 +1,4 @@
+// legacy: superseded by luci-app-qmodem-next (no ttl page there); scheduled for removal in Phase 4
 'use strict';
 'require view';
 'require form';

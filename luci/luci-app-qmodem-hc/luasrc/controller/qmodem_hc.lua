@@ -52,29 +52,42 @@ function getSIM()
     writeJsonResponse(current_slot, nextboot_slot)
 end
 
+-- legacy: HC-G80 专用 SIM 切换（GPIO 直写 + uboot env sim2），next 无等效 ubus 端点，
+-- 详见 docs/refactor/journal-retire-hc.md（set_sim_slot 等效性验证清单）
+
 function setSIM()
     local sim_gpio = "/sys/class/gpio/sim/value"
     local modem_gpio = "/sys/class/gpio/4g/value"
     local sim_slot = http.formvalue("slot")
+    -- 注入防护: slot 白名单校验, 拒绝任意输入后进入固定字面量分支
+    if sim_slot ~= "SIM1" and sim_slot ~= "SIM2" then
+        luci.http.status(400, "Bad Request")
+        luci.http.prepare_content("application/json")
+        luci.http.write_json({ error = "invalid slot" })
+        return
+    end
     local pre_detect = getSimSlot(sim_gpio)
-    
+
     local reset_module = 1
     if pre_detect == sim_slot then
         reset_module = 0
     end
+    local sysfs_value, fw_setenv_cmd
+    -- 硬件语义: GPIO sim 1=SIM1 / 0=SIM2; uboot env sim2 缺省(删除)=SIM1 启动, =1 为 SIM2 启动
+    -- fw_setenv 参数均为固定字面量, 无用户输入拼接; sysfs 写入用 fs.writefile 替代 shell 重定向
     if sim_slot == "SIM1" then
-        sysfs_cmd = "echo 1 >"..sim_gpio
+        sysfs_value = "1"
         fw_setenv_cmd = "fw_setenv sim2"
-    elseif sim_slot == "SIM2" then
-        sysfs_cmd = "echo 0 >"..sim_gpio
+    else
+        sysfs_value = "0"
         fw_setenv_cmd = "fw_setenv sim2 1"
     end
-    shell(sysfs_cmd)
+    fs.writefile(sim_gpio, sysfs_value)
     shell(fw_setenv_cmd)
     if reset_module == 1 then
-        shell("echo 0 >"..modem_gpio)
+        fs.writefile(modem_gpio, "0")
         os.execute("sleep 1")
-        shell("echo 1 >"..modem_gpio)
+        fs.writefile(modem_gpio, "1")
     end
     local current_slot = getSimSlot(sim_gpio)
     local nextboot_slot = getNextBootSlot()

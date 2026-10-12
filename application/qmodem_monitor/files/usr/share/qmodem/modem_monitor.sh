@@ -355,6 +355,25 @@ run_actions(){
 }
 
 parse_args "$@"
+
+# Per-modem mutex with monitor_recovery.sh: both profiles take the same
+# /var/run/qmodem_monitor/$Modem_ID.lock flock (recovery holds fd 9 for its
+# whole lifetime), so a legacy monitor and the recovery monitor can never
+# drive CFUN/redial recovery on one modem concurrently. Choosing the shared
+# per-modem lock over a global /var/run/qmodem/monitor.lock keeps different
+# modems independent.
+case $Modem_ID in ''|*[!A-Za-z0-9_-]*)
+    log "Invalid Modem_ID: $Modem_ID"
+    exit 1
+    ;;
+esac
+mkdir -p /var/run/qmodem_monitor || exit 1
+exec 9>"/var/run/qmodem_monitor/$Modem_ID.lock"
+# Redirection failure on exec is fatal in a non-interactive shell; flock -n
+# exits(1) so procd's respawn throttle (3600 5 5) bounds retry churn while
+# the recovery profile holds the lock.
+flock -n 9 || { log "Another monitor instance holds $Modem_ID, exiting"; exit 1; }
+
 update_cfg
 update_netcfg
 log "Start monitoring $Modem_ID($Method) with interval $Interval and threshold $Threshold"

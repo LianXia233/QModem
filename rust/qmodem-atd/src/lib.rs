@@ -24,6 +24,7 @@ pub mod line;
 pub mod port;
 pub mod registry;
 pub mod transport;
+pub mod ubus_proto;
 
 #[cfg(feature = "service")]
 pub mod service;

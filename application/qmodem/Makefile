@@ -149,6 +149,12 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/qmodem_init \
+		./files/etc/init.d/qmodem_led \
+		./files/etc/init.d/qmodem_network \
+		./files/etc/init.d/qmodem_reboot \
+		./files/etc/init.d/qmodem_usage_stats $(1)/etc/init.d/
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./files/etc/config/qmodem $(1)/etc/config/
 	$(INSTALL_DATA) ./files/etc/config/qmodem_led $(1)/etc/config/

@@ -51,8 +51,10 @@ static void setserial(int baudrate)
 {
 	struct termios t;
 	if (tcgetattr(port, &t) < 0)
+	{
 		fprintf(stderr,"tcgetattr(%s)\n", dev);
-
+		return;  // Avoid using an uninitialized termios.
+	}
 	memmove(&save_tio, &t, sizeof(t));
 
 	cfmakeraw(&t);
@@ -195,7 +197,10 @@ int main(int argc, char* argv[])
 		if(argc < 3)
 			usage();
 		if(strlen(argv[2]) > 160)
+		{
 			fprintf(stderr,"sms message too long: '%s'\n", argv[2]);
+			exit(2);
+		}
 	}else if (!strcmp("delete",argv[0]))
 	{
 		if(argc < 2)
@@ -245,8 +250,10 @@ int main(int argc, char* argv[])
 	if (!strcmp("send", argv[0]))
 	{
 		int pdu_len = pdu_encode("", argv[1], argv[2], pdu, sizeof(pdu));
-		if (pdu_len < 0)
+		if (pdu_len < 0) {
 			fprintf(stderr,"error encoding to PDU: %s \"%s\n", argv[1], argv[2]);
+			return 1;  // Avoid reading the uninitialized pdu below.
+		}
 
 		const int pdu_len_except_smsc = pdu_len - 1 - pdu[0];
 		snprintf(cmdstr, sizeof(cmdstr), "AT+CMGS=%d\r\n", pdu_len_except_smsc);
@@ -317,6 +324,11 @@ int main(int argc, char* argv[])
 				break;
 			if(starts_with("+CMGL:", buf))
 			{
+				if(count >= (int)(sizeof(idx)/sizeof(idx[0])))
+				{
+					fprintf(stderr, "too many messages, ignoring rest\n");
+					break;
+				}
 				if(sscanf(buf, "+CMGL: %d,", &idx[count]) != 1)
 				{
 					fprintf(stderr, "unparsable CMGL response: %s\n", buf+7);
@@ -347,6 +359,11 @@ int main(int argc, char* argv[])
 				}
 
 				int l = strlen(buf);
+				if (l / 2 > (int)sizeof(pdu))
+				{
+					fprintf(stderr, "pdu line too long: %d\n", l);
+					continue;
+				}
 				int i;
 				for(i = 0; i < l; i+=2)
 					pdu[i/2] = 16*char_to_hex(buf[i]) + char_to_hex(buf[i+1]);
@@ -471,7 +488,7 @@ int main(int argc, char* argv[])
 				}
 				if(starts_with("+CMS ERROR:", buf))
 				{
-					printf("Error deleting message %d: %s\n", i, buf+12);
+					printf("Error deleting message %d: %s\n", i, buf+11);
 					break;
 				}
 			}
@@ -551,7 +568,7 @@ int main(int argc, char* argv[])
 				continue;
 			if(starts_with("+CME ERROR:", buf))
 			{
-				fprintf(stderr, "error: %s\n", buf+12);
+				fprintf(stderr, "error: %s\n", buf+11);
 				break;
 			}
 			if(starts_with("+CUSD:", buf))
@@ -560,7 +577,7 @@ int main(int argc, char* argv[])
 					printf("debug: %s\n", buf);
 
 				char tmp[8];
-				rc = sscanf(buf, "+CUSD:%7[^\"]\"%[^\"]\",%d", tmp, ussd_buf, &tp_dcs_type);
+				rc = sscanf(buf, "+CUSD:%7[^\"]\"%255[^\"]\",%d", tmp, ussd_buf, &tp_dcs_type);
 				if(rc == 2)
 				{
 					if(rawoutput == 1)
@@ -626,7 +643,7 @@ int main(int argc, char* argv[])
 							coding = (enum sms_charset) ((tp_dcs_type & 0x0c) >> 2);
 						break;
 					case 15:
-						if (lower & 0x4 == 0)
+						if ((lower & 0x4) == 0)
 							coding = SMS_CHARSET_7BIT;
 						break;
 				};
@@ -652,8 +669,9 @@ int main(int argc, char* argv[])
 						// GSM 7 bit
 						l = DecodePDUMessage_GSM_7bit(pdu, l/2, ussd_txt, sizeof(ussd_txt));
 						if (l > 0) {
-							if (l < sizeof(ussd_txt))
-								ussd_txt[l] = 0;
+							if (l >= (int)sizeof(ussd_txt))
+								l = (int)sizeof(ussd_txt) - 1;
+							ussd_txt[l] = 0;
 
 							printf("%s\n", ussd_txt);
 						} else {
@@ -671,7 +689,10 @@ int main(int argc, char* argv[])
 						{
 							int ucs2_char = 0x000000FF&pdu[i+1];
 							ucs2_char|=(0x0000FF00&(pdu[i]<<8));
-							utf_pos += ucs2_to_utf8(ucs2_char,&ussd_txt[utf_pos]);
+							int len = ucs2_to_utf8(ucs2_char,&ussd_txt[utf_pos]);
+							if (len < 0 || utf_pos + len >= (int)sizeof(ussd_txt))
+								break;  // Bad code point or buffer full.
+							utf_pos += len;
 						}
 
 						if (utf_pos > 0) {
@@ -694,7 +715,7 @@ int main(int argc, char* argv[])
 			}
 			if (multiline == 1)
 			{
-				rc = sscanf(buf, "%[^\"]\",%d", ussd_buf, &tp_dcs_type);
+				rc = sscanf(buf, "%255[^\"]\",%d", ussd_buf, &tp_dcs_type);
 				if (rc == 1)
 				{
 					printf("%s", ussd_buf);

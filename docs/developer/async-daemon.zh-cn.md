@@ -1,5 +1,7 @@
 # qmodem-atd 异步 AT 守护进程架构（异步核心 · 实验性）
 
+[简体中文](async-daemon.zh-cn.md) | [English](async-daemon.en.md)
+
 > 状态：**实验性（experimental）**。`rust/qmodem-atd` 是 `application/ubus_at_daemon`（C 版）的并行可选项，目前**不替换任何现有组件的打包路径**。设计说明与修复对照的权威来源是 `rust/README.md` 与 `docs/refactor/journal-rust-core.md`，本文是面向开发者的架构导览。
 
 ## 1. 线程-actor 模型

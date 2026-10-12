@@ -109,7 +109,7 @@ at_dial_monitor() {
             ipv4=$(echo $result | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
             disallow_ipv4="0.0.0.0"
             #remove the disallow ip
-            if [ "$ipv4" == "$disallow_ipv4" ];then
+            if [ "$ipv4" = "$disallow_ipv4" ];then
                 ipv4=""
             fi
             if [ -n "$ipv4" ] || [ -n "$ipv6" ];then
@@ -134,9 +134,9 @@ precheck()
     debug_log "enable_dial:$enable_dial"
     debug_log "pdp_index:$pdp_index"
     debug_log "global_en:$global_en"
-    [ -z "$state" ] || [ "$state" == "disabled" ] && return 1
-    [ "$global_en" == "0" ] && return 1
-    [ -z "$enable_dial" ] || [ "$enable_dial" == "0" ] && return 1
+    [ -z "$state" ] || [ "$state" = "disabled" ] && return 1
+    [ "$global_en" = "0" ] && return 1
+    [ -z "$enable_dial" ] || [ "$enable_dial" = "0" ] && return 1
     [ -z "$at_port" ] && return 1
     [ ! -e "$at_port" ] && return 1
     return 0

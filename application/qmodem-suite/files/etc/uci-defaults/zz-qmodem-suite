@@ -1,11 +1,23 @@
 #!/bin/sh
 # uci-defaults bootstrap for qmodem-suite.
 # Runs once after install/first boot, then is deleted by the system.
-
+#
 # Enable daemons shipped by the suite (ignore failures on partial installs).
-[ -x /etc/init.d/qmodem-smsd ] && /etc/init.d/qmodem-smsd enable
-[ -x /etc/init.d/qmodem_monitor ] && /etc/init.d/qmodem_monitor enable
+# NOTE: none of these services are auto-enabled by opkg/apk; without this
+# step the stack is installed but inert (no /var/run/qmodem, no scan, no
+# AT daemon, no dial, no SMS). qmodem_reboot/qmodem_usage_stats are enabled
+# by the qmodem package's own uci-defaults, so they are not repeated here.
+for svc in \
+	qmodem_init \
+	qmodem_network \
+	qmodem_led \
+	ubus-at-daemon \
+	qmodem-smsd \
+	qmodem_monitor \
+; do
+	[ -x "/etc/init.d/$svc" ] && "/etc/init.d/$svc" enable
+done
 
 echo "qmodem-suite installed: core + LuCI UI + SMS daemon + monitor."
-echo "Open LuCI -> Services/Status to configure. See /etc/config/qmodem."
+echo "Open LuCI -> admin/modem to configure. See /etc/config/qmodem."
 exit 0

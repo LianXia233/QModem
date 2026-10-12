@@ -28,7 +28,7 @@ int ucs2_to_utf8 (int ucs2, unsigned char * utf8)
         utf8[2] = '\0';
         return 2;
     }
-    if (ucs2 >= 0x800 && ucs2 < 0xFFFF) {
+    if (ucs2 >= 0x800 && ucs2 <= 0xFFFF) {
 	if (ucs2 >= 0xD800 && ucs2 <= 0xDFFF) {
 	    /* Ill-formed. */
 	    return UNICODE_SURROGATE_PAIR;
@@ -39,7 +39,7 @@ int ucs2_to_utf8 (int ucs2, unsigned char * utf8)
         utf8[3] = '\0';
         return 3;
     }
-    if (ucs2 >= 0x10000 && ucs2 < 0x10FFFF) {
+    if (ucs2 >= 0x10000 && ucs2 <= 0x10FFFF) {
 	/* http://tidy.sourceforge.net/cgi-bin/lxr/source/src/utf8.c#L380 */
 	utf8[0] = 0xF0 | (ucs2 >> 18);
 	utf8[1] = 0x80 | ((ucs2 >> 12) & 0x3F);

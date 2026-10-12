@@ -89,7 +89,8 @@ static int ubus_open_method(struct ubus_context *ctx, struct ubus_object *obj,
     int databits = DEFAULT_DATABITS;
     int parity = DEFAULT_PARITY;
     int stopbits = DEFAULT_STOPBITS;
-    int timeout = DEFAULT_TIMEOUT;
+
+    (void)obj; (void)method; (void)msg;
     
     blobmsg_parse(open_policy, __OPEN_MAX, tb, blob_data(msg), blob_len(msg));
     
@@ -107,8 +108,6 @@ static int ubus_open_method(struct ubus_context *ctx, struct ubus_object *obj,
         parity = blobmsg_get_u32(tb[OPEN_PARITY]);
     if (tb[OPEN_STOPBITS])
         stopbits = blobmsg_get_u32(tb[OPEN_STOPBITS]);
-    if (tb[OPEN_TIMEOUT])
-        timeout = blobmsg_get_u32(tb[OPEN_TIMEOUT]);
     
     // Find existing port instance
     at_port_instance_t *port = find_port_instance(at_port);
@@ -170,7 +169,8 @@ static int ubus_sendat_method(struct ubus_context *ctx, struct ubus_object *obj,
     int timeout = DEFAULT_TIMEOUT;
     int is_raw = 0;
     int sendonly = 0;
-    
+
+    (void)obj; (void)method;
     blobmsg_parse(sendat_policy, __SENDAT_MAX, tb, blob_data(msg), blob_len(msg));
     
     if (!tb[SENDAT_AT_PORT]) {
@@ -445,6 +445,7 @@ static int ubus_list_method(struct ubus_context *ctx, struct ubus_object *obj,
                            struct ubus_request_data *req, const char *method,
                            struct blob_attr *msg) {
     struct blob_buf b = {};
+    (void)obj; (void)method; (void)req; (void)msg;
     blob_buf_init(&b, 0);
     
     void *array = blobmsg_open_array(&b, "ports");
@@ -514,7 +515,8 @@ static int ubus_close_method(struct ubus_context *ctx, struct ubus_object *obj,
                             struct blob_attr *msg) {
     struct blob_attr *tb[__CLOSE_MAX];
     const char *at_port;
-    
+
+    (void)obj; (void)method; (void)req; (void)msg;
     blobmsg_parse(close_policy, __CLOSE_MAX, tb, blob_data(msg), blob_len(msg));
     
     if (!tb[CLOSE_AT_PORT]) {
@@ -604,7 +606,7 @@ static void server_main(void) {
     uloop_done();
 }
 
-int main(int argc, char **argv) {
+int main(void) {
     struct timespec started;
     // Initialize global context
     memset(&g_daemon_ctx, 0, sizeof(g_daemon_ctx));

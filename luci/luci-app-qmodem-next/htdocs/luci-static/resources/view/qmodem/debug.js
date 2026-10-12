@@ -65,6 +65,37 @@ return view.extend({
 		portSection.appendChild(portInfo);
 		container.appendChild(portSection);
 
+		// Current band display (best effort; unsupported vendors show a hint)
+		var bandSection = E('div', { 'class': 'cbi-value' });
+		bandSection.appendChild(E('label', { 'class': 'cbi-value-title' }, _('Current Band')));
+		var bandField = E('div', { 'class': 'cbi-value-field' });
+		bandField.appendChild(E('div', { 'class': 'spinning' }, _('Loading...')));
+		bandSection.appendChild(bandField);
+		container.appendChild(bandSection);
+
+		qmodem.getCurrentBand(modem.id).then(function(res) {
+			var band = res && res.current_band;
+
+			if (!band || band.status === 'unsupported') {
+				dom.content(bandField, _('Vendor does not support band query'));
+				return;
+			}
+
+			if (band.status !== 'ok') {
+				dom.content(bandField, _('Not registered'));
+				return;
+			}
+
+			var names = (band.cells || []).map(function(cell) {
+				var name = cell.band_name || ((cell.rat || '') + ' B' + (cell.band || ''));
+				return cell.channel ? name + ' (' + cell.channel + ')' : name;
+			});
+
+			dom.content(bandField, names.length ? names.join(', ') : _('N/A'));
+		}).catch(function() {
+			dom.content(bandField, _('Vendor does not support band query'));
+		});
+
 		// Load AT configuration
 		qmodem.getAtCfg(modem.id).then(function(cfg) {
 			if (!cfg || !cfg.at_cfg) {

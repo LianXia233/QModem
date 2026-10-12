@@ -43,7 +43,7 @@ nm_config() {
 nm_init_state() {
     Connectivity=unknown Phase=starting Reason='' Failures=0 ActionFailures=0
     PrimaryOK=null BackupOK=null LastAction='' CommandOK=null Address=false
-    NetDev='' NextAction=0 Switched=0 Child='' Watchdog=''
+    NetDev='' NextAction=0 Switched=0 Child='' Watchdog='' ChildGroup=0
 }
 nm_state() {
     [ -z "$1" ] || Phase=$1
@@ -56,8 +56,8 @@ nm_state() {
         --argjson failures "$Failures" --argjson action_failures "$ActionFailures" \
         --argjson primary_ok "$PrimaryOK" --argjson backup_ok "$BackupOK" \
         --argjson address_acquired "$Address" --argjson command_ok "$CommandOK" \
-        --argjson next_action_at "$NextAction" \
-        '{api_version:1,modem:$modem,interface:$interface,pid:$pid,phase:$phase,
+        --argjson next_action_at "$NextAction" --argjson version 1 \
+        '{api_version:1,version:$version,modem:$modem,interface:$interface,pid:$pid,phase:$phase,
           connectivity:$connectivity,reason:$reason,failures:$failures,
           action_failures:$action_failures,primary_ok:$primary_ok,backup_ok:$backup_ok,
           last_action:$last_action,address_acquired:$address_acquired,command_ok:$command_ok,
@@ -85,21 +85,39 @@ nm_status() {
 }
 # A bounded child never retains the daemon flock. Heartbeat remains current
 # during AT, netifd, ping and sleeps; stop interrupts the child before cleanup.
+# Usage: nm_run <limit> <group|fn> <cmd...>
+#   group: external commands run under setsid (own process group) so the
+#          timeout sweeps grandchildren that outlived their parent, including
+#          ones already reparented to init.
+#   fn:    shell functions must stay in-process (setsid execs and cannot run
+#          them); they keep the fork+tree-walk semantics, whose residual race
+#          is a grandchild surviving a parent that dies mid-kill.
 nm_run() {
-    local limit=$1 deadline rc; shift
-    "$@" 9>&- & Child=$!
+    local limit=$1 mode=$2 deadline rc; shift 2
+    ChildGroup=0
+    if [ "$mode" = group ] && command -v setsid >/dev/null 2>&1; then
+        setsid "$@" 9>&- & ChildGroup=1
+    else
+        "$@" 9>&- &
+    fi
+    Child=$!
     deadline=$(($(nm_now) + limit))
     while kill -0 "$Child" 2>/dev/null; do
         nm_state
         if [ "$(nm_now)" -ge "$deadline" ]; then
-            nm_kill_tree "$Child"
+            if [ "$ChildGroup" = 1 ]; then nm_kill_group "$Child"; else nm_kill_tree "$Child"; fi
             wait "$Child" 2>/dev/null
             Child=''
             return 124
         fi
         sleep 1
     done
-    wait "$Child"; rc=$?; Child=''; return "$rc"
+    wait "$Child"; rc=$?
+    # Parent exited on its own: sweep any group members it left behind so a
+    # reparented grandchild cannot outlive the probe.
+    [ "$ChildGroup" = 1 ] && kill -KILL "-$Child" 2>/dev/null
+    Child=''
+    return "$rc"
 }
 nm_sleep() {
     local end
@@ -119,17 +137,22 @@ nm_sample() {
     PrimaryOK=null BackupOK=null
     if ! nm_interface; then Reason=interface_unavailable; return 1; fi
     PrimaryOK=false
-    if nm_run "$((Timeout+2))" ping -4 -c 1 -W "$Timeout" -w "$Timeout" -I "$NetDev" "$Primary" >/dev/null 2>&1; then PrimaryOK=true; return 0; fi
+    if nm_run "$((Timeout+2))" group ping -4 -c 1 -W "$Timeout" -w "$Timeout" -I "$NetDev" "$Primary" >/dev/null 2>&1; then PrimaryOK=true; return 0; fi
     if [ -n "$Backup" ]; then
         BackupOK=false
-        if nm_run "$((Timeout+2))" ping -4 -c 1 -W "$Timeout" -w "$Timeout" -I "$NetDev" "$Backup" >/dev/null 2>&1; then BackupOK=true; return 0; fi
+        if nm_run "$((Timeout+2))" group ping -4 -c 1 -W "$Timeout" -w "$Timeout" -I "$NetDev" "$Backup" >/dev/null 2>&1; then BackupOK=true; return 0; fi
     fi
     Reason=targets_unreachable
     return 1
 }
 nm_at_command() {
     local rc
-    # at() is the existing QModem transport, including ubus serialization.
+    # at() is the single QModem AT entry point: it sources modem_util.sh,
+    # whose qmodem_at_dispatch() branches on qmodem.main.at_tool
+    # (0/1 -> tom_modem/sms_tool_q, 2 -> qmodem_atd_sendat unix-socket
+    # transport). CFUN recovery therefore needs no separate code path for
+    # at_tool=2; response semantics (lines + exit code) are mapped inside
+    # qmodem_atd_sendat().
     at "$AT_PORT" "$1" > "$NM_RUN/$Modem_ID.at" 2>/dev/null; rc=$?
     [ "$rc" = 0 ] || return "$rc"
     tr -d '\r' < "$NM_RUN/$Modem_ID.at" | awk 'NF {last=$0} END {exit(last != "OK")}'
@@ -137,16 +160,27 @@ nm_at_command() {
 nm_kill_tree() {
     local p=$1 child
     if [ -r "/proc/$p/task/$p/children" ]; then
-        for child in $(cat "/proc/$p/task/$p/children"); do nm_kill_tree "$child"; done
+        for child in $(cat "/proc/$p/task/$p/children" 2>/dev/null); do nm_kill_tree "$child"; done
     fi
     kill -TERM "$p" 2>/dev/null
     kill -KILL "$p" 2>/dev/null
     return 0
 }
+# Only valid for a child started under setsid: its pid is then a private
+# process group id, so the negative pid reaches descendants whose parent
+# already exited (reparented, invisible to the /proc children walk). The
+# per-pid walk stays as the fallback when the shell/kill lacks negative-pid
+# support, degrading to plain nm_kill_tree semantics.
+nm_kill_group() {
+    local p=$1
+    kill -TERM "-$p" 2>/dev/null
+    kill -KILL "-$p" 2>/dev/null
+    nm_kill_tree "$p"
+}
 nm_cfun_on() {
     [ -f "$NM_INTENTS/$Modem_ID" ] || return 0
     nm_state recovering restoring_cfun
-    if nm_run 20 nm_at_command 'AT+CFUN=1'; then
+    if nm_run 20 fn nm_at_command 'AT+CFUN=1'; then
         rm -f "$NM_INTENTS/$Modem_ID"
         return 0
     fi
@@ -162,11 +196,11 @@ nm_redial() {
         mv "$NM_INTENTS/$Modem_ID.tmp" "$NM_INTENTS/$Modem_ID" || return 1
     sync
     nm_state recovering cfun_off
-    nm_run 20 nm_at_command 'AT+CFUN=0' && off=0
+    nm_run 20 fn nm_at_command 'AT+CFUN=0' && off=0
     nm_sleep 1
     nm_cfun_on || return 1
     nm_state recovering restarting_dialer
-    nm_run 30 "$NM_NET_SERVICE" redial "$Modem_ID" || return 1
+    nm_run 30 group "$NM_NET_SERVICE" redial "$Modem_ID" || return 1
     [ "$off" = 0 ]
 }
 nm_switch() {
@@ -218,7 +252,11 @@ nm_probe_round() {
 }
 nm_cleanup() {
     trap '' INT TERM
-    [ -z "$Child" ] || { nm_kill_tree "$Child"; wait "$Child" 2>/dev/null; Child=''; }
+    if [ -n "$Child" ]; then
+        if [ "$ChildGroup" = 1 ]; then nm_kill_group "$Child"; else nm_kill_tree "$Child"; fi
+        wait "$Child" 2>/dev/null
+        Child=''
+    fi
     # Preserve the intent if compensation fails; init also starts disabled
     # profiles with a pending intent so a service restart can finish it.
     nm_cfun_on
@@ -249,7 +287,7 @@ nm_main() {
     while :; do
         if ! nm_guard; then Connectivity=unknown; nm_state error legacy_conflict; nm_sleep 5; continue; fi
         if ! nm_cfun_on; then Connectivity=unknown; nm_sleep 10; continue; fi
-        if [ "$Action" != redial ] && ! nm_run 15 nm_switch_supported; then
+        if [ "$Action" != redial ] && ! nm_run 15 fn nm_switch_supported; then
             Connectivity=unknown; nm_state error sim_switch_unsupported; nm_sleep 15; continue
         fi
         if ! nm_probe_round; then
@@ -265,7 +303,7 @@ nm_main() {
             nm_state recovering "$LastAction"
             case "$LastAction" in
                 redial) nm_redial && CommandOK=true;;
-                switch_sim_slot) nm_run 45 nm_switch && CommandOK=true;;
+                switch_sim_slot) nm_run 45 fn nm_switch && CommandOK=true;;
             esac
             nm_state settling waiting_registration
             nm_sleep "$Settle"

@@ -1,6 +1,7 @@
 #include "modem_scan_common.h"
 
 #include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,10 +27,11 @@ static int send_request(const char *line)
 	struct sockaddr_un addr;
 	char reply[QMODEM_MAX_REPLY];
 	ssize_t n;
+	size_t len, sent;
 
 	fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (fd < 0) {
-		perror("socket");
+		fprintf(stderr, "socket: %s\n", strerror(errno));
 		return 1;
 	}
 
@@ -41,15 +43,44 @@ static int send_request(const char *line)
 		if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == 0)
 			break;
 		if (i == 19) {
-			fprintf(stderr, "modem_scand unavailable: %s\n", strerror(errno));
+			if (errno == ENOENT || errno == ECONNREFUSED)
+				fprintf(stderr,
+					"modem_scand not running (socket %s: %s)\n",
+					QMODEM_SCAND_SOCKET, strerror(errno));
+			else if (errno == EACCES || errno == EPERM)
+				fprintf(stderr,
+					"permission denied on %s: %s\n",
+					QMODEM_SCAND_SOCKET, strerror(errno));
+			else
+				fprintf(stderr, "connect %s: %s\n",
+					QMODEM_SCAND_SOCKET, strerror(errno));
 			close(fd);
 			return 2;
 		}
 		usleep(100000);
 	}
 
-	if (write(fd, line, strlen(line)) < 0 || write(fd, "\n", 1) < 0) {
-		perror("write");
+	/* write the request with a newline; retry on short writes/EINTR */
+	len = strlen(line);
+	sent = 0;
+	while (sent < len) {
+		n = write(fd, line + sent, len - sent);
+		if (n < 0) {
+			if (errno == EINTR)
+				continue;
+			fprintf(stderr, "write: %s\n", strerror(errno));
+			close(fd);
+			return 1;
+		}
+		sent += (size_t)n;
+	}
+	for (;;) {
+		n = write(fd, "\n", 1);
+		if (n == 1)
+			break;
+		if (n < 0 && errno == EINTR)
+			continue;
+		fprintf(stderr, "write: %s\n", strerror(errno));
 		close(fd);
 		return 1;
 	}
@@ -66,6 +97,8 @@ static int send_request(const char *line)
 int main(int argc, char **argv)
 {
 	char line[QMODEM_MAX_LINE];
+
+	signal(SIGPIPE, SIG_IGN);
 
 	if (argc < 2) {
 		usage(stderr);

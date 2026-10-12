@@ -11,7 +11,8 @@
 				"dial_status", "get_connect_status", "get_dial_log",
 				"get_sim_switch_capabilities", "get_sim_slot",
 				"get_pcie_devices", "get_usb_devices", "get_leds",
-				"get_network_interfaces", "get_tty_ports", "get_available_devices"
+				"get_network_interfaces", "get_tty_ports", "get_available_devices",
+			"get_stats", "get_current_band"
 			],
 				"qmodem.sms": [
 					"status", "config_get", "sync_status", "list", "get", "modem_list", "storage_get"
@@ -25,6 +26,7 @@
 			"ubus": {
 				"qmodem": [
 					"clear_dial_log",
+					"clear_stats",
 					"delete_sms",
 					"do_reboot",
 					"modem_dial",

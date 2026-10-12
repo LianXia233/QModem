@@ -36,8 +36,9 @@ ql_csv_field()
 }
 
 # Print the first capture group of <ERE> matched against stdin lines
-# (first matching line wins; within a line the ERE is matched greedily,
-# like `sed -n -E "s/.*<ERE>.*/\1/p"`).
+# (one output line per matching input line — `sed -n -E "s/.*<ERE>.*/\1/p"`
+# semantics; NOT "first match only". Callers wanting a single value must
+# pipe through `head -n1` or ensure the input yields at most one match).
 # $1: POSIX ERE containing at least one capture group.
 # Returns: 0 and prints the group if a non-empty match was found,
 #          1 when nothing matched (or the group is empty),

@@ -12,6 +12,11 @@
 #     (Method=curl); ping is the default, so curl stays a soft dependency.
 #   - Real package names verified: "qmodem-smsd" (hyphen) vs "qmodem_monitor"
 #     (underscore) -- do NOT normalize these.
+#   - No package auto-enables its init.d scripts; qmodem's own uci-defaults
+#     only cover qmodem_reboot/qmodem_usage_stats. The suite bootstrap
+#     (zz-qmodem-suite) enables the rest: qmodem_init (mkdir /var/run/qmodem
+#     + modem scan), qmodem_network (dial), qmodem_led, ubus-at-daemon,
+#     qmodem-smsd, qmodem_monitor. Verified: docs/refactor/journal-pkg-verify.md
 #
 include $(TOPDIR)/rules.mk
 

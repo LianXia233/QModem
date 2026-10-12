@@ -1,3 +1,4 @@
+-- legacy: superseded by luci-app-qmodem-next (no ttl page there); scheduled for removal in Phase 4
 -- Copyright 2024 Siriling <siriling@qq.com>
 module("luci.controller.qmodem_ttl", package.seeall)
 function index()

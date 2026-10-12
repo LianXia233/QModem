@@ -1,4 +1,8 @@
 <!-- legacy: superseded by luci-app-qmodem-next; scheduled for removal in Phase 4 -->
+<!-- legacy: 本页经旧栈 HTTP dispatcher 端点 admin/modem/qmodem/{get_sim,set_sim} 操作 HC-G80
+     专用链路（GPIO /sys/class/gpio/sim + uboot env sim2，fw_setenv）。next 的 set_sim_slot
+     为 vendor AT 路径，无等效端点；retire 前需完成等效性验证，
+     见 docs/refactor/journal-retire-hc.md。 -->
 
 <script>
 	function set_sim_view(slot){

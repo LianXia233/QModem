@@ -78,7 +78,12 @@ EncodePDUMessage(const char* sms_text, int sms_text_length, unsigned char* outpu
 		}
 	}
 
-	if (i <= sms_text_length)
+	// Only when the loop exited via its own condition (i == length - 1)
+	// is the final septet still unprocessed.  Exiting via the carry-reset
+	// skip (i == length) means everything is already packed; writing here
+	// emitted a spurious octet (and read sms_text[length]) for every
+	// length that is a multiple of 8.
+	if (i == sms_text_length - 1)
 		output_buffer[output_buffer_length++] =	(sms_text[i] & BITMASK_7BITS) >> (carry_on_bits - 1);
 
 	return output_buffer_length;
@@ -93,7 +98,9 @@ DecodePDUMessage_GSM_7bit(const unsigned char* buffer, int buffer_length, char* 
 	if (buffer_length > 0)
 		output_sms_text[output_text_length++] = BITMASK_7BITS & buffer[0];
 
-	if (sms_text_length > 1) {
+	// Guard against buffer_length == 0: without it the remainder below
+	// reads buffer[i - 1] == buffer[0] of an empty buffer.
+	if (sms_text_length > 1 && buffer_length > 0) {
 		int carry_on_bits = 1;
 		int i = 1;
 		for (; i < buffer_length; ++i) {
@@ -257,7 +264,9 @@ G7bitToAscii(char* buffer, int buffer_length, int use_turkish_locking,
 					buffer_length--;
 					break;
 				}
-				buffer[i] = ext_table[(unsigned char)buffer[i + 1]];
+				// Mask to 7 bits: the 128-entry table must never be
+				// indexed with a full-octet value.
+				buffer[i] = ext_table[(unsigned char)buffer[i + 1] & 0x7F];
 				if (i + 2 < buffer_length)
 					memmove(&buffer[i + 1], &buffer[i + 2], buffer_length - i - 2);
 				buffer_length--;
@@ -582,7 +591,7 @@ int pdu_decode(const unsigned char* buffer, int buffer_length,
 		return -1;  // Not enough bytes for PID/DCS/timestamp.
 
 	// Decode timestamp.
-	struct tm sms_broken_time;
+	struct tm sms_broken_time = {0};
 	sms_broken_time.tm_year = 100 + SwapDecimalNibble(buffer[sms_pid_start + 2]);
 	sms_broken_time.tm_mon  = SwapDecimalNibble(buffer[sms_pid_start + 3]) - 1;
 	sms_broken_time.tm_mday = SwapDecimalNibble(buffer[sms_pid_start + 4]);

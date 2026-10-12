@@ -3565,3 +3565,59 @@ msgstr ""
 #: view/qmodem/network_config.js:345
 msgid "quectel-CM will append the DNS server to the resolv.conf file by default.if you do not want to modify the resolv.conf file, please check this option."
 msgstr ""
+
+#: view/qmodem/stats.js:158
+msgid "Traffic Statistics"
+msgstr ""
+
+#: view/qmodem/stats.js:183
+msgid "RX Rate"
+msgstr ""
+
+#: view/qmodem/stats.js:188
+msgid "TX Rate"
+msgstr ""
+
+#: view/qmodem/stats.js:193
+msgid "Total RX"
+msgstr ""
+
+#: view/qmodem/stats.js:198
+msgid "Total TX"
+msgstr ""
+
+#: view/qmodem/stats.js:203
+msgid "Updated"
+msgstr ""
+
+#: view/qmodem/stats.js:221
+msgid "Clear Statistics"
+msgstr ""
+
+#: view/qmodem/stats.js:71
+msgid "Vendor does not support traffic statistics"
+msgstr ""
+
+#: view/qmodem/stats.js:217
+msgid "Are you sure you want to clear the traffic statistics of modem %s?"
+msgstr ""
+
+#: view/qmodem/stats.js:225
+msgid "Statistics cleared"
+msgstr ""
+
+#: view/qmodem/stats.js:230
+msgid "Failed to clear statistics: "
+msgstr ""
+
+#: view/qmodem/debug.js:70
+msgid "Current Band"
+msgstr ""
+
+#: view/qmodem/debug.js:78
+msgid "Vendor does not support band query"
+msgstr ""
+
+#: view/qmodem/debug.js:83
+msgid "Not registered"
+msgstr ""

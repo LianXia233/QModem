@@ -702,6 +702,34 @@ check_ip()
         fi
 }
 
+# Find the index of the firewall zone named "wan" by deterministic traversal.
+# Sets wan_zone_index and returns 0 when found; returns 1 when absent.
+find_wan_zone_index()
+{
+    local i=0
+    while uci -q get "firewall.@zone[$i]" >/dev/null 2>&1; do
+        if [ "$(uci -q get firewall.@zone[$i].name)" = "wan" ]; then
+            wan_zone_index=$i
+            return 0
+        fi
+        i=$((i+1))
+    done
+    return 1
+}
+
+# Check whether a firewall zone (given by numeric index) already contains
+# a network interface name.
+zone_has_network()
+{
+    local zone_index="$1"
+    local if_name="$2"
+    local network
+    for network in $(uci -q get "firewall.@zone[$zone_index].network"); do
+        [ "$network" = "$if_name" ] && return 0
+    done
+    return 1
+}
+
 append_to_fw_zone()
 {
     local fw_zone=$1
@@ -823,7 +851,12 @@ set_if()
     fi
     interface=$(uci -q get network.$interface_name)
     interfacev6=$(uci -q get network.$interface6_name)
-    num=$(uci show firewall | grep "name='wan'" | wc -l)
+    wan_zone_index=""
+    if ! find_wan_zone_index; then
+        logger -t qmodem "error: no firewall zone named 'wan' found, skip zone operations for $interface_name"
+    else
+        num=$wan_zone_index
+    fi
     if [ "$env4" -eq 1 ];then
         if [ -z "$interface" ];then
             uci set network.${interface_name}=interface
@@ -840,8 +873,7 @@ set_if()
             else
                 uci del network.${interface_name}.peerdns
             fi
-            local wwan_num=$(uci -q get firewall.@zone[$num].network | grep -w "${interface_name}" | wc -l)
-            if [ "$wwan_num" = "0" ]; then
+            if [ -n "$num" ] && ! zone_has_network "$num" "$interface_name"; then
                 append_to_fw_zone $num ${interface_name}
             fi
             network_reload_flag=1
@@ -866,8 +898,7 @@ set_if()
             uci set network.${interface6_name}.device="@${interface_name}"
             uci set network.${interface6_name}.metric="${metric}"
             
-            local wwan6_num=$(uci -q get firewall.@zone[$num].network | grep -w "${interface6_name}" | wc -l)
-            if [ "$wwan6_num" = "0" ]; then
+            if [ -n "$num" ] && ! zone_has_network "$num" "$interface6_name"; then
                 append_to_fw_zone $num ${interface6_name}
             fi
             network_reload_flag=1
@@ -1263,18 +1294,27 @@ qmi_dial()
     qmi_dial_fail_count=0
     while true; do
         m_debug "dialing: $cmd_line"
+        dial_start_time=$(date +%s)
         $cmd_line &
         qmi_dial_pid=$!
         echo "$qmi_dial_pid" > "${MODEM_RUNDIR}/${modem_config}_dir/$modem_config.pid"
         m_debug "pid: $qmi_dial_pid"
         # wait only for our own dial job, not unrelated background tasks
         wait "$qmi_dial_pid"
-        qmi_dial_fail_count=$((qmi_dial_fail_count + 1))
-        m_debug "quectel-CM exited (consecutive failures: $qmi_dial_fail_count), retrying dial"
-        if [ "$qmi_dial_fail_count" -ge 3 ]; then
-            logger -t qmodem "qmi_dial failed $qmi_dial_fail_count consecutive times for $modem_config, backing off 30s"
-            sleep 30
+        dial_run_time=$(( $(date +%s) - dial_start_time ))
+        if [ "$dial_run_time" -ge 60 ]; then
+            # dial held the data connection for a while: this was a
+            # successful session that later dropped, reset the counter
             qmi_dial_fail_count=0
+            m_debug "quectel-CM exited after ${dial_run_time}s, connection dropped, redialing"
+        else
+            qmi_dial_fail_count=$((qmi_dial_fail_count + 1))
+            m_debug "quectel-CM exited after ${dial_run_time}s (consecutive failures: $qmi_dial_fail_count), retrying dial"
+            if [ "$qmi_dial_fail_count" -ge 3 ]; then
+                logger -t qmodem "qmi_dial failed $qmi_dial_fail_count consecutive times for $modem_config, backing off 30s"
+                sleep 30
+                qmi_dial_fail_count=0
+            fi
         fi
     done
 }

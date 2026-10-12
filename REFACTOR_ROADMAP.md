@@ -89,3 +89,28 @@ Phase 1-4（后续，见评估报告）：vendor 层配置驱动下沉 → smsd/
 | W26 | CI：rust-build.yml 交叉编译矩阵 + check_all 新 stage | agent-ci-p2 | ✅ |
 
   门禁复核（编排者）：check_all 8 stage 全 PASS/SKIP 合规、cargo 37 tests、tests/sh 18 PASS、at_tool=2 端到端验证、vendor lib 调用覆盖 12/12 厂商文件；scripts/dist/ 构建产物已 gitignore。
+
+- **T4（2026-10-12 18:20）**：Phase 3 —— 20 个子代理并行（W27-W44）+ 3 个补发（W45-W47），Rust 深化与 gap 补齐：
+
+| # | 工作包 | 子代理 | 关键产出 |
+|---|--------|--------|----------|
+| W27 | ubus FFI 实装（blobmsg 纯 Rust 编解码 + mock transport 全流程测试） | agent-ffi-ubus | 47/52 tests，跨语言格式锁定 |
+| W28 | qmodem-smsd Rust 骨架（Storage trait/claim/退避/调度/URC） | agent-smsd-rs | 10 tests，零依赖 |
+| W29 | PDU 一致性测试 14→64（TS 23.038 向量/交叉/property） | agent-pdu-conform | **发现并修复 SCTS 时区真 bug** |
+| W30 | atd 微基准（往返 p50=50ms/吞吐 31.4k cmd/s/广播 6.8µs） | agent-atd-bench | docs/refactor/bench-atd.md |
+| W31 | rpcd gap 端点：get_stats/clear_stats/get_current_band | agent-rpcd-gap | 53 断言全绿 |
+| W32 | next 前端 stats 视图 + ACL/menu + debug band 行 | agent-luci-gap | gap「流量统计/当前频段」闭环 |
+| W33-36 | 旧栈退役审查 mwan/ttl/voip/hc（结论：mwan 保留、ttl 合并待迁、voip 独立、hc 需实机验证） | agent-retire-* | 顺带修注入/bashism |
+| W37 | vendor 残留清理（重复分支 0、huawei 8 处收编） | agent-vendor-residue | 字节级对比证据 |
+| W38 | dial wan zone 确定性遍历 + qmi_dial 退避计数器清零修正 | agent-dial-zone | mock uci 5 组断言 |
+| W39-40 | at-daemon/scand C 收尾（警告清零、pdu_decoder 有界、uci get 取值） | agent-atd-c-final / scan-c-final | -Wall -Wextra 0 |
+| W41 | libqmodem-sms + sms-tool_q 审计修复（pdu_lib 同源 C5/C6 高危） | agent-sms-c-audit | ASan 模糊 20 万轮 0 报告 |
+| W42 | vendored 上游审计（**qfirehose 3 个高危**：system 注入/XML 溢出/usb2tcp 无鉴权） | agent-vendored-audit | docs/security/vendored-audit.md |
+| W43 | release.yml（CHANGELOG→Release 自动化）+ markdownlint | agent-ci-release | 8 workflow 校验 |
+| W44 | 文档英文化 ×3 + README 链接 | agent-docs-en | 双向互链 |
+| W45 | UCI 选项参考文档（73 选项/中英）+ config 注释 | agent-uci-docs | docs/reference/ |
+| W46 | monitor 心跳 schema version + per-modem 互斥锁 + 进程组 kill | agent-monitor-hard | dash 双跑断言 |
+| W47 | **单包交付断链修复**：qmodem 5 个 init.d 未被安装、suite enable 缺失 | agent-pkg-verify | 首装即用闭环 |
+
+  编排者收尾：pdu README SCTS 语义更新、ql_regex_pick 注释失实修正。
+  门禁复核：check_all 7 PASS+1 SKIP 合规、cargo test 113（pdu 64/atd 39/smsd 10）、tests/sh 35 PASS、lua 16 PASS。

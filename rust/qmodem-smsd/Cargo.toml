@@ -1,0 +1,9 @@
+[package]
+name = "qmodem-smsd"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "SMS daemon skeleton (Rust port of application/qmodem_smsd), storage/queue/scheduler/URC core"
+
+[dependencies]
+qmodem-pdu = { path = "../qmodem-pdu" }

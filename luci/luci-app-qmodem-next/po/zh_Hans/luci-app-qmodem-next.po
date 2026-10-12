@@ -2646,3 +2646,59 @@ msgstr "模组初始化后重新发送锁小区命令"
 # Source: view/qmodem/config_advanced.js
 msgid "Delay"
 msgstr "延迟"
+
+# Source: view/qmodem/stats.js
+msgid "Traffic Statistics"
+msgstr "流量统计"
+
+# Source: view/qmodem/stats.js
+msgid "RX Rate"
+msgstr "接收速率"
+
+# Source: view/qmodem/stats.js
+msgid "TX Rate"
+msgstr "发送速率"
+
+# Source: view/qmodem/stats.js
+msgid "Total RX"
+msgstr "累计接收"
+
+# Source: view/qmodem/stats.js
+msgid "Total TX"
+msgstr "累计发送"
+
+# Source: view/qmodem/stats.js
+msgid "Updated"
+msgstr "更新时间"
+
+# Source: view/qmodem/stats.js
+msgid "Clear Statistics"
+msgstr "清零统计"
+
+# Source: view/qmodem/stats.js
+msgid "Vendor does not support traffic statistics"
+msgstr "厂商不支持流量统计"
+
+# Source: view/qmodem/stats.js
+msgid "Are you sure you want to clear the traffic statistics of modem %s?"
+msgstr "确定要清零模组 %s 的流量统计吗？"
+
+# Source: view/qmodem/stats.js
+msgid "Statistics cleared"
+msgstr "统计已清零"
+
+# Source: view/qmodem/stats.js
+msgid "Failed to clear statistics: "
+msgstr "清零统计失败："
+
+# Source: view/qmodem/debug.js
+msgid "Current Band"
+msgstr "当前频段"
+
+# Source: view/qmodem/debug.js
+msgid "Vendor does not support band query"
+msgstr "厂商未支持"
+
+# Source: view/qmodem/debug.js
+msgid "Not registered"
+msgstr "未注册"

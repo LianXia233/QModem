@@ -7,6 +7,7 @@ include $(TOPDIR)/rules.mk
 include ../../version.mk
 
 PKG_NAME:=luci-app-qmodem-ttlfw4
+# legacy: fw4/nft 专用变体，维护模式；与 luci-app-qmodem-ttl 互斥（共用 /etc/config/qmodem_ttl），勿新增功能
 LUCI_TITLE:=LuCI App for QModem TTL Configuration (JS LuCI / fw4 Only) (legacy, maintenance mode)
 LUCI_DEPENDS:=+luci-base
 PKG_CONFLICTS:=luci-app-qmodem-ttl

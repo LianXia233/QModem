@@ -243,6 +243,7 @@ int send_at_command_with_response(at_port_instance_t *port, const char *cmd, int
     return response->status;
 }
 
+/* dormant: not registered in ubus method table */
 int send_at_command(at_port_instance_t *port, const char *cmd, int timeout, const char *end_flag, int is_raw) {
     at_response_t response;
     return send_at_command_with_response(port, cmd, timeout, end_flag, is_raw, &response);

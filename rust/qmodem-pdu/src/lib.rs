@@ -85,10 +85,12 @@ pub struct Timestamp {
     pub hour: u8,
     pub minute: u8,
     pub second: u8,
-    /// Time zone offset in quarter-hours (15-minute steps).
+    /// Time zone offset in quarter-hours (15-minute steps), range ±79.
     ///
-    /// Per the SCTS timezone octet: the low nibble carries the offset count
-    /// and bit 0x80 (bit 3 of the high nibble) marks a negative offset.
+    /// Per TS 23.040 §9.2.3.11 the SCTS timezone octet is semi-octet coded:
+    /// the LOW nibble carries the tens digit of the quarter-hour count with
+    /// bit 0x08 marking a negative offset, the HIGH nibble the units digit
+    /// (e.g. +8:00 = 32q = 0x23, -2:00 = -8q = 0x88, +12:45 = 51q = 0x15).
     pub timezone_quarters: i8,
 }
 
@@ -382,8 +384,14 @@ fn parse_scts(buf: &[u8], pos: usize) -> Result<Timestamp, PduError> {
     let minute = swap_decimal_nibble(buf[pos + 4]);
     let second = swap_decimal_nibble(buf[pos + 5]);
     let tz_byte = buf[pos + 6];
-    let count = (tz_byte & 0x0f) as i8;
-    let tzq = if tz_byte & 0x80 != 0 { -count } else { count };
+    // TS 23.040 §9.2.3.11: the timezone octet is semi-octet coded — the low
+    // nibble is the TENS digit of the quarter-hour count with bit 0x08 as
+    // the sign flag, the high nibble the UNITS digit. Count range 0..=79.
+    if tz_byte >> 4 > 9 {
+        return Err(PduError::Invalid("bad scts field"));
+    }
+    let count = i16::from(tz_byte & 0x07) * 10 + i16::from(tz_byte >> 4);
+    let tzq = if tz_byte & 0x08 != 0 { -count } else { count };
     if !(1..=12).contains(&month)
         || !(1..=31).contains(&day)
         || hour > 23
@@ -399,15 +407,18 @@ fn parse_scts(buf: &[u8], pos: usize) -> Result<Timestamp, PduError> {
         hour,
         minute,
         second,
-        timezone_quarters: tzq,
+        timezone_quarters: tzq as i8,
     })
 }
 
 pub fn encode_scts(ts: &Timestamp) -> [u8; 7] {
-    // Semi-octet: tens digit in the LOW nibble, ones in the HIGH nibble.
+    // Semi-octet: TENS digit in the LOW nibble (with sign flag 0x08 for
+    // negative offsets), UNITS digit in the HIGH nibble — TS 23.040 §9.2.3.11.
     let bcd = |v: u8| ((v % 10) << 4) | (v / 10);
-    let tz_count = ts.timezone_quarters.unsigned_abs() & 0x0f;
-    let tz_flag = if ts.timezone_quarters < 0 { 0x80 } else { 0x00 };
+    let count = ts.timezone_quarters.unsigned_abs();
+    let tens = count / 10;
+    let units = count % 10;
+    let tz_flag: u8 = if ts.timezone_quarters < 0 { 0x08 } else { 0x00 };
     [
         bcd((ts.year % 100) as u8),
         bcd(ts.month),
@@ -415,7 +426,7 @@ pub fn encode_scts(ts: &Timestamp) -> [u8; 7] {
         bcd(ts.hour),
         bcd(ts.minute),
         bcd(ts.second),
-        tz_flag | tz_count,
+        tz_flag | tens | (units << 4),
     ]
 }
 
@@ -683,11 +694,14 @@ mod tests {
     /// Cross-validation vector 1: UCS-2 "你好", sender +13818906569.
     /// Constructed by hand from the C decoder's field layout
     /// (pdu.c:534-630): SMSC(08 91...) + TP-MTI(04) + sender(0B 91...)
-    /// + PID/DCS(00 08) + SCTS(2017-12-08 15:00:32 +8q) + UDL(04)
+    /// + PID/DCS(00 08) + SCTS(2017-12-08 15:00:32 +8:00) + UDL(04)
     /// + UD(4F60 597D).
+    ///
+    /// The timezone octet 0x23 is the semi-octet coding of 32 quarter-hours
+    /// (Beijing +8:00) per TS 23.040 §9.2.3.11.
     #[test]
     fn cross_vector_ucs2_nihao() {
-        let buf = hex("0891683108101505F0040B913118986065F9000871218051002308044F60597D");
+        let buf = hex("0891683108101505F0040B913118986065F9000871218051002323044F60597D");
         let m = decode(&buf).expect("decode");
         assert_eq!(m.smsc.as_deref(), Some("8613800151500"));
         assert_eq!(m.sender, "+13818906569");
@@ -705,7 +719,7 @@ mod tests {
                 hour: 15,
                 minute: 0,
                 second: 32,
-                timezone_quarters: 8,
+                timezone_quarters: 32,
             }
         );
     }
@@ -713,7 +727,7 @@ mod tests {
     /// Cross-validation vector 2: GSM 7-bit "hellohello" (the classic
     /// dreamfabric bit-layout example), 5-digit national sender "10086"
     /// with unknown TOA (0x81, no `+` prefix), timezone -8 quarters
-    /// (0x88: count 8, sign bit 0x80).
+    /// (0x88: units digit 8 in the high nibble, sign flag 0x08).
     #[test]
     fn cross_vector_7bit_hellohello() {
         let buf = hex("0891683108101505F00405810180F60000321051900300880AE8329BFD4697D9EC37");
@@ -751,15 +765,15 @@ mod tests {
 
     #[test]
     fn scts_timezone_polarity() {
-        // 0x88: count 8 + sign bit => -8 quarters (-2h).
-        // Date 2023-01-15 09:30:00 in semi-octet coding:
+        // 0x88: units digit 8 in the high nibble + sign flag 0x08 => -8
+        // quarters (-2h). Date 2023-01-15 09:30:00 in semi-octet coding:
         // tens digit sits in the LOW nibble of each octet.
         let ts = parse_scts(&[0x32, 0x10, 0x51, 0x90, 0x03, 0x00, 0x88], 0).unwrap();
         assert_eq!(ts.timezone_quarters, -8);
         // Round-trip through the encoder.
         assert_eq!(encode_scts(&ts), [0x32, 0x10, 0x51, 0x90, 0x03, 0x00, 0x88]);
-        // 0x08: positive 8 quarters (+2h).
-        let pos = parse_scts(&[0x71, 0x21, 0x80, 0x51, 0x00, 0x23, 0x08], 0).unwrap();
+        // 0x80: positive 8 quarters (+2h).
+        let pos = parse_scts(&[0x71, 0x21, 0x80, 0x51, 0x00, 0x23, 0x80], 0).unwrap();
         assert_eq!(pos.timezone_quarters, 8);
         assert_eq!(
             pos,
@@ -923,7 +937,7 @@ mod tests {
     #[test]
     fn truncated_input_never_panics() {
         let vectors = [
-            "0891683108101505F0040B913118986065F9000871218051002308044F60597D",
+            "0891683108101505F0040B913118986065F9000871218051002323044F60597D",
             "0891683108101505F00405810180F60000321051900300880AE8329BFD4697D9EC37",
             "0891683108101505F0440B913118986065F900087121805100230808050003AB03024F60",
             "00",

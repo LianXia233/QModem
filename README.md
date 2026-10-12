@@ -59,10 +59,13 @@ make menuconfig
 
 Select `luci-app-qmodem-next` under `LuCI -> Applications`. The target firmware must also contain USB, serial, QMI, MBIM, or MHI drivers matching the modem, protocol, kernel, and hardware topology.
 
-The detailed English manuals are currently maintained in the existing [user guide](docs/user-guide.md) and [developer guide](docs/developer-guide.md). The new structured documentation is being introduced in Chinese first:
+The detailed English manuals are currently maintained in the existing [user guide](docs/user-guide.md) and [developer guide](docs/developer-guide.md). The new structured documentation is being introduced in Chinese first (three documents are also available in English):
 
 - [User documentation](docs/user/index.zh-cn.md)
 - [Developer documentation](docs/developer/index.zh-cn.md)
+- [One-package install guide (qmodem-suite)](docs/user/install-suite.zh-cn.md) ([English](docs/user/install-suite.en.md))
+- [Rust async daemon architecture](docs/developer/async-daemon.zh-cn.md) ([English](docs/developer/async-daemon.en.md))
+- [AT tool selection](docs/developer/at-tool-selection.zh-cn.md) ([English](docs/developer/at-tool-selection.en.md))
 - [Changelog](CHANGELOG.md) - [Branch and release policy](docs/release/branch-policy.zh-cn.md)
 - [Version migration and issue reporting](docs/release/version-migration.zh-cn.md)
 - [Supported hardware](docs/support_list.md)
