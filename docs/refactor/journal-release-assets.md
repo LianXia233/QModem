@@ -74,6 +74,21 @@ arch 清单只含 `tom_modem / ubus_at_daemon`。qmodem-suite 及其 DEPENDS
 | apk 架构后缀冲突 | 无（3×14 全部唯一） |
 | CHANGELOG 双语段落 | 已同步（Unreleased → Fixed） |
 
+### 包格式核查（重要，排除误报）
+
+初次校验时 `ar t *.ipk` 与 `gzip -t *.apk` **全部失败**，一度怀疑产物损坏。
+查证后确认这是**本地工具与这代 SDK 包格式不匹配造成的误报**，包本身完好：
+
+| 格式 | 实际结构 | 依据 | 设备端安装 |
+|---|---|---|---|
+| `.ipk` | `gzip(tar(debian-binary + control.tar.gz + data.tar.gz))` | OpenWrt 现行 `ipkg-build`（`tar … \| gzip -n - > pkg.ipk`，openwrt commit 7a732213）；CSDN 拆包教程同样记载"该文件实质是 .tar.gz" | `opkg install` 正常 |
+| `.apk` | APK v3 容器：`ADB` 魔数 + 压缩模式字节（`d`=Deflate level 0）+ raw deflate 流，解压后为 `ADB.pckg` schema | Alpine apk-tools v3（OpenWrt 25.12 起默认，snapshot SDK 已切换）；raw deflate 无 gzip 头，`gzip -t` 必然失败 | `apk add`（apk-tools 3.x）正常 |
+
+按真实规范重写校验（`scripts/verify_release_packages.py`）：38 ipk + 42 apk
+**全部通过**（ipk 三件套齐全且 control.tar.gz 内含 control 元数据；apk
+ADB 流可完整解压且 schema 为 pckg）。该脚本已入库，作为未来 Release 产物的
+格式门禁，避免再次误判。
+
 ## 待办
 
 - qmodem-suite 构建产物（ipk + apk）由推送后触发的 main.yml 重建产出，
