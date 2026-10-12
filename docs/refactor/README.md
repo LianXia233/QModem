@@ -21,6 +21,15 @@
 | [journal-pkg-suite.md](journal-pkg-suite.md) | qmodem-suite 元包（agent-pkg-suite） |
 | [journal-tests.md](journal-tests.md) | tests/ 轻量回归测试（agent-tests） |
 | [journal-vendor-lib.md](journal-vendor-lib.md) | 公共解析库与 vendor 试点迁移（agent-vendor-lib） |
+| [journal-vendor-full.md](journal-vendor-full.md) | W17：剩余 10 厂商脚本全量迁移 qmodem_lib（agent-vendor-full） |
+| [journal-rpcd.md](journal-rpcd.md) | W18：rpcd 去 eval/原子缓存/POSIX 化（agent-rpcd） |
+| [journal-rust-cross.md](journal-rust-cross.md) | W19：Rust 交叉编译脚本、musl 工具链兜底与体积实测（agent-rust-cross + 编排者收尾） |
+| [journal-atd-quality.md](journal-atd-quality.md) | W20：at-daemon 剩余清理（agent-atd-quality） |
+| [journal-tom-modem.md](journal-tom-modem.md) | W21：tom_modem 去重与 C14 修复（agent-tom-modem） |
+| [journal-luci-final.md](journal-luci-final.md) | W22：LuCI next 收尾优化（agent-luci-final） |
+| [journal-retire-s1.md](journal-retire-s1.md) | W23：旧栈退役 Step1 与 gap 表（agent-retire-s1） |
+| [journal-atd-bridge.md](journal-atd-bridge.md) | W24：at_tool=2 接入 Rust atd（agent-atd-bridge） |
+| [journal-ci-p2.md](journal-ci-p2.md) | W26：rust-build.yml 交叉编译矩阵（agent-ci-p2） |
 
 > 上表为 `ls docs/refactor/` 实际文件（截至 2026-10-12）。后续新增 journal（如 CI、cmd 库迁移）请同步补入本清单。
 

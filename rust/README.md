@@ -66,3 +66,28 @@ cargo check -p qmodem-atd --features tty,ubus
 5. **配置加载**：对齐 `config_loader.c` 的 JSON 配置（端口列表、波特率、事件回调脚本），命令注入面用 `std::process::Command` 参数数组消除。
 
 各 crate 的 C→Rust 修复对照详见其 README 与 `docs/refactor/journal-rust-core.md`。
+
+## Cross compilation
+
+```sh
+# aarch64 musl 静态二进制（自动获取 musl 工具链）
+bash scripts/cross-build-rust.sh --target aarch64-unknown-linux-musl
+# x86_64 musl
+bash scripts/cross-build-rust.sh --target x86_64-unknown-linux-musl
+# 原生（本机验证用）
+bash scripts/cross-build-rust.sh
+```
+
+产物输出到 `scripts/dist/<target>/qmodem-atd`（stripped，含 sha256 与 `file`
+自检）。release profile：`opt-level="z"` + `lto` + `strip` + `codegen-units=1`，
+本机实测 450,544 B（x86_64-gnu 原生）；纯 std 零依赖，musl 下全静态链接，
+无运行时 so 依赖。
+
+集成到 OpenWrt 包的两条路线：
+
+1. **SDK 源码构建**：feed 包 Makefile 直接调用 cargo（SDK 带 rust 工具链时优先，
+   构建可复现）；
+2. **预编译注入**：CI（`.github/workflows/rust-build.yml`）按 target 产出静态
+   二进制 artifact，`qmodem-suite` 按 ARCH 注入（适合 SDK 无 rust 的代际）。
+
+详见 docs/refactor/journal-rust-cross.md。

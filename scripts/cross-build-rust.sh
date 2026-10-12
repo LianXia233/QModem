@@ -108,7 +108,11 @@ if [[ -n "$LINKER" ]]; then
     export CC_X86_64_UNKNOWN_LINUX_MUSL="${LINKER%-gcc}-cc"
 fi
 # 纯 std 零依赖 workspace 无 cc 调用；RUSTFLAGS 仅做静态链接加固
-export RUSTFLAGS="-C target-feature=+crt-static"
+# （仅 musl target 需要；gnu host target 强制 crt-static 会以 static-pie
+#  形式链接并显著增大体积，交由发行版默认动态链接即可）
+if [[ "$TARGET" == *-musl ]]; then
+    export RUSTFLAGS="-C target-feature=+crt-static"
+fi
 
 # ---------------------------------------------------------------------------
 # 4. 构建 release
