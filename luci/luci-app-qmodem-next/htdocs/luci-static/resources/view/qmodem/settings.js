@@ -182,8 +182,8 @@ return view.extend({
 						var msg = res.message || _('PCIe scan failed');
 						if (res.output) msg += ' - ' + res.output;
 						ui.addNotification(null, E('p', msg), 'warning');
-						window.location.reload();
 					}
+					window.location.reload();
 				})
 				.catch(function(err) {
 					ui.hideModal();
@@ -201,14 +201,14 @@ return view.extend({
 				.then(function(res) {
 					ui.hideModal();
 					if (res.code === 0) {
-						ui.addNotification(null, E('p', res.message || _('USB scan completed successfully')), 'info');
-						window.location.reload();
-					} else {
-						var msg = res.message || _('USB scan failed');
-						if (res.output) msg += ' - ' + res.output;
-						ui.addNotification(null, E('p', msg), 'warning');
-					}
-				})
+					ui.addNotification(null, E('p', res.message || _('USB scan completed successfully')), 'info');
+				} else {
+					var msg = res.message || _('USB scan failed');
+					if (res.output) msg += ' - ' + res.output;
+					ui.addNotification(null, E('p', msg), 'warning');
+				}
+				window.location.reload();
+			})
 				.catch(function(err) {
 					ui.hideModal();
 					ui.addNotification(null, E('p', _('USB scan error: ') + (err.message || err)), 'error');
@@ -225,14 +225,14 @@ return view.extend({
 				.then(function(res) {
 					ui.hideModal();
 					if (res.code === 0) {
-						ui.addNotification(null, E('p', res.message || _('Full scan completed successfully')), 'info');
-						window.location.reload();
-					} else {
-						var msg = res.message || _('Full scan failed');
-						if (res.output) msg += ' - ' + res.output;
-						ui.addNotification(null, E('p', msg), 'warning');
-					}
-				})
+					ui.addNotification(null, E('p', res.message || _('Full scan completed successfully')), 'info');
+				} else {
+					var msg = res.message || _('Full scan failed');
+					if (res.output) msg += ' - ' + res.output;
+					ui.addNotification(null, E('p', msg), 'warning');
+				}
+				window.location.reload();
+			})
 				.catch(function(err) {
 					ui.hideModal();
 					ui.addNotification(null, E('p', _('Full scan error: ') + (err.message || err)), 'error');

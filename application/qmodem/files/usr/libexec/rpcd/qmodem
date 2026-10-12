@@ -12,6 +12,14 @@ TRAFFIC_RESET_DEFAULT_HOUR=0
 TRAFFIC_RESET_DEFAULT_DAY=1
 TRAFFIC_RESET_DEFAULT_MINUTE=0
 
+# Validate a UCI section name: non-empty, only [A-Za-z0-9_], max 64 chars
+valid_section() {
+    case "$1" in
+        ''|*[!A-Za-z0-9_]*) return 1 ;;
+    esac
+    [ "${#$1}" -le 64 ]
+}
+
 # Helper function for caching
 try_cache() {
     cache_timeout=$1
@@ -402,6 +410,7 @@ traffic_reset_set_schedule()
     day=$(echo "$input_json" | jsonfilter -e '@.day')
 
     [ -n "$config_section" ] || traffic_reset_fail "Missing config_section"
+    valid_section "$config_section" || traffic_reset_fail "Invalid config_section"
 
     case "$reset_type" in
         daily|monthly)
@@ -663,6 +672,10 @@ EOF
     call)
         read -r input
         config_section=$(echo "$input" | jsonfilter -e '@.config_section')
+        if [ -n "$config_section" ] && ! valid_section "$config_section"; then
+            printf '%s\n' '{"error":"invalid modem section"}'
+            exit 1
+        fi
         if [ "$2" = get_monitor_status ]; then
             case "$config_section" in ''|*[!A-Za-z0-9_]*) printf '%s\n' '{"error":"invalid modem section"}'; exit 1;; esac
             [ "$(uci -q get "qmodem.$config_section")" = modem-device ] || { printf '%s\n' '{"error":"unknown modem section"}'; exit 1; }
@@ -864,7 +877,6 @@ EOF
                 ;;
                 
             delete_sms)
-                read -r input
                 index=$(echo "$input" | jsonfilter -e '@.index')
                 
                 # Source helper functions and get configuration
@@ -942,7 +954,6 @@ EOF
                 ;;
                 
             send_raw_pdu)
-                read -r input
                 cmd=$(echo "$input" | jsonfilter -e '@.cmd')
                 
                 # Source helper functions and get configuration
@@ -966,7 +977,6 @@ EOF
                 ;;
                 
             send_sms)
-                read -r input
                 params=$(echo "$input" | jsonfilter -e '@.params')
                 phone_number=$(echo "$params" | jq -r '.phone_number')
                 message_content=$(echo "$params" | jq -r '.message_content')
@@ -993,6 +1003,26 @@ EOF
                 
             set_imei)
                 imei=$(echo "$input" | jsonfilter -e '@.imei')
+                case "$imei" in
+                    *[!0-9]*|"")
+                        json_init
+                        json_add_object result
+                        json_add_string status "0"
+                        json_add_string error "invalid imei, must be 15 digits"
+                        json_close_object
+                        json_dump
+                        exit 1
+                        ;;
+                esac
+                [ "${#imei}" -eq 15 ] || {
+                    json_init
+                    json_add_object result
+                    json_add_string status "0"
+                    json_add_string error "invalid imei, must be 15 digits"
+                    json_close_object
+                    json_dump
+                    exit 1
+                }
                 json_init
                 json_add_string imei "$imei"
                 json_add_object result
@@ -1004,6 +1034,12 @@ EOF
                 
             set_lockband|set_neighborcell|set_network_prefer)
                 config_section=$(echo "$input" | jsonfilter -e '@.config_section')
+                if ! valid_section "$config_section"; then
+                    json_init
+                    json_add_string error "invalid modem section"
+                    json_dump
+                    exit 1
+                fi
                 params=$(echo "$input" | jsonfilter -e '@.params')
                 
                 # Source helper functions and get configuration

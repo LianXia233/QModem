@@ -43,7 +43,8 @@ pduParser.parse = function(pdu) {
 
     var encoding = pduParser.detectEncoding(dataCodingScheme);
 
-    var timestamp = pduParser.deSwapNibbles(pdu.slice(cursor, cursor+14));
+    var rawTimestamp = pdu.slice(cursor, cursor+14);
+    var timestamp = pduParser.deSwapNibbles(rawTimestamp);
 
 
     var time = new Date;
@@ -54,13 +55,15 @@ pduParser.parse = function(pdu) {
     time.setUTCMinutes(timestamp.slice(8,10));
     time.setUTCSeconds(timestamp.slice(10,12));
 
-    var firstTimezoneOctet = parseInt(timestamp.slice(12,13));
-    var binary = ("0000"+firstTimezoneOctet.toString(2)).slice(-4);
-    var factor = binary.slice(0,1) === '1' ? 1 : -1;
-    var binary = '0'+binary.slice(1, 4);
-    var firstTimezoneOctet = parseInt(binary, 2).toString(10);
-    var timezoneDiff = parseInt(firstTimezoneOctet + timestamp.slice(13, 14));
-    var time = new Date(time.getTime() + (timezoneDiff * 15 * 1000 * 60 * factor));
+    // TP-SCTS timezone octet (3GPP TS 23.038): the timezone is expressed
+    // in units of 15 minutes as two swapped semi-octets. The low nibble
+    // holds the first digit, bits 0-2 of the high nibble hold the second
+    // digit, and bit 3 of the high nibble is the sign: 1 means west of
+    // GMT (negative offset). Convert the local timestamp to UTC.
+    var tzOctet = parseInt(rawTimestamp.slice(12, 14), 16);
+    var tzSign = (tzOctet & 0x8) ? -1 : 1;
+    var tzQuarters = (tzOctet & 0x0F) * 10 + ((tzOctet >> 4) & 0x07);
+    var time = new Date(time.getTime() - tzSign * tzQuarters * 15 * 60 * 1000);
 
     cursor += 14;
 
@@ -386,149 +389,6 @@ function randomHexa(size)
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 }
-
-
-class LuciTable{
-        constructor(){
-            this.rows = [];
-            this.tbody;
-            this.fieldset;
-            this.init_table();
-        }
-
-        init_table(){
-            //create a luci fieldset (class cbi-section)
-            var fieldset = document.createElement('fieldset');
-            fieldset.className="cbi-section";
-            //set fieldset Header name
-            var legend = document.createElement('legend');
-            var title_span = document.createElement('span');
-            title_span.className="panel-title"
-            //init table
-            var table = document.createElement('table');
-            var tbody = document.createElement('tbody');
-            table.className="table"
-            //save
-            this.fieldset = fieldset;
-            this.tbody = tbody
-            this.title_span = title_span
-            this.legend = legend
-            
-            fieldset.appendChild(legend);
-            fieldset.appendChild(title_span);
-            table.appendChild(tbody)
-            fieldset.appendChild(table)
-        }
-
-        new_tr(data,index){
-            var type = data.type;
-            var col = data.col;
-            var left = data.left;
-            var right = data.right;
-            //clear the row
-            this.rows[index].left.innerHTML = "";
-            this.rows[index].right.innerHTML = "";
-            //set the row
-            this.rows[index].left.appendChild(left);
-            this.rows[index].right.appendChild(right);
-            if (right == null || right == "") {
-                this.rows[index].row.style.display = "none";
-            }
-            else{
-                this.rows[index].row.style.display = "";
-            }
-        }
-
-
-        set title(value){
-            this.legend.innerHTML = value;
-            this.title_span.innerHTML = value;
-        }
-
-        set object_data(value){
-            var row_length = this.rows.length;
-            var value_length = Object.keys(value).length;
-            if (row_length < value_length) {
-                for ( let i = row_length; i < value_length; i++) {
-                    let row = document.createElement('tr');
-                    row.className = "tr"
-                    let cell_left = document.createElement('td');
-                    cell_left.classList.add("td")
-                    cell_left.setAttribute("width","33%")
-                    let cell_right = document.createElement('td');
-                    cell_right.classList.add("td");
-                    row.appendChild(cell_left);
-                    row.appendChild(cell_right);
-                    this.tbody.appendChild(row);
-                    var row_dict = {
-                        "row":row,
-                        "left":cell_left,
-                        "right":cell_right,
-                    }
-                    this.rows.push(row_dict);
-                }
-            }
-            else if(row_length > value_length){
-                for (let i = value_length; i < row_length; i++) {
-                    this.tbody.removeChild(this.rows[i].row);
-                }
-                this.rows = this.rows.slice(0,value_length);
-            }
-            var index = 0;
-            for (var key in value) {
-                this.rows[index].left.innerHTML = key;
-                this.rows[index].right.innerHTML = value[key];
-                index++;
-            }
-        }
-        
-        set array_data(value){
-            var row_length = this.rows.length;
-            var value_length = value.length;
-            if (row_length < value_length) {
-                for ( let i = row_length; i < value_length; i++) {
-                    let row = document.createElement('tr');
-                    row.className = "tr"
-                    let cell_left = document.createElement('td');
-                    cell_left.classList.add("td")
-                    cell_left.setAttribute("width","33%")
-                    let cell_right = document.createElement('td');
-                    cell_right.classList.add("sms_recv_content")
-                    cell_right.classList.add("td")
-                    row.appendChild(cell_left);
-                    row.appendChild(cell_right);
-                    this.tbody.appendChild(row);
-                    var row_dict = {
-                        "row":row,
-                        "left":cell_left,
-                        "right":cell_right,
-                    }
-                    this.rows.push(row_dict);
-                }
-            }
-            else if(row_length > value_length){
-                for (let i = value_length; i < row_length; i++) {
-                    this.tbody.removeChild(this.rows[i].row);
-                }
-                this.rows = this.rows.slice(0,value_length);
-            }
-            for (let i = 0; i < value.length; i++) {
-                this.new_tr(value[i],i);
-            }
-        }
-
-        set data(value){
-            if (value == null) {
-                return;
-            }
-            if (Array.isArray(value)) {
-                this.array_data = value;
-            }
-            else{
-                this.object_data = value;
-            }
-        }
-    }
 
 // Export pduParser as a proper module
 return L.Class.extend({

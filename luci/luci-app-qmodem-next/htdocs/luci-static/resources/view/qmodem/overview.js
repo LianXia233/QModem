@@ -6,12 +6,8 @@
 'require uci';
 'require qmodem.qmodem as qmodem';
 
-// Load CSS
-document.head.appendChild(E('link', {
-	'rel': 'stylesheet',
-	'type': 'text/css',
-	'href': L.resource('qmodem/qmodem-next.css')
-}));
+// Load CSS (deduplicated)
+qmodem.loadCss(L.resource('qmodem/qmodem-next.css'));
 
 // Check if cbi-progressbar class exists
 function hasCssClass(className) {
@@ -96,10 +92,14 @@ LuciTable.prototype = {
 				var max = parseFloat(data.max_value);
 				var unit = data.unit || '';
 				var title = '(' + data.value + '/' + data.max_value + unit + ')';
-				var percentage = ((value - min) / (max - min)) * 100;
-				
+				// Guard against division by zero / degenerate ranges
+				var percentage = (max - min > 1) ?
+					((value - min) / (max - min)) * 100 :
+					(value > min ? 100 : 0);
+
 				// Clamp percentage between 0 and 100
 				percentage = Math.max(0, Math.min(100, percentage));
+				if (isNaN(percentage)) percentage = 0;
 				
 				// Translate full_name and extra_info
 				var translatedName = _(full_name);
@@ -330,10 +330,8 @@ return view.extend({
 			
 			// Save new order
 			var newOrder = Array.from(infoContainer.querySelectorAll('.cbi-section.draggable')).map(function(section) {
-				// Extract className from legend or title
-				var legend = section.querySelector('legend');
-				var title = section.querySelector('.panel-title');
-				return (legend && legend.textContent) || (title && title.textContent) || '';
+				// Use the stable data-section-key attribute (language-independent)
+				return section.getAttribute('data-section-key') || '';
 			}).filter(function(name) {
 				return name !== '';
 			});
@@ -434,6 +432,8 @@ return view.extend({
 			orderedClasses.forEach(function(className) {
 				if (!tables_map[className]) {
 					tables_map[className] = new LuciTable();
+					// Store the stable (untranslated) class name for persistence
+					tables_map[className].fieldset.setAttribute('data-section-key', className);
 					infoContainer.appendChild(tables_map[className].fieldset);
 					self.attachSectionHandlers(tables_map[className].fieldset, className, modemId, infoContainer);
 				}

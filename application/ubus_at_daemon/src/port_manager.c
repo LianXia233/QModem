@@ -60,7 +60,13 @@ at_port_instance_t *create_port_instance(const char *port_path) {
     pthread_mutex_init(&port->write_mutex, NULL);
     pthread_mutex_init(&port->response_mutex, NULL);
     pthread_cond_init(&port->queue_cond, NULL);
-    pthread_cond_init(&port->response_cond, NULL);
+    // response_cond uses CLOCK_MONOTONIC so timed waits are immune to
+    // system clock jumps (see send_at_command_with_response)
+    pthread_condattr_t cond_attr;
+    pthread_condattr_init(&cond_attr);
+    pthread_condattr_setclock(&cond_attr, CLOCK_MONOTONIC);
+    pthread_cond_init(&port->response_cond, &cond_attr);
+    pthread_condattr_destroy(&cond_attr);
     
     // Add to global ports list
     pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
@@ -73,6 +79,17 @@ at_port_instance_t *create_port_instance(const char *port_path) {
 
 void destroy_port_instance(at_port_instance_t *port) {
     if (!port) return;
+
+    // If the instance is still referenced (e.g. by the sendat handler),
+    // defer destruction: it will be performed by port_instance_release()
+    // once the last reference is dropped.
+    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
+    if (port->refcount > 0) {
+        port->pending_destroy = 1;
+        pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
+        return;
+    }
+    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
 
     // Close the port
     close_at_port(port);

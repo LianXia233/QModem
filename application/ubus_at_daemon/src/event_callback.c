@@ -81,17 +81,18 @@ void process_incoming_data(at_port_instance_t *port, const char *data) {
         }
         
         if (should_trigger) {
-            // Execute callback script
-            char command[MAX_SCRIPT_PATH_SIZE + MAX_BUFFER_SIZE + 32];
-            snprintf(command, sizeof(command), "%s \"%s\"", callback->callback_script, data);
-            
+            // Execute callback script.
+            // data comes from modem serial output (remote controlled), so it is
+            // NEVER interpolated into the -c string; it is passed as a positional
+            // parameter ($2) to the script. SIGCHLD is set to SIG_IGN at daemon
+            // init, so children are reaped automatically (no zombies).
             pid_t pid = fork();
             if (pid == 0) {
                 // Child process
-                system(command);
-                exit(0);
+                execl("/bin/sh", "sh", "-c", callback->callback_script, "qmodem-event", data, (char *)NULL);
+                _exit(127);
             } else if (pid > 0) {
-                // Parent process - don't wait for child to avoid blocking
+                // Parent process - SIGCHLD is ignored, child is reaped automatically
             }
         }
         

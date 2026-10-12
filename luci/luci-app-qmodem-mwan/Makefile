@@ -11,7 +11,7 @@ LUCI_TITLE:=Luci qwrt modem mwan support
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_LICENSE:=GPLv3
-PKG_LINCESE_FILES:=LICENSE
+PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tom <fjrcn@outlook.com>
 LUCI_DEPENDS:=+luci-app-qmodem +luci-app-mwan3
 		

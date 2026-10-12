@@ -79,53 +79,75 @@ static int tty_set_device(PROFILE_T *profile, FDS_T *fds)
 }
 int tty_open_device(PROFILE_T *profile,FDS_T *fds)
 {
-    fds->tty_fd = open(profile->tty_dev, O_RDWR | O_NOCTTY);
-    if (fds->tty_fd < 0)
+    int fd;
+
+    fds->fdi = NULL;
+    fds->fdo = NULL;
+
+    fd = open(profile->tty_dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (fd < 0)
     {
         err_msg("Error opening tty device: %s", profile->tty_dev);
         return COMM_ERROR;
     }
+    fds->tty_fd = fd;
 
     if (tty_set_device(profile,fds) != 0)
     {
         err_msg("Error setting tty device");
-        return COMM_ERROR;
+        goto err;
     }
 
-    fds->tty_fd = open(profile->tty_dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    fds->fdi = fdopen(fds->tty_fd, "r");
-    if (setvbuf(fds->fdi , NULL, _IOFBF, 0))
-    {
-        err_msg("Error setting buffer for fdi");
-        return COMM_ERROR;
-    }
     usleep(10000);
-    tcflush(fds->tty_fd, TCIOFLUSH);
-    if (fds->tty_fd >= 0)
-        close(fds->tty_fd);
-    else
-        return COMM_ERROR;
-    fds->tty_fd = open(profile->tty_dev, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    fds->fdi = fdopen(fds->tty_fd, "r");
-    fds->fdo = fdopen(fds->tty_fd, "w");
-    if (fds->fdi == NULL || fds->fdo == NULL)
+    tcflush(fd, TCIOFLUSH);
+
+    // Each FILE* must own a distinct fd: fdi takes the original fd,
+    // fdo takes a duplicated one.
+    fds->fdi = fdopen(fd, "r");
+    if (fds->fdi == NULL)
     {
         err_msg("Error opening file descriptor");
-        return COMM_ERROR;
-    }
-
-    if (setvbuf(fds->fdo , NULL, _IOFBF, 0))
-    {
-        err_msg("Error setting buffer for fdi");
-        return COMM_ERROR;
+        goto err;
     }
 
     if (setvbuf(fds->fdi , NULL, _IOLBF, 0))
     {
         err_msg("Error setting buffer for fdi");
-        return COMM_ERROR;
+        goto err;
+    }
+
+    fd = dup(fds->tty_fd);
+    if (fd < 0)
+    {
+        err_msg("Error duplicating tty file descriptor");
+        goto err;
+    }
+    fds->fdo = fdopen(fd, "w");
+    if (fds->fdo == NULL)
+    {
+        err_msg("Error opening file descriptor");
+        close(fd);
+        goto err;
+    }
+
+    if (setvbuf(fds->fdo , NULL, _IOFBF, 0))
+    {
+        err_msg("Error setting buffer for fdo");
+        goto err;
     }
     return SUCCESS;
+
+err:
+    if (fds->fdo)
+        fclose(fds->fdo);
+    if (fds->fdi)
+        fclose(fds->fdi);
+    else if (fds->tty_fd >= 0)
+        close(fds->tty_fd);
+    fds->fdi = NULL;
+    fds->fdo = NULL;
+    fds->tty_fd = -1;
+    return COMM_ERROR;
 }
 
 int tty_read(FILE *fdi, AT_MESSAGE_T *message, PROFILE_T *profile) {

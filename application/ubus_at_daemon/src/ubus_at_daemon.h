@@ -153,6 +153,10 @@ typedef struct at_port_instance {
     // Status
     int is_open;
     int should_stop;
+
+    // Lifetime management (protected by g_daemon_ctx.ports_mutex)
+    int refcount;        // in-use count held by e.g. the sendat handler
+    int pending_destroy; // destroy requested while refcount > 0
     
     // Port monitoring
     time_t last_check_time;

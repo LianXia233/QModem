@@ -255,7 +255,25 @@ var callSetSimSlot = rpc.declare({
 	expect: { }
 });
 
+// Shared CSS loader, deduplicates by href
+var loadedCss = {};
+
+function loadCss(href) {
+	if (loadedCss[href]) return;
+	loadedCss[href] = true;
+	document.head.appendChild(E('link', {
+		'rel': 'stylesheet',
+		'type': 'text/css',
+		'href': href
+	}));
+}
+
 return L.Class.extend({
+	// Load a stylesheet once (deduplicated by href)
+	loadCss: function(href) {
+		loadCss(href);
+	},
+
 	// Get modem base information
 	getBaseInfo: function(section) {
 		return callBaseInfo(section);
@@ -464,25 +482,25 @@ return L.Class.extend({
 
 		switch(type) {
 			case 'rssi':
-				if (num >= -70) return value + ' dBm (Excellent)';
-				if (num >= -85) return value + ' dBm (Good)';
-				if (num >= -100) return value + ' dBm (Fair)';
-				return value + ' dBm (Poor)';
+				if (num >= -70) return value + ' dBm ' + _('(Excellent)');
+				if (num >= -85) return value + ' dBm ' + _('(Good)');
+				if (num >= -100) return value + ' dBm ' + _('(Fair)');
+				return value + ' dBm ' + _('(Poor)');
 			case 'rsrp':
-				if (num >= -80) return value + ' dBm (Excellent)';
-				if (num >= -90) return value + ' dBm (Good)';
-				if (num >= -100) return value + ' dBm (Fair)';
-				return value + ' dBm (Poor)';
+				if (num >= -80) return value + ' dBm ' + _('(Excellent)');
+				if (num >= -90) return value + ' dBm ' + _('(Good)');
+				if (num >= -100) return value + ' dBm ' + _('(Fair)');
+				return value + ' dBm ' + _('(Poor)');
 			case 'rsrq':
-				if (num >= -10) return value + ' dB (Excellent)';
-				if (num >= -15) return value + ' dB (Good)';
-				if (num >= -20) return value + ' dB (Fair)';
-				return value + ' dB (Poor)';
+				if (num >= -10) return value + ' dB ' + _('(Excellent)');
+				if (num >= -15) return value + ' dB ' + _('(Good)');
+				if (num >= -20) return value + ' dB ' + _('(Fair)');
+				return value + ' dB ' + _('(Poor)');
 			case 'sinr':
-				if (num >= 20) return value + ' dB (Excellent)';
-				if (num >= 13) return value + ' dB (Good)';
-				if (num >= 0) return value + ' dB (Fair)';
-				return value + ' dB (Poor)';
+				if (num >= 20) return value + ' dB ' + _('(Excellent)');
+				if (num >= 13) return value + ' dB ' + _('(Good)');
+				if (num >= 0) return value + ' dB ' + _('(Fair)');
+				return value + ' dB ' + _('(Poor)');
 			default:
 				return value;
 		}

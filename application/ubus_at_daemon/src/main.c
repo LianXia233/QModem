@@ -1,8 +1,41 @@
 #include "ubus_at_daemon.h"
+#include <signal.h>
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 at_daemon_ctx_t g_daemon_ctx;
+
+// Reference counting for port instances (protected by ports_mutex).
+// The sendat handler holds a reference for the whole duration it uses the
+// raw port pointer, so a concurrent close/destroy cannot free it in use.
+static int port_instance_acquire(at_port_instance_t *port) {
+    int found = 0;
+
+    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
+    for (at_port_instance_t *current = g_daemon_ctx.ports; current; current = current->next) {
+        if (current == port) {
+            port->refcount++;
+            found = 1;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
+    return found ? 0 : -1;
+}
+
+static void port_instance_release(at_port_instance_t *port) {
+    int do_destroy = 0;
+
+    pthread_mutex_lock(&g_daemon_ctx.ports_mutex);
+    if (port->refcount > 0)
+        port->refcount--;
+    if (port->refcount == 0 && port->pending_destroy)
+        do_destroy = 1;
+    pthread_mutex_unlock(&g_daemon_ctx.ports_mutex);
+
+    if (do_destroy)
+        destroy_port_instance(port);
+}
 
 // Policy for open method
 enum {
@@ -202,7 +235,12 @@ static int ubus_sendat_method(struct ubus_context *ctx, struct ubus_object *obj,
             return UBUS_STATUS_NO_DATA;
         }
     }
-    
+
+    // Hold a reference while using the raw port pointer
+    if (port_instance_acquire(port) != 0) {
+        return UBUS_STATUS_NO_DATA;
+    }
+
     const char *cmd = is_raw ? raw_at_content : at_cmd;
     int result;
     at_response_t response;
@@ -214,6 +252,7 @@ static int ubus_sendat_method(struct ubus_context *ctx, struct ubus_object *obj,
         blobmsg_add_string(&busy, "message", "AT port is leased for modem initialization");
         ubus_send_reply(ctx, req, busy.head);
         blob_buf_free(&busy);
+        port_instance_release(port);
         return UBUS_STATUS_OK;
     }
     
@@ -276,6 +315,7 @@ static int ubus_sendat_method(struct ubus_context *ctx, struct ubus_object *obj,
     
     ubus_send_reply(ctx, req, b.head);
     blob_buf_free(&b);
+    port_instance_release(port);
     return UBUS_STATUS_OK;
 }
 
@@ -597,6 +637,8 @@ int main(int argc, char **argv) {
     struct timespec started;
     // Initialize global context
     memset(&g_daemon_ctx, 0, sizeof(g_daemon_ctx));
+    // Automatically reap event-callback children (no waitpid needed, no zombies)
+    signal(SIGCHLD, SIG_IGN);
     clock_gettime(CLOCK_REALTIME, &started);
     g_daemon_ctx.daemon_epoch = (uint64_t)started.tv_sec * 1000000000U +
                                 (uint64_t)started.tv_nsec;

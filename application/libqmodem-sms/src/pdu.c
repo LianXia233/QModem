@@ -332,7 +332,7 @@ EncodePhoneNumber(const char* phone_number, unsigned char* output_buffer, int bu
 	int i = 0;
 	for (; i < phone_number_length; ++i) {
 
-		if (phone_number[i] < '0' && phone_number[i] > '9')
+		if (phone_number[i] < '0' || phone_number[i] > '9')
 			return -1;
 
 		if (i % 2 == 0) {
@@ -378,7 +378,7 @@ pdu_encode(const char* service_center_number, const char* phone_number, const ch
 		output_buffer[1] = TYPE_OF_ADDRESS_INTERNATIONAL_PHONE;
 		length = EncodePhoneNumber(service_center_number,
 					   output_buffer + 2, buffer_size - 2);
-		if (length < 0 && length >= 254)
+		if (length < 0 || length >= 254)
 			return -1;
 		length++;  // Add type of address.
 	}
@@ -403,6 +403,8 @@ pdu_encode(const char* service_center_number, const char* phone_number, const ch
 	length = EncodePhoneNumber(phone_number,
 				   output_buffer + output_buffer_length + 2,
 				   buffer_size - output_buffer_length - 2);
+	if (length < 0)
+		return -1;
 	output_buffer_length += length + 2;
 	if (output_buffer_length + 4 > buffer_size)
 		return -1;  // Check if it has space for four more bytes.
@@ -416,6 +418,10 @@ pdu_encode(const char* service_center_number, const char* phone_number, const ch
 	// 5. SMS message.
 	int sms_text_length = strlen(sms_text);
 	unsigned char sms_text_7bit[2*SMS_MAX_7BIT_TEXT_LENGTH];
+	// Escaped characters emit 2 bytes each, so the raw input must be
+	// capped to keep AsciiToG7bit within sms_text_7bit bounds.
+	if (sms_text_length > SMS_MAX_7BIT_TEXT_LENGTH)
+		return -1;
 	sms_text_length = AsciiToG7bit(sms_text, sms_text_length, sms_text_7bit);
 	if (sms_text_length > SMS_MAX_7BIT_TEXT_LENGTH)
 		return -1;
@@ -553,16 +559,27 @@ int pdu_decode(const unsigned char* buffer, int buffer_length,
 	if (sender_number_length + 1 > sender_phone_number_size)
 		return -3;  // Buffer too small to hold decoded phone number.
 
+	if (sms_deliver_start + 2 >= buffer_length)
+		return -2;  // Sender type of address out of bounds.
+	if (sms_deliver_start + 3 + (sender_number_length + 1) / 2 > buffer_length)
+		return -2;  // Sender number data out of bounds.
+
 	const int sender_type_of_address = buffer[sms_deliver_start + 2];
 	if (sender_type_of_address == TYPE_OF_ADDRESS_ALPHANUMERIC) {
-		int sender_len1 = DecodePDUMessage_GSM_7bit(buffer + sms_deliver_start + 3, (sender_number_length + 1) / 2, output_sender_phone_number, sender_number_length);
-		int sender_len2 = G7bitToAscii(output_sender_phone_number, sender_len1 - 1, 0, 0);
-		output_sender_phone_number[sender_len2] = 0;
+		if (sender_number_length == 0) {
+			output_sender_phone_number[0] = 0;
+		} else {
+			int sender_len1 = DecodePDUMessage_GSM_7bit(buffer + sms_deliver_start + 3, (sender_number_length + 1) / 2, output_sender_phone_number, sender_number_length);
+			int sender_len2 = G7bitToAscii(output_sender_phone_number, sender_len1 - 1, 0, 0);
+			output_sender_phone_number[sender_len2] = 0;
+		}
 	} else {
 		DecodePhoneNumber(buffer + sms_deliver_start + 3, sender_number_length, output_sender_phone_number);
 	}
 
-	const int sms_pid_start = sms_deliver_start + 3 + (buffer[sms_deliver_start + 1] + 1) / 2;
+	const int sms_pid_start = sms_deliver_start + 3 + (sender_number_length + 1) / 2;
+	if (sms_pid_start + 2 + 7 > buffer_length)
+		return -1;  // Not enough bytes for PID/DCS/timestamp.
 
 	// Decode timestamp.
 	struct tm sms_broken_time;
@@ -588,6 +605,8 @@ int pdu_decode(const unsigned char* buffer, int buffer_length,
 
 	int output_sms_text_length = buffer[sms_start];
 	if (sms_text_size < output_sms_text_length) return -1;  // Cannot hold decoded buffer.
+	if (sms_start + 1 + output_sms_text_length > buffer_length)
+		return -1;  // User data length exceeds remaining buffer.
 
 	const int sms_tp_dcs_start = sms_pid_start + 1;
 	*tp_dcs = buffer[sms_tp_dcs_start];

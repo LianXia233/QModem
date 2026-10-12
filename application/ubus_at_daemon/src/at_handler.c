@@ -123,6 +123,11 @@ int check_end_flags(at_port_instance_t *port, const char *line, char *matched_fl
 int send_at_command_with_response(at_port_instance_t *port, const char *cmd, int timeout, const char *end_flag, int is_raw, at_response_t *response) {
     int is_open;
 
+    // Initialize response immediately so every exit path returns a cleared buffer
+    if (response) {
+        memset(response, 0, sizeof(at_response_t));
+    }
+
     pthread_mutex_lock(&port->state_mutex);
     is_open = port->is_open;
     pthread_mutex_unlock(&port->state_mutex);
@@ -143,12 +148,12 @@ int send_at_command_with_response(at_port_instance_t *port, const char *cmd, int
     
     // Record start time
     clock_gettime(CLOCK_REALTIME, &response->start_time);
-    
-    // Parse end flags
-    parse_end_flags(port, end_flag);
-    
+
     pthread_mutex_lock(&port->response_mutex);
-    
+
+    // Parse end flags under response_mutex (shared with the reader thread)
+    parse_end_flags(port, end_flag);
+
     // Clear previous response and prepare for new one
     memset(&port->current_response, 0, sizeof(at_response_t));
     port->current_response.start_time = response->start_time;
@@ -198,15 +203,18 @@ int send_at_command_with_response(at_port_instance_t *port, const char *cmd, int
     pthread_mutex_unlock(&port->write_mutex);
     
     if (written != (ssize_t)send_len) {
+        pthread_mutex_lock(&port->response_mutex);
         port->waiting_for_response = 0;
+        pthread_mutex_unlock(&port->response_mutex);
         return -1;
     }
-    
+
     // Wait for response
     pthread_mutex_lock(&port->response_mutex);
-    
+
     struct timespec abs_timeout;
-    clock_gettime(CLOCK_REALTIME, &abs_timeout);
+    // response_cond uses CLOCK_MONOTONIC (see create_port_instance)
+    clock_gettime(CLOCK_MONOTONIC, &abs_timeout);
     abs_timeout.tv_sec += timeout;
     
     int wait_result = 0;

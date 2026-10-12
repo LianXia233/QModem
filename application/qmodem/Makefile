@@ -148,7 +148,91 @@ define Build/Compile
 endef
 
 define Package/$(PKG_NAME)/install
-		$(CP) ./files/* $(1)/
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_DATA) ./files/etc/config/qmodem $(1)/etc/config/
+	$(INSTALL_DATA) ./files/etc/config/qmodem_led $(1)/etc/config/
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_DATA) ./files/etc/hotplug.d/iface/80-wwan-led $(1)/etc/hotplug.d/iface/
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/net
+	$(INSTALL_BIN) ./files/etc/hotplug.d/net/20-modem-net $(1)/etc/hotplug.d/net/
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/usb
+	$(INSTALL_BIN) ./files/etc/hotplug.d/usb/20-modem-usb $(1)/etc/hotplug.d/usb/
+	$(INSTALL_DIR) $(1)/etc/board.d
+	$(INSTALL_BIN) ./files/etc/board.d/03_qmodem $(1)/etc/board.d/
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_DATA) ./files/etc/uci-defaults/luci-app-qmodem $(1)/etc/uci-defaults/
+	$(INSTALL_BIN) ./files/etc/uci-defaults/91-qmodem-use-ubus $(1)/etc/uci-defaults/
+	$(INSTALL_BIN) ./files/etc/uci-defaults/99-qmodem-board $(1)/etc/uci-defaults/
+	$(INSTALL_DIR) $(1)/lib/functions
+	$(INSTALL_DATA) ./files/lib/functions/qmodem-defaults.sh $(1)/lib/functions/
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/admin_status/index
+	$(INSTALL_DATA) ./files/usr/lib/lua/luci/view/admin_status/index/modem_overview.htm \
+		$(1)/usr/lib/lua/luci/view/admin_status/index/
+	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+	$(INSTALL_DATA) ./files/usr/share/rpcd/acl.d/luci-app-qmodem.json \
+		./files/usr/share/rpcd/acl.d/qmodem.json $(1)/usr/share/rpcd/acl.d/
+	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
+	$(INSTALL_BIN) ./files/usr/libexec/rpcd/modem_ctrl $(1)/usr/libexec/rpcd/
+	$(INSTALL_BIN) ./files/usr/libexec/rpcd/qmodem $(1)/usr/libexec/rpcd/
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) ./files/usr/sbin/qmodem_collect $(1)/usr/sbin/
+	$(INSTALL_DIR) $(1)/usr/share/qmodem
+	$(INSTALL_DATA) ./files/usr/share/qmodem/at_commands_en.json \
+		./files/usr/share/qmodem/at_commands_zh.json \
+		./files/usr/share/qmodem/feedback-recipient.conf \
+		./files/usr/share/qmodem/modem_port_rule.json \
+		./files/usr/share/qmodem/modem_support.json \
+		./files/usr/share/qmodem/usage_stats.sh $(1)/usr/share/qmodem/
+	$(INSTALL_BIN) ./files/usr/share/qmodem/generic.sh \
+		./files/usr/share/qmodem/modem_ctrl.sh \
+		./files/usr/share/qmodem/modem_dial.sh \
+		./files/usr/share/qmodem/modem_hook.sh \
+		./files/usr/share/qmodem/modem_scan.sh \
+		./files/usr/share/qmodem/modem_util.sh \
+		./files/usr/share/qmodem/qmodem_led_watch.sh $(1)/usr/share/qmodem/
+	$(INSTALL_DIR) $(1)/usr/share/qmodem/cmds
+	$(INSTALL_DATA) ./files/usr/share/qmodem/cmds/fibocom.sh \
+		./files/usr/share/qmodem/cmds/foxconn.sh \
+		./files/usr/share/qmodem/cmds/generic.sh \
+		./files/usr/share/qmodem/cmds/gosuncn.sh \
+		./files/usr/share/qmodem/cmds/huawei.sh \
+		./files/usr/share/qmodem/cmds/meig.sh \
+		./files/usr/share/qmodem/cmds/modem_dial.sh \
+		./files/usr/share/qmodem/cmds/modem_util.sh \
+		./files/usr/share/qmodem/cmds/neoway.sh \
+		./files/usr/share/qmodem/cmds/openluat.sh \
+		./files/usr/share/qmodem/cmds/quectel.sh \
+		./files/usr/share/qmodem/cmds/sierra.sh \
+		./files/usr/share/qmodem/cmds/simcom.sh \
+		./files/usr/share/qmodem/cmds/telit.sh \
+		./files/usr/share/qmodem/cmds/thales.sh $(1)/usr/share/qmodem/cmds/
+	$(INSTALL_DIR) $(1)/usr/share/qmodem/led_scripts
+	$(INSTALL_DATA) ./files/usr/share/qmodem/led_scripts/connectivity.sh \
+		./files/usr/share/qmodem/led_scripts/misectel_led.sh \
+		$(1)/usr/share/qmodem/led_scripts/
+	$(INSTALL_BIN) ./files/usr/share/qmodem/led_scripts/c2000_max.sh \
+		./files/usr/share/qmodem/led_scripts/hh500v_led.sh \
+		./files/usr/share/qmodem/led_scripts/m01k43.sh \
+		./files/usr/share/qmodem/led_scripts/m02k45.sh \
+		./files/usr/share/qmodem/led_scripts/m60k63.sh \
+		./files/usr/share/qmodem/led_scripts/misectel_3led.sh \
+		./files/usr/share/qmodem/led_scripts/misectel_modem_status.sh \
+		./files/usr/share/qmodem/led_scripts/misectel_network_detect.sh \
+		$(1)/usr/share/qmodem/led_scripts/
+	$(INSTALL_DIR) $(1)/usr/share/qmodem/vendor
+	$(INSTALL_DATA) ./files/usr/share/qmodem/vendor/dynamic_load.json \
+		./files/usr/share/qmodem/vendor/foxconn.sh \
+		./files/usr/share/qmodem/vendor/meig.sh \
+		./files/usr/share/qmodem/vendor/openluat.sh \
+		./files/usr/share/qmodem/vendor/sierra.sh \
+		./files/usr/share/qmodem/vendor/simcom.sh \
+		./files/usr/share/qmodem/vendor/telit.sh \
+		./files/usr/share/qmodem/vendor/thales.sh $(1)/usr/share/qmodem/vendor/
+	$(INSTALL_BIN) ./files/usr/share/qmodem/vendor/fibocom.sh \
+		./files/usr/share/qmodem/vendor/gosuncn.sh \
+		./files/usr/share/qmodem/vendor/huawei.sh \
+		./files/usr/share/qmodem/vendor/neoway.sh \
+		./files/usr/share/qmodem/vendor/quectel.sh $(1)/usr/share/qmodem/vendor/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

@@ -6,12 +6,8 @@
 'require qmodem.sms as smsService';
 'require qmodem.qmodem as qmodem';
 
-// Load CSS
-document.head.appendChild(E('link', {
-	'rel': 'stylesheet',
-	'type': 'text/css',
-	'href': L.resource('qmodem/qmodem-next.css')
-}));
+// Load CSS (deduplicated)
+qmodem.loadCss(L.resource('qmodem/qmodem-next.css'));
 
 return view.extend({
 	load: function() {

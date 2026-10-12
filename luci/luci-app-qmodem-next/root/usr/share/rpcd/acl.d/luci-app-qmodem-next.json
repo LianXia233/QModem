@@ -3,9 +3,16 @@
 		"description": "Grant access to QModem Next application",
 		"read": {
 			"ubus": {
-				"qmodem": [
-					"*"
-				],
+			"qmodem": [
+				"base_info", "cell_info", "info", "network_info", "sim_info",
+				"get_at_cfg", "get_imei", "get_mode", "get_lockband",
+				"get_neighborcell", "get_network_prefer", "get_dns", "get_sms",
+				"get_disabled_features", "get_reboot_caps", "get_copyright",
+				"dial_status", "get_connect_status", "get_dial_log",
+				"get_sim_switch_capabilities", "get_sim_slot",
+				"get_pcie_devices", "get_usb_devices", "get_leds",
+				"get_network_interfaces", "get_tty_ports", "get_available_devices"
+			],
 				"qmodem.sms": [
 					"status", "config_get", "sync_status", "list", "get", "modem_list", "storage_get"
 				],
@@ -17,11 +24,13 @@
 		"write": {
 			"ubus": {
 				"qmodem": [
+					"clear_dial_log",
 					"delete_sms",
 					"do_reboot",
 					"modem_dial",
 					"modem_hang",
 					"modem_redial",
+					"remove_modem",
 					"scan_all",
 					"scan_pcie",
 					"scan_usb",
@@ -33,6 +42,7 @@
 					"set_mode",
 					"set_neighborcell",
 					"set_network_prefer",
+					"set_sim_slot",
 					"set_sms_storage"
 				],
 				"qmodem.sms": [

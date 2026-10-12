@@ -11,7 +11,7 @@ LUCI_TITLE:=Luci qwrt modem sim switch
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_LICENSE:=GPLv3
-PKG_LINCESE_FILES:=LICENSE
+PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tom <fjrcn@outlook.com>
 LUCI_DEPENDS:=@TARGET_mediatek_mt7981_DEVICE_hc-g80||TARGET_mediatek_filogic_DEVICE_hc-g80 +luci-app-qmodem
 		

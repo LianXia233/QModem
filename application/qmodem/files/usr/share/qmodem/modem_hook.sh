@@ -56,11 +56,11 @@ _execute_lockcell_boot_hook(){
 . /usr/share/qmodem/modem_util.sh
 config_load ${config_name}
 
-config_get ${cfg_prefix}_delay $config_section delay
+config_get delay $config_section delay
 
 config_get at_port $config_section  at_port
 
-if [ -f "$at_port" ] || [ -z "$at_port" ]; then
+if [ -z "$at_port" ] || [ ! -f "$at_port" ]; then
     m_debug "$config_section:at_port is not set or not a file"
     m_debug "at_port $config_section: $at_port"
     exit 1

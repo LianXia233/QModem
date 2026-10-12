@@ -18,6 +18,12 @@ exec_pre_dial()
     /usr/share/qmodem/modem_hook.sh $section pre_dial
 }
 
+# safely single-quote a value for shell command lines
+sq()
+{
+    printf "'%s'" "$(printf "%s" "$1" | sed "s/'/'\\\\''/g")"
+}
+
 get_led()
 {
     config_foreach get_led_by_slot modem-slot
@@ -430,18 +436,19 @@ unlock_sim()
     pin=$1
     sim_lock_file="/var/run/qmodem/${modem_config}_dir/pincode"
     lock ${sim_lock_file}.lock
-    if [ -f $sim_lock_file ] && [ "$pin" == "$(cat $sim_lock_file)"];then
+    if [ -f "$sim_lock_file" ] && [ "$pin" = "$(cat "$sim_lock_file")" ]; then
         m_debug "pin code is already try"
     else
-        
+
         res=$(cmd_dial_cpin_unlock "$at_port" "$pin")
         case "$?" in
             0)
-                m_debug "unlock sim card with pin code $pin success"
+                m_debug "unlock sim card with pin code success"
                 ;;
             *)
                 echo $pin > $sim_lock_file
-                m_debug "info" "unlock sim card with pin code $pin failed,block try until nextboot"
+                chmod 600 $sim_lock_file
+                m_debug "info" "unlock sim card failed,block try until nextboot"
                 ;;
         esac
     fi
@@ -1171,13 +1178,13 @@ qmi_dial()
         m_debug 'please use force apn set for telit modem'
     fi
     if [ -n "$apn" ]; then
-        cmd_line="$cmd_line -s $apn"
+        cmd_line="$cmd_line -s $(sq "$apn")"
     fi
     if [ -n "$username" ]; then
-        cmd_line="$cmd_line $username"
+        cmd_line="$cmd_line $(sq "$username")"
     fi
     if [ -n "$password" ]; then
-        cmd_line="$cmd_line $password"
+        cmd_line="$cmd_line $(sq "$password")"
     fi
     if [ "$auth" != "none" ]; then
         cmd_line="$cmd_line $auth"
@@ -1402,7 +1409,7 @@ at_dial()
         	[ "$rf_status" = "off" ] && umbim -d  $mbim_port radio on
         	umbim -d $mbim_port disconnect
         	sleep 1
-        	umbim -d $mbim_port connect 0 --apn $apn
+        	umbim -d $mbim_port connect 0 --apn "$apn"
 		 	;;
 		*)
 			cmd_dial_command "${at_port}" "${cgdcont_command}"

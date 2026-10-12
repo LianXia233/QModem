@@ -3,41 +3,13 @@
 'require poll';
 'require ui';
 'require dom';
+'require qmodem.qmodem as qmodem';
 'require qmodem.sms as smsService';
 
-// Load CSS
-document.head.appendChild(E('link', {
-	'rel': 'stylesheet',
-	'type': 'text/css',
-	'href': L.resource('qmodem/qmodem-next.css')
-}));
+// Load CSS (deduplicated)
+qmodem.loadCss(L.resource('qmodem/qmodem-next.css'));
 
 return view.extend({
-	// Timezone offset setting utilities
-	getUtcOffsetSetting: function(type) {
-		// type: 'received' or 'sent'
-		var key = 'qmodem_sms_utc_offset_' + type;
-		var setting = localStorage.getItem(key);
-		return setting === 'true';
-	},
-
-	setUtcOffsetSetting: function(type, enabled) {
-		// type: 'received' or 'sent'
-		var key = 'qmodem_sms_utc_offset_' + type;
-		localStorage.setItem(key, enabled ? 'true' : 'false');
-	},
-
-	adjustTimestampForUtcOffset: function(timestamp, type) {
-		// If UTC offset is enabled for this message type, adjust the timestamp
-		// PDU time is in local time (UTC+8), but parsed as UTC+0
-		// So we need to subtract 8 hours to get the correct UTC time
-		if (this.getUtcOffsetSetting(type)) {
-			// Subtract 8 hours (28800 seconds)
-			return timestamp - 28800;
-		}
-		return timestamp;
-	},
-
 	load: function() {
 		return smsService.getModems();
 	},
@@ -77,53 +49,7 @@ return view.extend({
 		selectorRow.appendChild(selectCell);
 		selectorBody.appendChild(selectorRow);
 
-		// Timezone offset setting for received messages
-		var timezoneReceivedRow = E('tr', { 'class': 'tr' });
-		var timezoneReceivedLabel = E('td', { 'class': 'td', 'width': '33%' }, 
-			_('Parse received SMS time as UTC+0'));
-		var timezoneReceivedCell = E('td', { 'class': 'td' });
-		
-		var timezoneReceivedCheckbox = E('input', {
-			'type': 'checkbox',
-			'id': 'sms_utc_offset_received_checkbox'
-		});
-		if (self.getUtcOffsetSetting('received')) {
-			timezoneReceivedCheckbox.checked = true;
-		}
-		
-		timezoneReceivedCell.appendChild(timezoneReceivedCheckbox);
-		timezoneReceivedCell.appendChild(E('span', { 'style': 'margin-left: 5px;' }, 
-			_('Adjust received messages for local timezone (UTC+8)')));
-		timezoneReceivedRow.appendChild(timezoneReceivedLabel);
-		timezoneReceivedRow.appendChild(timezoneReceivedCell);
-		selectorBody.appendChild(timezoneReceivedRow);
-
-		// Timezone offset setting for sent messages
-		var timezoneSentRow = E('tr', { 'class': 'tr' });
-		var timezoneSentLabel = E('td', { 'class': 'td', 'width': '33%' }, 
-			_('Parse sent SMS time as UTC+0'));
-		var timezoneSentCell = E('td', { 'class': 'td' });
-		
-		var timezoneSentCheckbox = E('input', {
-			'type': 'checkbox',
-			'id': 'sms_utc_offset_sent_checkbox'
-		});
-		if (self.getUtcOffsetSetting('sent')) {
-			timezoneSentCheckbox.checked = true;
-		}
-		
-		var timezoneHelpText = E('div', {
-			'style': 'font-size: 12px; color: #666; margin-top: 5px;'
-		}, _('Enable if SMS timestamps appear 8 hours ahead (e.g., UTC+8 local time parsed as UTC+0)'));
-		
-		timezoneSentCell.appendChild(timezoneSentCheckbox);
-		timezoneSentCell.appendChild(E('span', { 'style': 'margin-left: 5px;' }, 
-			_('Adjust sent messages for local timezone (UTC+8)')));
-	timezoneSentCell.appendChild(timezoneHelpText);
-	timezoneSentRow.appendChild(timezoneSentLabel);
-	timezoneSentRow.appendChild(timezoneSentCell);
-	selectorBody.appendChild(timezoneSentRow);
-
+		// SMS mode setting row
 	var smsModeRow = E('tr', { 'class': 'tr' });
 	var smsModeLabel = E('td', { 'class': 'td', 'width': '33%' }, _('SMS Mode'));
 	var smsModeCell = E('td', { 'class': 'td' });
@@ -290,22 +216,6 @@ return view.extend({
 		self.loadSmsList(contentArea, loading, select.value);
 	});
 
-		// Timezone checkbox change handler for received messages
-		timezoneReceivedCheckbox.addEventListener('change', function() {
-			self.setUtcOffsetSetting('received', timezoneReceivedCheckbox.checked);
-			var loading = E('div', { 'class': 'spinning' }, _('Loading...'));
-			dom.content(contentArea, loading);
-			self.loadSmsList(contentArea, loading, select.value);
-		});
-
-	// Timezone checkbox change handler for sent messages
-	timezoneSentCheckbox.addEventListener('change', function() {
-		self.setUtcOffsetSetting('sent', timezoneSentCheckbox.checked);
-		var loading = E('div', { 'class': 'spinning' }, _('Loading...'));
-		dom.content(contentArea, loading);
-		self.loadSmsList(contentArea, loading, select.value);
-	});
-
 	function saveBackendConfig() {
 		var interval = +pollIntervalInput.value;
 		return smsService.configure(select.value, smsModeSelect.value, interval, null,
@@ -329,30 +239,13 @@ return view.extend({
 		var self = this;
 
 		smsService.listSms(configSection).then(function(result) {
-			// Adjust timestamps if UTC offset is enabled (based on message type)
-			if (result.conversations && result.conversations.length > 0) {
-				result.conversations.forEach(function(conv) {
-					if (conv.messages && conv.messages.length > 0) {
-						conv.messages.forEach(function(msg) {
-							if (msg.timestamp && msg.type) {
-								msg.timestamp = self.adjustTimestampForUtcOffset(msg.timestamp, msg.type);
-							}
-						});
-						// Re-sort messages by timestamp
-						conv.messages.sort(function(a, b) {
-							return a.timestamp - b.timestamp;
-						});
-					}
-				});
-			}
-
 			// Remove loading indicator
 			if (loadingDiv && loadingDiv.parentNode) {
 				dom.content(contentArea, null);
 			}
 
 			if (result.error) {
-				contentArea.appendChild(E('div', { 'class': 'alert-message error' }, 
+				contentArea.appendChild(E('div', { 'class': 'alert-message error' },
 					_('Error loading SMS: ') + result.error));
 				return;
 			}
@@ -363,32 +256,16 @@ return view.extend({
 			if (loadingDiv && loadingDiv.parentNode) {
 				dom.content(contentArea, null);
 			}
-			contentArea.appendChild(E('div', { 'class': 'alert-message error' }, 
+			contentArea.appendChild(E('div', { 'class': 'alert-message error' },
 				_('Failed to load SMS: ') + err.message));
 		});
 	},
 
 	pollSmsList: function(contentArea, configSection) {
 		var self = this;
-		
+
 		smsService.listSms(configSection).then(function(result) {
 			if (!result.error && result.conversations) {
-				// Adjust timestamps if UTC offset is enabled (based on message type)
-				if (result.conversations.length > 0) {
-					result.conversations.forEach(function(conv) {
-						if (conv.messages && conv.messages.length > 0) {
-							conv.messages.forEach(function(msg) {
-								if (msg.timestamp && msg.type) {
-									msg.timestamp = self.adjustTimestampForUtcOffset(msg.timestamp, msg.type);
-								}
-							});
-							// Re-sort messages by timestamp
-							conv.messages.sort(function(a, b) {
-								return a.timestamp - b.timestamp;
-							});
-						}
-					});
-				}
 				self.renderConversationsList(contentArea, result.conversations, configSection);
 			}
 		}).catch(function(err) {

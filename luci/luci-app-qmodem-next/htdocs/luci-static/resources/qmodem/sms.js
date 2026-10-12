@@ -34,6 +34,12 @@ function conversations(messages) {
 		.sort(function(a, b) { return b.last_timestamp - a.last_timestamp; });
 }
 
+function requireModem(configSection) {
+	if (!configSection)
+		return Promise.reject(new Error('configSection (modem_id) is required'));
+	return configSection;
+}
+
 function listRaw(modem) {
 	return callList(modem, 500, 0).then(function(result) {
 		if (result.status === 'error') return Promise.reject(new Error(result.error || 'SMS backend error'));
@@ -74,9 +80,9 @@ return L.Class.extend({
 			});
 		});
 	},
-	getConfig: function(configSection) { return callConfigGet(configSection || 'modem_1'); },
+	getConfig: function(configSection) { return callConfigGet(requireModem(configSection)); },
 	configure: function(configSection, mode, pollInterval, forwarding, autoDelete) {
-		var modem = configSection || 'modem_1';
+		var modem = requireModem(configSection);
 		return callConfigGet(modem).then(function(current) {
 			return callConfigure(modem, mode, pollInterval,
 				forwarding == null ? !!current.forwarding : forwarding, autoDelete);
@@ -86,7 +92,7 @@ return L.Class.extend({
 		});
 	},
 	listSms: function(configSection) {
-		var modem = configSection || 'modem_1';
+		var modem = requireModem(configSection);
 		return listRaw(modem).then(function(first) {
 			var refresh = first.mode === 'database_poll' ? syncRaw(modem) : Promise.resolve();
 			return refresh.then(function() { return first.mode === 'database_poll' ? listRaw(modem) : first; });
@@ -101,27 +107,27 @@ return L.Class.extend({
 			return { messages: found ? found.messages : [] };
 		});
 	},
-	sync: function(configSection) { return syncRaw(configSection || 'modem_1'); },
+	sync: function(configSection) { return syncRaw(requireModem(configSection)); },
 	sendSms: function(configSection, recipient, message) {
-		return callSend(configSection || 'modem_1', recipient, message).then(function(result) { result.success = result.status === 'success'; return result; });
+		return callSend(requireModem(configSection), recipient, message).then(function(result) { result.success = result.status === 'success'; return result; });
 	},
-	deleteSms: function(configSection, type, ids) { return deleteMany(configSection || 'modem_1', ids); },
+	deleteSms: function(configSection, type, ids) { return deleteMany(requireModem(configSection), ids); },
 	markRead: function(configSection, ids) {
-		var modem = configSection || 'modem_1'; ids = Array.isArray(ids) ? ids : [ ids ];
+		var modem = requireModem(configSection); ids = Array.isArray(ids) ? ids : [ ids ];
 		return Promise.all(ids.map(function(id) { return callMarkRead(modem, id); })).then(function() { return { success: true, marked: ids.length }; });
 	},
 	getSentHistory: function(configSection) {
-		return listRaw(configSection || 'modem_1').then(function(result) { return { messages: messagesFrom(result).filter(function(message) { return message.type === 'sent'; }) }; });
+		return listRaw(requireModem(configSection)).then(function(result) { return { messages: messagesFrom(result).filter(function(message) { return message.type === 'sent'; }) }; });
 	},
 	getReceivedHistory: function(configSection) {
-		return listRaw(configSection || 'modem_1').then(function(result) { return { messages: messagesFrom(result).filter(function(message) { return message.type === 'received'; }) }; });
+		return listRaw(requireModem(configSection)).then(function(result) { return { messages: messagesFrom(result).filter(function(message) { return message.type === 'received'; }) }; });
 	},
 	clearSentHistory: function(configSection) {
-		var modem = configSection || 'modem_1';
+		var modem = requireModem(configSection);
 		return this.getSentHistory(modem).then(function(result) { return deleteMany(modem, result.messages.map(function(message) { return message.id; })); });
 	},
 	clearReceivedHistory: function(configSection) {
-		var modem = configSection || 'modem_1';
+		var modem = requireModem(configSection);
 		return this.getReceivedHistory(modem).then(function(result) { return deleteMany(modem, result.messages.map(function(message) { return message.id; })); });
 	},
 	formatTimestamp: function(timestamp) {
@@ -140,15 +146,15 @@ return L.Class.extend({
 		maximum = maximum || 50; return !content || content.length <= maximum ? (content || '') : content.substring(0, maximum) + '...';
 	},
 	getSmsStorage: function(configSection) {
-		return callStorageGet(configSection || 'modem_1').then(function(result) { return result.status === 'error' ? { error: result.error } : { storage: parseStorage(result) }; });
+		return callStorageGet(requireModem(configSection)).then(function(result) { return result.status === 'error' ? { error: result.error } : { storage: parseStorage(result) }; });
 	},
 	setSmsStorage: function(configSection, mem1, mem2, mem3) {
-		return callStorageSet(configSection || 'modem_1', mem1, mem2, mem3 || mem2).then(function(result) { result.success = result.status !== 'error'; return result; });
+		return callStorageSet(requireModem(configSection), mem1, mem2, mem3 || mem2).then(function(result) { result.success = result.status !== 'error'; return result; });
 	},
 	getSimSms: function(configSection) {
-		return listRaw(configSection || 'modem_1').then(function(result) { return { messages: result.msg || result.received || result.messages || [] }; });
+		return listRaw(requireModem(configSection)).then(function(result) { return { messages: result.msg || result.received || result.messages || [] }; });
 	},
 	deleteSimSms: function(configSection, index) {
-		return callDelete(configSection || 'modem_1', index, index).then(function(result) { result.success = result.status === 'success'; return result; });
+		return callDelete(requireModem(configSection), index, index).then(function(result) { result.success = result.status === 'success'; return result; });
 	}
 });

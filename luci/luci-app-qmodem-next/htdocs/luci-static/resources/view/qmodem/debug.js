@@ -196,9 +196,9 @@ return view.extend({
 					qmodem.sendAt(modem.id, port, cmd, useUbus).then(function(result) {
 						if (result && result.at_cfg) {
 							var text = '';
-							text += 'Status: ' + (result.at_cfg.status === '1' ? 'Success' : 'Failed') + '\n';
-							text += 'Command: ' + (result.at_cfg.cmd || '') + '\n';
-							text += 'Response:\n' + (result.at_cfg.res || 'No response');
+							text += _('Status: ') + (result.at_cfg.status === '1' ? _('Success') : _('Failed')) + '\n';
+							text += _('Command: ') + (result.at_cfg.cmd || '') + '\n';
+							text += _('Response:\n') + (result.at_cfg.res || _('No response'));
 							responseDiv.textContent = text;
 						} else {
 							responseDiv.textContent = _('No response received');
