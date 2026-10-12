@@ -49,6 +49,6 @@ Phase 1-4（后续，见评估报告）：vendor 层配置驱动下沉 → smsd/
 ## 里程碑记录
 
 - **T0（2026-10-12 11:15）**：路线图与交接文档建立，4 个子代理并行启动（W1-W4）。
-- **T1（2026-10-12 11:45）**：W1-W4 全部完成并复核；编排者复跑全部门禁通过；分两个提交经 GitHub API 推送至 `LianXia233/QModem` main：
+- **T1（2026-10-12 11:45）**：W1-W4 全部完成并复核；编排者复跑全部门禁通过；分两个提交经 git 原生推送（hosts 直连）至 `LianXia233/QModem` main：
   - commit A `fix: ...`——W1/W2/W3（C 层 + Shell + 打包 + LuCI next，27 文件）
   - commit B `feat(rust): ...`——W4 + 重构文档（rust/ 工作区、REFACTOR_ROADMAP、docs/refactor/*）
