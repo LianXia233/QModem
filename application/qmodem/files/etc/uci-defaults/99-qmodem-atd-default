@@ -1,0 +1,14 @@
+#!/bin/sh
+# AT 通路默认切到 qmodem-atd（Rust，at_tool=2）。
+# - 守护进程由包默认启用（/etc/config/qmodem-atd 的 enabled=1）
+# - 未显式选过 legacy 通路时切到 2；用户已设 at_tool=1（sms_tool_q）则尊重
+[ "$(uci -q get qmodem.main.at_tool)" = "1" ] || {
+	uci -q set qmodem.main.at_tool='2'
+	uci -q set qmodem.main.at_socket='/var/run/qmodem/atd.sock'
+}
+uci -q set qmodem-atd.main.enabled='1'
+uci -q set qmodem-atd.main.socket='/var/run/qmodem/atd.sock'
+uci -q commit qmodem
+uci -q commit qmodem-atd
+/etc/init.d/qmodem-atd restart 2>/dev/null
+exit 0

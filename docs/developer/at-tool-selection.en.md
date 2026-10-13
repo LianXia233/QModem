@@ -16,7 +16,7 @@ All QModem shell scripts (vendor adapters, dialing, SMS) send AT commands unifor
 | Timeout semantics | `at()` uses the tom_modem default timeout (`$options` can append arguments); `fastat()` fixes `-t 1` | Same as left: `at()` default, `fastat()` appends `-t 1` | Explicit `timeout_ms` per request, monotonic clock; on timeout, returns the partially received lines + `timeout` status |
 | Dependencies | tom_modem / ubus daemon | Only the sms_tool_q binary | qmodem-atd binary + unix socket |
 | Suitable scenarios | Default path, widest compatibility | Lightweight devices / modems where tom_modem performs poorly | Scenarios with concurrent multi-modem operation, URC subscription, and stable timeout semantics |
-| Configuration | `at_tool='0'` or unset | `at_tool='1'` | `at_tool='2'` (`at_socket` specifies the socket path) |
+| Configuration | `at_tool='0'` (legacy) | `at_tool='1'` (legacy) | **default** (unset or `at_tool='2'`); `at_socket` sets the socket path |
 
 `fastat()` has consistent semantics across the three paths: a fixed 1-second timeout (converted to `timeout_ms: 1000` on path 2), no `$options` appended; intended for polling-style short commands.
 
@@ -25,16 +25,22 @@ All QModem shell scripts (vendor adapters, dialing, SMS) send AT commands unifor
 Write to `/etc/config/qmodem` and restart the main service to take effect:
 
 ```sh
-# Path 2: qmodem-atd unix socket (introduced in this version)
-uci set qmodem.main.at_tool='2'
-# Optional, default /var/run/qmodem/atd.sock
+# Path 2 is the default: the daemon ships enabled (/etc/config/qmodem-atd
+# enabled=1) and auto-collects AT ports from the modem-device sections.
+# Set it explicitly (or override the port/socket) with:
+uci set qmodem-atd.main.enabled='1'
+uci set qmodem-atd.main.socket='/var/run/qmodem/atd.sock'
+uci commit qmodem-atd
+/etc/init.d/qmodem-atd restart
+
+uci set qmodem.main.at_tool='2'      # default (unset behaves the same)
 uci set qmodem.main.at_socket='/var/run/qmodem/atd.sock'
 uci commit qmodem
-/etc/init.d/qmodem_init restart
+/etc/init.d/qmodem-atd restart
 
-# Back to the default path
-uci set qmodem.main.at_tool='0'
-uci commit qmodem && /etc/init.d/qmodem_init restart
+# Fall back to a legacy path (explicit opt-in only)
+uci set qmodem.main.at_tool='0'      # tom_modem
+uci commit qmodem
 ```
 
 Notes:

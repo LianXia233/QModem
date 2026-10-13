@@ -238,14 +238,15 @@ qmodem_atd_sendat()
 }
 
 #at_tool dispatch shared by at()/fastat() and their testcase-collect branches
+#default (unset or 2) is the Rust qmodem-atd socket path; 0/1 are legacy opt-outs
 #$1 port $2 atcmd
 qmodem_at_dispatch()
 {
 	local at_port="$1" atcmd="$2"
 	case "$(uci -q get qmodem.main.at_tool 2>/dev/null)" in
+		0) tom_modem $use_ubus_flag -d "$at_port" -o a -c "$atcmd" $options ;;
 		1) sms_tool_q -d "$at_port" at "$atcmd" ;;
-		2) qmodem_atd_sendat "$at_port" "$atcmd" 3000 ;;
-		*) tom_modem $use_ubus_flag -d "$at_port" -o a -c "$atcmd" $options ;;
+		*) qmodem_atd_sendat "$at_port" "$atcmd" 3000 ;;
 	esac
 }
 
@@ -253,9 +254,9 @@ qmodem_fastat_dispatch()
 {
 	local at_port="$1" atcmd="$2"
 	case "$(uci -q get qmodem.main.at_tool 2>/dev/null)" in
+		0) tom_modem -d "$at_port" -o a -c "$atcmd" -t 1 ;;
 		1) sms_tool_q -t 1 -d "$at_port" at "$atcmd" ;;
-		2) qmodem_atd_sendat "$at_port" "$atcmd" 1000 ;;
-		*) tom_modem -d "$at_port" -o a -c "$atcmd" -t 1 ;;
+		*) qmodem_atd_sendat "$at_port" "$atcmd" 1000 ;;
 	esac
 }
 

@@ -48,6 +48,15 @@
   「未打开则先 `ubus call at-daemon open`」的握手分支；响应字段由
   `status=success / end_flag_matched / response` 对齐为
   `status=ok / end_flag / lines`。
+- **AT 默认通路切到 qmodem-atd（Rust）**：`at()`/`fastat()` 在 `at_tool` 未配置
+  或为 `2` 时走 qmodem-atd 的 unix socket，`0`（tom_modem）/`1`（sms_tool_q）
+  降级为 legacy 显式选项。配套变更：`/etc/config/qmodem` 默认 `at_tool='2'`；
+  `/etc/config/qmodem-atd` 默认 `enabled='1'`；`/etc/init.d/qmodem-atd` 在未
+  声明任何 `config port` 段时自动收集 `/etc/config/qmodem` 各 modem-device 的
+  `at_port`（开箱即用），并把 `qmodem` 加入 reload trigger；新增
+  `etc/uci-defaults/99-qmodem-atd-default` 让既有安装升级后同样切到新通路
+  （用户已显式设 `at_tool='1'` 的尊重原选择）。回退只需
+  `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
 - **前端统一（视觉 / 组件 / 数据三层）**：`luci-app-qmodem-generic` 的 LuCI 适配整体

@@ -55,6 +55,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   "open it first via `ubus call at-daemon open`" handshake branch is gone, and
   the response fields are aligned from `status=success / end_flag_matched /
   response` to `status=ok / end_flag / lines`.
+- **The default AT path is now qmodem-atd (Rust)**: `at()` / `fastat()` use the
+  qmodem-atd unix socket when `at_tool` is unset or `2`; `0` (tom_modem) and
+  `1` (sms_tool_q) become legacy explicit opt-outs. Supporting changes:
+  `/etc/config/qmodem` defaults to `at_tool='2'`; `/etc/config/qmodem-atd`
+  ships with `enabled='1'`; `/etc/init.d/qmodem-atd` auto-collects `at_port`
+  from the `modem-device` sections of `/etc/config/qmodem` when no
+  `config port` section is declared (works out of the box) and adds `qmodem`
+  to its reload triggers; a new `etc/uci-defaults/99-qmodem-atd-default`
+  switches existing installs on upgrade as well (an explicitly set
+  `at_tool='1'` is respected). Rolling back is one line:
+  `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
 - **Unified frontend (visual / component / data layers)**: the LuCI adaptation from

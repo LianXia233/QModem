@@ -30,13 +30,15 @@ config main 'main'
 	# 用量统计 NVRAM 保存间隔秒数（qmodem_usage_stats 读取）；正整数，默认 300
 	option usage_stats_nvram_interval '300'
 	#AT command tool chain:
-	#  0 = tom_modem (ubus at-daemon, default)
-	#  1 = sms_tool_q (direct TTY)
-	#  2 = qmodem-atd (rust async AT daemon, unix socket JSON protocol, optional)
-	#Note: at_tool=2 does NOT fall back to 0/1 when the atd socket is absent;
-	#the AT call simply fails. Make sure qmodem-atd is running.
-	option at_tool '0'
-	#unix socket path of qmodem-atd, only used when at_tool=2
+	#  2 = qmodem-atd (rust AT daemon, unix socket JSON protocol, DEFAULT)
+	#  0 = tom_modem (legacy, ubus at-daemon)
+	#  1 = sms_tool_q (legacy, direct TTY)
+	#Note: unset or at_tool=2 uses qmodem-atd and does NOT fall back to 0/1
+	#when the atd socket is absent; the AT call simply fails. The daemon is
+	#enabled by default (/etc/config/qmodem-atd) and auto-collects AT ports
+	#from the modem-device sections; make sure it is running.
+	option at_tool '2'
+	#unix socket path of qmodem-atd, only used when at_tool=2 (default)
 	option at_socket '/var/run/qmodem/atd.sock'
 	#collect AT command fixtures to /tmp/qmodem/testcases for qmodem_collect pack
 	#用例采集开关（modem_util.sh/qmodem_collect 读取）；0/1，默认 0

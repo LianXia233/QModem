@@ -1,8 +1,12 @@
 #!/bin/sh /etc/rc.common
 
-# qmodem-atd：Rust AT 守护进程（unix socket JSON 协议）。
-# 启动时按 /etc/config/qmodem-atd 的 port 段逐个登记串口。
-# 注意：默认 enabled=0；把 qmodem.main.at_tool 切到 2 之前必须先启用本服务。
+# qmodem-atd：Rust AT 守护进程（unix socket JSON 协议），at_tool 的默认通路。
+# 端口来源（按优先级）：
+#   1) /etc/config/qmodem-atd 里显式声明的 `config port` 段；
+#   2) 未声明任何 port 段时，自动收集 /etc/config/qmodem 各 modem-device 的
+#      at_port，使开箱即用。
+# 注意：baudrate / databits / parity / stopbits 目前由守护进程以默认配置打开
+# （AtPortConfig::default），待 atd 实现配置加载后接入。
 
 START=98
 STOP=10
@@ -10,14 +14,27 @@ STOP=10
 USE_PROCD=1
 PROG=/usr/bin/qmodem-atd
 
-qmodem_atd_add_port()
+qmodem_atd_collect_port()
+{
+	local at_port="$1"
+	[ -n "$at_port" ] || return 0
+	case " $qmodem_atd_ports " in
+		*" $at_port "*) return 0 ;;
+	esac
+	qmodem_atd_ports="$qmodem_atd_ports $at_port"
+}
+
+qmodem_atd_port_section()
 {
 	local section="$1"
-	local at_port
-	at_port=$(config_get "$section" at_port)
-	[ -n "$at_port" ] || return 0
-	# baudrate / databits / parity / stopbits 目前未接入 atd（AtPortConfig::default）
-	qmodem_atd_args="$qmodem_atd_args --port $at_port"
+	qmodem_atd_collect_port "$(config_get "$section" at_port)"
+}
+
+qmodem_atd_modem_section()
+{
+	local section="$1"
+	[ "$(config_get "$section" type)" = "modem-device" ] || return 0
+	qmodem_atd_collect_port "$(config_get "$section" at_port)"
 }
 
 start_service()
@@ -29,9 +46,25 @@ start_service()
 	socket=$(uci -q get qmodem-atd.main.socket 2>/dev/null)
 	[ -n "$socket" ] || socket="/var/run/qmodem/atd.sock"
 
-	qmodem_atd_args="--socket $socket"
+	qmodem_atd_ports=""
 	config_load qmodem-atd
-	config_foreach qmodem_atd_add_port port
+	config_foreach qmodem_atd_port_section port
+
+	# 未显式声明 port 段时，从 qmodem 的 modem-device 收集 AT 口（开箱即用）
+	if [ -z "$qmodem_atd_ports" ]; then
+		config_load qmodem
+		config_foreach qmodem_atd_modem_section modem-device
+	fi
+
+	if [ -z "$qmodem_atd_ports" ]; then
+		echo "qmodem-atd: no AT port found (set /etc/config/qmodem-atd port sections)" >&2
+		return 0
+	fi
+
+	qmodem_atd_args="--socket $socket"
+	for p in $qmodem_atd_ports; do
+		qmodem_atd_args="$qmodem_atd_args --port $p"
+	done
 
 	mkdir -p "$(dirname "$socket")"
 
@@ -46,6 +79,7 @@ start_service()
 service_triggers()
 {
 	procd_add_reload_trigger "qmodem-atd"
+	procd_add_reload_trigger "qmodem"
 }
 
 reload_service()

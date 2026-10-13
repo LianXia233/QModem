@@ -25,20 +25,21 @@
 写入 `/etc/config/qmodem` 后重启主服务生效：
 
 ```sh
-# 通路 2：qmodem-atd unix socket（本版本引入）
-# 1) 先启用守护进程并登记 AT 口（/etc/config/qmodem-atd 的 port 段）
+# 通路 2 是默认通路：守护进程随包启用（/etc/config/qmodem-atd enabled=1），
+# 未声明 port 段时自动收集 /etc/config/qmodem 各 modem-device 的 at_port。
+# 若需显式指定端口或 socket：
 uci set qmodem-atd.main.enabled='1'
 uci set qmodem-atd.main.socket='/var/run/qmodem/atd.sock'
 uci commit qmodem-atd
 /etc/init.d/qmodem-atd restart
 
-# 2) 再把 AT 通路切到 qmodem-atd
-uci set qmodem.main.at_tool='2'
+uci set qmodem.main.at_tool='2'      # 默认（未配置时同为 2）
 uci set qmodem.main.at_socket='/var/run/qmodem/atd.sock'
 uci commit qmodem
+/etc/init.d/qmodem-atd restart
 
-# 回到默认通路
-uci set qmodem.main.at_tool='0'
+# 回退到 legacy 通路（显式选择才生效）
+uci set qmodem.main.at_tool='0'      # tom_modem
 uci commit qmodem
 ```
 
