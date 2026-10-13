@@ -11,6 +11,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+### Added
+- **ImmortalWrt-native build variant (`arm64_apk_immortalwrt`)**: QModem is now
+  additionally built from the ImmortalWrt SNAPSHOT SDK
+  (`immortalwrt-sdk-mediatek-filogic_`) with `SDK_FLAVOR=immortalwrt`, which
+  makes `main.yml` select ImmortalWrt feeds: `immortalwrt/immortalwrt` as the
+  base feed (the source of the ubus / libubox / libblobmsg-json ABI) plus the
+  ImmortalWrt `packages` and `luci` mirrors. Packages produced earlier were
+  built from the OpenWrt SDK and OpenWrt feeds, whose ubus ABI is
+  `libubus20260925`; ImmortalWrt master ships `libubus20260628`, so those apk
+  files could not be installed on an ImmortalWrt device (unsatisfiable
+  dependency). The OpenWrt variants are unchanged. ImmortalWrt assets are
+  published with an `-immortalwrt` suffix so they do not overwrite the
+  identically named OpenWrt assets inside a Release.
+
 ### Fixed
 - **Release assets are now directly installable** (`main.yml`,
   `publish-existing-release.yml`): artifacts are no longer repacked into
