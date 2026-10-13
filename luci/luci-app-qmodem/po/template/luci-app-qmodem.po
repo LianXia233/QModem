@@ -125,6 +125,10 @@ msgstr ""
 msgid "7-bit (ASCII)"
 msgstr ""
 
+#: view/qmodem/monitor.js:478
+msgid "8.8.8.8 or www.example.com"
+msgstr ""
+
 #: qmodem/controls.js:1495
 msgid "A module restart or airplane-mode cycle is required before this change takes effect."
 msgstr ""
@@ -159,6 +163,7 @@ msgstr ""
 msgid "ARFCN"
 msgstr ""
 
+#: view/qmodem/monitor.js:93
 #: view/qmodem/monitor.js:523
 msgid "AT Commands"
 msgstr ""
@@ -889,6 +894,7 @@ msgstr ""
 msgid "DNS"
 msgstr ""
 
+#: view/qmodem/monitor.js:50
 #: view/qmodem/monitor.js:471
 msgid "DNS Server"
 msgstr ""
@@ -1700,8 +1706,16 @@ msgstr ""
 msgid "Good"
 msgstr ""
 
+#: view/qmodem/monitor.js:68
+msgid "HTTP Request"
+msgstr ""
+
 #: view/qmodem/sms_forward.js:177
 msgid "HTTP headers, one per line"
+msgstr ""
+
+#: view/qmodem/monitor.js:69
+msgid "HTTP request to check connectivity"
 msgstr ""
 
 #: view/qmodem/network_config.js:587
@@ -1772,10 +1786,12 @@ msgstr ""
 msgid "IMEI 读取"
 msgstr ""
 
+#: view/qmodem/monitor.js:48
 #: view/qmodem/monitor.js:469
 msgid "IP Address / Domain"
 msgstr ""
 
+#: view/qmodem/monitor.js:60
 #: view/qmodem/monitor.js:483
 msgid "IP Version"
 msgstr ""
@@ -2913,8 +2929,13 @@ msgstr ""
 msgid "Physical slot identifier (e.g., 1-1.4 for USB, 0000:01:00.0 for PCIe)"
 msgstr ""
 
+#: view/qmodem/monitor.js:45
 #: view/qmodem/monitor.js:467
 msgid "Ping Type"
+msgstr ""
+
+#: view/qmodem/monitor.js:42
+msgid "Ping target to check connectivity"
 msgstr ""
 
 #: view/qmodem/service.js:394
@@ -3359,6 +3380,14 @@ msgstr ""
 msgid "Routing Area Code"
 msgstr ""
 
+#: view/qmodem/monitor.js:100
+msgid "Run Scripts"
+msgstr ""
+
+#: view/qmodem/monitor.js:101
+msgid "Run custom scripts"
+msgstr ""
+
 #: view/qmodem/monitor.js:155
 #: view/qmodem/monitor.js:604
 #: view/qmodem/network_config.js:78
@@ -3715,6 +3744,7 @@ msgstr ""
 msgid "Script Path"
 msgstr ""
 
+#: view/qmodem/monitor.js:104
 #: view/qmodem/monitor.js:530
 msgid "Script Paths"
 msgstr ""
@@ -3775,6 +3805,14 @@ msgstr ""
 #: view/qmodem/sms_conversation.js:243
 #: view/qmodem/terminal.js:278
 msgid "Send"
+msgstr ""
+
+#: view/qmodem/monitor.js:89
+msgid "Send AT Commands"
+msgstr ""
+
+#: view/qmodem/monitor.js:90
+msgid "Send AT commands to modem"
 msgstr ""
 
 #: view/qmodem/sms_conversation.js:112
@@ -4026,8 +4064,16 @@ msgstr ""
 msgid "Swisscom (CH)"
 msgstr ""
 
+#: view/qmodem/monitor.js:84
+msgid "Switch SIM Slot"
+msgstr ""
+
 #: view/qmodem/sim_switch.js:25
 msgid "Switch between SIM card slots. Note: Some modems may require a reboot after switching SIM slots."
+msgstr ""
+
+#: view/qmodem/monitor.js:85
+msgid "Switch to another SIM slot"
 msgstr ""
 
 #: qmodem/controls.js:981
@@ -4084,6 +4130,7 @@ msgstr ""
 msgid "TX Rate"
 msgstr ""
 
+#: view/qmodem/monitor.js:55
 #: view/qmodem/monitor.js:476
 msgid "Target IP / Domain"
 msgstr ""
@@ -4266,6 +4313,7 @@ msgstr ""
 msgid "UMobile (MY)"
 msgstr ""
 
+#: view/qmodem/monitor.js:72
 #: view/qmodem/monitor.js:493
 msgid "URL"
 msgstr ""
@@ -6390,43 +6438,4 @@ msgstr ""
 
 #: view/qmodem/network.js:240
 msgid "高通调制解调器接口（QMI）"
-msgstr ""
-
-msgid "Ping target to check connectivity"
-msgstr ""
-
-msgid "HTTP Request"
-msgstr ""
-
-msgid "HTTP request to check connectivity"
-msgstr ""
-
-msgid "Switch SIM Slot"
-msgstr ""
-
-msgid "Switch to another SIM slot"
-msgstr ""
-
-msgid "Send AT Commands"
-msgstr ""
-
-msgid "Send AT commands to modem"
-msgstr ""
-
-msgid "Run Scripts"
-msgstr ""
-
-msgid "Run custom scripts"
-msgstr ""
-
-msgid "8.8.8.8 or www.example.com"
-msgstr ""
-
-msgid "Network Monitor"
-msgstr ""
-
-msgid "Statistics"
-msgstr ""
-
-msgid "Network Monitor Configuration"
 msgstr ""
