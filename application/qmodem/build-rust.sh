@@ -114,6 +114,7 @@ REAL="$LINKER"
 XSYSROOT="$XSYSROOT"
 LOGF="$LINKER_LOG"
 first=1
+skipnext=0
 for a in "\$@"; do
 	if [ "\$first" = 1 ]; then set --; first=0; fi
 	case "\$a" in
@@ -123,10 +124,19 @@ for a in "\$@"; do
 			else
 				set -- "\$@" "\$a"
 			fi ;;
+		--sysroot)
+			# 分两个参数传递的形态：吃掉下一个参数再替换
+			skipnext=1
+			[ -n "\$XSYSROOT" ] && set -- "\$@" "--sysroot=\$XSYSROOT" || true ;;
 		crt1.o|crti.o|crtn.o|crtbegin.o|crtend.o|crtbeginS.o|crtendS.o)
-			p=\("\$REAL" -print-file-name="\$a" 2>/dev/null | tail -1)
+			p=\$("\$REAL" -print-file-name="\$a" 2>/dev/null | tail -1)
 			case "\$p" in /*) set -- "\$@" "\$p" ;; *) set -- "\$@" "\$a" ;; esac ;;
-		*) set -- "\$@" "\$a" ;;
+		*)
+			if [ "\${skipnext:-0}" = 1 ]; then
+				skipnext=0
+			else
+				set -- "\$@" "\$a"
+			fi ;;
 	esac
 done
 printf '%s\n' "\$*" >> "\$LOGF" 2>/dev/null || true
@@ -146,9 +156,12 @@ eval "export CARGO_TARGET_${UP}_RUSTFLAGS=\"-C target-feature=+crt-static $EXTRA
 
 echo "==> rust toolchain: $TOOLCHAIN / target: $RUST_TARGET_TRIPLE"
 echo "==> linker: $LINKER"
-# nightly（build-std）分支默认开 -v：rustc 会完整回显链接命令，排查
-# sysroot / 启动文件问题必需；tier 2 保持安静。
-[ "$TOOLCHAIN" = nightly ] && CARGO_VERBOSE="-v" || CARGO_VERBOSE=""
+# 说明：包装器会把每条链接调用（含改写后参数）记到
+# $OUT_DIR/linker-args.log，失败时回显最后一条，因此无需再开 cargo -v
+# （-v 会把 job 日志撑到 10MB 级，反而不利于定位）。
+CARGO_VERBOSE="-v"
+[ "$TOOLCHAIN" = nightly ] || CARGO_VERBOSE=""
+[ "${QMODEM_RUST_VERBOSE:-0}" = 1 ] && CARGO_VERBOSE="-v" || true
 
 mkdir -p "$OUT_DIR"
 LOG="$OUT_DIR/cargo-build.log"
@@ -160,8 +173,13 @@ if ( cd "$RUST_DIR" && \
 		$STD_FLAGS -p qmodem-atd ) >"$LOG" 2>&1; then
 	echo "==> cargo build OK"
 else
-	echo "!! cargo build failed, log follows" >&2
+	echo "!! cargo build failed, cargo log follows" >&2
 	cat "$LOG" >&2
+	# 链接器包装器记下的原始/改写后参数（最后一条即最终链接调用）
+	if [ -s "$OUT_DIR/linker-args.log" ]; then
+		echo "!! last linker invocation:" >&2
+		tail -1 "$OUT_DIR/linker-args.log" >&2
+	fi
 	exit 1
 fi
 
