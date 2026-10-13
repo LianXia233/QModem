@@ -82,21 +82,21 @@ msgstr ""
 msgid "16-bit (Unicode)"
 msgstr ""
 
-#: view/qmodem/advanced.js:108
-#: view/qmodem/network.js:208
+#: view/qmodem/advanced.js:109
+#: view/qmodem/network.js:209
 msgid "2G / 3G（GSM / WCDMA）"
 msgstr ""
 
-#: view/qmodem/network.js:209
+#: view/qmodem/network.js:210
 msgid "3G UMTS"
 msgstr ""
 
-#: view/qmodem/advanced.js:109
+#: view/qmodem/advanced.js:110
 msgid "4G LTE"
 msgstr ""
 
-#: view/qmodem/network.js:210
 #: view/qmodem/network.js:211
+#: view/qmodem/network.js:212
 msgid "4G 长期演进（LTE）"
 msgstr ""
 
@@ -104,19 +104,19 @@ msgstr ""
 msgid "5G Ethernet Interface"
 msgstr ""
 
-#: view/qmodem/advanced.js:110
-#: view/qmodem/network.js:213
+#: view/qmodem/advanced.js:111
 #: view/qmodem/network.js:214
+#: view/qmodem/network.js:215
 msgid "5G NR（NSA 非独立组网）"
 msgstr ""
 
-#: view/qmodem/advanced.js:111
-#: view/qmodem/network.js:215
+#: view/qmodem/advanced.js:112
 #: view/qmodem/network.js:216
+#: view/qmodem/network.js:217
 msgid "5G NR（SA 独立组网）"
 msgstr ""
 
-#: view/qmodem/network.js:212
+#: view/qmodem/network.js:213
 msgid "5G 新空口（NR）"
 msgstr ""
 
@@ -151,11 +151,11 @@ msgstr ""
 msgid "APN"
 msgstr ""
 
-#: view/qmodem/connection.js:685
+#: view/qmodem/connection.js:691
 msgid "APN 设置已保存到 QModem 配置（qmodem），请重拨以生效。"
 msgstr ""
 
-#: view/qmodem/status.js:1078
+#: view/qmodem/status.js:1074
 msgid "APN、拨号、IP 详情与会话计数"
 msgstr ""
 
@@ -210,26 +210,26 @@ msgstr ""
 msgid "AT commands to send when action is triggered"
 msgstr ""
 
-#: view/qmodem/system.js:66
-#: view/qmodem/system.js:440
+#: view/qmodem/system.js:67
+#: view/qmodem/system.js:450
 msgid "AT 串口"
 msgstr ""
 
-#: view/qmodem/advanced.js:703
+#: view/qmodem/advanced.js:704
 msgid "AT 命令"
 msgstr ""
 
-#: view/qmodem/advanced.js:947
+#: view/qmodem/advanced.js:949
 msgid "AT 控制台"
 msgstr ""
 
-#: view/qmodem/device.js:173
-#: view/qmodem/network.js:957
-#: view/qmodem/status.js:771
+#: view/qmodem/device.js:176
+#: view/qmodem/network.js:961
+#: view/qmodem/status.js:770
 msgid "AT 端口"
 msgstr ""
 
-#: view/qmodem/advanced.js:701
+#: view/qmodem/advanced.js:702
 msgid "AT 透传控制台"
 msgstr ""
 
@@ -300,7 +300,7 @@ msgstr ""
 msgid "After setting this option, the first module loaded into this slot will automatically be assigned this default alias."
 msgstr ""
 
-#: view/qmodem/system.js:486
+#: view/qmodem/system.js:496
 msgid "Airplane mode failed: %s"
 msgstr ""
 
@@ -899,7 +899,7 @@ msgstr ""
 msgid "DNS Server"
 msgstr ""
 
-#: view/qmodem/advanced.js:144
+#: view/qmodem/advanced.js:145
 msgid "DNS 读取"
 msgstr ""
 
@@ -1606,54 +1606,54 @@ msgstr ""
 msgid "Full scan failed"
 msgstr ""
 
-#: view/qmodem/status.js:724
+#: view/qmodem/status.js:723
 msgid "GBR · 会话视频（实时）"
 msgstr ""
 
-#: view/qmodem/status.js:723
+#: view/qmodem/status.js:722
 msgid "GBR · 会话语音"
-msgstr ""
-
-#: view/qmodem/status.js:718
-#: view/qmodem/status.js:733
-msgid "GBR · 关键任务 PTT"
-msgstr ""
-
-#: view/qmodem/status.js:720
-#: view/qmodem/status.js:736
-msgid "GBR · 关键任务数据"
-msgstr ""
-
-#: view/qmodem/status.js:734
-msgid "GBR · 关键任务视频"
 msgstr ""
 
 #: view/qmodem/status.js:717
 #: view/qmodem/status.js:732
+msgid "GBR · 关键任务 PTT"
+msgstr ""
+
+#: view/qmodem/status.js:719
+#: view/qmodem/status.js:735
+msgid "GBR · 关键任务数据"
+msgstr ""
+
+#: view/qmodem/status.js:733
+msgid "GBR · 关键任务视频"
+msgstr ""
+
+#: view/qmodem/status.js:716
+#: view/qmodem/status.js:731
 msgid "GBR · 关键任务语音"
 msgstr ""
 
-#: view/qmodem/status.js:725
+#: view/qmodem/status.js:724
 msgid "GBR · 实时游戏 / 交互"
 msgstr ""
 
-#: view/qmodem/status.js:710
+#: view/qmodem/status.js:709
 msgid "GBR · 实时游戏 / 低延迟交互"
 msgstr ""
 
-#: view/qmodem/status.js:709
+#: view/qmodem/status.js:708
 msgid "GBR · 实时视频通话"
 msgstr ""
 
-#: view/qmodem/status.js:708
+#: view/qmodem/status.js:707
 msgid "GBR · 实时语音 (VoLTE)"
 msgstr ""
 
-#: view/qmodem/status.js:726
+#: view/qmodem/status.js:725
 msgid "GBR · 缓冲流媒体"
 msgstr ""
 
-#: view/qmodem/status.js:711
+#: view/qmodem/status.js:710
 msgid "GBR · 缓冲流视频"
 msgstr ""
 
@@ -1774,15 +1774,15 @@ msgstr ""
 msgid "IMEI set successfully. Please reboot the modem for changes to take effect."
 msgstr ""
 
-#: view/qmodem/advanced.js:133
+#: view/qmodem/advanced.js:134
 msgid "IMEI 写入"
 msgstr ""
 
-#: view/qmodem/system.js:295
+#: view/qmodem/system.js:296
 msgid "IMEI 写入失败：%s"
 msgstr ""
 
-#: view/qmodem/advanced.js:134
+#: view/qmodem/advanced.js:135
 msgid "IMEI 读取"
 msgstr ""
 
@@ -1796,17 +1796,17 @@ msgstr ""
 msgid "IP Version"
 msgstr ""
 
-#: view/qmodem/connection.js:519
-#: view/qmodem/connection.js:638
-#: view/qmodem/device.js:199
+#: view/qmodem/connection.js:525
+#: view/qmodem/connection.js:644
+#: view/qmodem/device.js:202
 msgid "IP 协议"
 msgstr ""
 
-#: view/qmodem/connection.js:473
+#: view/qmodem/connection.js:476
 msgid "IP 透传"
 msgstr ""
 
-#: view/qmodem/connection.js:472
+#: view/qmodem/connection.js:475
 msgid "IP 透传 / 后置路由 / DMZ"
 msgstr ""
 
@@ -1814,11 +1814,11 @@ msgstr ""
 msgid "IPv4"
 msgstr ""
 
-#: view/qmodem/connection.js:340
+#: view/qmodem/connection.js:341
 msgid "IPv4 DNS"
 msgstr ""
 
-#: view/qmodem/connection.js:337
+#: view/qmodem/connection.js:338
 msgid "IPv4 地址"
 msgstr ""
 
@@ -1830,11 +1830,11 @@ msgstr ""
 msgid "IPv6"
 msgstr ""
 
-#: view/qmodem/connection.js:341
+#: view/qmodem/connection.js:342
 msgid "IPv6 DNS"
 msgstr ""
 
-#: view/qmodem/connection.js:338
+#: view/qmodem/connection.js:339
 msgid "IPv6 地址"
 msgstr ""
 
@@ -1999,7 +1999,7 @@ msgstr ""
 msgid "LED indicator for network connection status"
 msgstr ""
 
-#: view/qmodem/system.js:511
+#: view/qmodem/system.js:521
 msgid "LED 设置已接受。"
 msgstr ""
 
@@ -2259,7 +2259,7 @@ msgid "Mobile Equipment (ME)"
 msgstr ""
 
 #: qmodem/controls.js:1544
-#: view/qmodem/status.js:1014
+#: view/qmodem/status.js:1016
 msgid "Mobile Network"
 msgstr ""
 
@@ -2629,10 +2629,6 @@ msgstr ""
 msgid "No modem configured."
 msgstr ""
 
-#: view/qmodem/status.js:998
-msgid "No modem detected (make sure QModem has recognised the device)."
-msgstr ""
-
 #: view/qmodem/sms.js:27
 #: view/qmodem/sms_conversation.js:44
 #: view/qmodem/sms_sim.js:26
@@ -2678,42 +2674,42 @@ msgstr ""
 msgid "No status information available"
 msgstr ""
 
-#: view/qmodem/status.js:712
-#: view/qmodem/status.js:727
+#: view/qmodem/status.js:711
+#: view/qmodem/status.js:726
 msgid "Non-GBR · IMS 信令"
 msgstr ""
 
-#: view/qmodem/status.js:713
+#: view/qmodem/status.js:712
 msgid "Non-GBR · TCP 优先（网页/邮件/文件）"
 msgstr ""
 
-#: view/qmodem/status.js:714
+#: view/qmodem/status.js:713
 msgid "Non-GBR · 交互业务（VoIP/在线游戏）"
 msgstr ""
 
-#: view/qmodem/status.js:728
+#: view/qmodem/status.js:727
 msgid "Non-GBR · 交互（TCP 网页/邮件）"
 msgstr ""
 
-#: view/qmodem/status.js:729
+#: view/qmodem/status.js:728
 msgid "Non-GBR · 交互（VoIP/在线游戏）"
 msgstr ""
 
-#: view/qmodem/status.js:719
-#: view/qmodem/status.js:735
+#: view/qmodem/status.js:718
+#: view/qmodem/status.js:734
 msgid "Non-GBR · 关键任务信令"
 msgstr ""
 
-#: view/qmodem/status.js:716
-#: view/qmodem/status.js:731
+#: view/qmodem/status.js:715
+#: view/qmodem/status.js:730
 msgid "Non-GBR · 后台数据（最低优先级）"
 msgstr ""
 
-#: view/qmodem/status.js:715
+#: view/qmodem/status.js:714
 msgid "Non-GBR · 通用数据（默认上网）"
 msgstr ""
 
-#: view/qmodem/status.js:730
+#: view/qmodem/status.js:729
 msgid "Non-GBR · 默认数据"
 msgstr ""
 
@@ -2813,19 +2809,19 @@ msgstr ""
 msgid "PCIe scan failed"
 msgstr ""
 
-#: view/qmodem/advanced.js:898
+#: view/qmodem/advanced.js:900
 msgid "PCIe 以太网 PHY 档位"
 msgstr ""
 
-#: view/qmodem/advanced.js:887
+#: view/qmodem/advanced.js:889
 msgid "PCIe 以太网控制器"
 msgstr ""
 
-#: view/qmodem/advanced.js:889
+#: view/qmodem/advanced.js:891
 msgid "PCIe 控制器"
 msgstr ""
 
-#: view/qmodem/advanced.js:895
+#: view/qmodem/advanced.js:897
 msgid "PCIe 控制器命令已被接受。"
 msgstr ""
 
@@ -2837,7 +2833,7 @@ msgstr ""
 msgid "PDP Type"
 msgstr ""
 
-#: view/qmodem/device.js:178
+#: view/qmodem/device.js:181
 msgid "PDP 上下文索引"
 msgstr ""
 
@@ -2845,11 +2841,11 @@ msgstr ""
 msgid "PDU request timed out"
 msgstr ""
 
-#: view/qmodem/advanced.js:900
+#: view/qmodem/advanced.js:902
 msgid "PHY 档位"
 msgstr ""
 
-#: view/qmodem/advanced.js:906
+#: view/qmodem/advanced.js:908
 msgid "PHY 档位命令已被接受。"
 msgstr ""
 
@@ -2857,20 +2853,20 @@ msgstr ""
 msgid "PIN Code"
 msgstr ""
 
-#: view/qmodem/system.js:226
+#: view/qmodem/system.js:227
 msgid "PIN 操作将经由 QModem 以 AT 指令下发给模组。"
 msgstr ""
 
-#: view/qmodem/system.js:216
-#: view/qmodem/system.js:219
+#: view/qmodem/system.js:217
+#: view/qmodem/system.js:220
 msgid "PIN 码"
 msgstr ""
 
-#: view/qmodem/system.js:231
+#: view/qmodem/system.js:232
 msgid "PIN 需为 4–8 位数字；PUK 必须恰好 8 位数字。"
 msgstr ""
 
-#: view/qmodem/system.js:219
+#: view/qmodem/system.js:220
 msgid "PUK 码"
 msgstr ""
 
@@ -3069,63 +3065,71 @@ msgstr ""
 msgid "QModem Settings"
 msgstr ""
 
-#: view/qmodem/connection.js:355
+#: view/qmodem/connection.js:356
 msgid "QModem dial_status 实时状态上报"
 msgstr ""
 
-#: view/qmodem/advanced.js:840
+#: view/qmodem/advanced.js:842
 msgid "QModem 上报的特性支持情况与重启能力。"
 msgstr ""
 
-#: view/qmodem/device.js:175
+#: view/qmodem/device.js:178
 msgid "QModem 下发 AT 命令使用的端口设备节点。留空则由 QModem 自动选择。"
 msgstr ""
 
-#: view/qmodem/system.js:262
+#: view/qmodem/system.js:263
 msgid "QModem 仅上报模组温度（当前 %s）。阈值写入没有通用的 QModem 方法，将以 AT 透传指令下发，模组可能拒绝。"
 msgstr ""
 
-#: view/qmodem/advanced.js:759
+#: view/qmodem/advanced.js:760
 msgid "QModem 依赖模组支持库识别模组型号。若本模组尚未被 QModem 收录，可在此写入内置定义。"
 msgstr ""
 
-#: view/qmodem/advanced.js:829
+#: view/qmodem/advanced.js:831
 msgid "QModem 依赖模组支持库识别模组型号；本插件内置的型号定义可一键写入。"
 msgstr ""
 
-#: view/qmodem/device.js:191
+#: view/qmodem/device.js:194
 msgid "QModem 允许该模组使用的拨号模式列表，按模组实际能力显示。"
 msgstr ""
 
-#: view/qmodem/status.js:957
+#: view/qmodem/status.js:956
 msgid "QModem 将更新定时任务，使流量统计按设定时间自动清零。是否继续？"
 msgstr ""
 
-#: view/qmodem/system.js:451
+#: view/qmodem/advanced.js:752
+msgid "QModem 尚未识别到可用的模组设备，若本模组尚未被 QModem 收录，可写入内置定义。"
+msgstr ""
+
+#: view/qmodem/system.js:344
+msgid "QModem 尚未识别到可用的模组设备，请确认硬件接口已正确连接并被系统识别。"
+msgstr ""
+
+#: view/qmodem/system.js:461
 msgid "QModem 未向此模组暴露 ICCID。"
 msgstr ""
 
-#: view/qmodem/connection.js:476
+#: view/qmodem/connection.js:479
 msgid "QModem 未导出这些模组私有设置，此处作只读展示。"
 msgstr ""
 
-#: view/qmodem/advanced.js:450
+#: view/qmodem/advanced.js:451
 msgid "QModem 未报告任何被禁用的特性"
 msgstr ""
 
-#: view/qmodem/system.js:524
+#: view/qmodem/system.js:534
 msgid "QModem 未报告此模组支持 SIM 卡槽切换。"
 msgstr ""
 
-#: view/qmodem/system.js:510
+#: view/qmodem/system.js:520
 msgid "QModem 没有通用 LED 方法，该设置将以模组专用 AT 指令下发，重启后生效。"
 msgstr ""
 
-#: view/qmodem/device.js:170
+#: view/qmodem/device.js:173
 msgid "QModem 用于该模组数据接口与配置节的名称。"
 msgstr ""
 
-#: view/qmodem/status.js:798
+#: view/qmodem/status.js:797
 msgid "QoS 等级"
 msgstr ""
 
@@ -3139,7 +3143,7 @@ msgstr ""
 msgid "RAT"
 msgstr ""
 
-#: view/qmodem/network.js:452
+#: view/qmodem/network.js:453
 msgid "RF 射频通道"
 msgstr ""
 
@@ -3464,11 +3468,11 @@ msgstr ""
 msgid "SIM Number"
 msgstr ""
 
-#: view/qmodem/system.js:241
+#: view/qmodem/system.js:242
 msgid "SIM PIN 指令已接受。"
 msgstr ""
 
-#: view/qmodem/system.js:224
+#: view/qmodem/system.js:225
 msgid "SIM PIN 管理"
 msgstr ""
 
@@ -3544,76 +3548,76 @@ msgstr ""
 msgid "SIM slot switched to Slot %s successfully."
 msgstr ""
 
-#: view/qmodem/system.js:478
+#: view/qmodem/system.js:488
 msgid "SIM 与射频控制"
 msgstr ""
 
-#: view/qmodem/status.js:101
-#: view/qmodem/status.js:786
-#: view/qmodem/system.js:445
+#: view/qmodem/status.js:102
+#: view/qmodem/status.js:785
+#: view/qmodem/system.js:455
 msgid "SIM 与订阅"
 msgstr ""
 
-#: view/qmodem/system.js:61
+#: view/qmodem/system.js:62
 msgid "SIM 信息"
 msgstr ""
 
-#: view/qmodem/system.js:362
+#: view/qmodem/system.js:369
 msgid "SIM 卡中未存储"
 msgstr ""
 
-#: view/qmodem/system.js:515
-#: view/qmodem/system.js:517
+#: view/qmodem/system.js:525
+#: view/qmodem/system.js:527
 msgid "SIM 卡启用"
 msgstr ""
 
-#: view/qmodem/system.js:64
-#: view/qmodem/system.js:450
+#: view/qmodem/system.js:65
+#: view/qmodem/system.js:460
 msgid "SIM 卡槽"
 msgstr ""
 
-#: view/qmodem/system.js:181
-#: view/qmodem/system.js:371
+#: view/qmodem/system.js:182
+#: view/qmodem/system.js:378
 msgid "SIM 卡槽 %s"
 msgstr ""
 
-#: view/qmodem/advanced.js:131
 #: view/qmodem/advanced.js:132
-#: view/qmodem/system.js:65
-#: view/qmodem/system.js:460
+#: view/qmodem/advanced.js:133
+#: view/qmodem/system.js:66
+#: view/qmodem/system.js:470
 msgid "SIM 卡槽切换"
 msgstr ""
 
-#: view/qmodem/system.js:527
+#: view/qmodem/system.js:537
 msgid "SIM 卡槽切换失败：%s"
 msgstr ""
 
-#: view/qmodem/system.js:518
+#: view/qmodem/system.js:528
 msgid "SIM 启用指令已接受。"
 msgstr ""
 
-#: view/qmodem/system.js:155
+#: view/qmodem/system.js:156
 msgid "SIM 在位 · 就绪"
 msgstr ""
 
-#: view/qmodem/system.js:155
+#: view/qmodem/system.js:156
 msgid "SIM 异常 / 未就绪"
 msgstr ""
 
-#: view/qmodem/system.js:20
+#: view/qmodem/system.js:21
 msgid "SIM 未就绪"
 msgstr ""
 
-#: view/qmodem/advanced.js:910
 #: view/qmodem/advanced.js:912
+#: view/qmodem/advanced.js:914
 msgid "SIM 热插拔"
 msgstr ""
 
-#: view/qmodem/advanced.js:918
+#: view/qmodem/advanced.js:920
 msgid "SIM 热插拔命令已被接受。"
 msgstr ""
 
-#: view/qmodem/system.js:458
+#: view/qmodem/system.js:468
 msgid "SIM 状态"
 msgstr ""
 
@@ -4277,7 +4281,7 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: view/qmodem/device.js:244
+#: view/qmodem/device.js:250
 msgid "UCI 配置与设备节点映射拓扑"
 msgstr ""
 
@@ -4334,19 +4338,19 @@ msgstr ""
 msgid "USB scan failed"
 msgstr ""
 
-#: view/qmodem/advanced.js:871
+#: view/qmodem/advanced.js:873
 msgid "USB 数据模式"
 msgstr ""
 
-#: view/qmodem/advanced.js:873
+#: view/qmodem/advanced.js:875
 msgid "USB 模式"
 msgstr ""
 
-#: view/qmodem/advanced.js:883
+#: view/qmodem/advanced.js:885
 msgid "USB 模式命令已被接受。"
 msgstr ""
 
-#: view/qmodem/status.js:619
+#: view/qmodem/status.js:618
 msgid "USB 链路速率"
 msgstr ""
 
@@ -4536,12 +4540,12 @@ msgstr ""
 msgid "d"
 msgstr ""
 
-#: view/qmodem/network.js:924
+#: view/qmodem/network.js:928
 msgid "dBm（毫瓦分贝）"
 msgstr ""
 
-#: view/qmodem/network.js:925
-#: view/qmodem/network.js:926
+#: view/qmodem/network.js:929
+#: view/qmodem/network.js:930
 msgid "dB（分贝）"
 msgstr ""
 
@@ -4578,1864 +4582,1881 @@ msgstr ""
 msgid "quectel-CM will append the DNS server to the resolv.conf file by default.if you do not want to modify the resolv.conf file, please check this option."
 msgstr ""
 
-#: view/qmodem/network.js:405
+#: view/qmodem/network.js:406
 msgid "一般"
 msgstr ""
 
-#: view/qmodem/status.js:870
+#: view/qmodem/status.js:869
 msgid "上行 (UL)"
 msgstr ""
 
-#: view/qmodem/network.js:683
-#: view/qmodem/network.js:946
-#: view/qmodem/status.js:639
+#: view/qmodem/network.js:684
+#: view/qmodem/network.js:950
+#: view/qmodem/status.js:638
 msgid "上行带宽"
 msgstr ""
 
-#: view/qmodem/advanced.js:717
+#: view/qmodem/advanced.js:718
 msgid "下发命令"
 msgstr ""
 
-#: view/qmodem/advanced.js:714
+#: view/qmodem/advanced.js:715
 msgid "下发失败：%s"
 msgstr ""
 
-#: view/qmodem/status.js:690
+#: view/qmodem/status.js:689
 msgid "下行 %s / 上行 %s"
 msgstr ""
 
-#: view/qmodem/status.js:869
+#: view/qmodem/status.js:868
 msgid "下行 (DL)"
 msgstr ""
 
-#: view/qmodem/network.js:682
-#: view/qmodem/network.js:945
-#: view/qmodem/status.js:638
+#: view/qmodem/network.js:683
+#: view/qmodem/network.js:949
+#: view/qmodem/status.js:637
 msgid "下行带宽"
 msgstr ""
 
-#: view/qmodem/status.js:594
-#: view/qmodem/status.js:1051
+#: view/qmodem/status.js:593
+#: view/qmodem/status.js:1056
 msgid "不可用"
 msgstr ""
 
-#: view/qmodem/advanced.js:455
 #: view/qmodem/advanced.js:456
-#: view/qmodem/network.js:705
-#: view/qmodem/system.js:460
+#: view/qmodem/advanced.js:457
+#: view/qmodem/network.js:706
+#: view/qmodem/system.js:470
 msgid "不支持"
 msgstr ""
 
-#: view/qmodem/device.js:196
+#: view/qmodem/device.js:199
 msgid "与「移动数据」页共用同一份 QModem 配置。"
 msgstr ""
 
-#: view/qmodem/status.js:402
+#: view/qmodem/status.js:401
 msgid "中"
 msgstr ""
 
-#: view/qmodem/system.js:264
+#: view/qmodem/system.js:265
 msgid "串行温度日志"
 msgstr ""
 
-#: view/qmodem/advanced.js:815
+#: view/qmodem/advanced.js:817
 msgid "主机处理器、QModem 守护进程与模组蜂窝核心交互链路"
 msgstr ""
 
-#: view/qmodem/connection.js:531
+#: view/qmodem/connection.js:537
 msgid "主机网卡接口、QModem 驱动核心与移动蜂窝 WAN 实时链路"
 msgstr ""
 
-#: view/qmodem/advanced.js:398
+#: view/qmodem/advanced.js:399
 msgid "以下内置型号尚未写入支持库：%s。同步后需重启 QModem 或重启设备。"
 msgstr ""
 
-#: view/qmodem/advanced.js:867
+#: view/qmodem/advanced.js:869
 msgid "以下能力在 QModem 中没有通用方法，只能经 send_at 以模块私有 AT 命令下发；可点击「读取当前值」向模组查询。"
 msgstr ""
 
-#: view/qmodem/network.js:239
+#: view/qmodem/network.js:240
 msgid "以太网控制模型（ECM）"
 msgstr ""
 
-#: view/qmodem/status.js:402
+#: view/qmodem/status.js:401
 msgid "优"
 msgstr ""
 
-#: view/qmodem/network.js:405
+#: view/qmodem/network.js:406
 msgid "优秀"
 msgstr ""
 
-#: view/qmodem/advanced.js:899
+#: view/qmodem/advanced.js:901
 msgid "使 PHY 档位与以太网控制器匹配。"
 msgstr ""
 
-#: view/qmodem/connection.js:592
+#: view/qmodem/connection.js:598
 msgid "保存 APN 设置"
 msgstr ""
 
-#: view/qmodem/status.js:956
+#: view/qmodem/status.js:955
 msgid "保存流量清零计划"
 msgstr ""
 
-#: view/qmodem/status.js:946
+#: view/qmodem/status.js:945
 msgid "保存计划"
 msgstr ""
 
-#: view/qmodem/device.js:267
+#: view/qmodem/device.js:273
 msgid "保存设备参数"
 msgstr ""
 
-#: view/qmodem/system.js:469
+#: view/qmodem/system.js:479
 msgid "保护等级"
 msgstr ""
 
-#: view/qmodem/advanced.js:350
+#: view/qmodem/advanced.js:351
 msgid "保持不变"
 msgstr ""
 
-#: view/qmodem/status.js:540
+#: view/qmodem/status.js:539
 msgid "信号"
 msgstr ""
 
-#: view/qmodem/network.js:744
-#: view/qmodem/network.js:926
+#: view/qmodem/network.js:745
+#: view/qmodem/network.js:930
 msgid "信号与干扰加噪声比（SINR）"
 msgstr ""
 
-#: view/qmodem/system.js:212
+#: view/qmodem/system.js:213
 msgid "修改 PIN"
 msgstr ""
 
-#: view/qmodem/advanced.js:822
+#: view/qmodem/advanced.js:824
 msgid "修改硬件接口档位可能同时中断移动数据与模组管理通道。应用前请记录当前取值。"
-msgstr ""
-
-#: view/qmodem/advanced.js:575
-#: view/qmodem/network.js:524
-msgid "修改网络优选"
-msgstr ""
-
-#: view/qmodem/system.js:517
-msgid "停用 SIM 卡将立即移除移动服务。"
-msgstr ""
-
-#: view/qmodem/advanced.js:637
-#: view/qmodem/network.js:608
-msgid "全选"
-msgstr ""
-
-#: view/qmodem/network.js:597
-msgid "共 %d 个频段"
-msgstr ""
-
-#: view/qmodem/system.js:258
-#: view/qmodem/system.js:259
-#: view/qmodem/system.js:375
-msgid "关闭"
-msgstr ""
-
-#: view/qmodem/device.js:164
-msgid "关闭后 QModem 将不再管理此模组。"
-msgstr ""
-
-#: view/qmodem/advanced.js:394
-msgid "内置型号"
-msgstr ""
-
-#: view/qmodem/advanced.js:400
-msgid "内置型号均已存在于支持库中，无需同步。"
-msgstr ""
-
-#: view/qmodem/system.js:285
-msgid "写入 IMEI 可能受当地法律或运营商限制，本选项仅用于恢复模组出厂标识。"
-msgstr ""
-
-#: view/qmodem/system.js:293
-msgid "写入设备标识"
-msgstr ""
-
-#: view/qmodem/status.js:945
-msgid "分钟"
-msgstr ""
-
-#: view/qmodem/system.js:522
-#: view/qmodem/system.js:525
-msgid "切换 SIM 卡槽"
-msgstr ""
-
-#: view/qmodem/advanced.js:527
-#: view/qmodem/network.js:478
-msgid "切换为 %s"
-msgstr ""
-
-#: view/qmodem/advanced.js:884
-msgid "切换后 USB 接口会重新枚举，管理通道可能短暂中断。"
-msgstr ""
-
-#: view/qmodem/system.js:525
-msgid "切换物理 SIM 通路时模组将短暂脱离网络。"
-msgstr ""
-
-#: view/qmodem/advanced.js:517
-#: view/qmodem/network.js:474
-msgid "切换网络模式"
-msgstr ""
-
-#: view/qmodem/advanced.js:522
-msgid "切换网络模式失败：%s"
-msgstr ""
-
-#: view/qmodem/network.js:678
-msgid "制式"
-msgstr ""
-
-#: view/qmodem/system.js:437
-msgid "制造商"
-msgstr ""
-
-#: view/qmodem/status.js:1053
-msgid "刷新"
-msgstr ""
-
-#: view/qmodem/advanced.js:413
-#: view/qmodem/advanced.js:951
-#: view/qmodem/network.js:972
-msgid "刷新状态"
-msgstr ""
-
-#: view/qmodem/connection.js:529
-msgid "动态数据通路拓扑"
-msgstr ""
-
-#: view/qmodem/system.js:173
-msgid "单卡槽架构"
-msgstr ""
-
-#: view/qmodem/status.js:594
-msgid "单载波"
-msgstr ""
-
-#: view/qmodem/status.js:767
-msgid "厂商"
-msgstr ""
-
-#: view/qmodem/connection.js:581
-msgid "参数保存后写入 /etc/config/qmodem，点击「重新拨号」即可应用生效。"
-msgstr ""
-
-#: view/qmodem/network.js:742
-#: view/qmodem/network.js:924
-msgid "参考信号接收功率（RSRP）"
-msgstr ""
-
-#: view/qmodem/network.js:743
-#: view/qmodem/network.js:925
-msgid "参考信号接收质量（RSRQ）"
-msgstr ""
-
-#: view/qmodem/status.js:594
-msgid "双连接"
-msgstr ""
-
-#: view/qmodem/network.js:768
-#: view/qmodem/system.js:228
-#: view/qmodem/system.js:265
-#: view/qmodem/system.js:288
-#: view/qmodem/system.js:309
-msgid "取消"
-msgstr ""
-
-#: view/qmodem/system.js:484
-#: view/qmodem/system.js:495
-msgid "变更射频功能"
-msgstr ""
-
-#: view/qmodem/network.js:884
-msgid "可用 %d"
-msgstr ""
-
-#: view/qmodem/device.js:184
-msgid "可用拨号模式"
-msgstr ""
-
-#: view/qmodem/advanced.js:408
-msgid "同步支持库"
-msgstr ""
-
-#: view/qmodem/advanced.js:437
-msgid "同步支持库失败：%s"
-msgstr ""
-
-#: view/qmodem/advanced.js:430
-msgid "同步未生效：%s"
-msgstr ""
-
-#: view/qmodem/connection.js:474
-msgid "后置路由"
-msgstr ""
-
-#: view/qmodem/advanced.js:890
-#: view/qmodem/advanced.js:913
-msgid "启用"
-msgstr ""
-
-#: view/qmodem/system.js:211
-msgid "启用 PIN 锁"
-msgstr ""
-
-#: view/qmodem/system.js:517
-msgid "启用物理 SIM 卡以进行网络注册？"
-msgstr ""
-
-#: view/qmodem/status.js:941
-msgid "启用自动清零"
-msgstr ""
-
-#: view/qmodem/device.js:163
-msgid "启用该模组"
-msgstr ""
-
-#: view/qmodem/status.js:769
-msgid "固件"
-msgstr ""
-
-#: view/qmodem/network.js:633
-msgid "固件报告频段锁定已禁用，但底层 set_lockband 方法仍可调用。"
-msgstr ""
-
-#: view/qmodem/system.js:438
-msgid "固件版本"
-msgstr ""
-
-#: view/qmodem/status.js:1051
-msgid "在线"
-msgstr ""
-
-#: view/qmodem/connection.js:330
-msgid "地址与 DNS"
-msgstr ""
-
-#: view/qmodem/status.js:768
-#: view/qmodem/system.js:436
-msgid "型号"
-msgstr ""
-
-#: view/qmodem/network.js:686
-#: view/qmodem/network.js:944
-msgid "子载波间隔"
-msgstr ""
-
-#: view/qmodem/status.js:1085
-msgid "完整模组信息"
-msgstr ""
-
-#: view/qmodem/network.js:916
-msgid "实时监控服务小区物理参数、载波聚合配置及多频段策略。"
-msgstr ""
-
-#: view/qmodem/connection.js:657
-msgid "密码"
-msgstr ""
-
-#: view/qmodem/status.js:542
-msgid "射频与信道环境质量"
-msgstr ""
-
-#: view/qmodem/status.js:100
-#: view/qmodem/status.js:1079
-msgid "射频与小区"
-msgstr ""
-
-#: view/qmodem/status.js:642
-msgid "射频与小区详情"
-msgstr ""
-
-#: view/qmodem/advanced.js:644
-#: view/qmodem/network.js:583
-msgid "将 %s 锁定到频段 %s？移动数据会短暂中断。"
 msgstr ""
 
 #: view/qmodem/advanced.js:576
 #: view/qmodem/network.js:525
-msgid "将允许驻网的制式设置为 %s？移动数据会短暂中断。"
+msgid "修改网络优选"
+msgstr ""
+
+#: view/qmodem/system.js:527
+msgid "停用 SIM 卡将立即移除移动服务。"
+msgstr ""
+
+#: view/qmodem/advanced.js:638
+#: view/qmodem/network.js:609
+msgid "全选"
+msgstr ""
+
+#: view/qmodem/network.js:598
+msgid "共 %d 个频段"
+msgstr ""
+
+#: view/qmodem/system.js:259
+#: view/qmodem/system.js:260
+#: view/qmodem/system.js:382
+msgid "关闭"
+msgstr ""
+
+#: view/qmodem/device.js:167
+msgid "关闭后 QModem 将不再管理此模组。"
+msgstr ""
+
+#: view/qmodem/advanced.js:395
+msgid "内置型号"
+msgstr ""
+
+#: view/qmodem/advanced.js:401
+msgid "内置型号均已存在于支持库中，无需同步。"
+msgstr ""
+
+#: view/qmodem/system.js:286
+msgid "写入 IMEI 可能受当地法律或运营商限制，本选项仅用于恢复模组出厂标识。"
+msgstr ""
+
+#: view/qmodem/system.js:294
+msgid "写入设备标识"
+msgstr ""
+
+#: view/qmodem/status.js:944
+msgid "分钟"
+msgstr ""
+
+#: view/qmodem/system.js:532
+#: view/qmodem/system.js:535
+msgid "切换 SIM 卡槽"
+msgstr ""
+
+#: view/qmodem/advanced.js:528
+#: view/qmodem/network.js:479
+msgid "切换为 %s"
+msgstr ""
+
+#: view/qmodem/advanced.js:886
+msgid "切换后 USB 接口会重新枚举，管理通道可能短暂中断。"
+msgstr ""
+
+#: view/qmodem/system.js:535
+msgid "切换物理 SIM 通路时模组将短暂脱离网络。"
 msgstr ""
 
 #: view/qmodem/advanced.js:518
 #: view/qmodem/network.js:475
-msgid "将模组拨号模式切换为 %s？切换过程中移动数据会短暂中断。"
+msgid "切换网络模式"
 msgstr ""
 
-#: view/qmodem/system.js:551
-msgid "将重启模组并短暂中断移动连接。"
+#: view/qmodem/advanced.js:523
+msgid "切换网络模式失败：%s"
 msgstr ""
 
-#: view/qmodem/network.js:942
-msgid "小区 ID"
-msgstr ""
-
-#: view/qmodem/status.js:944
-msgid "小时"
-msgstr ""
-
-#: view/qmodem/advanced.js:699
-msgid "尚未下发命令。"
-msgstr ""
-
-#: view/qmodem/status.js:790
-#: view/qmodem/system.js:13
-#: view/qmodem/system.js:14
-msgid "就绪"
-msgstr ""
-
-#: view/qmodem/connection.js:440
-msgid "展开以读取拨号日志。"
-msgstr ""
-
-#: view/qmodem/device.js:246
-msgid "展示 UCI 配置节、QModem 守护进程与硬件设备节点之间的同步流向。"
-msgstr ""
-
-#: view/qmodem/status.js:402
-msgid "差"
-msgstr ""
-
-#: view/qmodem/system.js:376
-msgid "已停用"
-msgstr ""
-
-#: view/qmodem/advanced.js:395
-msgid "已入库"
-msgstr ""
-
-#: view/qmodem/advanced.js:428
-msgid "已写入支持库：%s。请重启 QModem 或重启设备生效。"
-msgstr ""
-
-#: view/qmodem/status.js:655
-msgid "已分配地址"
-msgstr ""
-
-#: view/qmodem/connection.js:343
-msgid "已启动 (UP)"
-msgstr ""
-
-#: view/qmodem/system.js:376
-msgid "已启用"
-msgstr ""
-
-#: view/qmodem/connection.js:544
-msgid "已开始拨号。"
-msgstr ""
-
-#: view/qmodem/status.js:657
-msgid "已断开"
-msgstr ""
-
-#: view/qmodem/status.js:867
-msgid "已更新"
-msgstr ""
-
-#: view/qmodem/status.js:657
-msgid "已激活"
-msgstr ""
-
-#: view/qmodem/advanced.js:335
-msgid "已读取当前值：%s"
-msgstr ""
-
-#: view/qmodem/connection.js:334
-#: view/qmodem/connection.js:499
-#: view/qmodem/status.js:661
-#: view/qmodem/status.js:665
-#: view/qmodem/status.js:1051
-msgid "已连接"
-msgstr ""
-
-#: view/qmodem/connection.js:344
-msgid "已连接时长"
-msgstr ""
-
-#: view/qmodem/network.js:568
-msgid "已选 %d / %d"
-msgstr ""
-
-#: view/qmodem/system.js:470
-msgid "已配置阈值"
-msgstr ""
-
-#: view/qmodem/advanced.js:622
-msgid "已锁定 %d 个频段，共 %d 个可用频段。不勾选任何频段表示解除锁定。"
-msgstr ""
-
-#: view/qmodem/network.js:919
-msgid "已驻网"
-msgstr ""
-
-#: view/qmodem/advanced.js:369
-#: view/qmodem/system.js:244
-#: view/qmodem/system.js:277
-msgid "应用"
-msgstr ""
-
-#: view/qmodem/system.js:509
-msgid "应用 LED 设置"
-msgstr ""
-
-#: view/qmodem/advanced.js:894
-msgid "应用 PCIe 控制器"
-msgstr ""
-
-#: view/qmodem/advanced.js:905
-msgid "应用 PHY 档位"
-msgstr ""
-
-#: view/qmodem/system.js:516
-msgid "应用 SIM 启用"
-msgstr ""
-
-#: view/qmodem/advanced.js:917
-msgid "应用 SIM 热插拔"
-msgstr ""
-
-#: view/qmodem/advanced.js:882
-msgid "应用 USB 模式"
-msgstr ""
-
-#: view/qmodem/advanced.js:930
-msgid "应用热保护设置"
-msgstr ""
-
-#: view/qmodem/advanced.js:585
-#: view/qmodem/network.js:528
-msgid "应用网络优选"
-msgstr ""
-
-#: view/qmodem/advanced.js:655
-#: view/qmodem/network.js:589
-msgid "应用锁定"
-msgstr ""
-
-#: view/qmodem/advanced.js:643
-#: view/qmodem/network.js:582
-msgid "应用频段锁定"
-msgstr ""
-
-#: view/qmodem/system.js:258
-#: view/qmodem/system.js:259
-#: view/qmodem/system.js:375
-msgid "开启"
-msgstr ""
-
-#: view/qmodem/network.js:762
-msgid "开始扫描"
-msgstr ""
-
-#: view/qmodem/connection.js:547
-msgid "开始拨号"
-msgstr ""
-
-#: view/qmodem/system.js:286
-msgid "当前 IMEI"
-msgstr ""
-
-#: view/qmodem/system.js:219
-msgid "当前 PIN"
-msgstr ""
-
-#: view/qmodem/system.js:521
-msgid "当前 SIM 卡槽"
-msgstr ""
-
-#: view/qmodem/system.js:481
-msgid "当前 SIM 状态"
-msgstr ""
-
-#: view/qmodem/network.js:515
-msgid "当前优选"
-msgstr ""
-
-#: view/qmodem/advanced.js:532
-#: view/qmodem/network.js:483
-msgid "当前模式"
-msgstr ""
-
-#: view/qmodem/network.js:446
-msgid "当前活跃"
-msgstr ""
-
-#: view/qmodem/system.js:468
-msgid "当前温度"
-msgstr ""
-
-#: view/qmodem/network.js:600
-msgid "当前锁定 %d 个："
-msgstr ""
-
-#: view/qmodem/network.js:927
-msgid "当前频段"
-msgstr ""
-
-#: view/qmodem/advanced.js:140
-#: view/qmodem/advanced.js:141
-msgid "当前频段/载波聚合"
-msgstr ""
-
-#: view/qmodem/network.js:698
-msgid "当前频段与载波聚合（%d 个载波）"
-msgstr ""
-
-#: view/qmodem/advanced.js:527
-#: view/qmodem/network.js:478
-msgid "当前：%s"
-msgstr ""
-
-#: view/qmodem/system.js:312
-#: view/qmodem/system.js:320
-#: view/qmodem/system.js:549
-msgid "恢复出厂设置"
-msgstr ""
-
-#: view/qmodem/system.js:316
-msgid "恢复出厂设置失败：%s"
-msgstr ""
-
-#: view/qmodem/system.js:499
-msgid "恢复射频失败：%s"
-msgstr ""
-
-#: view/qmodem/system.js:306
-msgid "恢复模组出厂设置"
-msgstr ""
-
-#: view/qmodem/system.js:505
-msgid "恢复移动射频"
-msgstr ""
-
-#: view/qmodem/system.js:495
-msgid "恢复移动网络注册与数据服务？"
+#: view/qmodem/network.js:679
+msgid "制式"
 msgstr ""
 
 #: view/qmodem/system.js:447
-msgid "手机号码"
+msgid "制造商"
 msgstr ""
 
-#: view/qmodem/network.js:766
-msgid "扫描会占用模组资源并可能持续较长时间，期间移动数据可能受影响。"
+#: view/qmodem/status.js:1059
+msgid "刷新"
 msgstr ""
 
-#: view/qmodem/network.js:779
-msgid "扫描失败：%s"
+#: view/qmodem/advanced.js:754
+msgid "刷新检测"
 msgstr ""
 
-#: view/qmodem/network.js:799
-msgid "扫描结果（%d 行）"
+#: view/qmodem/advanced.js:414
+#: view/qmodem/advanced.js:953
+#: view/qmodem/network.js:976
+msgid "刷新状态"
 msgstr ""
 
-#: view/qmodem/system.js:566
-msgid "技术细节（QModem 原始 JSON）"
+#: view/qmodem/system.js:346
+msgid "刷新页面"
 msgstr ""
 
-#: view/qmodem/advanced.js:960
-#: view/qmodem/network.js:994
-msgid "技术细节（QModem 原始数据）"
+#: view/qmodem/connection.js:535
+msgid "动态数据通路拓扑"
 msgstr ""
 
-#: view/qmodem/advanced.js:417
-msgid "把本插件内置的模组定义写入 QModem 支持库，用于识别新收录的型号。写入前自动备份。"
+#: view/qmodem/system.js:174
+msgid "单卡槽架构"
 msgstr ""
 
-#: view/qmodem/connection.js:252
-msgid "拨号中断 · 离线中"
+#: view/qmodem/status.js:593
+msgid "单载波"
 msgstr ""
 
-#: view/qmodem/device.js:181
-msgid "拨号使用的 PDP 上下文序号（AT+CGDCONT 的 cid）。"
+#: view/qmodem/status.js:766
+msgid "厂商"
 msgstr ""
 
-#: view/qmodem/connection.js:468
-msgid "拨号模式"
+#: view/qmodem/connection.js:587
+msgid "参数保存后写入 /etc/config/qmodem，点击「重新拨号」即可应用生效。"
 msgstr ""
 
-#: view/qmodem/advanced.js:852
-msgid "拨号模式与驻网制式，使用 QModem 的专用方法下发。"
+#: view/qmodem/network.js:743
+#: view/qmodem/network.js:928
+msgid "参考信号接收功率（RSRP）"
 msgstr ""
 
-#: view/qmodem/advanced.js:130
-msgid "拨号模式切换"
+#: view/qmodem/network.js:744
+#: view/qmodem/network.js:929
+msgid "参考信号接收质量（RSRQ）"
 msgstr ""
 
-#: view/qmodem/advanced.js:129
-msgid "拨号模式读取"
+#: view/qmodem/status.js:593
+msgid "双连接"
 msgstr ""
 
-#: view/qmodem/advanced.js:143
-#: view/qmodem/connection.js:353
-msgid "拨号状态"
+#: view/qmodem/network.js:769
+#: view/qmodem/system.js:229
+#: view/qmodem/system.js:266
+#: view/qmodem/system.js:289
+#: view/qmodem/system.js:310
+msgid "取消"
 msgstr ""
 
-#: view/qmodem/connection.js:579
-msgid "拨号设置 (APN)"
+#: view/qmodem/system.js:494
+#: view/qmodem/system.js:505
+msgid "变更射频功能"
 msgstr ""
 
-#: view/qmodem/connection.js:673
-msgid "拨号设置渲染失败："
+#: view/qmodem/network.js:885
+msgid "可用 %d"
 msgstr ""
 
-#: view/qmodem/system.js:252
-msgid "持续功耗上限"
+#: view/qmodem/device.js:187
+msgid "可用拨号模式"
 msgstr ""
 
-#: view/qmodem/system.js:253
-msgid "持续限制恢复"
+#: view/qmodem/advanced.js:409
+msgid "同步支持库"
 msgstr ""
 
-#: view/qmodem/connection.js:552
-msgid "挂断移动数据"
+#: view/qmodem/advanced.js:438
+msgid "同步支持库失败：%s"
 msgstr ""
 
-#: view/qmodem/connection.js:558
-msgid "挂断连接"
+#: view/qmodem/advanced.js:431
+msgid "同步未生效：%s"
 msgstr ""
 
-#: view/qmodem/status.js:794
-msgid "接入技术"
+#: view/qmodem/connection.js:477
+msgid "后置路由"
 msgstr ""
 
-#: view/qmodem/status.js:795
-msgid "接入点"
+#: view/qmodem/advanced.js:892
+#: view/qmodem/advanced.js:915
+msgid "启用"
 msgstr ""
 
-#: view/qmodem/status.js:1045
-msgid "接口:"
+#: view/qmodem/system.js:212
+msgid "启用 PIN 锁"
 msgstr ""
 
-#: view/qmodem/connection.js:342
-#: view/qmodem/connection.js:469
-msgid "接口协议"
+#: view/qmodem/system.js:527
+msgid "启用物理 SIM 卡以进行网络注册？"
 msgstr ""
 
-#: view/qmodem/connection.js:343
-msgid "接口状态"
+#: view/qmodem/status.js:940
+msgid "启用自动清零"
 msgstr ""
 
-#: view/qmodem/status.js:864
-msgid "接口计数器 %s"
+#: view/qmodem/device.js:166
+msgid "启用该模组"
 msgstr ""
 
-#: view/qmodem/system.js:227
-msgid "操作类型"
+#: view/qmodem/status.js:768
+msgid "固件"
 msgstr ""
 
-#: view/qmodem/advanced.js:455
-#: view/qmodem/advanced.js:456
-#: view/qmodem/network.js:706
-#: view/qmodem/system.js:460
-msgid "支持"
+#: view/qmodem/network.js:634
+msgid "固件报告频段锁定已禁用，但底层 set_lockband 方法仍可调用。"
 msgstr ""
 
-#: view/qmodem/system.js:173
-msgid "支持双槽切换"
+#: view/qmodem/system.js:448
+msgid "固件版本"
 msgstr ""
 
-#: view/qmodem/advanced.js:432
-msgid "支持库已是最新，本次未做修改。"
+#: view/qmodem/status.js:1056
+msgid "在线"
 msgstr ""
 
-#: view/qmodem/advanced.js:393
-msgid "支持库路径"
+#: view/qmodem/connection.js:331
+msgid "地址与 DNS"
 msgstr ""
 
-#: view/qmodem/connection.js:466
-msgid "数据通路"
+#: view/qmodem/status.js:767
+#: view/qmodem/system.js:446
+msgid "型号"
 msgstr ""
 
-#: view/qmodem/system.js:287
-msgid "新 IMEI"
+#: view/qmodem/network.js:687
+#: view/qmodem/network.js:948
+msgid "子载波间隔"
 msgstr ""
 
-#: view/qmodem/system.js:217
-msgid "新 PIN"
+#: view/qmodem/status.js:1081
+msgid "完整模组信息"
 msgstr ""
 
-#: view/qmodem/advanced.js:395
-#: view/qmodem/connection.js:646
-msgid "无"
+#: view/qmodem/network.js:917
+msgid "实时监控服务小区物理参数、载波聚合配置及多频段策略。"
 msgstr ""
 
-#: view/qmodem/advanced.js:964
-#: view/qmodem/system.js:570
-msgid "无响应。"
+#: view/qmodem/connection.js:663
+msgid "密码"
 msgstr ""
 
-#: view/qmodem/network.js:432
-msgid "无数据"
+#: view/qmodem/status.js:541
+msgid "射频与信道环境质量"
 msgstr ""
 
-#: view/qmodem/advanced.js:788
-#: view/qmodem/network.js:896
-msgid "无法序列化 QModem 返回数据。"
+#: view/qmodem/status.js:101
+#: view/qmodem/status.js:1075
+msgid "射频与小区"
 msgstr ""
 
-#: view/qmodem/network.js:911
-msgid "无线射频与蜂窝小区"
+#: view/qmodem/status.js:641
+msgid "射频与小区详情"
 msgstr ""
 
-#: view/qmodem/network.js:951
-msgid "无线状态"
+#: view/qmodem/advanced.js:645
+#: view/qmodem/network.js:584
+msgid "将 %s 锁定到频段 %s？移动数据会短暂中断。"
 msgstr ""
 
-#: view/qmodem/advanced.js:851
-#: view/qmodem/network.js:978
-msgid "无线策略"
+#: view/qmodem/advanced.js:577
+#: view/qmodem/network.js:526
+msgid "将允许驻网的制式设置为 %s？移动数据会短暂中断。"
+msgstr ""
+
+#: view/qmodem/advanced.js:519
+#: view/qmodem/network.js:476
+msgid "将模组拨号模式切换为 %s？切换过程中移动数据会短暂中断。"
+msgstr ""
+
+#: view/qmodem/system.js:561
+msgid "将重启模组并短暂中断移动连接。"
+msgstr ""
+
+#: view/qmodem/network.js:946
+msgid "小区 ID"
+msgstr ""
+
+#: view/qmodem/status.js:943
+msgid "小时"
+msgstr ""
+
+#: view/qmodem/advanced.js:700
+msgid "尚未下发命令。"
+msgstr ""
+
+#: view/qmodem/status.js:789
+#: view/qmodem/system.js:14
+#: view/qmodem/system.js:15
+msgid "就绪"
+msgstr ""
+
+#: view/qmodem/connection.js:443
+msgid "展开以读取拨号日志。"
+msgstr ""
+
+#: view/qmodem/device.js:252
+msgid "展示 UCI 配置节、QModem 守护进程与硬件设备节点之间的同步流向。"
+msgstr ""
+
+#: view/qmodem/status.js:401
+msgid "差"
+msgstr ""
+
+#: view/qmodem/system.js:383
+msgid "已停用"
+msgstr ""
+
+#: view/qmodem/advanced.js:396
+msgid "已入库"
+msgstr ""
+
+#: view/qmodem/advanced.js:429
+msgid "已写入支持库：%s。请重启 QModem 或重启设备生效。"
+msgstr ""
+
+#: view/qmodem/status.js:654
+msgid "已分配地址"
+msgstr ""
+
+#: view/qmodem/connection.js:344
+msgid "已启动 (UP)"
+msgstr ""
+
+#: view/qmodem/system.js:383
+msgid "已启用"
+msgstr ""
+
+#: view/qmodem/connection.js:550
+msgid "已开始拨号。"
+msgstr ""
+
+#: view/qmodem/status.js:656
+msgid "已断开"
+msgstr ""
+
+#: view/qmodem/status.js:866
+msgid "已更新"
+msgstr ""
+
+#: view/qmodem/status.js:656
+msgid "已激活"
+msgstr ""
+
+#: view/qmodem/advanced.js:336
+msgid "已读取当前值：%s"
+msgstr ""
+
+#: view/qmodem/connection.js:335
+#: view/qmodem/connection.js:504
+#: view/qmodem/status.js:660
+#: view/qmodem/status.js:664
+#: view/qmodem/status.js:1056
+msgid "已连接"
+msgstr ""
+
+#: view/qmodem/connection.js:345
+msgid "已连接时长"
+msgstr ""
+
+#: view/qmodem/network.js:569
+msgid "已选 %d / %d"
 msgstr ""
 
 #: view/qmodem/system.js:480
-msgid "日常 SIM 与射频控制，经由 QModem ubus 接口执行。"
+msgid "已配置阈值"
+msgstr ""
+
+#: view/qmodem/advanced.js:623
+msgid "已锁定 %d 个频段，共 %d 个可用频段。不勾选任何频段表示解除锁定。"
+msgstr ""
+
+#: view/qmodem/network.js:922
+msgid "已驻网"
+msgstr ""
+
+#: view/qmodem/advanced.js:370
+#: view/qmodem/system.js:245
+#: view/qmodem/system.js:278
+msgid "应用"
+msgstr ""
+
+#: view/qmodem/system.js:519
+msgid "应用 LED 设置"
+msgstr ""
+
+#: view/qmodem/advanced.js:896
+msgid "应用 PCIe 控制器"
+msgstr ""
+
+#: view/qmodem/advanced.js:907
+msgid "应用 PHY 档位"
+msgstr ""
+
+#: view/qmodem/system.js:526
+msgid "应用 SIM 启用"
+msgstr ""
+
+#: view/qmodem/advanced.js:919
+msgid "应用 SIM 热插拔"
+msgstr ""
+
+#: view/qmodem/advanced.js:884
+msgid "应用 USB 模式"
 msgstr ""
 
 #: view/qmodem/advanced.js:932
-msgid "日常使用请保持热保护开启。当前模组温度：%s"
+msgid "应用热保护设置"
 msgstr ""
 
-#: view/qmodem/status.js:814
-msgid "暂无历史数据。"
+#: view/qmodem/advanced.js:586
+#: view/qmodem/network.js:529
+msgid "应用网络优选"
 msgstr ""
 
-#: view/qmodem/connection.js:360
-msgid "暂无拨号状态数据"
+#: view/qmodem/advanced.js:656
+#: view/qmodem/network.js:590
+msgid "应用锁定"
 msgstr ""
 
-#: view/qmodem/status.js:395
-msgid "暂无数据"
+#: view/qmodem/advanced.js:644
+#: view/qmodem/network.js:583
+msgid "应用频段锁定"
 msgstr ""
 
-#: view/qmodem/connection.js:448
-msgid "最近拨号日志"
+#: view/qmodem/system.js:259
+#: view/qmodem/system.js:260
+#: view/qmodem/system.js:382
+msgid "开启"
 msgstr ""
 
-#: view/qmodem/network.js:935
-msgid "服务小区"
+#: view/qmodem/network.js:763
+msgid "开始扫描"
 msgstr ""
 
-#: view/qmodem/status.js:661
-#: view/qmodem/status.js:665
-msgid "未分配"
+#: view/qmodem/connection.js:553
+msgid "开始拨号"
+msgstr ""
+
+#: view/qmodem/system.js:287
+msgid "当前 IMEI"
+msgstr ""
+
+#: view/qmodem/system.js:220
+msgid "当前 PIN"
+msgstr ""
+
+#: view/qmodem/system.js:531
+msgid "当前 SIM 卡槽"
+msgstr ""
+
+#: view/qmodem/system.js:491
+msgid "当前 SIM 状态"
+msgstr ""
+
+#: view/qmodem/network.js:516
+msgid "当前优选"
+msgstr ""
+
+#: view/qmodem/advanced.js:533
+#: view/qmodem/network.js:484
+msgid "当前模式"
+msgstr ""
+
+#: view/qmodem/network.js:447
+msgid "当前活跃"
+msgstr ""
+
+#: view/qmodem/system.js:478
+msgid "当前温度"
+msgstr ""
+
+#: view/qmodem/network.js:601
+msgid "当前锁定 %d 个："
+msgstr ""
+
+#: view/qmodem/network.js:931
+msgid "当前频段"
+msgstr ""
+
+#: view/qmodem/advanced.js:141
+#: view/qmodem/advanced.js:142
+msgid "当前频段/载波聚合"
+msgstr ""
+
+#: view/qmodem/network.js:699
+msgid "当前频段与载波聚合（%d 个载波）"
+msgstr ""
+
+#: view/qmodem/advanced.js:528
+#: view/qmodem/network.js:479
+msgid "当前：%s"
+msgstr ""
+
+#: view/qmodem/system.js:313
+#: view/qmodem/system.js:321
+#: view/qmodem/system.js:559
+msgid "恢复出厂设置"
+msgstr ""
+
+#: view/qmodem/system.js:317
+msgid "恢复出厂设置失败：%s"
+msgstr ""
+
+#: view/qmodem/system.js:509
+msgid "恢复射频失败：%s"
+msgstr ""
+
+#: view/qmodem/system.js:307
+msgid "恢复模组出厂设置"
+msgstr ""
+
+#: view/qmodem/system.js:515
+msgid "恢复移动射频"
+msgstr ""
+
+#: view/qmodem/system.js:505
+msgid "恢复移动网络注册与数据服务？"
+msgstr ""
+
+#: view/qmodem/system.js:457
+msgid "手机号码"
+msgstr ""
+
+#: view/qmodem/network.js:767
+msgid "扫描会占用模组资源并可能持续较长时间，期间移动数据可能受影响。"
+msgstr ""
+
+#: view/qmodem/network.js:780
+msgid "扫描失败：%s"
+msgstr ""
+
+#: view/qmodem/network.js:800
+msgid "扫描结果（%d 行）"
+msgstr ""
+
+#: view/qmodem/system.js:576
+msgid "技术细节（QModem 原始 JSON）"
+msgstr ""
+
+#: view/qmodem/advanced.js:962
+#: view/qmodem/network.js:998
+msgid "技术细节（QModem 原始数据）"
+msgstr ""
+
+#: view/qmodem/advanced.js:418
+msgid "把本插件内置的模组定义写入 QModem 支持库，用于识别新收录的型号。写入前自动备份。"
+msgstr ""
+
+#: view/qmodem/connection.js:253
+msgid "拨号中断 · 离线中"
+msgstr ""
+
+#: view/qmodem/device.js:184
+msgid "拨号使用的 PDP 上下文序号（AT+CGDCONT 的 cid）。"
+msgstr ""
+
+#: view/qmodem/connection.js:471
+msgid "拨号模式"
+msgstr ""
+
+#: view/qmodem/advanced.js:854
+msgid "拨号模式与驻网制式，使用 QModem 的专用方法下发。"
+msgstr ""
+
+#: view/qmodem/advanced.js:131
+msgid "拨号模式切换"
+msgstr ""
+
+#: view/qmodem/advanced.js:130
+msgid "拨号模式读取"
+msgstr ""
+
+#: view/qmodem/advanced.js:144
+#: view/qmodem/connection.js:354
+msgid "拨号状态"
+msgstr ""
+
+#: view/qmodem/connection.js:585
+msgid "拨号设置 (APN)"
+msgstr ""
+
+#: view/qmodem/connection.js:679
+msgid "拨号设置渲染失败："
+msgstr ""
+
+#: view/qmodem/system.js:253
+msgid "持续功耗上限"
+msgstr ""
+
+#: view/qmodem/system.js:254
+msgid "持续限制恢复"
+msgstr ""
+
+#: view/qmodem/connection.js:558
+msgid "挂断移动数据"
+msgstr ""
+
+#: view/qmodem/connection.js:564
+msgid "挂断连接"
+msgstr ""
+
+#: view/qmodem/status.js:793
+msgid "接入技术"
+msgstr ""
+
+#: view/qmodem/status.js:794
+msgid "接入点"
+msgstr ""
+
+#: view/qmodem/status.js:1047
+msgid "接口:"
 msgstr ""
 
 #: view/qmodem/connection.js:343
+#: view/qmodem/connection.js:472
+msgid "接口协议"
+msgstr ""
+
+#: view/qmodem/connection.js:344
+msgid "接口状态"
+msgstr ""
+
+#: view/qmodem/status.js:863
+msgid "接口计数器 %s"
+msgstr ""
+
+#: view/qmodem/system.js:228
+msgid "操作类型"
+msgstr ""
+
+#: view/qmodem/advanced.js:456
+#: view/qmodem/advanced.js:457
+#: view/qmodem/network.js:707
+#: view/qmodem/system.js:470
+msgid "支持"
+msgstr ""
+
+#: view/qmodem/system.js:174
+msgid "支持双槽切换"
+msgstr ""
+
+#: view/qmodem/advanced.js:433
+msgid "支持库已是最新，本次未做修改。"
+msgstr ""
+
+#: view/qmodem/advanced.js:394
+msgid "支持库路径"
+msgstr ""
+
+#: view/qmodem/connection.js:469
+msgid "数据通路"
+msgstr ""
+
+#: view/qmodem/system.js:288
+msgid "新 IMEI"
+msgstr ""
+
+#: view/qmodem/system.js:218
+msgid "新 PIN"
+msgstr ""
+
+#: view/qmodem/advanced.js:396
+#: view/qmodem/connection.js:652
+msgid "无"
+msgstr ""
+
+#: view/qmodem/advanced.js:966
+#: view/qmodem/system.js:580
+msgid "无响应。"
+msgstr ""
+
+#: view/qmodem/network.js:433
+msgid "无数据"
+msgstr ""
+
+#: view/qmodem/advanced.js:789
+#: view/qmodem/network.js:897
+msgid "无法序列化 QModem 返回数据。"
+msgstr ""
+
+#: view/qmodem/network.js:912
+msgid "无线射频与蜂窝小区"
+msgstr ""
+
+#: view/qmodem/network.js:955
+msgid "无线状态"
+msgstr ""
+
+#: view/qmodem/advanced.js:853
+#: view/qmodem/network.js:982
+msgid "无线策略"
+msgstr ""
+
+#: view/qmodem/system.js:490
+msgid "日常 SIM 与射频控制，经由 QModem ubus 接口执行。"
+msgstr ""
+
+#: view/qmodem/advanced.js:934
+msgid "日常使用请保持热保护开启。当前模组温度：%s"
+msgstr ""
+
+#: view/qmodem/status.js:813
+msgid "暂无历史数据。"
+msgstr ""
+
+#: view/qmodem/connection.js:361
+msgid "暂无拨号状态数据"
+msgstr ""
+
+#: view/qmodem/status.js:394
+msgid "暂无数据"
+msgstr ""
+
+#: view/qmodem/connection.js:451
+msgid "最近拨号日志"
+msgstr ""
+
+#: view/qmodem/network.js:939
+msgid "服务小区"
+msgstr ""
+
+#: view/qmodem/status.js:660
+#: view/qmodem/status.js:664
+msgid "未分配"
+msgstr ""
+
+#: view/qmodem/connection.js:344
 msgid "未启动 (DOWN)"
 msgstr ""
 
-#: view/qmodem/advanced.js:388
+#: view/qmodem/advanced.js:389
 msgid "未检测到 QModem 的模组支持库（%s）。请确认已安装 QModem。"
 msgstr ""
 
-#: view/qmodem/system.js:19
-#: view/qmodem/system.js:21
+#: view/qmodem/system.js:20
+#: view/qmodem/system.js:22
 msgid "未检测到 SIM 卡"
 msgstr ""
 
-#: view/qmodem/advanced.js:755
-#: view/qmodem/connection.js:419
-#: view/qmodem/device.js:150
-#: view/qmodem/network.js:824
-#: view/qmodem/system.js:341
+#: view/qmodem/status.js:997
+msgid "未检测到可用移动模组"
+msgstr ""
+
+#: view/qmodem/advanced.js:751
+#: view/qmodem/connection.js:420
+#: view/qmodem/device.js:153
+#: view/qmodem/network.js:825
+#: view/qmodem/system.js:343
+msgid "未检测到模组"
+msgstr ""
+
 #: view/qmodem/terminal.js:136
 #: view/qmodem/terminal.js:225
 msgid "未检测到模组（请确认 QModem 已识别该设备）。"
 msgstr ""
 
-#: view/qmodem/status.js:790
+#: view/qmodem/status.js:789
 msgid "未知"
 msgstr ""
 
-#: view/qmodem/connection.js:334
-#: view/qmodem/connection.js:499
+#: view/qmodem/connection.js:335
+#: view/qmodem/connection.js:504
 msgid "未连接"
 msgstr ""
 
-#: view/qmodem/network.js:882
-#: view/qmodem/network.js:956
+#: view/qmodem/network.js:883
+#: view/qmodem/network.js:960
 msgid "未锁定"
 msgstr ""
 
-#: view/qmodem/network.js:601
+#: view/qmodem/network.js:602
 msgid "未锁定，模组可自由驻网到该类别全部可用频段。"
 msgstr ""
 
-#: view/qmodem/network.js:919
+#: view/qmodem/network.js:922
 msgid "未驻网"
 msgstr ""
 
-#: view/qmodem/system.js:264
+#: view/qmodem/system.js:265
 msgid "本地存储温度日志"
 msgstr ""
 
-#: view/qmodem/advanced.js:320
+#: view/qmodem/advanced.js:321
 msgid "本模组经 QModem 不支持 AT 透传命令 %s：%s"
 msgstr ""
 
-#: view/qmodem/advanced.js:473
+#: view/qmodem/advanced.js:474
 msgid "本模组经 QModem 不支持该重启方式。"
 msgstr ""
 
-#: view/qmodem/advanced.js:501
+#: view/qmodem/advanced.js:502
 msgid "本模组经 QModem 已禁用拨号模式切换。"
 msgstr ""
 
-#: view/qmodem/advanced.js:541
+#: view/qmodem/advanced.js:542
 msgid "本模组经 QModem 已禁用网络优选。"
 msgstr ""
 
-#: view/qmodem/advanced.js:669
+#: view/qmodem/advanced.js:670
 msgid "本模组经 QModem 已禁用频段锁定。"
 msgstr ""
 
-#: view/qmodem/connection.js:470
+#: view/qmodem/connection.js:473
 msgid "本模组经 QModem 暂以 QModem 网络配置为准。"
 msgstr ""
 
-#: view/qmodem/advanced.js:684
-#: view/qmodem/network.js:651
+#: view/qmodem/advanced.js:685
+#: view/qmodem/network.js:652
 msgid "本模组经 QModem 暂无可用的锁频段数据。"
 msgstr ""
 
-#: view/qmodem/connection.js:387
+#: view/qmodem/connection.js:388
 msgid "本模组经 QModem 暂无拨号日志。"
 msgstr ""
 
-#: view/qmodem/network.js:712
+#: view/qmodem/network.js:713
 msgid "本模组经 QModem 暂无载波聚合数据。"
 msgstr ""
 
-#: view/qmodem/network.js:755
+#: view/qmodem/network.js:756
 msgid "本模组经 QModem 暂无邻区数据。"
 msgstr ""
 
-#: view/qmodem/advanced.js:494
+#: view/qmodem/advanced.js:495
 msgid "本模组经 QModem 未上报任何可用的重启方式。"
 msgstr ""
 
-#: view/qmodem/advanced.js:534
-#: view/qmodem/network.js:485
+#: view/qmodem/advanced.js:535
+#: view/qmodem/network.js:486
 msgid "本模组经 QModem 未上报可用的网络模式。"
 msgstr ""
 
-#: view/qmodem/advanced.js:601
-#: view/qmodem/network.js:543
+#: view/qmodem/advanced.js:602
+#: view/qmodem/network.js:544
 msgid "本模组经 QModem 未上报该类别的可用频段。"
 msgstr ""
 
-#: view/qmodem/advanced.js:943
+#: view/qmodem/advanced.js:945
 msgid "查看模组设备参数，或直接向模组发送 AT 命令。"
 msgstr ""
 
-#: view/qmodem/system.js:548
+#: view/qmodem/system.js:558
 msgid "标识实验室"
 msgstr ""
 
-#: view/qmodem/advanced.js:866
+#: view/qmodem/advanced.js:868
 msgid "模块专有硬件设置（AT 透传）"
 msgstr ""
 
-#: view/qmodem/status.js:1044
+#: view/qmodem/status.js:1046
 msgid "模式:"
 msgstr ""
 
-#: view/qmodem/status.js:99
-#: view/qmodem/status.js:194
-#: view/qmodem/status.js:760
-#: view/qmodem/status.js:764
-#: view/qmodem/system.js:354
+#: view/qmodem/status.js:100
+#: view/qmodem/status.js:195
+#: view/qmodem/status.js:759
+#: view/qmodem/status.js:763
+#: view/qmodem/system.js:361
 msgid "模组"
 msgstr ""
 
-#: view/qmodem/system.js:199
+#: view/qmodem/system.js:200
 msgid "模组不支持通过 QModem 执行 AT 透传指令 %s：%s"
 msgstr ""
 
-#: view/qmodem/status.js:1080
+#: view/qmodem/status.js:1076
 msgid "模组与 SIM"
 msgstr ""
 
-#: view/qmodem/advanced.js:888
+#: view/qmodem/advanced.js:890
 msgid "模组侧 PCIe 以太网数据通路开关。"
 msgstr ""
 
-#: view/qmodem/connection.js:472
+#: view/qmodem/connection.js:475
 msgid "模组侧入站转发。"
 msgstr ""
 
-#: view/qmodem/system.js:62
-#: view/qmodem/system.js:434
+#: view/qmodem/system.js:63
+#: view/qmodem/system.js:444
 msgid "模组信息"
 msgstr ""
 
-#: view/qmodem/advanced.js:923
+#: view/qmodem/advanced.js:925
 msgid "模组内置温度保护的轮询开关与周期。"
 msgstr ""
 
-#: view/qmodem/device.js:168
+#: view/qmodem/device.js:171
 msgid "模组名称 / 网络接口"
 msgstr ""
 
-#: view/qmodem/status.js:1038
+#: view/qmodem/status.js:1040
 msgid "模组在线，但移动数据会话已断开。"
 msgstr ""
 
-#: view/qmodem/system.js:424
+#: view/qmodem/system.js:434
 msgid "模组基带与卡槽架构拓扑"
 msgstr ""
 
-#: view/qmodem/advanced.js:872
+#: view/qmodem/advanced.js:874
 msgid "模组对主机呈现的 USB 网络驱动档位。"
 msgstr ""
 
-#: view/qmodem/advanced.js:500
+#: view/qmodem/advanced.js:501
 msgid "模组对外呈现的拨号模式。"
 msgstr ""
 
-#: view/qmodem/advanced.js:531
-#: view/qmodem/network.js:482
+#: view/qmodem/advanced.js:532
+#: view/qmodem/network.js:483
 msgid "模组对外呈现的拨号模式（由 QModem get_mode / set_mode 提供）。"
 msgstr ""
 
-#: view/qmodem/advanced.js:489
+#: view/qmodem/advanced.js:490
 msgid "模组将执行软复位并重新注册网络，移动数据会中断约 30 秒。"
 msgstr ""
 
-#: view/qmodem/advanced.js:491
+#: view/qmodem/advanced.js:492
 msgid "模组将断电复位。可能同时影响 PCIe/USB 链路。"
 msgstr ""
 
-#: view/qmodem/system.js:312
+#: view/qmodem/system.js:313
 msgid "模组将重置自身配置并重启。"
 msgstr ""
 
-#: view/qmodem/advanced.js:316
+#: view/qmodem/advanced.js:317
 msgid "模组已接受该命令。"
 msgstr ""
 
-#: view/qmodem/system.js:196
+#: view/qmodem/system.js:197
 msgid "模组已接受该指令。"
 msgstr ""
 
-#: view/qmodem/advanced.js:313
+#: view/qmodem/advanced.js:314
 msgid "模组拒绝了 AT 透传命令 %s：%s"
 msgstr ""
 
-#: view/qmodem/system.js:193
+#: view/qmodem/system.js:194
 msgid "模组拒绝了 AT 透传指令 %s：%s"
 msgstr ""
 
-#: view/qmodem/advanced.js:416
-#: view/qmodem/advanced.js:758
-#: view/qmodem/advanced.js:828
+#: view/qmodem/advanced.js:417
+#: view/qmodem/advanced.js:759
+#: view/qmodem/advanced.js:830
 msgid "模组支持库"
 msgstr ""
 
-#: view/qmodem/status.js:1036
+#: view/qmodem/status.js:1038
 msgid "模组未响应，请检查模组连接。"
 msgstr ""
 
-#: view/qmodem/advanced.js:712
+#: view/qmodem/advanced.js:713
 msgid "模组未返回内容。"
 msgstr ""
 
-#: view/qmodem/advanced.js:338
+#: view/qmodem/advanced.js:339
 msgid "模组未返回可识别的当前值（%s）：%s"
 msgstr ""
 
-#: view/qmodem/network.js:797
+#: view/qmodem/network.js:798
 msgid "模组未返回扫描数据。"
 msgstr ""
 
-#: view/qmodem/system.js:415
-#: view/qmodem/system.js:461
+#: view/qmodem/system.js:423
+#: view/qmodem/system.js:471
 msgid "模组温度"
 msgstr ""
 
-#: view/qmodem/system.js:508
-#: view/qmodem/system.js:510
+#: view/qmodem/system.js:518
+#: view/qmodem/system.js:520
 msgid "模组状态 LED"
 msgstr ""
 
-#: view/qmodem/system.js:407
+#: view/qmodem/system.js:414
 msgid "模组系统与 SIM 卡"
 msgstr ""
 
-#: view/qmodem/advanced.js:452
+#: view/qmodem/advanced.js:453
 msgid "模组能力"
 msgstr ""
 
-#: view/qmodem/advanced.js:751
-msgid "模组能力、重启与无线策略，全部经 QModem 的 qmodem ubus 下发。"
-msgstr ""
-
-#: view/qmodem/advanced.js:839
+#: view/qmodem/advanced.js:841
 msgid "模组能力与维护"
 msgstr ""
 
-#: view/qmodem/device.js:256
+#: view/qmodem/device.js:262
 msgid "模组设备配置"
 msgstr ""
 
-#: view/qmodem/status.js:1080
+#: view/qmodem/status.js:1076
 msgid "模组身份、SIM 信息与维护"
 msgstr ""
 
-#: view/qmodem/advanced.js:485
+#: view/qmodem/advanced.js:486
 msgid "模组重启"
 msgstr ""
 
-#: view/qmodem/system.js:553
+#: view/qmodem/system.js:563
 msgid "模组重启失败：%s"
 msgstr ""
 
-#: view/qmodem/system.js:543
+#: view/qmodem/system.js:553
 msgid "模组防护、恢复与通信排障工具。"
 msgstr ""
 
-#: view/qmodem/connection.js:366
+#: view/qmodem/connection.js:367
 msgid "正在下发连接操作…"
 msgstr ""
 
-#: view/qmodem/advanced.js:710
+#: view/qmodem/advanced.js:711
 msgid "正在下发，请稍候…"
 msgstr ""
 
-#: view/qmodem/network.js:774
+#: view/qmodem/network.js:775
 msgid "正在扫描，请稍候…"
 msgstr ""
 
-#: view/qmodem/connection.js:382
+#: view/qmodem/connection.js:383
 msgid "正在读取拨号日志…"
 msgstr ""
 
-#: view/qmodem/system.js:251
+#: view/qmodem/system.js:252
 msgid "正常工作阈值"
 msgstr ""
 
-#: view/qmodem/advanced.js:907
+#: view/qmodem/advanced.js:909
 msgid "此处选择的是硬件 PHY 档位。"
 msgstr ""
 
-#: view/qmodem/status.js:962
+#: view/qmodem/status.js:961
 msgid "此操作会立即清零该模组的流量计数，并同步清零本机分天流量记录。是否继续？"
 msgstr ""
 
-#: view/qmodem/system.js:268
+#: view/qmodem/system.js:269
 msgid "每个阈值必须是 0–150°C 之间的温度。"
 msgstr ""
 
-#: view/qmodem/status.js:920
+#: view/qmodem/status.js:919
 msgid "每日"
 msgstr ""
 
-#: view/qmodem/status.js:111
+#: view/qmodem/status.js:112
 msgid "每日流量"
 msgstr ""
 
-#: view/qmodem/status.js:919
+#: view/qmodem/status.js:918
 msgid "每月（按日期）"
 msgstr ""
 
-#: view/qmodem/status.js:109
+#: view/qmodem/status.js:110
 msgid "流量清零计划"
 msgstr ""
 
-#: view/qmodem/advanced.js:138
 #: view/qmodem/advanced.js:139
-#: view/qmodem/status.js:104
-#: view/qmodem/status.js:862
+#: view/qmodem/advanced.js:140
+#: view/qmodem/status.js:105
+#: view/qmodem/status.js:861
 msgid "流量统计"
 msgstr ""
 
-#: view/qmodem/status.js:969
+#: view/qmodem/status.js:968
 msgid "流量自动清零"
 msgstr ""
 
-#: view/qmodem/advanced.js:631
-#: view/qmodem/network.js:612
-#: view/qmodem/network.js:620
+#: view/qmodem/advanced.js:632
+#: view/qmodem/network.js:613
+#: view/qmodem/network.js:621
 msgid "清空"
 msgstr ""
 
-#: view/qmodem/status.js:933
+#: view/qmodem/status.js:932
 msgid "清零日（每月）"
 msgstr ""
 
-#: view/qmodem/status.js:942
+#: view/qmodem/status.js:941
 msgid "清零频率"
 msgstr ""
 
-#: view/qmodem/status.js:550
+#: view/qmodem/status.js:549
 msgid "温度"
 msgstr ""
 
-#: view/qmodem/system.js:273
+#: view/qmodem/system.js:274
 msgid "温度日志设置已更新。"
 msgstr ""
 
-#: view/qmodem/advanced.js:145
+#: view/qmodem/advanced.js:146
 msgid "温度读取"
 msgstr ""
 
-#: view/qmodem/network.js:240
+#: view/qmodem/network.js:241
 msgid "点对点协议（PPP）"
 msgstr ""
 
-#: view/qmodem/system.js:260
+#: view/qmodem/system.js:261
 msgid "热保护参数设置"
 msgstr ""
 
-#: view/qmodem/advanced.js:931
+#: view/qmodem/advanced.js:933
 msgid "热保护命令已被接受。"
 msgstr ""
 
-#: view/qmodem/system.js:466
+#: view/qmodem/system.js:476
 msgid "热保护状态"
 msgstr ""
 
-#: view/qmodem/system.js:272
+#: view/qmodem/system.js:273
 msgid "热保护设置已保存。"
 msgstr ""
 
-#: view/qmodem/advanced.js:922
+#: view/qmodem/advanced.js:924
 msgid "热保护轮询"
 msgstr ""
 
-#: view/qmodem/system.js:547
+#: view/qmodem/system.js:557
 msgid "热保护阈值"
 msgstr ""
 
-#: view/qmodem/advanced.js:911
+#: view/qmodem/advanced.js:913
 msgid "物理 SIM 卡插拔检测行为。"
 msgstr ""
 
-#: view/qmodem/network.js:681
-#: view/qmodem/network.js:941
+#: view/qmodem/network.js:682
+#: view/qmodem/network.js:945
 msgid "物理小区标识（PCI）"
 msgstr ""
 
-#: view/qmodem/network.js:745
+#: view/qmodem/network.js:746
 msgid "物理小区标识（PCI）: "
 msgstr ""
 
-#: view/qmodem/system.js:212
+#: view/qmodem/system.js:213
 msgid "用 PUK 解锁"
 msgstr ""
 
-#: view/qmodem/connection.js:652
+#: view/qmodem/connection.js:658
 msgid "用户名"
 msgstr ""
 
-#: view/qmodem/connection.js:466
+#: view/qmodem/connection.js:469
 msgid "由 QModem 上报的模组数据通路信息。"
 msgstr ""
 
-#: view/qmodem/connection.js:332
+#: view/qmodem/connection.js:333
 msgid "由 QModem 上报的逻辑接口地址与协商参数"
 msgstr ""
 
-#: view/qmodem/advanced.js:453
+#: view/qmodem/advanced.js:454
 msgid "由 QModem 的 get_disabled_features / get_reboot_caps 上报。被禁用的特性已隐藏或降级只读。"
 msgstr ""
 
-#: view/qmodem/device.js:235
+#: view/qmodem/device.js:240
 msgid "由 QModem 管理"
 msgstr ""
 
-#: view/qmodem/connection.js:635
-#: view/qmodem/device.js:195
+#: view/qmodem/connection.js:641
+#: view/qmodem/device.js:198
 msgid "留空使用运营商默认值"
 msgstr ""
 
-#: view/qmodem/connection.js:665
+#: view/qmodem/connection.js:671
 msgid "留空则使用移动网络下发的 DNS。"
 msgstr ""
 
-#: view/qmodem/advanced.js:135
+#: view/qmodem/advanced.js:136
 msgid "短信"
 msgstr ""
 
-#: view/qmodem/advanced.js:137
+#: view/qmodem/advanced.js:138
 msgid "短信发送"
 msgstr ""
 
-#: view/qmodem/advanced.js:136
+#: view/qmodem/advanced.js:137
 msgid "短信读取"
 msgstr ""
 
-#: view/qmodem/status.js:762
+#: view/qmodem/status.js:761
 msgid "硬件与固件信息"
 msgstr ""
 
-#: view/qmodem/advanced.js:813
+#: view/qmodem/advanced.js:815
 msgid "硬件总线与数据通路架构"
 msgstr ""
 
-#: view/qmodem/advanced.js:804
+#: view/qmodem/advanced.js:805
 msgid "硬件总线模式、重启能力、驻网策略与底层 AT 透传调试。"
 msgstr ""
 
-#: view/qmodem/system.js:409
+#: view/qmodem/system.js:416
 msgid "硬件标识与订阅卡管理"
 msgstr ""
 
-#: view/qmodem/advanced.js:490
+#: view/qmodem/advanced.js:491
 msgid "硬重启模组"
 msgstr ""
 
-#: view/qmodem/advanced.js:456
+#: view/qmodem/advanced.js:457
 msgid "硬重启（断电复位）"
 msgstr ""
 
-#: view/qmodem/system.js:299
+#: view/qmodem/system.js:300
 msgid "确认修改"
 msgstr ""
 
-#: view/qmodem/network.js:765
+#: view/qmodem/network.js:766
 msgid "确认执行频率扫描"
 msgstr ""
 
-#: view/qmodem/system.js:310
+#: view/qmodem/system.js:311
 msgid "确认文本不匹配。"
 msgstr ""
 
-#: view/qmodem/connection.js:552
+#: view/qmodem/connection.js:558
 msgid "确认现在断开移动数据连接？"
 msgstr ""
 
-#: view/qmodem/advanced.js:890
-#: view/qmodem/advanced.js:913
+#: view/qmodem/advanced.js:892
+#: view/qmodem/advanced.js:915
 msgid "禁用"
 msgstr ""
 
-#: view/qmodem/system.js:211
+#: view/qmodem/system.js:212
 msgid "禁用 PIN 锁"
 msgstr ""
 
-#: view/qmodem/connection.js:287
+#: view/qmodem/connection.js:288
 msgid "离线"
 msgstr ""
 
-#: view/qmodem/status.js:106
-#: view/qmodem/status.js:653
+#: view/qmodem/status.js:107
+#: view/qmodem/status.js:652
 msgid "移动 IP"
 msgstr ""
 
-#: view/qmodem/network.js:938
+#: view/qmodem/network.js:942
 msgid "移动国家码 / 移动网络码（MCC / MNC）"
 msgstr ""
 
-#: view/qmodem/network.js:240
+#: view/qmodem/network.js:241
 msgid "移动宽带接口模型（MBIM）"
 msgstr ""
 
-#: view/qmodem/connection.js:494
-#: view/qmodem/status.js:1078
+#: view/qmodem/connection.js:497
+#: view/qmodem/status.js:1074
 msgid "移动数据"
 msgstr ""
 
-#: view/qmodem/status.js:1034
+#: view/qmodem/status.js:1036
 msgid "移动模组"
 msgstr ""
 
-#: view/qmodem/status.js:631
+#: view/qmodem/status.js:630
 msgid "移动网络"
 msgstr ""
 
-#: view/qmodem/status.js:1037
+#: view/qmodem/status.js:1039
 msgid "移动网络已连接并正常运行。"
 msgstr ""
 
+#: view/qmodem/status.js:959
 #: view/qmodem/status.js:960
-#: view/qmodem/status.js:961
 msgid "立即清零流量统计"
 msgstr ""
 
-#: view/qmodem/system.js:251
+#: view/qmodem/system.js:252
 msgid "第一档功耗降低"
 msgstr ""
 
-#: view/qmodem/system.js:251
+#: view/qmodem/system.js:252
 msgid "第一档恢复"
 msgstr ""
 
-#: view/qmodem/system.js:252
+#: view/qmodem/system.js:253
 msgid "第二档功耗降低"
 msgstr ""
 
-#: view/qmodem/system.js:252
+#: view/qmodem/system.js:253
 msgid "第二档恢复"
 msgstr ""
 
-#: view/qmodem/status.js:50
+#: view/qmodem/status.js:51
 msgid "等待数据"
 msgstr ""
 
-#: view/qmodem/status.js:796
+#: view/qmodem/status.js:795
 msgid "签约速率"
 msgstr ""
 
-#: view/qmodem/system.js:514
+#: view/qmodem/system.js:524
 msgid "管理 SIM PIN"
 msgstr ""
 
-#: view/qmodem/connection.js:495
+#: view/qmodem/connection.js:498
 msgid "管理移动网络连接会话、配置 APN 及拨号策略。"
 msgstr ""
 
-#: view/qmodem/system.js:253
+#: view/qmodem/system.js:254
 msgid "紧急恢复"
 msgstr ""
 
-#: view/qmodem/system.js:253
+#: view/qmodem/system.js:254
 msgid "紧急飞行模式"
 msgstr ""
 
-#: view/qmodem/network.js:788
+#: view/qmodem/network.js:789
 msgid "经 QModem 下发 AT^CELLSCAN 扫描无线频段。"
 msgstr ""
 
-#: view/qmodem/advanced.js:365
+#: view/qmodem/advanced.js:366
 msgid "经 QModem 向模组下发 AT 透传命令 %s？该能力没有通用的 QModem 方法，模组可能拒绝执行。"
 msgstr ""
 
-#: view/qmodem/advanced.js:486
+#: view/qmodem/advanced.js:487
 msgid "经 QModem 的 do_reboot 重启模组。重启期间移动数据会中断，请勿断电。"
 msgstr ""
 
-#: view/qmodem/advanced.js:702
+#: view/qmodem/advanced.js:703
 msgid "经 QModem 的 send_at 向模组下发任意 AT 命令，用于模块私有设置与调试。"
 msgstr ""
 
-#: view/qmodem/network.js:940
+#: view/qmodem/network.js:944
 msgid "绝对射频信道号（EARFCN / ARFCN）"
 msgstr ""
 
-#: view/qmodem/network.js:782
+#: view/qmodem/network.js:783
 msgid "继续"
 msgstr ""
 
-#: view/qmodem/device.js:231
+#: view/qmodem/device.js:234
 msgid "编辑 QModem 配置中当前模组的设备参数（配置节：%s）。"
 msgstr ""
 
-#: view/qmodem/device.js:142
+#: view/qmodem/device.js:143
 msgid "编辑 QModem 配置（/etc/config/qmodem）中当前模组的设备参数。"
 msgstr ""
 
-#: view/qmodem/status.js:107
+#: view/qmodem/status.js:108
 msgid "网络"
 msgstr ""
 
-#: view/qmodem/advanced.js:127
-#: view/qmodem/advanced.js:540
-#: view/qmodem/advanced.js:566
-#: view/qmodem/network.js:512
-#: view/qmodem/network.js:955
+#: view/qmodem/advanced.js:128
+#: view/qmodem/advanced.js:541
+#: view/qmodem/advanced.js:567
+#: view/qmodem/network.js:513
+#: view/qmodem/network.js:959
 msgid "网络优选"
 msgstr ""
 
-#: view/qmodem/advanced.js:128
+#: view/qmodem/advanced.js:129
 msgid "网络优选设置"
 msgstr ""
 
-#: view/qmodem/advanced.js:142
+#: view/qmodem/advanced.js:143
 msgid "网络信息"
 msgstr ""
 
-#: view/qmodem/connection.js:269
-#: view/qmodem/connection.js:467
-#: view/qmodem/connection.js:511
+#: view/qmodem/connection.js:270
+#: view/qmodem/connection.js:470
+#: view/qmodem/connection.js:517
 msgid "网络接口"
 msgstr ""
 
-#: view/qmodem/network.js:239
+#: view/qmodem/network.js:240
 msgid "网络控制模型（NCM）"
 msgstr ""
 
-#: view/qmodem/advanced.js:500
-#: view/qmodem/advanced.js:530
-#: view/qmodem/network.js:481
-#: view/qmodem/network.js:937
-#: view/qmodem/network.js:954
+#: view/qmodem/advanced.js:501
+#: view/qmodem/advanced.js:531
+#: view/qmodem/network.js:482
+#: view/qmodem/network.js:941
+#: view/qmodem/network.js:958
 msgid "网络模式"
 msgstr ""
 
-#: view/qmodem/advanced.js:115
-#: view/qmodem/connection.js:434
-#: view/qmodem/network.js:239
+#: view/qmodem/advanced.js:116
+#: view/qmodem/connection.js:437
+#: view/qmodem/network.js:240
 msgid "自动"
 msgstr ""
 
-#: view/qmodem/connection.js:663
+#: view/qmodem/connection.js:669
 msgid "自定义 DNS"
 msgstr ""
 
-#: view/qmodem/status.js:704
+#: view/qmodem/status.js:703
 msgid "自定义承载"
 msgstr ""
 
-#: view/qmodem/status.js:402
+#: view/qmodem/status.js:401
 msgid "良"
 msgstr ""
 
-#: view/qmodem/network.js:405
+#: view/qmodem/network.js:406
 msgid "良好"
 msgstr ""
 
-#: view/qmodem/advanced.js:645
-#: view/qmodem/network.js:584
+#: view/qmodem/advanced.js:646
+#: view/qmodem/network.js:585
 msgid "解除 %s 的频段锁定？"
 msgstr ""
 
-#: view/qmodem/system.js:270
+#: view/qmodem/system.js:271
 msgid "触发温度须逐级升高，且每个恢复温度必须低于对应触发值。"
 msgstr ""
 
-#: view/qmodem/status.js:788
+#: view/qmodem/status.js:787
 msgid "订阅身份与运营商 QoS"
 msgstr ""
 
-#: view/qmodem/connection.js:645
+#: view/qmodem/connection.js:651
 msgid "认证方式"
 msgstr ""
 
-#: view/qmodem/device.js:141
-#: view/qmodem/device.js:230
+#: view/qmodem/device.js:142
+#: view/qmodem/device.js:233
 msgid "设备参数"
 msgstr ""
 
-#: view/qmodem/device.js:211
+#: view/qmodem/device.js:214
 msgid "设备参数已保存到 QModem 配置（/etc/config/qmodem），请重拨或重启模组使其生效。"
 msgstr ""
 
-#: view/qmodem/advanced.js:946
+#: view/qmodem/advanced.js:948
 msgid "设备参数设置"
 msgstr ""
 
-#: view/qmodem/system.js:284
+#: view/qmodem/system.js:285
 msgid "设备标识实验室"
 msgstr ""
 
-#: view/qmodem/status.js:117
+#: view/qmodem/status.js:118
 msgid "设备速率"
 msgstr ""
 
-#: view/qmodem/status.js:969
+#: view/qmodem/status.js:968
 msgid "设置定时自动清零流量统计，或手动立即清零。"
 msgstr ""
 
-#: view/qmodem/advanced.js:580
+#: view/qmodem/advanced.js:581
 msgid "设置网络优选失败：%s"
 msgstr ""
 
-#: view/qmodem/advanced.js:650
+#: view/qmodem/advanced.js:651
 msgid "设置频段锁定失败：%s"
 msgstr ""
 
-#: view/qmodem/system.js:546
+#: view/qmodem/system.js:556
 msgid "诊断"
 msgstr ""
 
-#: view/qmodem/advanced.js:942
+#: view/qmodem/advanced.js:944
 msgid "诊断与开发者工具"
 msgstr ""
 
-#: view/qmodem/system.js:293
+#: view/qmodem/system.js:294
 msgid "该操作可能导致无法入网，仅在恢复模组标签所印标识时继续。"
 msgstr ""
 
-#: view/qmodem/system.js:307
+#: view/qmodem/system.js:308
 msgid "该操作将清除模组的 APN、射频、SIM、接口和热保护设置并重启模组，不会影响 OpenWrt 设置。"
 msgstr ""
 
-#: view/qmodem/status.js:878
+#: view/qmodem/status.js:877
 msgid "该模组未通过 QModem 上报流量统计。"
 msgstr ""
 
-#: view/qmodem/status.js:1086
+#: view/qmodem/status.js:1082
 msgid "该模组由 QModem 上报的全部字段，按类别分组展示。"
 msgstr ""
 
-#: view/qmodem/advanced.js:362
+#: view/qmodem/advanced.js:363
 msgid "请先选择一个值。"
 msgstr ""
 
-#: view/qmodem/connection.js:366
+#: view/qmodem/status.js:998
+msgid "请检查设备 USB/M.2 接口硬件连接或确认 QModem 服务是否正常运行。"
+msgstr ""
+
+#: view/qmodem/connection.js:421
+#: view/qmodem/device.js:153
+#: view/qmodem/network.js:825
+msgid "请确认 QModem 已接入并识别该设备，然后刷新页面重试。"
+msgstr ""
+
+#: view/qmodem/connection.js:367
 msgid "请稍候…"
 msgstr ""
 
-#: view/qmodem/advanced.js:574
-#: view/qmodem/network.js:523
+#: view/qmodem/advanced.js:575
+#: view/qmodem/network.js:524
 msgid "请至少选择一种网络制式。"
 msgstr ""
 
-#: view/qmodem/advanced.js:709
+#: view/qmodem/advanced.js:710
 msgid "请输入 AT 命令。"
 msgstr ""
 
-#: view/qmodem/system.js:291
+#: view/qmodem/system.js:292
 msgid "请输入一个不同的 15 位 IMEI。"
 msgstr ""
 
-#: view/qmodem/advanced.js:342
+#: view/qmodem/advanced.js:343
 msgid "读取失败（%s）：%s"
 msgstr ""
 
-#: view/qmodem/advanced.js:345
+#: view/qmodem/advanced.js:346
 msgid "读取当前值"
 msgstr ""
 
-#: view/qmodem/advanced.js:391
+#: view/qmodem/advanced.js:392
 msgid "读取支持库失败：%s"
 msgstr ""
 
-#: view/qmodem/status.js:110
+#: view/qmodem/status.js:111
 msgid "调制方式"
 msgstr ""
 
-#: view/qmodem/network.js:943
+#: view/qmodem/network.js:947
 msgid "跟踪区码 / 位置区码（TAC / LAC）"
 msgstr ""
 
-#: view/qmodem/advanced.js:924
+#: view/qmodem/advanced.js:926
 msgid "轮询周期"
 msgstr ""
 
-#: view/qmodem/advanced.js:488
+#: view/qmodem/advanced.js:489
 msgid "软重启模组"
 msgstr ""
 
-#: view/qmodem/advanced.js:455
+#: view/qmodem/advanced.js:456
 msgid "软重启（AT 复位）"
 msgstr ""
 
-#: view/qmodem/network.js:689
 #: view/qmodem/network.js:690
+#: view/qmodem/network.js:691
 msgid "载波"
 msgstr ""
 
-#: view/qmodem/status.js:594
+#: view/qmodem/status.js:593
 msgid "载波聚合中"
 msgstr ""
 
-#: view/qmodem/status.js:105
-#: view/qmodem/status.js:629
+#: view/qmodem/status.js:106
+#: view/qmodem/status.js:628
 msgid "载波聚合状态"
 msgstr ""
 
-#: view/qmodem/network.js:405
+#: view/qmodem/network.js:406
 msgid "较弱"
 msgstr ""
 
-#: view/qmodem/system.js:308
+#: view/qmodem/system.js:309
 msgid "输入 RESET 以确认"
 msgstr ""
 
-#: view/qmodem/system.js:225
+#: view/qmodem/system.js:226
 msgid "输入错误的 PIN 或 PUK 次数过多将永久锁定 SIM 卡，操作前请查阅运营商文档。"
 msgstr ""
 
-#: view/qmodem/network.js:953
-#: view/qmodem/status.js:793
+#: view/qmodem/network.js:957
+#: view/qmodem/status.js:792
 msgid "运营商"
 msgstr ""
 
-#: view/qmodem/system.js:456
+#: view/qmodem/system.js:466
 msgid "运行状态"
 msgstr ""
 
-#: view/qmodem/device.js:275
+#: view/qmodem/device.js:281
 msgid "返回模组与 SIM"
 msgstr ""
 
-#: view/qmodem/device.js:279
+#: view/qmodem/device.js:285
 msgid "返回高级设置"
 msgstr ""
 
-#: view/qmodem/device.js:258
+#: view/qmodem/device.js:264
 msgid "这些选项写入 /etc/config/qmodem 的 modem-device 配置节。除非自动识别有误，否则无需修改 AT 端口与拨号模式。"
 msgstr ""
 
-#: view/qmodem/system.js:492
+#: view/qmodem/system.js:502
 msgid "进入飞行模式"
 msgstr ""
 
-#: view/qmodem/network.js:239
+#: view/qmodem/network.js:240
 msgid "远程网络驱动接口规范（RNDIS）"
 msgstr ""
 
-#: view/qmodem/status.js:102
+#: view/qmodem/status.js:103
 msgid "连接"
 msgstr ""
 
-#: view/qmodem/system.js:459
+#: view/qmodem/system.js:469
 msgid "连接状态"
 msgstr ""
 
-#: view/qmodem/status.js:677
+#: view/qmodem/status.js:676
 msgid "连接详情"
 msgstr ""
 
-#: view/qmodem/advanced.js:540
+#: view/qmodem/advanced.js:541
 msgid "选择模组允许驻网的制式。"
 msgstr ""
 
-#: view/qmodem/network.js:513
+#: view/qmodem/network.js:514
 msgid "选择模组允许驻网的制式。至少保留一项。"
 msgstr ""
 
-#: view/qmodem/advanced.js:567
+#: view/qmodem/advanced.js:568
 msgid "选择模组允许驻网的制式（由 QModem get_network_prefer / set_network_prefer 提供）。至少保留一项。"
 msgstr ""
 
-#: view/qmodem/network.js:738
+#: view/qmodem/network.js:739
 msgid "邻区 %d"
 msgstr ""
 
-#: view/qmodem/network.js:752
+#: view/qmodem/network.js:753
 msgid "邻区信息（%d）"
 msgstr ""
 
-#: view/qmodem/advanced.js:125
 #: view/qmodem/advanced.js:126
+#: view/qmodem/advanced.js:127
 msgid "邻区查询"
 msgstr ""
 
-#: view/qmodem/connection.js:488
+#: view/qmodem/connection.js:491
 msgid "部分数据读取失败："
 msgstr ""
 
-#: view/qmodem/advanced.js:454
-#: view/qmodem/connection.js:507
+#: view/qmodem/advanced.js:455
+#: view/qmodem/connection.js:513
 msgid "配置节"
 msgstr ""
 
-#: view/qmodem/network.js:979
+#: view/qmodem/network.js:983
 msgid "配置驻网模式、网络制式优选及射频扫描。"
 msgstr ""
 
-#: view/qmodem/system.js:551
-#: view/qmodem/system.js:557
+#: view/qmodem/system.js:561
+#: view/qmodem/system.js:567
 msgid "重启模组"
 msgstr ""
 
-#: view/qmodem/advanced.js:477
+#: view/qmodem/advanced.js:478
 msgid "重启模组失败：%s"
 msgstr ""
 
-#: view/qmodem/connection.js:563
+#: view/qmodem/connection.js:569
 msgid "重拨期间移动数据将短暂中断。是否继续？"
 msgstr ""
 
-#: view/qmodem/connection.js:563
 #: view/qmodem/connection.js:569
+#: view/qmodem/connection.js:575
 msgid "重新拨号"
 msgstr ""
 
-#: view/qmodem/connection.js:252
+#: view/qmodem/connection.js:253
 msgid "链路活跃 · 通路畅通"
 msgstr ""
 
-#: view/qmodem/system.js:471
+#: view/qmodem/system.js:481
 msgid "阈值写入使用 AT 透传指令。"
 msgstr ""
 
-#: view/qmodem/system.js:261
+#: view/qmodem/system.js:262
 msgid "阈值设置不当可能导致性能下降、过热或射频紧急关断，每个恢复值必须低于对应的触发值。"
 msgstr ""
 
-#: view/qmodem/system.js:541
+#: view/qmodem/system.js:551
 msgid "防护与维护"
 msgstr ""
 
-#: view/qmodem/network.js:629
+#: view/qmodem/network.js:630
 msgid "限制模组可使用的频段。日常使用建议保持不锁定。"
 msgstr ""
 
-#: view/qmodem/advanced.js:663
+#: view/qmodem/advanced.js:664
 msgid "限制模组可使用的频段（由 QModem get_lockband / set_lockband 提供）。日常使用建议保持不锁定。"
 msgstr ""
 
-#: view/qmodem/system.js:15
+#: view/qmodem/system.js:16
 msgid "需要输入 PIN 码"
 msgstr ""
 
-#: view/qmodem/system.js:17
+#: view/qmodem/system.js:18
 msgid "需要输入 PIN2 码"
 msgstr ""
 
-#: view/qmodem/system.js:16
+#: view/qmodem/system.js:17
 msgid "需要输入 PUK 码"
 msgstr ""
 
-#: view/qmodem/system.js:18
+#: view/qmodem/system.js:19
 msgid "需要输入 PUK2 码"
 msgstr ""
 
 #: qmodem/controls.js:505
-#: view/qmodem/connection.js:617
-#: view/qmodem/device.js:289
+#: view/qmodem/connection.js:623
+#: view/qmodem/device.js:295
 msgid "页面渲染失败："
 msgstr ""
 
-#: view/qmodem/network.js:679
-#: view/qmodem/network.js:939
+#: view/qmodem/network.js:680
+#: view/qmodem/network.js:943
 msgid "频段"
 msgstr ""
 
-#: view/qmodem/status.js:1079
+#: view/qmodem/status.js:1075
 msgid "频段、小区、射频策略与诊断"
 msgstr ""
 
-#: view/qmodem/advanced.js:124
-#: view/qmodem/advanced.js:662
-#: view/qmodem/network.js:628
-#: view/qmodem/network.js:956
+#: view/qmodem/advanced.js:125
+#: view/qmodem/advanced.js:663
+#: view/qmodem/network.js:629
+#: view/qmodem/network.js:960
 msgid "频段锁定"
 msgstr ""
 
-#: view/qmodem/network.js:680
+#: view/qmodem/network.js:681
 msgid "频点"
 msgstr ""
 
-#: view/qmodem/network.js:787
+#: view/qmodem/network.js:788
 msgid "频率扫描"
 msgstr ""
 
-#: view/qmodem/system.js:484
+#: view/qmodem/system.js:494
 msgid "飞行模式将立即断开移动数据与语音服务。"
 msgstr ""
 
-#: view/qmodem/network.js:450
+#: view/qmodem/network.js:451
 msgid "驻网频段"
 msgstr ""
 
-#: view/qmodem/system.js:211
+#: view/qmodem/system.js:212
 msgid "验证当前 PIN"
 msgstr ""
 
-#: view/qmodem/advanced.js:750
-msgid "高级设置"
-msgstr ""
-
-#: view/qmodem/advanced.js:803
+#: view/qmodem/advanced.js:804
 msgid "高级设置与硬件控制"
 msgstr ""
 
-#: view/qmodem/connection.js:602
+#: view/qmodem/connection.js:608
 msgid "高级连接信息与数据通路"
 msgstr ""
 
-#: view/qmodem/network.js:240
+#: view/qmodem/network.js:241
 msgid "高通 Gobi 网络协议（GobiNet）"
 msgstr ""
 
-#: view/qmodem/network.js:240
+#: view/qmodem/network.js:241
 msgid "高通调制解调器接口（QMI）"
 msgstr ""
