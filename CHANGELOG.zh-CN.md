@@ -66,6 +66,18 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **CI 工作流合并（11 → 8）**：把重叠的测试/校验工作流合并为两个，覆盖面不减：
+  - `ci.yml`（新增）取代 `quality.yml` + `vendor-fixtures.yml` + `rust-build.yml`。
+    合并时同时消掉三处重复检查：shell 语法检查只由 `check_all.sh` 跑一遍
+    （原先 vendor-fixtures 又用 `--only shell` 跑第二次）；`cargo test
+    --workspace` + clippy 只由 `check_all.sh` 的 rust stage 跑一遍（旧
+    rust-build 的 `test` job 与之完全一致）；js 单测只由 js-test stage 跑一遍。
+  - `support-list.yml`（新增）取代 `commit_check_supportlist.yaml` +
+    `pr_check_supportlist.yaml`，两者校验逻辑本就相同，只是后处理不同（推送后
+    自动提交、PR 时发评论）。
+  发布链（`main.yml` / `release.yml` / `tagger.yml` /
+  `publish-existing-release.yml`）与 `extract-i18n.yml` / `wiki.yml` 保持不变。
+  推送 tag 现在只会启动 3 个工作流，而非 5 个。
 - **CI 按需编译（不再每次推送就全量构建）**：`main.yml` 原先监听
   `push: branches: ['*']`，任何分支的任何改动都会跑满 arm64 三个变体（约
   15 分钟 × 3）。现在拆成两个工作流——

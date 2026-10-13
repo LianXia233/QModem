@@ -77,6 +77,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **CI workflows consolidated (11 → 8)**: merged overlapping test/validation
+  workflows into two, without weakening coverage:
+  - `ci.yml` (new) replaces `quality.yml` + `vendor-fixtures.yml` +
+    `rust-build.yml`. Three duplicated checks were removed in the process:
+    the shell syntax check now runs once via `check_all.sh` (vendor-fixtures
+    used to run it a second time with `--only shell`), `cargo test --workspace`
+    + clippy now run once in `check_all.sh`'s rust stage (the old rust-build
+    `test` job was byte-for-byte the same), and the js unit test runs once in
+    the js-test stage.
+  - `support-list.yml` (new) replaces `commit_check_supportlist.yaml` +
+    `pr_check_supportlist.yaml`, which were the same script with different
+    post-processing (auto-commit on push, PR comment on PR).
+  Release chain (`main.yml` / `release.yml` / `tagger.yml` /
+  `publish-existing-release.yml`) and `extract-i18n.yml` / `wiki.yml` are
+  untouched. A tag push now starts 3 workflows instead of 5.
 - **CI builds are now on-demand (no more build-per-push)**: `main.yml` listened
   to `push: branches: ['*']`, so every commit on any branch ran the full arm64
   matrix (≈15 min × 3). It is now split into two workflows:

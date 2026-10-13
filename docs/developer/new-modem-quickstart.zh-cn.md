@@ -143,6 +143,6 @@ vendor 函数表与 recognition fixture 四处注册源，缺失会逐条报告�
 - [ ] recognition fixture 已入库且 `expected_identity` 正确（回放脚本通过）
 - [ ] `scripts/check_modem_registry.py` 退出码 0
 - [ ] `docs/support_list.md` 已更新（脚本生成）
-- [ ] CI（quality.yml / vendor-fixtures.yml）全绿；声明硬件验证层级
+- [ ] CI（ci.yml）全绿；声明硬件验证层级
 
 提交前用 `git diff --check` 确认无 CRLF/行尾空白（本仓库统一 LF）。

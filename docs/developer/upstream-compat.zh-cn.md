@@ -82,7 +82,7 @@ grep -rhoE '(application|luci|rust|scripts|docs/refactor)/[A-Za-z0-9_./-]+' \
 
 - 数据文件：`modem_support.json`、`modem_port_rule.json`、`at_commands_en/zh.json`
   （合入后跑 `scripts/update_support_list.py` 校验与 `docs/support_list.md` 一致，
-  见 `.github/workflows/commit_check_supportlist.yaml`）。
+  见 `.github/workflows/support-list.yml`）。
 - 独立 vendored 组件：`application/qfirehose/`（许可禁本地修改，安全修复按 ADR 0001
   决策 7 走上游补丁跟踪，不本地深改）、`application/qmodem/src/quectel_CM_5G_M/`、`application/ndisc6/`、
   `application/qmodem/src/qmodem-seal/`、`application/voipd/`、`application/qmodem_sipd/`。
@@ -112,7 +112,7 @@ grep -rhoE '(application|luci|rust|scripts|docs/refactor)/[A-Za-z0-9_./-]+' \
 2. **厂商脚本**：新增 vendor 时，脚本须 `source` `cmds/qmodem_lib.sh` 并走公共解析库
    （[journal-vendor-lib.md](../refactor/journal-vendor-lib.md) 的约定），不得直接合入上游旧式管道写法。
 3. **能力屏蔽**：按 `modem_ctrl.sh` 的 `get_disabled_features` case 补齐或屏蔽 feature。
-4. **校验**：合入后由 `commit_check_supportlist.yaml`（JSON 合法性 + `docs/support_list.md` 差异）
+4. **校验**：合入后由 `support-list.yml`（JSON 合法性 + `docs/support_list.md` 差异）
    与 `scripts/update_support_list.py` 把关；规划中的 `check_modem_registry` 应替代其中的手工核对部分。
 5. **fixture**：有实机条件时按 `testcases/README.md` 补 AT fixture，纳入回放。
 

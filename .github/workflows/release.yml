@@ -1,9 +1,9 @@
 name: Release
 
 # 职责边界：本 workflow 只负责"发版"（release notes + GitHub Release），
-# 不构建固件/SDK/二进制——那些由 main.yml（SDK 构建）与 rust-build.yml 负责，
+# 不构建固件/SDK/二进制——那些由 main.yml（SDK 构建）与 ci.yml 负责，
 # 因此不会与 main.yml 的 tag push 构建冲突（main.yml 对 .github/** paths-ignore）。
-# 产物不跨 workflow 拉取，仅在 release notes 中保留 rust-build.yml 的下载链接模板。
+# 产物不跨 workflow 拉取，仅在 release notes 中保留 ci.yml 的下载链接模板。
 
 on:
   push:
@@ -124,7 +124,7 @@ jobs:
             echo "若本 Release 尚未附带包文件（例如纯 tag 触发时 SDK 构建未通过），可从 Actions 产物页按对应 commit/tag 下载："
             echo ""
             echo "- SDK 构建: ${REPO_URL}/actions/workflows/main.yml"
-            echo "- Rust 二进制: ${REPO_URL}/actions/workflows/rust-build.yml"
+            echo "- Rust 二进制: ${REPO_URL}/actions/workflows/ci.yml"
             echo ""
             echo "也可手动运行 \`publish-existing-release.yml\`，从指定构建 run 把散装 ipk/apk 补传到本 Release。"
           } >> release_notes.md
