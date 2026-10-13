@@ -92,6 +92,11 @@
   `mipsel_24kc`（必须带 ISA 后缀），精确匹配的 `ifeq ($(ARCH),mipsel)` 永远不成立，
   `Build/CompileRust` 在 cargo 启动前就中止（且诊断被 OpenWrt 吞掉）。三元组推导改为
   `$(filter)` 前缀匹配，覆盖 `aarch64*` / `mipsel*` / `mips*` / `x86_64*`。
+- **`mmips`（mipsel）build-std 链接失败**：`-Zbuild-std` 下链接驱动解析不到 musl
+  启动文件（`crt1.o` 等）与 `-lunwind`（build-std 产物为带 hash 的
+  `libunwind-<hash>.a`，`-lunwind` 无从绑定）。`build-rust.sh` 现在把交叉工具链的
+  真实 sysroot 作为最后一个 `--sysroot` 链接参数追加，并提供空 `libunwind.a` 垫片
+  （std 以 `panic_abort` 构建、运行期不需要真 unwinder，垫片合法）。
 - **CI 包编译失败不再静默**：`Compile QModem` 步骤失败时用 `make ... V=s -j1` 重跑，
   让被 OpenWrt 默认隐藏的真实错误（如 cargo 交叉编译日志）直接出现在 job 日志中。
 - **移除跨包文件冲突**：`qmodem` 与 `luci-app-qmodem` 此前都会安装

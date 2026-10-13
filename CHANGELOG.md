@@ -105,6 +105,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `ifeq ($(ARCH),mipsel)` never fired and `Build/CompileRust` aborted before cargo
   ran (with OpenWrt swallowing the diagnostic). The triple lookup now uses
   `$(filter)` prefix matching for `aarch64*` / `mipsel*` / `mips*` / `x86_64*`.
+- **`mmips` (mipsel) build-std link failure**: under `-Zbuild-std` the linker driver
+  could not resolve the musl startfiles (`crt1.o` etc.) or `-lunwind` (build-std
+  artifacts are hash-named, so `-lunwind` has nothing to bind to). `build-rust.sh`
+  now appends the cross toolchain's real sysroot as the last `--sysroot` link arg
+  and provides an empty `libunwind.a` shim (valid because std is built with
+  `panic_abort`, which needs no runtime unwinder).
 - **Silent package build failures in CI**: the `Compile QModem` step now retries the
   failing package with `make ... V=s -j1`, so the real error output (e.g. cargo
   cross-compile logs that OpenWrt hides by default) lands directly in the job log.

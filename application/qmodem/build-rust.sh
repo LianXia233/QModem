@@ -57,6 +57,39 @@ LINKER="$TARGET_CC"
 AR="${LINKER%gcc}ar"
 [ -x "$AR" ] || AR=""
 
+if [ "$TOOLCHAIN" = nightly ]; then
+	# --- tier 3 链接环境修复（CI 实测：crt1.o/-lunwind 全部找不到） ---
+	# build-std 模式下 rustc 传给链接驱动（gcc）的 sysroot 不是交叉工具链
+	# 的 sysroot，gcc 的启动文件（crt1.o/crti.o/...）搜索因此落空；tier 2
+	# 不受影响是因为预编译 std 自带 self-contained 组件兜底。修复：
+	#   A) 把交叉 gcc 的真实 sysroot 作为最后一个 --sysroot 追加到链接参数
+	#      （gcc 取最后一个生效），恢复 crt 启动文件解析；
+	#   B) -lunwind 在交叉 sysroot 与 build-std 产物目录里都解析不到
+	#      （build-std 产物是带 hash 的 libunwind-<hash>.a），而
+	#      panic_abort 模式运行期不需要真正的 unwinder —— 提供一个空
+	#      libunwind.a 垫片满足链接即可。
+	# 探针输出留在日志里（V=s 重跑可见），便于后续架构调整时核对。
+	echo "==> probe: $LINKER -print-sysroot = $("$LINKER" -print-sysroot 2>/dev/null || true)" >&2
+	echo "==> probe: crt1.o = $("$LINKER" -print-file-name=crt1.o 2>/dev/null || true)" >&2
+
+	XSYSROOT=$("$LINKER" -print-sysroot 2>/dev/null | tail -1)
+	case "$XSYSROOT" in
+		/*) if [ -d "$XSYSROOT" ]; then
+			EXTRA_RUSTFLAGS="$EXTRA_RUSTFLAGS -C link-arg=--sysroot=$XSYSROOT"
+			echo "==> fix A: link-arg --sysroot=$XSYSROOT" >&2
+		fi ;;
+	esac
+
+	UNWIND_DIR="$OUT_DIR/fake-unwind"
+	mkdir -p "$UNWIND_DIR"
+	if "${AR:-ar}" crs "$UNWIND_DIR/libunwind.a" 2>/dev/null; then
+		EXTRA_RUSTFLAGS="$EXTRA_RUSTFLAGS -C link-arg=-L$UNWIND_DIR"
+		echo "==> fix B: empty libunwind.a at $UNWIND_DIR" >&2
+	else
+		echo "!! fix B skipped: cannot create empty libunwind.a" >&2
+	fi
+fi
+
 # 纯 std 零依赖组件（qmodem-atd 的 service/tty feature）走全静态 musl，
 # 不引入任何 .so 运行时依赖；启用 ubus/uci/sqlite feature 后改由
 # -L $(STAGING_DIR)/usr/lib 动态链接（届时另设 RUSTFLAGS，见 Makefile 注释）。
