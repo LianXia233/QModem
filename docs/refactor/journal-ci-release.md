@@ -6,6 +6,37 @@
   `docs/refactor/journal-ci-release.md`（本文件）。**仅允许修改/新建 `.github/**` + 本 journal**，未触碰其他文件。
 
 ## 变更
+### 0. 触发策略：按需编译，不再"每次推送就编译"（2026-10-14）
+
+**问题**：`main.yml` 原先监听 `push: branches: ['*']`，任何分支/任何文件改动都会
+跑满 arm64 三个变体的全量构建（约 15 分钟 × 3），日常提交代价过高。
+
+**现状（拆成两个工作流）**：
+
+| 工作流 | 触发条件 | 职责 |
+| --- | --- | --- |
+| `main.yml` | ① 推送 `v*` 标签 ② 手动 `workflow_dispatch` ③ PR 到 main（忽略 docs/README/.github） | 全量编译 + 产物上传 + 打 tag 时创建 Release |
+| `tagger.yml` | `push` 到 main/stable **且变更文件包含 `version.mk`**，或手动触发 | 只做版本号判断与打标签（秒级，不编译） |
+
+**发版链路**：改 `version.mk` → `tagger.yml` 打出 `vX.Y.Z` 标签 → 标签推送触发
+`main.yml` 全量编译 → 自动创建 Release。日常推代码不触发任何编译。
+
+**手动编译**：Actions → "OpenWrt SDK 自动编译" → Run workflow。
+
+**其他**：两个工作流都保留 `concurrency`（同一 ref 只保留最新一次运行），SDK/Rust
+缓存键不含 commit sha，因此即便不看编译也不会丢缓存收益。
+
+### 0.1 Rust 目标：优先 Cortex-A53（2026-10-14）
+
+`build-rust.sh` 对 `aarch64*` 目标显式加 `-C target-cpu=cortex-a53`。Rust 的
+`aarch64-unknown-linux-musl` 默认 `target-cpu=generic`，实测特性集只有
+`crt-static`/`neon`；指定 cortex-a53 后追加 `aes`/`crc`/`sha2`/`pmuv3`
+（`rustc --print cfg` 实测）。主力设备 MT7981 的 A53 在 `/proc/cpuinfo` 中确认带有
+`asimd aes pmull sha1 sha2 crc32`，因此安全可用。
+
+未实现 ARMv8 Crypto 扩展的 A53 设备需回退：导出 `QMODEM_RUST_TARGET_CPU=generic`
+即可（无需改脚本）。C 侧由 OpenWrt SDK 自身的 `-mcpu=cortex-a53` 保证一致。
+
 
 ### 1. 新建 `.github/workflows/release.yml`
 - **触发**：

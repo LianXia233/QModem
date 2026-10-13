@@ -1,0 +1,111 @@
+name: "自动打版本标签"
+
+permissions:
+  contents: write
+
+on:
+  # 关键：只有 version.mk 变更（= 发版意图）才触发本工作流，日常推送连这个轻量作业
+  # 都不会启动；打出的 tag 再由 main.yml 的 tag 触发做全量编译与发布。
+  push:
+    branches:
+      - main
+      - stable
+    paths:
+      - 'version.mk'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  auto_tag:
+    name: 自动生成版本标签
+    runs-on: ubuntu-latest
+    # 轻量作业：只判断版本号并打标签，不做任何编译（编译由 tag 触发的 main.yml 负责）
+    # main owns pre-release tags; stable owns final release tags.
+    # 由 paths 过滤保证只在 version.mk 变更时触发；手动触发时也允许运行
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 检查 version.mk 是否变更
+      id: check_version_change
+      run: |
+        # 检查version.mk是否在这次提交中被修改
+        if git diff --name-only HEAD~1 HEAD | grep -q "^version\.mk$"; then
+          echo "version.mk was modified in this commit"
+          echo "version_changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "version.mk was not modified in this commit"
+          echo "version_changed=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: 提取 version.mk 版本号
+      id: extract_version
+      if: steps.check_version_change.outputs.version_changed == 'true'
+      run: |
+        # 从version.mk文件中提取QMODEM_VERSION
+        version=$(grep "^QMODEM_VERSION" version.mk | sed 's/QMODEM_VERSION:=//' | xargs)
+        echo "Current QMODEM_VERSION: $version"
+        echo "version=$version" >> $GITHUB_OUTPUT
+        
+        # 检查version是否为空
+        if [ -z "$version" ]; then
+          echo "Error: Could not extract version from version.mk"
+          exit 1
+        fi
+
+        case "${GITHUB_REF#refs/heads/}:$version" in
+          main:*[_-][0-9a-zA-Z]*) ;;
+          stable:[0-9]*.[0-9]*.[0-9]*) ;;
+          *)
+            echo "QMODEM_VERSION does not match its release branch: ${GITHUB_REF#refs/heads/}:$version" >&2
+            exit 1
+            ;;
+        esac
+        
+        # 生成tag名称
+        tag_name="v$version"
+        echo "tag_name=$tag_name" >> $GITHUB_OUTPUT
+        echo "Generated tag name: $tag_name"
+    
+    - name: 检查标签是否已存在
+      id: check_tag
+      if: steps.check_version_change.outputs.version_changed == 'true'
+      run: |
+        tag_name="${{ steps.extract_version.outputs.tag_name }}"
+        
+        # 检查tag是否已经存在
+        if git tag -l | grep -q "^${tag_name}$"; then
+          echo "Tag $tag_name already exists, skipping tag creation"
+          echo "tag_exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "Tag $tag_name does not exist, will create it"
+          echo "tag_exists=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: 创建并推送标签
+      id: create_tag
+      if: steps.check_version_change.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
+      run: |
+        tag_name="${{ steps.extract_version.outputs.tag_name }}"
+        version="${{ steps.extract_version.outputs.version }}"
+        
+        # 配置git用户信息
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # 创建带注释的tag
+        git tag -a "$tag_name" -m "Release version $version - Auto-generated tag when QMODEM_VERSION was updated to $version"
+        
+        # 推送tag到远程仓库
+        git push origin "$tag_name"
+        
+        echo "✅ Successfully created and pushed tag: $tag_name"
+        echo "tag_name=$tag_name" >> $GITHUB_OUTPUT
+        echo "tag_created=true" >> $GITHUB_OUTPUT

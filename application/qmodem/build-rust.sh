@@ -53,6 +53,27 @@ esac
 # CARGO_TARGET_<TRIPLE> 环境变量名：小写连字符 -> 大写下划线。
 UP=$(printf '%s' "$RUST_TARGET_TRIPLE" | tr 'a-z-' 'A-Z_')
 
+# 目标 CPU：本包主力设备为 ARM Cortex-A53（MT7981 等 Filogic/WiFi6 平台，
+# OpenWrt 目标 aarch64_cortex-a53）。Rust 的 aarch64-unknown-linux-musl 默认
+# target-cpu=generic，不会采用 A53 的特性与流水线；显式指定后可启用 A53 基线
+# 特性（如 CRC），链路层也按 A53 调度优化。仅指定 CPU 基线，不追加 +crypto：
+# ARMv8 Crypto 扩展在 A53 上是可选项，个别 SoC 未实现，盲目启用在无该扩展的
+# 设备上会触发非法指令。
+case "$RUST_TARGET_TRIPLE" in
+	aarch64*)
+		# 默认按主力设备优化：MT7981（Filogic 820）的 Cortex-A53 实测带有
+		# asimd/aes/pmull/sha1/sha2/crc32（实机 /proc/cpuinfo 已确认），因此
+		# cortex-a53 带来的 aes/sha2/crc 特性可安全启用。
+		# 若要在**未实现 ARMv8 Crypto 扩展**的 A53 上运行，导出
+		#   QMODEM_RUST_TARGET_CPU=generic
+		# 即可回退为通用 aarch64（脚本无需修改）。
+		CPU_FLAGS="-C target-cpu=${QMODEM_RUST_TARGET_CPU:-cortex-a53}"
+		;;
+	*)
+		CPU_FLAGS=""
+		;;
+esac
+
 LINKER="$TARGET_CC"
 AR="${LINKER%gcc}ar"
 [ -x "$AR" ] || AR=""
@@ -155,10 +176,11 @@ fi
 # -L $(STAGING_DIR)/usr/lib 动态链接（届时另设 RUSTFLAGS，见 Makefile 注释）。
 eval "export CARGO_TARGET_${UP}_LINKER=\"\$LINKER\""
 [ -n "$AR" ] && eval "export CARGO_TARGET_${UP}_AR=\"\$AR\""
-eval "export CARGO_TARGET_${UP}_RUSTFLAGS=\"-C target-feature=+crt-static $EXTRA_RUSTFLAGS\""
+eval "export CARGO_TARGET_${UP}_RUSTFLAGS=\"-C target-feature=+crt-static $CPU_FLAGS $EXTRA_RUSTFLAGS\""
 
 echo "==> rust toolchain: $TOOLCHAIN / target: $RUST_TARGET_TRIPLE"
 echo "==> linker: $LINKER"
+echo "==> rust target-cpu: ${CPU_FLAGS:-（默认 generic）}"
 # 说明：包装器会把每条链接调用（含改写后参数）记到
 # $OUT_DIR/linker-args.log，失败时回显最后一条，因此无需再开 cargo -v
 # （-v 会把 job 日志撑到 10MB 级，反而不利于定位）。

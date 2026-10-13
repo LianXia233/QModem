@@ -12,6 +12,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 ## [Unreleased]
 
 ### Added
+- **Rust target optimized for Cortex-A53**: `build-rust.sh` now passes
+  `-C target-cpu=cortex-a53` for `aarch64*` targets. Measured with
+  `rustc --print cfg`, the default `generic` CPU exposes only
+  `crt-static`/`neon`, while cortex-a53 adds `aes`/`crc`/`sha2`/`pmuv3`; the
+  MT7981 A53 on the reference device reports
+  `asimd aes pmull sha1 sha2 crc32` in `/proc/cpuinfo`, so enabling them is
+  safe. Devices whose A53 lacks the ARMv8 crypto extensions can fall back with
+  `QMODEM_RUST_TARGET_CPU=generic` (no script edit needed). The C side keeps the
+  OpenWrt SDK's own `-mcpu=cortex-a53`, so both halves agree.
 - **ImmortalWrt-native build variant (`arm64_apk_immortalwrt`)**: QModem is now
   additionally built from the ImmortalWrt SNAPSHOT SDK
   (`immortalwrt-sdk-mediatek-filogic_`) with `SDK_FLAVOR=immortalwrt`, which
@@ -68,6 +77,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **CI builds are now on-demand (no more build-per-push)**: `main.yml` listened
+  to `push: branches: ['*']`, so every commit on any branch ran the full arm64
+  matrix (≈15 min × 3). It is now split into two workflows:
+  - `main.yml` runs only on **① `v*` tag push ② manual `workflow_dispatch`
+    ③ pull requests to main** (docs/README/.github ignored) and owns the full
+    build + release;
+  - `tagger.yml` (new) runs only on **push to main/stable that touches
+    `version.mk`**, and merely validates the version and pushes a tag (seconds,
+    no compilation). The tag push then triggers `main.yml`, so the release path
+    is unchanged.
+  Routine code pushes no longer start any build.
 - **Tab hierarchy refined**: the theme appends multiple `ul.tabs` rows inside
   `#tabmenu` (row 1 = top level, row 2 = children of the active entry). The
   second row is now visually subordinate — smaller type (12px) and padding

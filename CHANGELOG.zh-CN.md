@@ -12,6 +12,13 @@
 ## [Unreleased]
 
 ### 新增（Added）
+- **Rust 目标优先 Cortex-A53**：`build-rust.sh` 对 `aarch64*` 目标显式加
+  `-C target-cpu=cortex-a53`。实测（`rustc --print cfg`）默认 `generic` 只有
+  `crt-static`/`neon`，指定后追加 `aes`/`crc`/`sha2`/`pmuv3`；主力设备 MT7981
+  的 A53 在 `/proc/cpuinfo` 中确认带有 `asimd aes pmull sha1 sha2 crc32`，
+  故可安全启用。未实现 ARMv8 Crypto 扩展的 A53 设备可导出
+  `QMODEM_RUST_TARGET_CPU=generic` 回退，无需改脚本。C 侧沿用 OpenWrt SDK 的
+  `-mcpu=cortex-a53`，两侧一致。
 - **ImmortalWrt 原生构建变体（`arm64_apk_immortalwrt`）**：新增
   `.github/workflows/arm64_apk_immortalwrt.env`，改用 ImmortalWrt SNAPSHOT SDK
   （`immortalwrt-sdk-mediatek-filogic_`），并以 `SDK_FLAVOR=immortalwrt` 让
@@ -59,6 +66,15 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **CI 按需编译（不再每次推送就全量构建）**：`main.yml` 原先监听
+  `push: branches: ['*']`，任何分支的任何改动都会跑满 arm64 三个变体（约
+  15 分钟 × 3）。现在拆成两个工作流——
+  - `main.yml`：只在 **① 推送 `v*` 标签 ② 手动 workflow_dispatch ③ PR 到 main**
+    （忽略 docs/README/.github）时运行，负责全量编译与发布；
+  - `tagger.yml`（新增）：只在 **main/stable 分支且变更包含 `version.mk`** 时
+    运行，只做版本号判断与打标签（秒级，不编译）。标签推送再触发 `main.yml`，
+    发版链路与原来一致。
+  日常提交代码不再触发任何编译。
 - **页签层级细化**：主题会按 `#tabmenu` 递归追加多个 `ul.tabs`（第一行一级、
   第二行当前一级项的子页签）。二级页签现单独降级——更小字号（12px）与内边距
   （5px 12px）、常规字重、弱化文字色、去掉重复分隔线，与一级形成清晰层级。
