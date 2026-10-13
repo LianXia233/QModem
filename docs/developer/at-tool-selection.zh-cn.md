@@ -26,15 +26,20 @@
 
 ```sh
 # 通路 2：qmodem-atd unix socket（本版本引入）
+# 1) 先启用守护进程并登记 AT 口（/etc/config/qmodem-atd 的 port 段）
+uci set qmodem-atd.main.enabled='1'
+uci set qmodem-atd.main.socket='/var/run/qmodem/atd.sock'
+uci commit qmodem-atd
+/etc/init.d/qmodem-atd restart
+
+# 2) 再把 AT 通路切到 qmodem-atd
 uci set qmodem.main.at_tool='2'
-# 可选，默认 /var/run/qmodem-atd.sock
-uci set qmodem.main.at_socket='/var/run/qmodem-atd.sock'
+uci set qmodem.main.at_socket='/var/run/qmodem/atd.sock'
 uci commit qmodem
-/etc/init.d/qmodem_init restart
 
 # 回到默认通路
 uci set qmodem.main.at_tool='0'
-uci commit qmodem && /etc/init.d/qmodem_init restart
+uci commit qmodem
 ```
 
 说明：

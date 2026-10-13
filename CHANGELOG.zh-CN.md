@@ -36,6 +36,18 @@
   `check_all.sh` 的 rust stage 在非 Unix 宿主改用预装 musl 目标 std 跑
   `cargo check + clippy --all-features`（不再是 SKIP），shell stage 把包根
   构建脚本与 `scripts/*.sh` 纳入语法检查（覆盖 74 → 114 个文件）。
+- **qmodem-atd 系统服务与配置**：新增 `/etc/init.d/qmodem-atd` 与
+  `/etc/config/qmodem-atd`，按 `config port` 段在启动时逐个登记 AT 口并把
+  socket 固定到 `/var/run/qmodem/atd.sock`（默认 `enabled='0'`，须显式开启）。
+  文档中三处旧的 `/var/run/qmodem-atd.sock` 路径已统一为
+  `/var/run/qmodem/atd.sock`。
+- **voipd 的 AT 适配改走 qmodem-atd unix socket**：`at_daemon_adapter.sh`
+  不再调用已退役语义的 ubus `at-daemon` 对象（list/open/sendat），改用
+  `{"cmd":"list"}` / `{"cmd":"sendat"}` JSON 行协议（nc -U 优先、curl
+  --http0.9 兜底）。端口在守护进程启动时即已登记，故删除了原先
+  「未打开则先 `ubus call at-daemon open`」的握手分支；响应字段由
+  `status=success / end_flag_matched / response` 对齐为
+  `status=ok / end_flag / lines`。
 
 ### 变更（Changed）
 - **前端统一（视觉 / 组件 / 数据三层）**：`luci-app-qmodem-generic` 的 LuCI 适配整体

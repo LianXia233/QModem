@@ -66,7 +66,7 @@ Startup (requires `cargo build --release` first, see `rust/README.md`):
 ```sh
 cd rust
 cargo build --release
-./target/release/qmodem-atd --socket /var/run/qmodem-atd.sock --loopback loop0
+./target/release/qmodem-atd --socket /var/run/qmodem/atd.sock --loopback loop0
 ```
 
 The protocol is **one JSON object per line**, with three commands: `sendat`, `list`, and `subscribe` (`subscribe` only streams events continuously and does not reply to the request line).
@@ -74,7 +74,7 @@ The protocol is **one JSON object per line**, with three commands: `sendat`, `li
 ### sendat
 
 ```sh
-curl --unix-socket /var/run/qmodem-atd.sock \
+curl --unix-socket /var/run/qmodem/atd.sock \
      -d '{"cmd":"sendat","port":"/dev/ttyUSB2","at":"AT+CSQ","timeout_ms":3000,"end_flag":"OK"}' \
      http://localhost/
 ```
@@ -90,7 +90,7 @@ Response:
 ### list
 
 ```sh
-curl --unix-socket /var/run/qmodem-atd.sock \
+curl --unix-socket /var/run/qmodem/atd.sock \
      -d '{"cmd":"list"}' http://localhost/
 # {"status":"ok","ports":["/dev/ttyUSB2","loop0"]}
 ```
@@ -98,7 +98,7 @@ curl --unix-socket /var/run/qmodem-atd.sock \
 ### subscribe (URC stream)
 
 ```sh
-curl -N --unix-socket /var/run/qmodem-atd.sock \
+curl -N --unix-socket /var/run/qmodem/atd.sock \
      -d '{"cmd":"subscribe"}' http://localhost/
 # {"event":"line","port":"/dev/ttyUSB2","line":"+CMTI: \"SM\",3","seq":7,"epoch":1}
 # If the consumer lags behind: {"event":"lagged","dropped":n}

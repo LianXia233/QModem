@@ -1,0 +1,13 @@
+config qmodem-atd 'main'
+    option enabled '0'
+    option socket '/var/run/qmodem/atd.sock'
+
+# 每个 modem 的 AT 口登记一段；qmodem-atd 启动时逐个以 --port 打开。
+# baudrate 等参数当前由守护进程以默认配置打开（AtPortConfig::default），
+# 待 atd 实现配置加载后接入。
+config port
+    option at_port '/dev/ttyUSB2'
+    option baudrate '115200'
+    option databits '8'
+    option parity '0'
+    option stopbits '1'

@@ -27,8 +27,8 @@ Write to `/etc/config/qmodem` and restart the main service to take effect:
 ```sh
 # Path 2: qmodem-atd unix socket (introduced in this version)
 uci set qmodem.main.at_tool='2'
-# Optional, default /var/run/qmodem-atd.sock
-uci set qmodem.main.at_socket='/var/run/qmodem-atd.sock'
+# Optional, default /var/run/qmodem/atd.sock
+uci set qmodem.main.at_socket='/var/run/qmodem/atd.sock'
 uci commit qmodem
 /etc/init.d/qmodem_init restart
 
@@ -60,10 +60,10 @@ ubus list | grep at-daemon
 ubus call at-daemon sendat '{"at_port":"/dev/ttyUSB2","at_cmd":"AT"}'
 
 # Path 2: socket liveness probe (list ports registered by qmodem-atd)
-curl --unix-socket /var/run/qmodem-atd.sock -d '{"cmd":"list"}' http://localhost/
+curl --unix-socket /var/run/qmodem/atd.sock -d '{"cmd":"list"}' http://localhost/
 
 # Path 2: AT liveness probe
-curl --unix-socket /var/run/qmodem-atd.sock \
+curl --unix-socket /var/run/qmodem/atd.sock \
      -d '{"cmd":"sendat","port":"/dev/ttyUSB2","at":"AT","timeout_ms":1000}' \
      http://localhost/
 # Normal response: {"status":"ok","lines":["OK"],"end_flag":"OK","elapsed_ms":...}

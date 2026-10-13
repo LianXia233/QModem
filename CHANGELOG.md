@@ -41,6 +41,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `cargo check + clippy --all-features` against the preinstalled musl target
   std on non-Unix hosts (no longer SKIP), and the `shell` stage now includes
   package-root build scripts and `scripts/*.sh` (coverage 74 → 114 files).
+- **qmodem-atd system service and config**: new `/etc/init.d/qmodem-atd` and
+  `/etc/config/qmodem-atd`; every `config port` section is registered with
+  `--port` at daemon start and the socket is pinned to
+  `/var/run/qmodem/atd.sock` (default `enabled='0'`, opt-in). The three stale
+  `/var/run/qmodem-atd.sock` paths in the docs were normalised to
+  `/var/run/qmodem/atd.sock`.
+- **voipd's AT adapter now speaks the qmodem-atd unix socket**: the
+  `at_daemon_adapter.sh` no longer calls the ubus `at-daemon` object
+  (`list` / `open` / `sendat`) and instead uses the `{"cmd":"list"}` /
+  `{"cmd":"sendat"}` JSON line protocol (`nc -U` first, `curl --http0.9`
+  fallback). Ports are registered at daemon start, so the old
+  "open it first via `ubus call at-daemon open`" handshake branch is gone, and
+  the response fields are aligned from `status=success / end_flag_matched /
+  response` to `status=ok / end_flag / lines`.
 
 ### Changed
 - **Unified frontend (visual / component / data layers)**: the LuCI adaptation from

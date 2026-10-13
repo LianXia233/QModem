@@ -66,7 +66,7 @@ C 侧的内存安全修复（未初始化 response、fd 泄漏、引用计数竞
 ```sh
 cd rust
 cargo build --release
-./target/release/qmodem-atd --socket /var/run/qmodem-atd.sock --loopback loop0
+./target/release/qmodem-atd --socket /var/run/qmodem/atd.sock --loopback loop0
 ```
 
 协议为**每行一个 JSON 对象**，共三个命令：`sendat`、`list`、`subscribe`（`subscribe` 只持续推送事件，不回应请求行）。
@@ -74,7 +74,7 @@ cargo build --release
 ### sendat
 
 ```sh
-curl --unix-socket /var/run/qmodem-atd.sock \
+curl --unix-socket /var/run/qmodem/atd.sock \
      -d '{"cmd":"sendat","port":"/dev/ttyUSB2","at":"AT+CSQ","timeout_ms":3000,"end_flag":"OK"}' \
      http://localhost/
 ```
@@ -90,7 +90,7 @@ curl --unix-socket /var/run/qmodem-atd.sock \
 ### list
 
 ```sh
-curl --unix-socket /var/run/qmodem-atd.sock \
+curl --unix-socket /var/run/qmodem/atd.sock \
      -d '{"cmd":"list"}' http://localhost/
 # {"status":"ok","ports":["/dev/ttyUSB2","loop0"]}
 ```
@@ -98,7 +98,7 @@ curl --unix-socket /var/run/qmodem-atd.sock \
 ### subscribe（URC 流）
 
 ```sh
-curl -N --unix-socket /var/run/qmodem-atd.sock \
+curl -N --unix-socket /var/run/qmodem/atd.sock \
      -d '{"cmd":"subscribe"}' http://localhost/
 # {"event":"line","port":"/dev/ttyUSB2","line":"+CMTI: \"SM\",3","seq":7,"epoch":1}
 # 消费滞后时：{"event":"lagged","dropped":n}

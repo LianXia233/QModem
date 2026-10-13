@@ -94,51 +94,124 @@ qmodem_voip_adapter_normalize()
 	esac
 }
 
+# ---------------------------------------------------------------------------
+# qmodem-atd unix socket transport (JSON line protocol).
+# Replaces the retired ubus `at-daemon` object: the daemon pre-registers every
+# modem port at start (`--port`), so there is no separate `open` handshake.
+#   request : {"cmd":"list"} / {"cmd":"sendat","port":..,"at":..,"timeout_ms":..}
+#   response: {"status":"ok"|"timeout"|"error","lines":[...],"end_flag":..}
+# ---------------------------------------------------------------------------
+
+qmodem_voip_atd_socket()
+{
+	local sock
+	sock=$(uci -q get qmodem-atd.main.socket 2>/dev/null)
+	[ -n "$sock" ] || sock=/var/run/qmodem/atd.sock
+	printf '%s\n' "$sock"
+}
+
+#send one request line, print the single json response line
+qmodem_voip_atd_request()
+{
+	local req=$1 sock res bg poll budget out
+	sock=$(qmodem_voip_atd_socket)
+	[ -S "$sock" ] || return 1
+	res=$(mktemp) || return 1
+	#the daemon keeps the connection open after replying, so run the
+	#transport in background and stop once one full json line arrived
+	budget=50
+	if command -v nc >/dev/null 2>&1; then
+		printf '%s\n' "$req" | nc -U "$sock" >"$res" 2>/dev/null &
+		bg=$!
+		poll=0
+		while [ "$poll" -lt "$budget" ]; do
+			[ "$(tail -c1 "$res" 2>/dev/null | wc -l)" = "1" ] && break
+			kill -0 "$bg" 2>/dev/null || break
+			sleep 0.1
+			poll=$((poll + 1))
+		done
+		kill "$bg" 2>/dev/null
+		wait "$bg" 2>/dev/null
+	fi
+	if [ ! -s "$res" ] && command -v curl >/dev/null 2>&1; then
+		: >"$res"
+		#HTTP/0.9 mode: accept the raw reply stream; curl's own header lines
+		#produce bad-json replies that precede the real response
+		curl -s --http0.9 -m 7 --unix-socket "$sock" -d "$req" \
+			http://localhost/ >"$res" 2>/dev/null &
+		bg=$!
+		poll=0
+		while [ "$poll" -lt "$budget" ]; do
+			[ "$(tail -c1 "$res" 2>/dev/null | wc -l)" = "1" ] && break
+			kill -0 "$bg" 2>/dev/null || break
+			sleep 0.1
+			poll=$((poll + 1))
+		done
+		kill "$bg" 2>/dev/null
+		wait "$bg" 2>/dev/null
+	fi
+	out=$(tail -n 1 "$res" 2>/dev/null)
+	rm -f "$res"
+	case $out in
+		'{'*'}') printf '%s\n' "$out"; return 0 ;;
+	esac
+	return 1
+}
+
+#extract a scalar/array with jq first, jsonfilter as fallback
+qmodem_voip_atd_get()
+{
+	local json=$1 path=$2
+	if command -v jq >/dev/null 2>&1; then
+		printf '%s' "$json" | jq -r "$path // empty" 2>/dev/null && return 0
+	fi
+	printf '%s' "$json" | jsonfilter -e "$path" 2>/dev/null
+}
+
 qmodem_voip_adapter_port_open()
 {
 	target_port=$1
-	daemon_ports=$(ubus call at-daemon list) || return 1
-	json_load "$daemon_ports" 2>/dev/null || return 1
-	json_select ports || return 1
-	json_get_keys daemon_port_keys
-	for daemon_port_key in $daemon_port_keys; do
-		json_select "$daemon_port_key" || return 1
-		json_get_var daemon_port port
-		json_get_var daemon_port_open is_open
-		json_select ..
-		[ "$daemon_port" = "$target_port" ] || continue
-		[ "$daemon_port_open" = 1 ] && return 0
-		return 1
-	done
+	daemon_ports=$(qmodem_voip_atd_request '{"cmd":"list"}') || return 1
+	[ "$(qmodem_voip_atd_get "$daemon_ports" '.status')" = ok ] || return 1
+	#`list` answers {"ports":["/dev/ttyUSB2",...]}; ports come from UCI
+	#device paths, which never contain quotes, so a substring match on the
+	#quoted name is an exact-enough membership test without a JSON parser
+	case $daemon_ports in
+		*"\"$target_port\""*) return 0 ;;
+	esac
 	return 1
+}
+
+#join the "lines" json array into one newline-separated response blob
+qmodem_voip_adapter_lines_to_text()
+{
+	local raw
+	raw=$(qmodem_voip_atd_get "$1" '.lines') || return 1
+	[ -n "$raw" ] || return 1
+	printf '%s' "$raw" | sed -e 's/^\[[[:space:]]*//' -e 's/[[:space:]]*\]$//' \
+		-e 's/",[[:space:]]*"/\n/g' -e 's/^"//' -e 's/"$//'
 }
 
 qmodem_voip_adapter_at()
 {
 	command=$1
 	port=$(qmodem_voip_adapter_endpoint) || return 1
-	command -v json_init >/dev/null 2>&1 || . /usr/share/libubox/jshn.sh || return 1
 	if ! qmodem_voip_adapter_port_open "$port"; then
-		json_init
-		json_add_string at_port "$port"
-		json_add_int baudrate 115200
-		json_add_int databits 8
-		json_add_int parity 0
-		json_add_int stopbits 1
-		json_add_int timeout 3
-		ubus call at-daemon open "$(json_dump)" >/dev/null 2>&1 || :
+		logger -t qmodem_voip "atd: port $port not registered, AT \"$command\" unavailable"
+		return 1
 	fi
-	json_init
-	json_add_string at_port "$port"
-	json_add_string at_cmd "$command"
-	payload=$(json_dump)
+	#port and command come from UCI and the fixed AT vocabulary; escape
+	#defensively before embedding into the request json
+	escaped_port=$(printf '%s' "$port" | sed 's/\\/\\\\/g; s/"/\\"/g')
+	escaped_cmd=$(printf '%s' "$command" | sed 's/\\/\\\\/g; s/"/\\"/g')
+	req=$(printf '{"cmd":"sendat","port":"%s","at":"%s","timeout_ms":3000}' \
+		"$escaped_port" "$escaped_cmd")
 	attempt=0
 	while [ "$attempt" -lt 3 ]; do
-		result=$(ubus call at-daemon sendat "$payload") || result=
-		status=$(printf '%s\n' "$result" | jsonfilter -e '@.status')
-		end_flag=$(printf '%s\n' "$result" | jsonfilter -e '@.end_flag_matched')
-		response=$(printf '%s\n' "$result" | jsonfilter -e '@.response')
-		if [ "$status" = success ] && [ "$end_flag" = OK ] && [ -n "$response" ]; then
+		result=$(qmodem_voip_atd_request "$req") || result=
+		if [ "$(qmodem_voip_atd_get "$result" '.status')" = ok ]; then
+			response=$(qmodem_voip_adapter_lines_to_text "$result") || return 1
+			[ -n "$response" ] || return 1
 			printf '%s\n' "$response" | qmodem_voip_adapter_normalize "$command"
 			return $?
 		fi

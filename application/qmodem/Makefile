@@ -199,6 +199,7 @@ define Package/$(PKG_NAME)/conffiles
 /etc/config/qmodem_ttl
 /etc/config/sms_forwarder
 /etc/config/ubus-at-daemon
+/etc/config/qmodem-atd
 endef
 
 # ---------------------------------------------------------------------------
@@ -324,6 +325,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/qmodem-smsd $(1)/etc/init.d/
 	$(INSTALL_BIN) ./files/etc/init.d/ubus-at-daemon $(1)/etc/init.d/
+	$(INSTALL_BIN) ./files/etc/init.d/qmodem-atd $(1)/etc/init.d/
 	$(INSTALL_BIN) ./files/etc/init.d/qmodem-settings $(1)/etc/init.d/
 	$(INSTALL_BIN) ./files/etc/init.d/qmodem_monitor $(1)/etc/init.d/
 	$(INSTALL_BIN) ./files/etc/init.d/sms_forwarder $(1)/etc/init.d/
@@ -350,6 +352,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_CONF) ./files/etc/config/qmodem_sms $(1)/etc/config/
 	$(INSTALL_CONF) ./files/etc/config/sms_forwarder $(1)/etc/config/
 	$(INSTALL_CONF) ./files/etc/config/ubus-at-daemon $(1)/etc/config/
+	$(INSTALL_CONF) ./files/etc/config/qmodem-atd $(1)/etc/config/
 	$(INSTALL_DATA) ./files/usr/share/qmodem/apns.json $(1)/usr/share/qmodem/
 	$(INSTALL_DATA) ./files/usr/share/qmodem/ref-rmnet-dhcp $(1)/usr/share/qmodem/
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
