@@ -59,6 +59,12 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **菜单整合（一级 16 → 6）**：原一级入口 16 个过密，改为
+  `概览 / 移动数据 / 短信 / 模块与 SIM / 网络监控 / 高级` 六个，其余页面下沉为
+  所属页面的子页签（拨号与网络、无线与小区 → 移动数据；SIM 短信、短信转发 →
+  短信；SIM 切换、设备参数 → 模块与 SIM；AT 控制台、统计 → 网络监控；模组功能、
+  TTL、服务与扫描 → 高级）。功能与页面一个不丢，仅调整层级；同步更新
+  advanced.js / system.js / status.js 中硬编码的菜单路径引用。
 - **CI 提速**：
   - OpenWrt SDK 缓存键不再包含 `github.sha`，SDK 与其 `build_dir` 可跨提交复用，
     不必每次提交都重新下载 SDK、重新拉 feeds、重编依赖（此前最大耗时项）

@@ -945,8 +945,8 @@ return view.extend({
 					E('p', { 'style': 'margin:0;color:var(--qm-text-muted);font-size:12px' }, _('查看模组设备参数，或直接向模组发送 AT 命令。'))
 				]),
 				E('div', { 'class': 'mt-hardware-tool-actions' }, [
-					E('a', { 'class': 'btn', 'href': L.url('admin/modem/qmodem/device') }, _('设备参数设置')),
-					E('a', { 'class': 'btn cbi-button-action', 'href': L.url('admin/modem/qmodem/terminal') }, _('AT 控制台')),
+					E('a', { 'class': 'btn', 'href': L.url('admin/modem/qmodem/system/device') }, _('设备参数设置')),
+					E('a', { 'class': 'btn cbi-button-action', 'href': L.url('admin/modem/qmodem/monitor/terminal') }, _('AT 控制台')),
 					E('button', {
 						'type': 'button', 'class': 'btn',
 						'click': function() { window.location.reload(); }

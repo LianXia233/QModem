@@ -545,7 +545,7 @@ return view.extend({
 					E('p', { 'style': 'margin:0;font-size:12px;color:var(--qm-text-muted)' }, _('模组防护、恢复与通信排障工具。'))
 				]),
 				E('div', { 'class':'mt-system-maint-tools' }, [
-					E('a', { 'class':'mt-sys-btn mt-sys-btn-secondary', 'href':L.url('admin/modem/qmodem/device') }, _('诊断')),
+					E('a', { 'class':'mt-sys-btn mt-sys-btn-secondary', 'href':L.url('admin/modem/qmodem/system/device') }, _('诊断')),
 					E('button', { 'class':'mt-sys-btn mt-sys-btn-secondary', 'click':function() { self.showThermalManager(temperature); } }, _('热保护阈值')),
 					E('button', { 'class':'mt-sys-btn mt-sys-btn-secondary', 'click':function() { self.showIdentityLab(imei !== '--' ? imei : ''); } }, _('标识实验室')),
 					E('button', { 'class':'mt-sys-btn mt-sys-btn-danger', 'click':function() { self.showFactoryReset(); } }, _('恢复出厂设置')),

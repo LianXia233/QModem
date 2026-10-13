@@ -68,6 +68,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **Menu consolidation (16 top-level entries → 6)**: the top level is now
+  `Overview / Mobile Data / Messages / Module and SIM / Network Monitor /
+  Advanced`; the remaining pages moved into their owner page as sub-tabs
+  (Dial and Network, Radio and Cells → Mobile Data; SIM Messages, SMS
+  Forwarding → Messages; SIM Switch, Device Parameters → Module and SIM; AT
+  Console, Statistics → Network Monitor; Modem Features, TTL, Service and Scan
+  → Advanced). No page or feature was dropped — only the hierarchy changed.
+  Hard-coded menu paths in `advanced.js`, `system.js` and `status.js` were
+  updated accordingly.
 - **Faster CI builds + localized workflow** (`main.yml` and friends):
   - the OpenWrt SDK cache key no longer contains `github.sha`, so the SDK and its
     `build_dir` are reused across pushes instead of being re-downloaded, re-fed

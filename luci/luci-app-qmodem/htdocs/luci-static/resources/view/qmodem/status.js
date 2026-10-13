@@ -641,7 +641,7 @@ return view.extend({
 				E('div', { 'class': 'qm-mini-item' }, [ E('div', { 'class': 'qm-mini-label' }, _('上行带宽')), E('div', { 'class': 'qm-mini-val' }, mhz(info.ulBandwidth) || '--') ]),
 				speedItem
 			].filter(Boolean)),
-			E('a', { 'class': 'qm-ip-link', 'href': L.url('admin/modem/qmodem/network') }, [ _('射频与小区详情'), ' →' ])
+			E('a', { 'class': 'qm-ip-link', 'href': L.url('admin/modem/qmodem/connection/network') }, [ _('射频与小区详情'), ' →' ])
 		]);
 	},
 
@@ -1078,7 +1078,7 @@ return view.extend({
 			/* 快捷跳转 */
 			E('div', { 'class': 'qm-shortcuts' }, [
 				this.shortcut(_('移动数据'), _('APN、拨号、IP 详情与会话计数'), 'admin/modem/qmodem/connection'),
-				this.shortcut(_('射频与小区'), _('频段、小区、射频策略与诊断'), 'admin/modem/qmodem/network'),
+				this.shortcut(_('射频与小区'), _('频段、小区、射频策略与诊断'), 'admin/modem/qmodem/connection/network'),
 				this.shortcut(_('模组与 SIM'), _('模组身份、SIM 信息与维护'), 'admin/modem/qmodem/system')
 			]),
 
