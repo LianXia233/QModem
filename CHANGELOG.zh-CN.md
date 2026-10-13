@@ -11,6 +11,19 @@
 
 ## [Unreleased]
 
+### 新增（Added）
+- **ImmortalWrt 原生构建变体（`arm64_apk_immortalwrt`）**：新增
+  `.github/workflows/arm64_apk_immortalwrt.env`，改用 ImmortalWrt SNAPSHOT SDK
+  （`immortalwrt-sdk-mediatek-filogic_`），并以 `SDK_FLAVOR=immortalwrt` 让
+  `main.yml` 选取 ImmortalWrt 的 feeds —— base 取 `immortalwrt/immortalwrt`
+  （ubus / libubox / libblobmsg-json 的 ABI 来源），packages 与 luci 取
+  ImmortalWrt 镜像，routing 与 ImmortalWrt 自身 `feeds.conf.default` 一致仍取
+  `openwrt/routing`。此前产物固定由 OpenWrt SDK 与 OpenWrt feeds 构建，其 ubus
+  ABI 为 `libubus20260925`，而 ImmortalWrt master 为 `libubus20260628`，导致 apk
+  在 ImmortalWrt 设备上因依赖不可满足而无法安装。OpenWrt 各变体行为不变；
+  ImmortalWrt 资产在 Release 中带 `-immortalwrt` 后缀，避免覆盖同名的 OpenWrt
+  资产。
+
 ### 修复（Fixed）
 - **Release 资产改为可直接安装的散装包**（`main.yml`、
   `publish-existing-release.yml`）：不再把构建产物二次打包为
