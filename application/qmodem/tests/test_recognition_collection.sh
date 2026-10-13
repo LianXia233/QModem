@@ -28,6 +28,7 @@ export vendor platform config_section clear_buffer options use_ubus_flag
 uci()
 {
     case "$*" in
+        *qmodem.main.at_tool*) printf '%s\n' 0 ;;
         *qmodem.fixture.name*) printf '%s\n' air724ug ;;
         *) return 1 ;;
     esac
