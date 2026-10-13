@@ -59,6 +59,20 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **排版与视觉规范统一（全站 18 个页面）**：`theme.js` 新增 `CSS_LAYOUT`
+  区块，把原本散落在 7 个视图里的 331 条内联 CSS 收敛到统一规范上——标题字阶
+  （h1>h2>h3>h4 + 首元素去上边距）、段落/列表行高、表格（表头底色与字重、
+  单元格内边距、悬停高亮、末行去边框）、表单控件高度与说明文字、相邻卡片/网格
+  的间距节奏、长文本溢出处理。
+- **顶部页签（tab）优化**：新增 `CSS_TABS` 区块，针对主题渲染的
+  `#tabmenu > ul.tabs`（menu-aurora.js 产出）做统一：胶囊化外观、6px 间距、
+  单行不换行 + 横向滚动（条目多时不再挤压换行）、悬停态、键盘焦点环、
+  激活态用「主色淡染底 + 主色描边 + 主题高对比文字色 + 加粗」区分（不用主色
+  直接作文字色，避免主色偏浅的主题对比度不足）。
+- **术语与文案统一**：补 29 条译文（Bridge Port、Direct modem access、SMS
+  Storage、Sender、Result、Notice、Slot %s、Webhook URL 等说明性文案），
+  专业术语与品牌名（APN、ARFCN、PCI、SCS、IPv4/IPv6、DNS、URL、USB、
+  Webhook、PushDeer、ServerChan 及运营商名）按规范保留原文。
 - **菜单整合（一级 16 → 6）**：原一级入口 16 个过密，改为
   `概览 / 移动数据 / 短信 / 模块与 SIM / 网络监控 / 高级` 六个，其余页面下沉为
   所属页面的子页签（拨号与网络、无线与小区 → 移动数据；SIM 短信、短信转发 →

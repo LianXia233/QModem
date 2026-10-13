@@ -287,6 +287,64 @@ function selDesc(list, suffix) {
 	return list.map(function(c) { return '.qm-app .' + c + suffix; }).join(',');
 }
 
+var CSS_LAYOUT = [
+	/* 标题字阶统一：h1>h2>h3>h4，首元素不留上边距，避免各页面各自为政 */
+	'.qm-app h1{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:0 0 10px}',
+	'.qm-app h2{font-size:17px;font-weight:750;margin:0 0 8px}',
+	'.qm-app h3{font-size:15px;font-weight:700;margin:0 0 6px}',
+	'.qm-app h4{font-size:13.5px;font-weight:700;margin:0 0 6px}',
+	'.qm-app h1:first-child,.qm-app h2:first-child,.qm-app h3:first-child{margin-top:0}',
+	/* 段落与列表：统一行高与间距 */
+	'.qm-app p{margin:0 0 10px;line-height:1.6}',
+	'.qm-app ul,.qm-app ol{margin:0 0 10px;padding-left:20px;line-height:1.65}',
+	'.qm-app li+li{margin-top:4px}',
+	/* 表格：统一表头、单元格内边距、斑马纹与悬停 */
+	'.qm-app table{width:100%;border-collapse:collapse;font-size:12.5px}',
+	'.qm-app thead th,.qm-app table>thead>tr>th{background:var(--qm-surface-2);color:var(--qm-text);',
+	'font-weight:700;text-align:left;padding:9px 12px;border-bottom:1px solid var(--qm-border)}',
+	'.qm-app tbody td,.qm-app table>tbody>tr>td{padding:8px 12px;border-bottom:1px solid var(--qm-border-soft);',
+	'color:var(--qm-text-soft);vertical-align:middle}',
+	'.qm-app tbody tr:hover>td{background:var(--qm-surface-2);color:var(--qm-text)}',
+	'.qm-app tbody tr:last-child>td{border-bottom:0}',
+	/* 表单（cbi）：统一控件高度与说明文字 */
+	'.qm-app .cbi-input-text,.qm-app .cbi-input-select,.qm-app .cbi-input-password,',
+	'.qm-app input[type="text"],.qm-app input[type="password"],.qm-app input[type="number"],.qm-app select,',
+	'.qm-app textarea{min-height:32px;font-size:12.5px;line-height:1.45}',
+	'.qm-app .cbi-value{margin-bottom:10px}',
+	'.qm-app .cbi-value-description{color:var(--qm-text-muted);font-size:11.5px;line-height:1.55}',
+	'.qm-app .cbi-value-title{font-weight:650}',
+	/* 区块节奏：相邻卡片/网格之间统一间距 */
+	'.qm-app .qm-card+.qm-card,.qm-app .qm-card+.qm-grid,.qm-app .qm-grid+.qm-card,',
+	'.qm-app .qm-grid+.qm-grid,.qm-app .qm-card+.qm-grid-2,.qm-app .qm-card+.qm-grid-3{margin-top:var(--qm-gap)}',
+	/* 长文本与代码：避免横向溢出 */
+	'.qm-app code,.qm-app pre,.qm-app .qm-mono{overflow-wrap:anywhere}',
+].join('');
+
+var CSS_TABS = [
+'/* 顶部页签（主题 menu-aurora.js 渲染：#tabmenu > ul.tabs > li.active）。',
+	' * 这些节点在 .qm-app 之外，故直接用主题在 :root 上的变量。 */',
+	'#tabmenu{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;margin:0 0 14px}',
+	'#tabmenu::-webkit-scrollbar{height:6px}',
+	'#tabmenu::-webkit-scrollbar-thumb{background:var(--border-color-medium,#d7dde5);border-radius:999px}',
+	'#tabmenu ul.tabs{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin:0;padding:2px 2px 8px;',
+	'border-bottom:1px solid var(--border-color-low,#e7ecf2);list-style:none}',
+	'#tabmenu ul.tabs>li{flex:0 0 auto;margin:0}',
+	'#tabmenu ul.tabs>li>a{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;',
+	'border:1px solid transparent;color:var(--text-color-medium,#3d4756);background:transparent;',
+	'font-size:12.5px;font-weight:650;line-height:1.45;white-space:nowrap;text-decoration:none;',
+	'transition:background-color .15s ease,color .15s ease,border-color .15s ease}',
+	'#tabmenu ul.tabs>li>a:hover{background:var(--background-color-low,#f4f6f9);',
+	'border-color:var(--border-color-medium,#d7dde5);color:var(--text-color-high,#16202c)}',
+	'#tabmenu ul.tabs>li>a:focus-visible{outline:2px solid var(--primary-color,#0072f5);outline-offset:2px}',
+	'#tabmenu ul.tabs>li.active>a{background:var(--background-color-high,#ffffff);',
+	'border-color:var(--primary-color,#0072f5);color:var(--text-color-high,#16202c);font-weight:700;',
+	'box-shadow:0 1px 3px rgba(15,23,42,.12)}',
+	/* 文字色跟随主题的高对比文字色（而非主色）：主色偏浅的主题（如 aurora）下',
+	 * 主色文字对比度不足，而 text-color-high 在浅/深主题下都足够 */
+	'@supports (color:color-mix(in srgb,red 50%,blue)){',
+	'#tabmenu ul.tabs>li.active>a{background:color-mix(in srgb,var(--primary-color,#0072f5) 10%,var(--background-color-high,#fff))}}',
+].join('');
+
 var CSS_LEGACY = [
 	/* 卡片容器 */
 	sel(CARD_CLASSES) + '{background:var(--qm-surface);border:1px solid var(--qm-border);',
@@ -498,7 +556,7 @@ var CSS_RESPONSIVE = [
 	'animation-iteration-count:1!important;transition-duration:.001ms!important}}'
 ].join('');
 
-var QM_CSS = [ CSS_TOKENS, CSS_BASE, CSS_COMPONENTS, CSS_LEGACY, CSS_RESPONSIVE ].join('\n');
+var QM_CSS = [ CSS_TOKENS, CSS_BASE, CSS_COMPONENTS, CSS_LAYOUT, CSS_TABS, CSS_LEGACY, CSS_RESPONSIVE ].join('\n');
 
 /* ------------------------------------------------------------------ */
 /* 6) 运行时：注入 + 明暗探测                                            */

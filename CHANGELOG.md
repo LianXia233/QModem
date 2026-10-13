@@ -68,6 +68,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **Unified typography & layout across all 18 pages**: `theme.js` gains a
+  `CSS_LAYOUT` block that folds the 331 inline CSS rules scattered over 7 views
+  into one spec — heading scale (h1>h2>h3>h4, no leading top margin), paragraph
+  and list rhythm, tables (header tint/weight, cell padding, row hover, no
+  trailing border), form control height and help text, spacing between adjacent
+  cards/grids, and long-text overflow handling.
+- **Top tab bar reworked**: new `CSS_TABS` block styling the theme-rendered
+  `#tabmenu > ul.tabs` (produced by `menu-aurora.js`): pill look, 6px gaps,
+  single-row with horizontal scrolling instead of wrapping, hover state,
+  keyboard focus ring, and an active state built from an accent-tinted
+  background + accent border + the theme's high-contrast text color + bold
+  weight (never the raw accent as text color, which fails AA on light-accent
+  themes).
+- **Terminology pass**: 29 new translations (Bridge Port, Direct modem access,
+  SMS Storage, Sender, Result, Notice, Slot %s, Webhook URL …). Technical terms
+  and brand names (APN, ARFCN, PCI, SCS, IPv4/IPv6, DNS, URL, USB, Webhook,
+  PushDeer, ServerChan, carrier names) stay in their original form by rule.
 - **Menu consolidation (16 top-level entries → 6)**: the top level is now
   `Overview / Mobile Data / Messages / Module and SIM / Network Monitor /
   Advanced`; the remaining pages moved into their owner page as sub-tabs

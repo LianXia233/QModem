@@ -3349,7 +3349,7 @@ msgstr "Webhook"
 #: view/qmodem/sms_forward.js:267
 # Source: view/qmodem/sms_forward.js:129, view/qmodem/sms_forward.js:267
 msgid "Webhook URL"
-msgstr "Webhook URL"
+msgstr "Webhook 地址"
 
 #: view/qmodem/network_config.js:509
 #: view/qmodem/network_config.js:518
@@ -8055,3 +8055,87 @@ msgstr "统计"
 
 msgid "Network Monitor Configuration"
 msgstr "网络监控配置"
+
+msgid "AT Probe Workers"
+msgstr "AT 探测线程数"
+
+msgid "Add Retry Delay"
+msgstr "追加重试延迟"
+
+msgid "Add Retry Max"
+msgstr "追加最大重试次数"
+
+msgid "Bridge Port"
+msgstr "桥接端口"
+
+msgid "Click "Scan Neighbor Cells" to search for nearby cell towers"
+msgstr "点击「扫描邻区」搜索附近基站"
+
+msgid "Configure cell lock parameters. You can manually enter values or use the "Copy" button from scanned cells."
+msgstr "配置锁小区参数：可手动输入，或使用扫描结果中的「复制」按钮。"
+
+msgid "Content"
+msgstr "内容"
+
+msgid "Database with URC"
+msgstr "数据库方式（URC 触发）"
+
+msgid "Database with polling"
+msgstr "数据库方式（轮询）"
+
+msgid "Default bridge port for passthrough. Device-level bridge_port overrides this slot default."
+msgstr "透传的默认桥接端口。设备级 bridge_port 会覆盖此卡槽默认值。"
+
+msgid "Device-level bridge port for passthrough. If set, it overrides the slot default bridge port."
+msgstr "透传的设备级桥接端口；设置后覆盖卡槽默认桥接端口。"
+
+msgid "Direct modem access"
+msgstr "直接访问模组"
+
+msgid "Fast AT Timeout"
+msgstr "快速 AT 超时"
+
+msgid "Hotplug Add Delay"
+msgstr "热插拔添加延迟"
+
+msgid "Model AT Timeout"
+msgstr "型号查询 AT 超时"
+
+msgid "No data available for the selected device. Please rescan and try again."
+msgstr "所选设备暂无数据，请重新扫描后重试。"
+
+msgid "No messages to delete"
+msgstr "没有可删除的短信"
+
+msgid "Notice"
+msgstr "提示"
+
+msgid "Result"
+msgstr "结果"
+
+msgid "SMS Mode"
+msgstr "短信模式"
+
+msgid "SMS Storage"
+msgstr "短信存储"
+
+msgid "Scan Log Level"
+msgstr "扫描日志级别"
+
+msgid "Scan Workers"
+msgstr "扫描线程数"
+
+msgid "Sender"
+msgstr "发送者"
+
+msgid "Slot %s"
+msgstr "卡槽 %s"
+
+msgid "Some SIM switch data failed to load; will retry on next refresh"
+msgstr "部分 SIM 切换数据加载失败，将在下次刷新时重试"
+
+msgid "N/A"
+msgstr "暂无"
+
+msgid "Content Type"
+msgstr "内容类型"
