@@ -66,6 +66,10 @@ var CSS_TOKENS = [
 	'--qm-glow-b:radial-gradient(circle,rgba(99,102,241,.09) 0%,rgba(14,165,233,.05) 50%,transparent 70%);',
 	'--qm-terminal-gradient:linear-gradient(135deg,#111820,#1d2733);',
 	'--qm-font-mono:var(--font-family-monospace,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);',
+	/* 界面字体栈：各视图不再各自内联一份 -apple-system…（原 6 处重复），
+	 * 统一在此定义；主题若提供 --font-family 则跟随主题。 */
+	'--qm-font:var(--font-family,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif);',
+	'font-family:var(--qm-font);',
 	'color:var(--qm-text);',
 
 	'}',
@@ -193,6 +197,8 @@ var CSS_COMPONENTS = [
 	'.qm-btn:hover{background:var(--qm-surface-2);border-color:var(--qm-border-strong)}',
 	'.qm-btn-primary{background:var(--qm-accent);border-color:var(--qm-accent);color:var(--qm-on-accent)}',
 	'.qm-btn-primary:hover{background:var(--qm-accent);filter:brightness(1.06)}',
+	'.qm-btn:active{transform:translateY(1px)}',
+	'.qm-btn-primary:active{filter:brightness(.94);transform:translateY(1px)}',
 	'.qm-btn-danger{background:var(--qm-danger);border-color:var(--qm-danger);color:#fff}',
 	'.qm-btn[disabled]{opacity:.55;cursor:not-allowed}',
 
@@ -299,12 +305,16 @@ var CSS_LAYOUT = [
 	'.qm-app ul,.qm-app ol{margin:0 0 10px;padding-left:20px;line-height:1.65}',
 	'.qm-app li+li{margin-top:4px}',
 	/* 表格：统一表头、单元格内边距、斑马纹与悬停 */
-	'.qm-app table{width:100%;border-collapse:collapse;font-size:12.5px}',
-	'.qm-app thead th,.qm-app table>thead>tr>th{background:var(--qm-surface-2);color:var(--qm-text);',
+	'.qm-app table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}',
+	/* 表头吸顶（在 .qm-scroll 等滚动容器内生效；普通容器下无副作用） */
+	'.qm-app thead th,.qm-app table>thead>tr>th{position:sticky;top:0;z-index:2;',
+	'background:var(--qm-surface-2);color:var(--qm-text);',
 	'font-weight:700;text-align:left;padding:9px 12px;border-bottom:1px solid var(--qm-border)}',
 	'.qm-app tbody td,.qm-app table>tbody>tr>td{padding:8px 12px;border-bottom:1px solid var(--qm-border-soft);',
 	'color:var(--qm-text-soft);vertical-align:middle}',
-	'.qm-app tbody tr:hover>td{background:var(--qm-surface-2);color:var(--qm-text)}',
+	/* 斑马纹：极浅底色分隔长表；悬停行优先级更高，可覆盖条纹 */
+	'.qm-app tbody tr:nth-child(even)>td{background:var(--qm-surface-2)}',
+	'.qm-app tbody tr:hover>td{background:var(--qm-surface-3);color:var(--qm-text)}',
 	'.qm-app tbody tr:last-child>td{border-bottom:0}',
 	/* 表单（cbi）：统一控件高度与说明文字 */
 	'.qm-app .cbi-input-text,.qm-app .cbi-input-select,.qm-app .cbi-input-password,',
