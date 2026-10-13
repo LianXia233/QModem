@@ -207,16 +207,20 @@ endef
 #
 # feed 以 src-link 指向仓库根，包目录为 <feed>/application/qmodem，故 rust/
 # 位于 ../../rust；若某天 rust/ 被并入包目录，用 ./rust 兜底。
-# 三元组按 $(ARCH) 推导：mipsel 为 tier 3（std 可用但 rustup 无预编译），
+# 三元组按 $(ARCH) 推导。注意 $(ARCH) 在不同目标下形态不一：aarch64 / x86_64
+# 平台是裸值，而 MIPS 平台必须带 ISA 后缀（如 mipsel_24kc / mips_24kc），故
+# 一律用 $(filter) 前缀匹配。mipsel 为 tier 3（std 可用但 rustup 无预编译），
 # 由 build-rust.sh 切到 nightly + -Z build-std；aarch64 / x86_64 为 tier 2。
 # 注意：mipsel 构建需要 CI 预装 nightly + rust-src（见 main.yml）。
 # ---------------------------------------------------------------------------
 QMODEM_RUST_SRC:=$(firstword $(foreach d,../../rust ./rust,$(if $(wildcard $(d)/Cargo.toml),$(d),)))
-ifeq ($(ARCH),aarch64)
+ifneq (,$(filter aarch64%,$(ARCH)))
 QMODEM_RUST_TRIPLE:=aarch64-unknown-linux-musl
-else ifeq ($(ARCH),mipsel)
+else ifneq (,$(filter mipsel%,$(ARCH)))
 QMODEM_RUST_TRIPLE:=mipsel-unknown-linux-musl
-else ifeq ($(ARCH),x86_64)
+else ifneq (,$(filter mips_% mips,$(ARCH)))
+QMODEM_RUST_TRIPLE:=mips-unknown-linux-musl
+else ifneq (,$(filter x86_64%,$(ARCH)))
 QMODEM_RUST_TRIPLE:=x86_64-unknown-linux-musl
 endif
 

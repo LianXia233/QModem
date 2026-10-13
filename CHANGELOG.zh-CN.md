@@ -88,6 +88,12 @@
   `qmodem`，落盘路径不变。
 
 ### 修复（Fixed）
+- **`mmips`（mipsel）构建因 Rust 目标三元组为空而失败**：MIPS 平台的 `$(ARCH)` 是
+  `mipsel_24kc`（必须带 ISA 后缀），精确匹配的 `ifeq ($(ARCH),mipsel)` 永远不成立，
+  `Build/CompileRust` 在 cargo 启动前就中止（且诊断被 OpenWrt 吞掉）。三元组推导改为
+  `$(filter)` 前缀匹配，覆盖 `aarch64*` / `mipsel*` / `mips*` / `x86_64*`。
+- **CI 包编译失败不再静默**：`Compile QModem` 步骤失败时用 `make ... V=s -j1` 重跑，
+  让被 OpenWrt 默认隐藏的真实错误（如 cargo 交叉编译日志）直接出现在 job 日志中。
 - **移除跨包文件冲突**：`qmodem` 与 `luci-app-qmodem` 此前都会安装
   `/usr/share/rpcd/acl.d/luci-app-qmodem.json`。现由前端包单独提供（并把原先位于
   后端 ACL 中的 `luci-mod-status-index → modem_ctrl` 授权合并进来），后端只装

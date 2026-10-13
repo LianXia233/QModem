@@ -100,6 +100,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **`mmips` (mipsel) builds failed with an empty Rust target triple**: `$(ARCH)` on
+  MIPS platforms is `mipsel_24kc` (CPU/ISA suffix mandatory), so the exact-match
+  `ifeq ($(ARCH),mipsel)` never fired and `Build/CompileRust` aborted before cargo
+  ran (with OpenWrt swallowing the diagnostic). The triple lookup now uses
+  `$(filter)` prefix matching for `aarch64*` / `mipsel*` / `mips*` / `x86_64*`.
+- **Silent package build failures in CI**: the `Compile QModem` step now retries the
+  failing package with `make ... V=s -j1`, so the real error output (e.g. cargo
+  cross-compile logs that OpenWrt hides by default) lands directly in the job log.
 - **Removed a cross-package file conflict**: both `qmodem` and `luci-app-qmodem` used to
   install `/usr/share/rpcd/acl.d/luci-app-qmodem.json`. It is now provided solely by the
   frontend package (which absorbed the `luci-mod-status-index → modem_ctrl` grant that

@@ -373,7 +373,10 @@ jobs:
           # （tom_modem / ubus_at_daemon）已随合并消失。
           qmodem_package=$(cat ../qmodem/.github/workflows/qmodem_package_generic)
           for package in $qmodem_package; do
-            make package/$package/compile -j$(nproc)
+            # OpenWrt 默认吞掉 Build/Compile 的全部输出；失败时用 V=s -j1
+            # 重跑一次，把真实错误（如 cargo 交叉编译）直接打进日志。
+            make package/$package/compile -j$(nproc) \
+              || make package/$package/compile V=s -j1
           done
           package_dir="bin/packages/${{ env.SDK_ARCH }}/qmodem"
           required_packages=(
