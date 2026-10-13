@@ -68,6 +68,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **Tab hierarchy refined**: the theme appends multiple `ul.tabs` rows inside
+  `#tabmenu` (row 1 = top level, row 2 = children of the active entry). The
+  second row is now visually subordinate — smaller type (12px) and padding
+  (5px 12px), regular weight, muted color, and no duplicate divider — so the two
+  rows read as a clear hierarchy.
 - **Unified typography & layout across all 18 pages**: `theme.js` gains a
   `CSS_LAYOUT` block that folds the 331 inline CSS rules scattered over 7 views
   into one spec — heading scale (h1>h2>h3>h4, no leading top margin), paragraph
@@ -150,6 +155,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **Second-level tabs were untranslated**: the menu titles `Dial and Network`,
+  `Device Parameters`, `Modem Features`, `Service and Scan`, `SIM Messages` and
+  `SMS Forwarding` had no po entries, so the second tab row rendered in English.
+  All six are now translated (`TTL` stays as a term).
+- **Light-background widgets inside hero rendered as blank blocks**: hero forces
+  white text on every descendant, but `.mt-system-temp-box` (module-system
+  temperature box, which gets a white background via CARD_CLASSES) and
+  `.mtconn-state` (connection status badge, `background:var(--qm-glass)`) are
+  light — i.e. white on white (confirmed on device). Both are now darkened inside
+  hero and their text (temperature value, description, badge label) forced white.
 - **White-on-white hero chips and button**: the hero rule
   `* { color:#fff !important }` forces white text on every descendant, while
   `.qm-hero-op` (operator), `.qm-pill-tag` (mode / interface) and

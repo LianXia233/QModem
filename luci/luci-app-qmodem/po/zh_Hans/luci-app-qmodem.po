@@ -8139,3 +8139,21 @@ msgstr "暂无"
 
 msgid "Content Type"
 msgstr "内容类型"
+
+msgid "Dial and Network"
+msgstr "拨号与网络"
+
+msgid "SIM Messages"
+msgstr "SIM 短信"
+
+msgid "SMS Forwarding"
+msgstr "短信转发"
+
+msgid "Device Parameters"
+msgstr "设备参数"
+
+msgid "Modem Features"
+msgstr "模组功能"
+
+msgid "Service and Scan"
+msgstr "服务与扫描"

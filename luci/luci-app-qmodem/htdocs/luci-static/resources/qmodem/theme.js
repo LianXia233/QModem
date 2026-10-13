@@ -329,6 +329,13 @@ var CSS_TABS = [
 	'#tabmenu ul.tabs{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin:0;padding:2px 2px 8px;',
 	'border-bottom:1px solid var(--border-color-low,#e7ecf2);list-style:none}',
 	'#tabmenu ul.tabs>li{flex:0 0 auto;margin:0}',
+	/* 第二行页签（主题按 #tabmenu 递归追加 ul.tabs 渲染下一级）：视觉降一级，
+	 * 与第一行形成清晰层级，并去掉重复分隔线 */
+	'#tabmenu ul.tabs+ul.tabs{margin-top:2px;padding-top:6px;border-bottom:0}',
+	'#tabmenu ul.tabs+ul.tabs>li>a{padding:5px 12px;font-size:12px;font-weight:600;',
+	'color:var(--text-color-low,#6b7684)}',
+	'#tabmenu ul.tabs+ul.tabs>li>a:hover{color:var(--text-color-high,#16202c)}',
+	'#tabmenu ul.tabs+ul.tabs>li.active>a{color:var(--text-color-high,#16202c);font-weight:700}',
 	'#tabmenu ul.tabs>li>a{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;',
 	'border:1px solid transparent;color:var(--text-color-medium,#3d4756);background:transparent;',
 	'font-size:12.5px;font-weight:650;line-height:1.45;white-space:nowrap;text-decoration:none;',
@@ -420,9 +427,19 @@ var CSS_LEGACY = [
 	selDesc(HERO_CLASSES, ' .qm-hero-op') + ',' +
 	selDesc(HERO_CLASSES, ' .qm-pill-tag') + ',' +
 	selDesc(HERO_CLASSES, ' .qm-refresh-btn') + ',' +
-	selDesc(HERO_CLASSES, ' .qm-status-badge') +
+	selDesc(HERO_CLASSES, ' .qm-status-badge') + ',' +
+	/* 同属"浅底小控件"但由视图/CARD_CLASSES 提供白底：hero 内同样黑化，
+	 * 否则白底 + 强制白字 = 空白块（实机"模组系统"页温度框、连接页状态徽章） */
+	selDesc(HERO_CLASSES, ' .mt-system-temp-box') + ',' +
+	selDesc(HERO_CLASSES, ' .mtconn-state') + ',' +
+	selDesc(HERO_CLASSES, ' .mt-ui-state') + ',' +
+	selDesc(HERO_CLASSES, ' .qm-ip-box') + ',' +
+	selDesc(HERO_CLASSES, ' [class*="-temp-box"]') +
 	'{background:rgba(0,0,0,.30)!important;border:1px solid rgba(255,255,255,.34)!important;',
 	'color:rgba(255,255,255,.92)!important;-webkit-text-fill-color:rgba(255,255,255,.92)!important}',
+	selDesc(HERO_CLASSES, ' .mt-system-temp-val') + ',' +
+	selDesc(HERO_CLASSES, ' .mt-system-temp-desc') + ',' +
+	selDesc(HERO_CLASSES, ' .mtconn-state span') + ',' +
 	selDesc(HERO_CLASSES, ' .qm-pill-tag strong') + ',' +
 	selDesc(HERO_CLASSES, ' .qm-hero-op strong') + ',' +
 	selDesc(HERO_CLASSES, ' .qm-status-badge strong') +

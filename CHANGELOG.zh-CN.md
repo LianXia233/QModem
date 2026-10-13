@@ -59,6 +59,9 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **页签层级细化**：主题会按 `#tabmenu` 递归追加多个 `ul.tabs`（第一行一级、
+  第二行当前一级项的子页签）。二级页签现单独降级——更小字号（12px）与内边距
+  （5px 12px）、常规字重、弱化文字色、去掉重复分隔线，与一级形成清晰层级。
 - **排版与视觉规范统一（全站 18 个页面）**：`theme.js` 新增 `CSS_LAYOUT`
   区块，把原本散落在 7 个视图里的 331 条内联 CSS 收敛到统一规范上——标题字阶
   （h1>h2>h3>h4 + 首元素去上边距）、段落/列表行高、表格（表头底色与字重、
@@ -128,6 +131,14 @@
   `qmodem`，落盘路径不变。
 
 ### 修复（Fixed）
+- **二级页签未汉化**：菜单标题 `Dial and Network`、`Device Parameters`、
+  `Modem Features`、`Service and Scan`、`SIM Messages`、`SMS Forwarding` 在 po
+  中没有条目，导致第二行页签显示英文。现已补齐（`TTL` 作为术语保留原文）。
+- **页签行内"浅底控件"变成空白块**：hero 会把后代文字强制白色，而
+  `.mt-system-temp-box`（模组系统页温度框，经 CARD_CLASSES 拿到白底）与
+  `.mtconn-state`（连接页状态徽章，`background:var(--qm-glass)`）是浅底，
+  于是白底白字整块看不见（实机截图确认）。二者在 hero 内同样黑化处理，
+  温度值/说明与徽章文字一并强制白字。
 - **Hero 内胶囊/按钮白底白字**：hero 的 `* { color:#fff !important }` 会把所有
   后代文字强制白色，而 `.qm-hero-op`（运营商）、`.qm-pill-tag`（模式、接口）、
   `.qm-refresh-btn`（刷新）的默认底色是白/浅灰（跟随主题）→ 白底白字不可见
