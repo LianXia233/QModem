@@ -344,6 +344,22 @@ jobs:
           echo 'CONFIG_PACKAGE_libopenssl=n' >> .config
           echo 'CONFIG_PACKAGE_openssl-util=n' >> .config
 
+      # Rust 工具链：qmodem-atd 由包的 Build/Compile 现场交叉编译（linker 用
+      # SDK 自带工具链，保证与目标 sysroot 的 musl/libubus ABI 一致）。
+      # aarch64 / x86_64 musl 是 tier 2，稳定版即可；mipsel musl 是 tier 3
+      # （std 可用但 rustup 无预编译），需要 nightly + rust-src + -Z build-std。
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: aarch64-unknown-linux-musl,x86_64-unknown-linux-musl
+      - name: Install Nightly Rust for mipsel (build-std)
+        if: startsWith(matrix.build_arch, 'mmips_')
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly
+          components: rust-src
+
       - name: Compile QModem
         id: compile
         run: |

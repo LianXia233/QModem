@@ -55,6 +55,10 @@ stage_shell() {
     local files tmp
     tmp="$(mktemp)"
     find application -type f -name '*.sh' -path '*/files/*' > "$tmp" 2>/dev/null
+    # 构建期脚本（包根的 build-rust.sh、scripts/ 下的 CI 辅助脚本）同样会被
+    # sh/bash 执行，语法错误会让全部构建矩阵一起挂，纳入检查。
+    find application -type f -name '*.sh' ! -path '*/files/*' >> "$tmp" 2>/dev/null
+    find scripts -type f -name '*.sh' >> "$tmp" 2>/dev/null
     # rpcd 脚本无 .sh 后缀，单独按目录发现
     find . -path ./.git -prune -o -path ./rust/target -prune -o \
         -type f -path '*/usr/libexec/rpcd/*' -print >> "$tmp" 2>/dev/null
@@ -126,6 +130,37 @@ stage_rust() {
     have cargo || { record SKIP rust "cargo 未安装"; return 0; }
     if [ "$CHANGED" -eq 1 ] && ! changed_files | grep -q '^rust/'; then
         record SKIP rust "rust/ 无改动"
+        return 0
+    fi
+    # 非 Unix 宿主（Windows / MinGW）无法编译 std::os::unix，但可以借用
+    # rustup 预装的 tier 2 musl 目标 std 做 `cargo check`（不链接，无需交叉
+    # linker）。这与包内 build-rust.sh 的 aarch64/x86_64 目标一致，把本机
+    # rust stage 从 SKIP 提升为真实的类型/借用检查。
+    local target=""
+    case "$(uname -s 2>/dev/null)" in
+        Linux | Darwin | *BSD*) ;;
+        *)
+            local t
+            for t in aarch64-unknown-linux-musl x86_64-unknown-linux-musl; do
+                if rustup target list --installed 2>/dev/null | grep -qx "$t"; then
+                    target="$t"
+                    break
+                fi
+            done
+            ;;
+    esac
+    if [ -n "$target" ]; then
+        ( cd rust && cargo check --workspace --all-features \
+              --target "$target" >/tmp/check_all_cargo.log 2>&1 ) \
+            || { record FAIL rust "cargo check --target $target 失败 (见 /tmp/check_all_cargo.log)";
+                 tail -n 40 /tmp/check_all_cargo.log >&2
+                 return 0; }
+        ( cd rust && cargo clippy --workspace --all-features \
+              --target "$target" -- -D warnings >>/tmp/check_all_cargo.log 2>&1 ) \
+            || { record FAIL rust "cargo clippy -D warnings 失败 (见 /tmp/check_all_cargo.log)";
+                 tail -n 40 /tmp/check_all_cargo.log >&2
+                 return 0; }
+        record PASS rust "cargo check + clippy 通过（--target $target，非 Unix 宿主以目标 std 检查）"
         return 0
     fi
     ( cd rust && cargo test --workspace >/tmp/check_all_cargo.log 2>&1 ) \

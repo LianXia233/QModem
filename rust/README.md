@@ -85,9 +85,13 @@ bash scripts/cross-build-rust.sh
 
 集成到 OpenWrt 包的两条路线：
 
-1. **SDK 源码构建**：feed 包 Makefile 直接调用 cargo（SDK 带 rust 工具链时优先，
-   构建可复现）；
-2. **预编译注入**：CI（`.github/workflows/rust-build.yml`）按 target 产出静态
-   二进制 artifact，`qmodem-suite` 按 ARCH 注入（适合 SDK 无 rust 的代际）。
+1. **SDK 源码构建（已实现，当前采用）**：`application/qmodem/build-rust.sh`
+   由 `Build/Compile` 调用，linker 用 OpenWrt 自带交叉工具链
+   （`$(TARGET_CC)`），保证与目标 sysroot 的 musl 配置及后续 libubus 等库的
+   ABI 一致；mipsel 为 Rust tier 3（std 可用但无预编译），由脚本切到
+   nightly + `-Z build-std=std,panic_abort`；
+2. **预编译注入（备用）**：CI（`.github/workflows/rust-build.yml`）按 target
+   产出静态二进制 artifact，按 ARCH 注入。仅当 SDK 内构建不可行时再启用。
 
+注意：mipsel 构建需要 CI 预装 nightly + rust-src（`main.yml` 已按矩阵变体处理）。
 详见 docs/refactor/journal-rust-cross.md。

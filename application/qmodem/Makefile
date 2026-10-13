@@ -188,7 +188,8 @@ endef
 define Package/$(PKG_NAME)/description
   QModem 一体化后端：模组识别与拨号脚本、ubus 数据服务、短信守护进程、
   统计采集、网络监控、SMS 转发，以及配套命令行工具（tom_modem、sms_tool_q、
-  ubus-at-daemon、modem_scan、quectel-CM-M、qmodem-seal）。
+  ubus-at-daemon、modem_scan、quectel-CM-M、qmodem-seal）。Rust 组件
+  qmodem-atd（AT 守护进程，unix socket 通路）随包构建与安装。
 endef
 
 define Package/$(PKG_NAME)/conffiles
@@ -198,6 +199,37 @@ define Package/$(PKG_NAME)/conffiles
 /etc/config/qmodem_ttl
 /etc/config/sms_forwarder
 /etc/config/ubus-at-daemon
+endef
+
+# ---------------------------------------------------------------------------
+# Rust 组件（仓库根 rust/ workspace）
+#
+# feed 以 src-link 指向仓库根，包目录为 <feed>/application/qmodem，故 rust/
+# 位于 ../../rust；若某天 rust/ 被并入包目录，用 ./rust 兜底。
+# 三元组按 $(ARCH) 推导：mipsel 为 tier 3（std 可用但 rustup 无预编译），
+# 由 build-rust.sh 切到 nightly + -Z build-std；aarch64 / x86_64 为 tier 2。
+# 注意：mipsel 构建需要 CI 预装 nightly + rust-src（见 main.yml）。
+# ---------------------------------------------------------------------------
+QMODEM_RUST_SRC:=$(firstword $(foreach d,../../rust ./rust,$(if $(wildcard $(d)/Cargo.toml),$(d),)))
+ifeq ($(ARCH),aarch64)
+QMODEM_RUST_TRIPLE:=aarch64-unknown-linux-musl
+else ifeq ($(ARCH),mipsel)
+QMODEM_RUST_TRIPLE:=mipsel-unknown-linux-musl
+else ifeq ($(ARCH),x86_64)
+QMODEM_RUST_TRIPLE:=x86_64-unknown-linux-musl
+endif
+
+define Build/CompileRust
+	if [ -z "$(QMODEM_RUST_SRC)" ] || [ -z "$(QMODEM_RUST_TRIPLE)" ]; then \
+		echo "!! rust build failed: QMODEM_RUST_SRC='$(QMODEM_RUST_SRC)' QMODEM_RUST_TRIPLE='$(QMODEM_RUST_TRIPLE)' (ARCH=$(ARCH))" >&2; \
+		exit 1; \
+	fi
+	RUST_DIR="$(QMODEM_RUST_SRC)" \
+	RUST_TARGET_TRIPLE="$(QMODEM_RUST_TRIPLE)" \
+	OUT_DIR="$(PKG_BUILD_DIR)/rust-bin" \
+	TARGET_CC="$(TARGET_CC)" \
+	STAGING_DIR="$(STAGING_DIR)" \
+	sh ./build-rust.sh
 endef
 
 # ---------------------------------------------------------------------------
@@ -224,6 +256,7 @@ endef
 #   libqmodem-sms 是公共依赖，先构建并发布到 STAGING_DIR；
 #   tom_modem 与 qmodem-smsd 链接 -lqmodem-sms。
 define Build/Compile
+	$(call Build/CompileRust)
 	$(MAKE) -C $(PKG_BUILD_DIR)/libqmodem-sms $(TARGET_CONFIGURE_OPTS) \
 		CC="$(TARGET_CC)" \
 		CFLAGS="$(TARGET_CFLAGS) -fPIC -Wall -Wextra -Werror -std=gnu99 -I." \
@@ -274,6 +307,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/libqmodem-sms/libqmodem-sms.so.1.0.0 $(1)/usr/lib/
 	ln -sf libqmodem-sms.so.1.0.0 $(1)/usr/lib/libqmodem-sms.so.1
 	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/rust-bin/qmodem-atd $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/tom_modem/tom_modem $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/sms-tool_q/sms_tool $(1)/usr/bin/sms_tool_q
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ubus_at_daemon/ubus-at-daemon $(1)/usr/bin/

@@ -24,6 +24,19 @@
   ImmortalWrt 资产在 Release 中带 `-immortalwrt` 后缀，避免覆盖同名的 OpenWrt
   资产。
 
+- **Rust 组件接入 OpenWrt 包构建（qmodem-atd 随包交付）**：`application/qmodem`
+  新增 `build-rust.sh`，`Build/Compile` 第一步用 cargo 交叉编译 `qmodem-atd`
+  并装入 `/usr/bin/`。linker 一律取 OpenWrt 自带交叉工具链（而非 musl.cc 等
+  第三方工具链），保证与目标 sysroot 的 musl 配置及后续 libubus / libjson-c /
+  libsqlite3 的 ABI 一致。目标三元组按 `$(ARCH)` 推导（aarch64 / mipsel /
+  x86_64 → `*-unknown-linux-musl`）；其中 **mipsel musl 是 Rust tier 3**
+  （`std` 可用但 rustup 无预编译），需 nightly + rust-src +
+  `-Z build-std=std,panic_abort`，aarch64 / x86_64 为 tier 2 用稳定版即可，
+  `main.yml` 已按矩阵变体预装对应工具链。本地门禁同步升级：
+  `check_all.sh` 的 rust stage 在非 Unix 宿主改用预装 musl 目标 std 跑
+  `cargo check + clippy --all-features`（不再是 SKIP），shell stage 把包根
+  构建脚本与 `scripts/*.sh` 纳入语法检查（覆盖 74 → 114 个文件）。
+
 ### 变更（Changed）
 - **前端统一（视觉 / 组件 / 数据三层）**：`luci-app-qmodem-generic` 的 LuCI 适配整体
   移植进 `luci-app-qmodem`，原 `luci-app-qmodem-next` 的 10 个业务视图改接统一入口

@@ -25,6 +25,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   published with an `-immortalwrt` suffix so they do not overwrite the
   identically named OpenWrt assets inside a Release.
 
+- **Rust components are now built into the OpenWrt package (`qmodem-atd` ships
+  in the package)**: `application/qmodem` gains `build-rust.sh`, and the first
+  step of `Build/Compile` cross-compiles `qmodem-atd` with cargo and installs it
+  to `/usr/bin/`. The linker is always the OpenWrt-provided cross toolchain
+  (not musl.cc or another third-party toolchain) so the musl configuration of
+  the target sysroot — and the ABI of the future libubus / libjson-c /
+  libsqlite3 link — match exactly. The target triple is derived from `$(ARCH)`
+  (aarch64 / mipsel / x86_64 → `*-unknown-linux-musl`); **mipsel musl is Rust
+  tier 3** (`std` is available but rustup ships no prebuilt std), so it needs
+  nightly + rust-src + `-Z build-std=std,panic_abort`, while aarch64 /
+  x86_64 are tier 2 and only need the stable toolchain — `main.yml` installs
+  the right one per matrix variant. The local gate was upgraded accordingly:
+  the `rust` stage of `check_all.sh` now runs
+  `cargo check + clippy --all-features` against the preinstalled musl target
+  std on non-Unix hosts (no longer SKIP), and the `shell` stage now includes
+  package-root build scripts and `scripts/*.sh` (coverage 74 → 114 files).
+
 ### Changed
 - **Unified frontend (visual / component / data layers)**: the LuCI adaptation from
   `luci-app-qmodem-generic` was ported wholesale into `luci-app-qmodem`, and the ten
