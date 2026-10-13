@@ -1,6 +1,8 @@
 # 重构工程索引（docs/refactor/）
 
-> 本目录存放 QModem 第一轮重构（Phase 0 止血 + Rust 异步核心）的工程过程文档。总进度见根目录 [REFACTOR_ROADMAP.md](../../REFACTOR_ROADMAP.md)，"如何验证、如何继续"见 [HANDOFF.md](HANDOFF.md)。
+> 本目录存放 QModem 各轮重构的工程过程文档：Phase 0 止血 / Phase 1-3 依赖收缩与 Rust 异步核心 /
+> Phase 4 旧栈退役决策 / **Phase 5 单包整合与前端三层统一**。总进度见根目录
+> [REFACTOR_ROADMAP.md](../../REFACTOR_ROADMAP.md)，"如何验证、如何继续"见 [HANDOFF.md](HANDOFF.md)。
 
 ## 1. 文件清单
 
@@ -8,6 +10,8 @@
 |---|---|
 | [REFACTOR_ROADMAP.md](../../REFACTOR_ROADMAP.md) | 唯一权威进度源：工作包状态、路线图、验证门禁、里程碑记录 |
 | [HANDOFF.md](HANDOFF.md) | 交接页：重构范围与原则、验证命令、token 安全与回退方式、日志索引 |
+| [integration-scope.zh-cn.md](integration-scope.zh-cn.md) | **Phase 5 交付**：包整合范围与保留清单（哪些并入 `qmodem` / `luci-app-qmodem`，哪些因系统依赖保留及原因，验收判据 G1-G10） |
+| [journal-next-into-generic-compat.zh-cn.md](journal-next-into-generic-compat.zh-cn.md) | **Phase 5 交付**：前端三层统一的覆盖范围、模块与调用路径、四层测试方式、"完美兼容"判定标准 |
 | [journal-c-core.md](journal-c-core.md) | W1：ubus_at_daemon / tom_modem / libqmodem-sms 的 C 层修复明细（C1-C7，问题 → 修复 → 验证） |
 | [journal-shell-pkg.md](journal-shell-pkg.md) | W2：modem_hook / modem_dial / rpcd 脚本安全修复与打包 Makefile 规范化明细 |
 | [journal-luci-next.md](journal-luci-next.md) | W3：luci-app-qmodem-next 前端修复明细（ACL 收敛、fallback、时区、CSS 等） |
@@ -44,10 +48,10 @@
 |---|---|---|
 | Rust 测试 | `cargo test --workspace` | `rust/` |
 | Rust lint | `cargo clippy --workspace --all-targets` | `rust/` |
-| JS 冒烟 | `node luci/luci-app-qmodem-next/tests/test_sms_service.js` | 仓库根 |
+| JS 冒烟 | `node luci/luci-app-qmodem/tests/test_sms_service.js` | 仓库根 |
 | Shell 语法 | `sh -n` 逐个改动脚本 | 仓库根 |
-| C 语法检查 | `gcc -fsyntax-only -I application/ubus_at_daemon/inc application/ubus_at_daemon/src/*.c` | 仓库根 |
-| LF 检查 | 改动文件无 CRLF | 仓库根 |
+| C 语法检查 | `gcc -fsyntax-only -I application/qmodem/src/ubus_at_daemon application/qmodem/src/ubus_at_daemon/*.c` | 仓库根 |
+| LF 检查 | `sh scripts/check_all.sh --only crlf`（判据为索引中的 `i/crlf`，非工作区行尾） | 仓库根 |
 | 残留检查 | `PKG_LINCESE` / `modem_1'` fallback / `28800` / `system(`(event_callback) 计数为 0 | 仓库根 |
 
 ## 3. 推送策略

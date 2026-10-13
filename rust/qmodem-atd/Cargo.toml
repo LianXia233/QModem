@@ -3,7 +3,7 @@ name = "qmodem-atd"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "AT command daemon on std::thread actors (Rust rewrite of application/ubus_at_daemon, zero external crates)"
+description = "AT command daemon on std::thread actors (Rust rewrite of application/qmodem/src/ubus_at_daemon, zero external crates)"
 
 [features]
 default = ["service"]

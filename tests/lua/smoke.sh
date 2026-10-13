@@ -1,12 +1,12 @@
 #!/bin/sh
-# Syntax check for old-stack LuCI lua files (luci/luci-app-*/luasrc/**.lua,
-# excluding the JS-based luci-app-qmodem-next stack).
+# Syntax check for old-stack LuCI lua files (luci/luci-app-*/luasrc/**.lua).
+# luci-app-qmodem 已改为纯 JS 前端（无 luasrc），由 check_all.sh 的
+# js-check / js-test 阶段覆盖。
 #   - luac -p when available, else lua loadfile, else SKIP (exit 0).
 # CI contract: exit 0 = pass or SKIP; exit 1 = at least one syntax error.
 cd "$(CDPATH= cd "$(dirname "$0")/../.." && pwd)" || exit 1
 
-files=$(find luci -type f -name '*.lua' -path '*luasrc*' \
-    ! -path '*luci-app-qmodem-next*' | sort)
+files=$(find luci -type f -name '*.lua' -path '*luasrc*' | sort)
 if [ -z "$files" ]; then
     echo "SKIP: no old-stack lua files found under luci/*/luasrc/"
     exit 0

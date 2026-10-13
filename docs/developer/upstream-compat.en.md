@@ -73,14 +73,14 @@ three-way merge, then pass the gates in [docs/refactor/README.md](../refactor/RE
 | `application/qmodem/files/usr/share/qmodem/vendor/*.sh` (12 vendor scripts) | Full migration to qmodem_lib, residue cleanup, ql_regex_pick hardening | [journal-vendor-full.md](../refactor/journal-vendor-full.md), [journal-vendor-residue.md](../refactor/journal-vendor-residue.md), [journal-regex-pick.md](../refactor/journal-regex-pick.md) |
 | `application/qmodem/files/usr/libexec/rpcd/qmodem` | eval removal, atomic cache, bashism zeroed, get_stats/get_current_band endpoints | [journal-rpcd.md](../refactor/journal-rpcd.md), [journal-rpcd-gap.md](../refactor/journal-rpcd-gap.md), [journal-tests-expand.md](../refactor/journal-tests-expand.md) |
 | `rust/` (qmodem-pdu / qmodem-atd / qmodem-smsd) | Rust async core and tests | [journal-rust-core.md](../refactor/journal-rust-core.md), [journal-pdu-conform.md](../refactor/journal-pdu-conform.md), [journal-ffi-ubus.md](../refactor/journal-ffi-ubus.md), [journal-smsd-rs.md](../refactor/journal-smsd-rs.md), [bench-atd.md](../refactor/bench-atd.md) |
-| `application/ubus_at_daemon/` | C memory-safety fixes (C1–C7), M1–M5 finishing | [journal-c-core.md](../refactor/journal-c-core.md), [journal-atd-quality.md](../refactor/journal-atd-quality.md) |
-| `application/tom_modem/` | Dedup and C14/C15 fixes | [journal-tom-modem.md](../refactor/journal-tom-modem.md) |
-| `application/libqmodem-sms/`, `extlib/pdu_decoder.c` | Boundary fixes, audit finishing | [journal-c-core.md](../refactor/journal-c-core.md), [journal-sms-c-audit.md](../refactor/journal-sms-c-audit.md) |
-| `application/modem_scan/` (scand/scanc) | Socket permissions, whitelist, write-loop fixes | [journal-c-scan.md](../refactor/journal-c-scan.md), [journal-scan-c-final.md](../refactor/journal-scan-c-final.md) |
-| `application/qmodem_smsd/` | C4/C10/C12 fixes | [journal-c-smsd.md](../refactor/journal-c-smsd.md) |
-| `application/qmodem_monitor/` | Injection fixes, heartbeat schema, concurrency locks | [journal-monitor-dial.md](../refactor/journal-monitor-dial.md), [journal-monitor-hard.md](../refactor/journal-monitor-hard.md) |
+| `application/qmodem/src/ubus_at_daemon/` | C memory-safety fixes (C1–C7), M1–M5 finishing | [journal-c-core.md](../refactor/journal-c-core.md), [journal-atd-quality.md](../refactor/journal-atd-quality.md) |
+| `application/qmodem/src/tom_modem/` | Dedup and C14/C15 fixes | [journal-tom-modem.md](../refactor/journal-tom-modem.md) |
+| `application/qmodem/src/libqmodem-sms/`, `extlib/pdu_decoder.c` | Boundary fixes, audit finishing | [journal-c-core.md](../refactor/journal-c-core.md), [journal-sms-c-audit.md](../refactor/journal-sms-c-audit.md) |
+| `application/qmodem/src/modem_scan/` (scand/scanc) | Socket permissions, whitelist, write-loop fixes | [journal-c-scan.md](../refactor/journal-c-scan.md), [journal-scan-c-final.md](../refactor/journal-scan-c-final.md) |
+| `application/qmodem/src/qmodem_smsd/` | C4/C10/C12 fixes | [journal-c-smsd.md](../refactor/journal-c-smsd.md) |
+| `application/qmodem/files/` (formerly `application/qmodem_monitor/`) | Injection fixes, heartbeat schema, concurrency locks | [journal-monitor-dial.md](../refactor/journal-monitor-dial.md), [journal-monitor-hard.md](../refactor/journal-monitor-hard.md) |
 | `modem_dial.sh` / `modem_util.sh` / `modem_hook.sh` / `modem_monitor.sh` | APN/zone fixes, at_tool=2 path, shared DNS constants | [journal-shell-pkg.md](../refactor/journal-shell-pkg.md), [journal-monitor-dial.md](../refactor/journal-monitor-dial.md), [journal-atd-bridge.md](../refactor/journal-atd-bridge.md), [journal-dial-zone.md](../refactor/journal-dial-zone.md) |
-| `luci/luci-app-qmodem-next/` | Componentization, ACL, stats/band endpoints, TTL view | [journal-luci-next.md](../refactor/journal-luci-next.md), [journal-luci-comp.md](../refactor/journal-luci-comp.md), [journal-luci-final.md](../refactor/journal-luci-final.md), [journal-luci-gap.md](../refactor/journal-luci-gap.md), [journal-retire-ttl.md](../refactor/journal-retire-ttl.md) |
+| `luci/luci-app-qmodem/` | Componentization, ACL, stats/band endpoints, TTL view | [journal-luci-next.md](../refactor/journal-luci-next.md), [journal-luci-comp.md](../refactor/journal-luci-comp.md), [journal-luci-final.md](../refactor/journal-luci-final.md), [journal-luci-gap.md](../refactor/journal-luci-gap.md), [journal-retire-ttl.md](../refactor/journal-retire-ttl.md) |
 | Legacy LuCI apps (`luci-app-qmodem`, `-sms`, `-ttl`, `-ttlfw4`, `-mwan`, `-voip`, `-hc`, `-monitor`) | Injection fixes, retirement annotations, Decisions 1–4 handling | [journal-lua-retire.md](../refactor/journal-lua-retire.md), [journal-retire-s1.md](../refactor/journal-retire-s1.md), [journal-retire-mwan.md](../refactor/journal-retire-mwan.md), [journal-retire-voip.md](../refactor/journal-retire-voip.md), [journal-retire-hc.md](../refactor/journal-retire-hc.md) |
 | Per-package `Makefile` and init scripts | PKG normalization, dependency review | [journal-shell-pkg.md](../refactor/journal-shell-pkg.md), [journal-pkg-audit-all.md](../refactor/journal-pkg-audit-all.md) |
 
@@ -94,8 +94,8 @@ checked out directly:
   `docs/support_list.md`, see `.github/workflows/commit_check_supportlist.yaml`).
 - Independent vendored components: `application/qfirehose/` (license forbids local
   modification; security fixes follow ADR 0001 Decision 7 via upstream patch tracking, no
-  local deep changes), `application/quectel_CM_5G_M/`, `application/ndisc6/`,
-  `application/qmodem-seal/`, `application/voipd/`, `application/qmodem_sipd/`.
+  local deep changes), `application/qmodem/src/quectel_CM_5G_M/`, `application/ndisc6/`,
+  `application/qmodem/src/qmodem-seal/`, `application/voipd/`, `application/qmodem_sipd/`.
 - Documentation: user-facing content under `docs/` (`support_list.md`, `tom-modem-manual*`,
   etc.); the locally added `docs/refactor/`, `docs/developer/` (async-daemon,
   at-tool-selection, etc.), `docs/adr/`, `docs/release/` are reverse-owned and excluded from

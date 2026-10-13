@@ -39,7 +39,7 @@ uci commit qmodem && /etc/init.d/qmodem_init restart
 
 说明：
 
-- `at_tool` 是全局选项，作用于所有模组的 `at()`/`fastat()` 调用；`luci-app-qmodem-next` 的 Settings 页提供 `Alternative AT Tools` 开关，对应 `at_tool='1'`（见 `luci/luci-app-qmodem-next/htdocs/luci-static/resources/view/qmodem/settings.js`）。
+- `at_tool` 是全局选项，作用于所有模组的 `at()`/`fastat()` 调用；`luci-app-qmodem` 的 Settings 页提供 `Alternative AT Tools` 开关，对应 `at_tool='1'`（见 `luci/luci-app-qmodem/htdocs/luci-static/resources/view/qmodem/settings.js`）。
 - 通路 2 要求 `qmodem-atd` 已运行并注册目标端口。守护进程的启动方式、端口注册与 JSON 协议细节见 [Rust 异步守护进程架构](async-daemon.zh-cn.md)。
 
 ## 3. 故障切换行为

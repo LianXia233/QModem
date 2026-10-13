@@ -352,19 +352,16 @@ jobs:
           ./scripts/feeds update qmodem
           ./scripts/feeds install -a -p qmodem
           rm -rf feeds/base/package/kernel/gpio-button-hotplug
-          generic_package=$(cat ../qmodem/.github/workflows/qmodem_package_generic)
-          arch_package=$(cat ../qmodem/.github/workflows/qmodem_package_arch)
-          for package in $generic_package; do
-            make package/$package/compile -j$(nproc)
-          done
-          for package in $arch_package; do
+          # 组件合并后只剩两个源包：qmodem（一体化后端，含全部 C 组件）
+          # 与 luci-app-qmodem（统一前端）。原先的 arch-only 列表
+          # （tom_modem / ubus_at_daemon）已随合并消失。
+          qmodem_package=$(cat ../qmodem/.github/workflows/qmodem_package_generic)
+          for package in $qmodem_package; do
             make package/$package/compile -j$(nproc)
           done
           package_dir="bin/packages/${{ env.SDK_ARCH }}/qmodem"
           required_packages=(
-            qmodem qmodem-smsd sms-forwarder-next
-            luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
-            qmodem-suite
+            qmodem luci-app-qmodem luci-i18n-qmodem-zh-cn
           )
           for package in "${required_packages[@]}"; do
             compgen -G "$package_dir/${package}[-_]*" >/dev/null || {

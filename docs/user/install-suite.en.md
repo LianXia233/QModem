@@ -1,117 +1,168 @@
-# qmodem-suite Single-Package Installation Guide
+# QModem installation guide
 
 [简体中文](install-suite.zh-cn.md) | English
 
-> Status: **new metapackage**. `qmodem-suite` is a metapackage (`PKGARCH:=all`, see `application/qmodem-suite/Makefile`) that installs the QModem core together with the recommended frontends in one step. If the package is not yet available in your firmware feed, refer directly to the "Per-package manual installation" section at the end of this document. The post-install service status checks and troubleshooting commands apply regardless of the installation method.
+> Status: **two-package layout**. After the component consolidation the whole stack is just
+> `qmodem` (backend, built for the target architecture) and `luci-app-qmodem` (frontend,
+> `all`). The former `qmodem-suite` meta-package and the standalone packages it pulled in
+> are retired; see the
+> [integration scope](../refactor/integration-scope.zh-cn.md) for the reasons and the
+> replacement mapping.
 
-## 1. One-command installation
+## 1. Packages
 
-qmodem-suite automatically pulls in the following components (dependencies are resolved by the package manager):
+| Package | Arch | Role | Required |
+| --- | --- | --- | --- |
+| `qmodem` | target | All-in-one backend: modem discovery and dialing scripts, ubus data services, SMS daemon, traffic statistics, network monitor, SMS forwarding, all CLI tools | yes |
+| `luci-app-qmodem` | `all` | The single frontend (pure JavaScript); all data is read through the `qmodem` ubus object | recommended |
+| `luci-i18n-qmodem-zh-cn` | `all` | Simplified Chinese translations | optional |
 
-- `qmodem`: core control and dialing stack (including modem_scand and rpcd scripts)
-- `luci-app-qmodem-next`: the recommended pure-JavaScript LuCI frontend
-- `qmodem-smsd`: SMS daemon
-- `qmodem_monitor` + `luci-app-qmodem-monitor`: network monitoring and its LuCI pages
-- `luci-app-qmodem-ttlfw4`: TTL management (modern fw4/nft firewall stack), disabled by default, enable on demand in LuCI
+`luci-app-qmodem` declares `DEPENDS:=+qmodem`, so **installing the frontend is enough** —
+the backend is pulled in automatically.
 
-### opkg (OpenWrt 21.02 / 23.05)
+> `qmodem` now embeds what used to be eleven separate packages: `libqmodem-sms`,
+> `tom_modem`, `sms_tool_q`, `ubus-at-daemon`, `modem_scan`, `qmodem-smsd`,
+> `qmodem-settings`, `qmodem_monitor`, `sms-forwarder-next`, `quectel-CM-5G-M` and
+> `qmodem-seal`. Those names are kept as `PKG_PROVIDES` so existing dependencies still
+> resolve, and they are listed in `PKG_CONFLICTS` so the old and new packages cannot be
+> installed side by side.
+
+## 2. Installation
+
+### 2.1 From a package feed (recommended)
 
 ```sh
+# opkg (OpenWrt 23.05 and older)
 opkg update
-opkg install qmodem-suite
-```
+opkg install luci-app-qmodem luci-i18n-qmodem-zh-cn
 
-### apk (default since OpenWrt 24.10)
-
-```sh
+# apk (OpenWrt 24.10 / ImmortalWrt 25.12 and newer)
 apk update
-apk add qmodem-suite
+apk add luci-app-qmodem luci-i18n-qmodem-zh-cn
 ```
 
-> Note: the two LuCI main interfaces should not be installed at the same time. The suite already points to `luci-app-qmodem-next`; do not additionally install the legacy `luci-app-qmodem`.
+`opkg install qmodem luci-app-qmodem` is equivalent if you want to pin the backend
+explicitly.
 
-### TTL component notes
+> Compatibility baseline: OpenWrt / ImmortalWrt **25.12 and newer** (24.10 and older are no
+> longer supported). The baseline is enforced by the CI build matrix and the documentation;
+> the package metadata carries no version-constraint expression because the OpenWrt
+> buildroot `DEPENDS` syntax does not support `(>= version)`.
 
-The TTL component shipped in the suite is `luci-app-qmodem-ttlfw4` (modern fw4/nft stack). It is **mutually exclusive** with the legacy iptables variant `luci-app-qmodem-ttl` (both share `/etc/config/qmodem_ttl`), so the suite does not include or depend on `luci-app-qmodem-ttl`. If the legacy `luci-app-qmodem-ttl` is already installed on the device, remove it first with `opkg remove luci-app-qmodem-ttl` (or `apk del luci-app-qmodem-ttl`) before installing the suite.
+### 2.2 Directly from the GitHub Release (no feed available)
 
-The TTL feature is disabled by default (the default `/etc/config/qmodem_ttl` section ships inside the `luci-app-qmodem-ttlfw4` package itself, so it is in place once the suite is installed); no extra configuration is needed — just enable it in LuCI when required. When enabled it rewrites the TTL/Hop Limit of outbound br-lan traffic and disables hardware flow offloading; see the LuCI page of that app for details.
+If the device has no QModem feed, download the **loose ipk/apk files** (no extraction
+needed) from [Releases](https://github.com/LianXia233/QModem/releases). Asset names carry an
+arch suffix — pick the one matching your device:
 
-### Voice (voip) component requires separate installation
-
-The experimental voice stack (`qmodem-voip` + `qmodem-sipd` + `luci-app-qmodem-voip`) is **not included in the suite** and must be installed separately:
-
-```sh
-opkg install luci-app-qmodem-voip   # or: apk add luci-app-qmodem-voip
-```
-
-That frontend automatically pulls in `qmodem-voip` (call-control daemon voipd) and `qmodem-sipd` (SIP signaling gateway). voip is experimental, restricted by a hardware whitelist (currently RM520N-GL only) and maintained independently (decision basis: `docs/refactor/journal-retire-voip.md`), so it is not part of the single-package delivery.
-
-### Direct install from GitHub Release assets (no feed available)
-
-If your device has no QModem feed configured, download the **loose ipk/apk files**
-(no extraction needed) from [Releases](https://github.com/LianXia233/QModem/releases)
-and install them directly. Asset names carry an arch suffix — pick the one matching your device:
-
-| Asset name suffix | Arch | Typical devices |
+| Asset suffix | Arch | Typical device |
 |---|---|---|
 | `_aarch64_cortex-a53` (ipk) / `_aarch64` (apk) | ARM 64-bit | Airpi AP3000M and other Cortex-A53 boards |
-| `_x86_64` | x86-64 | x64 routers / VMs |
-| `_mipsel_24kc` | MIPS little-endian 24Kc | MediaTek MT76xx/MT8621 etc. |
-| `_all` | arch-independent | LuCI apps and i18n — install once, works on every arch |
+| `_x86_64` | x86-64 | x64 soft routers / VMs |
+| `_mipsel_24kc` | MIPS little-endian 24Kc | MediaTek MT76xx / MT8621 |
+| `_all` | arch-independent | LuCI apps and i18n — install once, works everywhere |
 
 ```sh
-# OpenWrt (aarch64 example; apk filenames drop the ipk's `_cortex-a53` granularity)
+# OpenWrt (aarch64 shown; apk filenames drop the ipk `_cortex-a53` granularity)
 cd /tmp
-opkg install qmodem-suite_*_all.ipk
 opkg install qmodem_*_aarch64_cortex-a53.ipk
-opkg install qmodem-smsd_*_aarch64_cortex-a53.ipk
-opkg install qmodem_monitor_*_aarch64_cortex-a53.ipk
-opkg install luci-app-qmodem-next_*_all.ipk
-opkg install luci-app-qmodem-monitor_*_all.ipk
-opkg install luci-app-qmodem-ttlfw4_*_all.ipk
+opkg install luci-app-qmodem_*_all.ipk
+opkg install luci-i18n-qmodem-zh-cn_*_all.ipk
 
 # ImmortalWrt (apk)
-apk add --allow-untrusted qmodem-suite-*.apk   # the meta package pulls the deps above
+apk add --allow-untrusted qmodem-*_aarch64.apk luci-app-qmodem-*.apk
 ```
 
-> When installing package-by-package, make sure ALL suite dependencies (see the
-> one-command list above) are present, otherwise LuCI pages and monitoring will be incomplete.
+> Assets built natively for ImmortalWrt carry an `-immortalwrt` suffix. Do not mix them
+> with OpenWrt assets — the two have different ubus ABIs.
 
-## 2. Post-installation status checks
+### 2.3 TTL support
 
-### Service status (/etc/init.d/)
+TTL management (fw4/nft backend) is part of the unified packages: the service
+`/etc/init.d/qmodem_ttl` and the default config `/etc/config/qmodem_ttl` ship with
+`qmodem`, and the UI is the **TTL** page in `luci-app-qmodem`.
+
+- **Disabled by default**: TTL rewriting disables hardware flow offloading, so neither the
+  `qmodem` uci-defaults hook nor its `postinst` enables `qmodem_ttl`. Turn it on explicitly
+  in LuCI when you need it.
+- **Mutually exclusive with the legacy iptables variant**: the old `luci-app-qmodem-ttl`
+  (iptables stack) shares `/etc/config/qmodem_ttl` with the fw4 variant — a real conflict —
+  and has been retired. If the old package is still installed, run
+  `opkg remove luci-app-qmodem-ttl` (or `apk del luci-app-qmodem-ttl`) first.
+
+### 2.4 Voice (voip) is a separate install
+
+The experimental voice stack (`qmodem-voip` + `qmodem-sipd` + `luci-app-qmodem-voip`) is
+**not** part of the default install: it pulls in heavy libraries (`libpjsip`, `libsoxr`,
+`alsa-lib`) and is limited to a hardware allow-list (currently RM520N-GL only). Install it
+separately if needed:
 
 ```sh
-# Whether autostart is registered
-/etc/init.d/qmodem_init enabled && echo enabled
-
-# Status of each service
-/etc/init.d/qmodem_init status      # Main service: modem_scand scanning + initialization
-/etc/init.d/qmodem_network status   # Dialing network
-/etc/init.d/qmodem_led status       # Signal/status LED
-/etc/init.d/qmodem_reboot status    # Scheduled/conditional reboot
-/etc/init.d/qmodem_usage_stats status  # Traffic statistics persistence
+opkg install luci-app-qmodem-voip   # or apk add luci-app-qmodem-voip
 ```
 
-### ubus objects
+This frontend pulls in `qmodem-voip` (call-control daemon voipd) and `qmodem-sipd` (SIP
+signalling gateway). See
+[docs/refactor/journal-retire-voip.md](../refactor/journal-retire-voip.md) for why it is
+kept separate rather than merged.
+
+## 3. Post-install verification
+
+### 3.1 Service status
+
+`qmodem`'s `postinst` (package-manager installs) and
+`/etc/uci-defaults/99-qmodem-worker-bootstrap` (firmware images / first boot) fix script
+permissions, enable the daemons and restart `rpcd`. Confirm with:
 
 ```sh
-ubus list | grep qmodem
+for s in qmodem_init qmodem_network qmodem_led qmodem_reboot qmodem_usage_stats \
+         qmodem-smsd qmodem-settings qmodem_monitor qmodem-worker qmodem-stats-collect \
+         ubus-at-daemon; do
+	printf '%-24s %s\n' "$s" "$(/etc/init.d/$s enabled && echo enabled || echo DISABLED)"
+done
 
-# Example: query basic info of modem1 (section name refers to a modem-device section in /etc/config/qmodem)
+/etc/init.d/qmodem_init status            # discovery + init
+/etc/init.d/qmodem_network status         # dialing
+/etc/init.d/qmodem_led status             # status LED
+/etc/init.d/qmodem_reboot status          # scheduled reboot
+/etc/init.d/qmodem_usage_stats status     # traffic statistics persistence
+/etc/init.d/qmodem-smsd status            # SMS daemon
+/etc/init.d/ubus-at-daemon status         # serial AT channel daemon
+/etc/init.d/qmodem-worker status          # status cache collector
+/etc/init.d/qmodem-stats-collect status   # traffic sampling
+```
+
+### 3.2 ubus objects
+
+`qmodem`, `qmodem_cache`, `qmodem_stats`, `qmodem_support` and `qos` are provided by this
+package and only register after `/etc/init.d/rpcd` restarts once (handled by `postinst`):
+
+```sh
+ubus list | grep -E 'qmodem|qos'
+
 ubus call qmodem base_info '{"config_section":"modem1"}'
 ubus call qmodem network_info '{"config_section":"modem1"}'
 ```
 
-See [rpcd interface](../qmodem-rpcd-interface.zh-cn.md) for the full method table.
+The full method table is in the [rpcd interface](../qmodem-rpcd-interface.zh-cn.md) (Chinese).
 
-### LuCI menu path
+### 3.3 LuCI menu
 
-After installing `luci-app-qmodem-next`, a dedicated menu appears in the web interface: **Modem → QModem → Overview** (route `admin/modem`). If the menu is missing, first confirm that the browser account has been granted the ACL of `luci-app-qmodem-next`, then log in again.
+With `luci-app-qmodem` installed, a dedicated menu appears at **Modem → QModem → Overview**
+(route `admin/modem/qmodem/overview`). There are 18 pages: Overview, Statistics, Mobile
+Data, Radio and Cells, Dial and Network, Messages, SIM Messages, SMS Forwarding, Module and
+SIM, SIM Switch, AT Console, Network Monitor, Advanced, Modem Features, TTL, Device
+Parameters, Service and Scan, plus the SMS conversation page (not in the menu — reached
+from Messages).
 
-## 3. Minimal working configuration
+If the menu is missing, check that the browser account has the `luci-app-qmodem` ACL, then
+log in again; if necessary `rm -rf /tmp/luci-*cache` and hard-refresh the browser.
 
-QModem supports automatic scanning and discovery of modems; in most scenarios a reboot after installation is enough for the modems to show up in LuCI. To pin down the configuration, write a minimal `modem-device` section manually (into `/etc/config/qmodem`):
+## 4. Minimal configuration
+
+QModem discovers modems automatically; in most cases a reboot is enough for LuCI to show
+the modem. To pin a configuration manually, add a minimal `modem-device` section to
+`/etc/config/qmodem`:
 
 ```uci
 config modem-device 'modem1'
@@ -122,60 +173,89 @@ config modem-device 'modem1'
     option manufacturer 'Quectel'
     option enable_dial '1'
     option pdp_type 'IPv4/IPv6'
-    option apn ''          # Leave empty to auto-match the carrier
+    option apn ''          # empty = auto-detect from the carrier
 ```
 
-For field descriptions and more options (band locking, SIM switching, custom initialization commands, etc.), see the "Modem device configuration" section of the [legacy full user manual](../user-guide.zh-cn.md). After making changes, run:
+See the “modem device configuration” section of the
+[full user guide](../user-guide.md) for the field reference and further options (band
+locking, SIM switching, custom init commands, ...). After editing:
 
 ```sh
 /etc/init.d/qmodem_init restart
 ```
 
-## 4. Troubleshooting quick reference
+## 5. Troubleshooting quick reference
 
 | Symptom | Command / location |
 |---|---|
-| Service logs | `logread -t qmodem` (or `logread -e qmodem` to filter all QModem entries) |
+| Service logs | `logread -t qmodem` (or `logread -e qmodem` for all QModem entries) |
 | Scanner logs | `logread -e modem_scand` |
-| Dialing logs | LuCI: the dialing log panel inside Modem → QModem → Overview; or rpcd `ubus call qmodem get_dial_log '{"config_section":"modem1"}'` |
-| Kernel/driver layer | `logread -e usb -e mhi -e tty -e qmi -e mbim` |
+| Dial log | LuCI: Modem → QModem → Overview dial-log panel; or `ubus call qmodem get_dial_log '{"config_section":"modem1"}'` |
+| Kernel / driver | `logread -e usb -e mhi -e tty -e qmi -e mbim` |
 | Port enumeration | `ubus call qmodem get_tty_ports '{}'` |
+| UI reports “modem support library not detected” | `ls -l /usr/sbin/qmodem-modem-support /usr/libexec/rpcd/qmodem_support` should be `755`; then run `/usr/sbin/qmodem-modem-support` once by hand |
 
-Logs and AT responses may contain IMEI, IMSI, ICCID, phone numbers, APNs, or SMS content; they must be redacted before publishing. For a more complete troubleshooting workflow, see [Troubleshooting](troubleshooting.zh-cn.md).
-
-## 5. Comparison with per-package manual installation
-
-| Dimension | qmodem-suite (single package) | Per-package manual installation |
-|---|---|---|
-| Number of commands | 1 (`opkg install qmodem-suite`) | One per package; the list must be determined yourself |
-| Dependency resolution | Automatic by the package manager | Manual, in order: `qmodem` → frontend → optional packages |
-| Frontend choice | Fixed to the recommended `luci-app-qmodem-next` | Free choice, but easy to mistakenly install both main interfaces |
-| Upgrades | The metapackage upgrades as a whole, dependencies follow | Each package needs a separate `upgrade`; easy to miss one |
-| Fine-grained trimming | Weak (unneeded optional packages are pulled in too) | Strong (install only what is needed, e.g. only `qmodem` + SMS package) |
-| Suitable scenarios | First deployment, full-device delivery | Custom firmware, storage-constrained devices |
-
-For the package list and build sources of per-package manual installation, see the [Installation guide](installation.zh-cn.md).
+Logs and AT responses may contain IMEI, IMSI, ICCID, phone numbers, APNs or SMS bodies —
+redact before publishing. See [troubleshooting](troubleshooting.zh-cn.md) (Chinese) for the
+full flow.
 
 ## 6. AT path selection
 
-Which underlying path QModem uses for AT commands is determined globally by `qmodem.main.at_tool`: `0`/unset for the default tom_modem (optionally via ubus `at-daemon`), `1` for sms_tool_q direct connection, and `2` (introduced in this version) for the `qmodem-atd` unix socket (with the companion option `qmodem.main.at_socket` specifying the socket path, default `/var/run/qmodem-atd.sock`). For the applicable scenarios, timeout semantics, failover, and diagnostic commands of the three paths, see [AT tool selection](../developer/at-tool-selection.zh-cn.md).
+Which low-level path AT commands take is decided globally by `qmodem.main.at_tool`:
 
-After installing qmodem-suite, path 0 is used without any extra configuration; path 2 requires enabling the Rust component as described in the next section before switching.
+| Value | Path | Notes |
+| --- | --- | --- |
+| `0` / unset | `tom_modem` | default; can be serialized through `ubus-at-daemon` |
+| `1` | `sms_tool_q` | direct serial |
+| `2` | `qmodem-atd` | unix socket (Rust async daemon; deploy manually) |
+
+See [AT tool selection](../developer/at-tool-selection.en.md) for the trade-offs, timeout
+semantics, failover and diagnostics. A fresh install uses path 0 with no extra
+configuration; path 2 needs the Rust component from the next section.
 
 ## 7. Optional Rust component (qmodem-atd)
 
-`qmodem-suite` does not include the Rust async AT daemon `qmodem-atd` by default. To enable path 2, cross-compile the binary yourself and place it into the firmware or the suite installation directory:
+The default install does not include the Rust async AT daemon `qmodem-atd`. To use path 2,
+cross-compile the binary and ship it with the firmware:
 
-1. **Cross-compilation**: use the unified entry script `scripts/cross-build-rust.sh`—
+1. **Cross-compile** with the unified entry script `scripts/cross-build-rust.sh`:
 
    ```sh
-   # aarch64 (common router target)
    bash scripts/cross-build-rust.sh --target aarch64-unknown-linux-musl
-   # Output: scripts/dist/aarch64-unknown-linux-musl/qmodem-atd
+   # output: scripts/dist/aarch64-unknown-linux-musl/qmodem-atd
    ```
 
-   The output is a fully static musl binary (zero external crates, about 731 KiB, unstripped); after `file` confirms `statically linked`, it can be copied directly to the target device. For build details and the equivalent manual commands, see section 4 of [Rust async daemon architecture](../developer/async-daemon.zh-cn.md).
+   The result is a fully static musl binary (zero external crates). Confirm with `file`
+   that it is `statically linked`, then copy it to the target. See section 4 of the
+   [Rust async daemon architecture](../developer/async-daemon.en.md) for build details and
+   the equivalent manual commands.
 
-2. **Deployment**: put the binary into the device PATH (e.g. `/usr/bin/qmodem-atd`), and specify the socket path and port at startup (see section 3 of the async-daemon documentation); the default socket path matches `qmodem.main.at_socket`.
+2. **Deploy**: put the binary in the device PATH (e.g. `/usr/bin/qmodem-atd`) and start it
+   with the socket path and port described in section 3 of the async-daemon document. The
+   default socket path matches `qmodem.main.at_socket`.
 
-3. **Switch the path**: as described in the previous section, set `at_tool` to `2` and restart `qmodem_init`; when the socket is unreachable, it automatically falls back to the tom_modem path.
+3. **Switch**: set `at_tool` to `2` and restart `qmodem_init`. If the socket is
+   unreachable, QModem falls back to the `tom_modem` path automatically.
+
+## 8. Upgrading from an older layout
+
+Older releases installed `qmodem` alongside a set of standalone packages (`qmodem-smsd`,
+`qmodem_monitor`, `tom_modem`, `ubus-at-daemon`, `sms-forwarder-next`, ...) and used
+`luci-app-qmodem-next` or the legacy Lua `luci-app-qmodem` as the frontend. Migration:
+
+```sh
+# 1) remove the absorbed standalone packages first so they cannot fight over
+#    identically named files
+opkg remove qmodem-suite qmodem-smsd qmodem_monitor qmodem-settings tom_modem \
+	ubus-at-daemon sms-forwarder-next qmodem-seal 2>/dev/null
+opkg remove luci-app-qmodem-next luci-app-qmodem-monitor luci-app-qmodem-ttlfw4 \
+	luci-app-qmodem-ttl luci-app-qmodem-sms 2>/dev/null
+
+# 2) install the new layout
+opkg install luci-app-qmodem luci-i18n-qmodem-zh-cn
+```
+
+`/etc/config/qmodem`, `/etc/config/qmodem_sms`, `/etc/config/sms_forwarder`,
+`/etc/config/qmodem_ttl` and `/etc/config/ubus-at-daemon` are conffiles and are preserved
+across upgrades. The SMS database `/etc/qmodem/sms.sqlite3` is preserved too (`keep.d`
+declares `/etc/qmodem`).

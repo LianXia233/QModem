@@ -1,6 +1,6 @@
 # qmodem-pdu
 
-3GPP TS 23.038 SMS PDU 编解码库，对应 C 版 `application/libqmodem-sms/src/pdu.c` 的 Rust 重写（修复版语义）。
+3GPP TS 23.038 SMS PDU 编解码库，对应 C 版 `application/qmodem/src/libqmodem-sms/src/pdu.c` 的 Rust 重写（修复版语义）。
 
 ## 公开 API
 

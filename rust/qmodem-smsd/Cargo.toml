@@ -3,7 +3,7 @@ name = "qmodem-smsd"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "SMS daemon skeleton (Rust port of application/qmodem_smsd), storage/queue/scheduler/URC core"
+description = "SMS daemon skeleton (Rust port of application/qmodem/src/qmodem_smsd), storage/queue/scheduler/URC core"
 
 [dependencies]
 qmodem-pdu = { path = "../qmodem-pdu" }

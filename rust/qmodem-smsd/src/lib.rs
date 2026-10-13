@@ -1,5 +1,5 @@
 //! qmodem-smsd: Rust skeleton of the SMS daemon
-//! (`application/qmodem_smsd`, the C `qmodem_smsd` binary).
+//! (`application/qmodem/src/qmodem_smsd`, the C `qmodem_smsd` binary).
 //!
 //! Scope of this skeleton (see README.md for the full C/Rust parity table):
 //! * message import with idempotent dedup, PDU decoding via [`qmodem_pdu`]

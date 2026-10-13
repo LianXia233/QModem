@@ -7,7 +7,7 @@
 rust/
 ├── Cargo.toml            # workspace（无 [workspace.dependencies]）
 ├── qmodem-pdu/           # 3GPP TS 23.038 SMS PDU 编解码（lib，零依赖）
-│   └── src/lib.rs        #   ← application/libqmodem-sms/src/pdu.c 的修复版重写
+│   └── src/lib.rs        #   ← application/qmodem/src/libqmodem-sms/src/pdu.c 的修复版重写
 └── qmodem-atd/           # std::thread actor AT 守护进程（bin + lib，零依赖）
     ├── src/transport.rs  #   SerialPort trait(同步+读超时) / LoopbackPort / TtyPort(tty feature，内联 termios FFI)
     ├── src/port.rs       #   AtPort actor 线程：命令队列 + oneshot + 单调超时 + URC 广播
@@ -59,7 +59,7 @@ cargo check -p qmodem-atd --features tty,ubus
 
 ## 后续迁移计划
 
-1. **ubus FFI 接入**（`feature = "ubus"`）：实现 `ubus_ffi.rs` 的对象注册与 handler 桥接，替换/并列 JSON 服务，对齐 `application/ubus_at_daemon` 的方法表（open/close/sendat/list/event_callback*/load_conf）。交叉编译走 OpenWrt SDK sysroot。
+1. **ubus FFI 接入**（`feature = "ubus"`）：实现 `ubus_ffi.rs` 的对象注册与 handler 桥接，替换/并列 JSON 服务，对齐 `application/qmodem/src/ubus_at_daemon` 的方法表（open/close/sendat/list/event_callback*/load_conf）。交叉编译走 OpenWrt SDK sysroot。
 2. **vendor 规则引擎**：迁移 `libqmodem-sms` 其余部分（smsd 的分段重组、存储读写）与 `qmodem_smsd` 的队列调度；UDH 分片重组逻辑直接复用 `qmodem-pdu::Udh`。
 3. **smsd**：在 atd 之上加消息组装/去重/持久化 actor 线程，替代 C 版 `qmodem_smsd` 的轮询模型。
 4. **TtyPort 加固**：从 O_NONBLOCK 轮询升级为 poll/epoll 集成（仍零依赖，`std::os::fd` + libc syscall 声明）；端口监控线程（C `port_monitor_thread_func`）改为周期任务。

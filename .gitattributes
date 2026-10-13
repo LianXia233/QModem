@@ -1,0 +1,49 @@
+# ---------------------------------------------------------------------------
+# 行尾与文本属性策略
+#
+# 仓库与 CI 的前提是「一律 LF」：scripts/check_all.sh 的 crlf stage 以此为判据，
+# 每个提交也要求 LF 换行。但本仓库此前没有 .gitattributes，于是 Windows 上
+# core.autocrlf=true 会在检出时把工作区写成 CRLF，导致
+#   sh scripts/check_all.sh --only crlf
+# 报出大量「与提交内容无关」的误报（索引里其实仍是 LF）。
+# 显式声明 eol=lf 后，检出即 LF，本地门禁与 CI 判定一致。
+# ---------------------------------------------------------------------------
+
+# 默认：文本文件统一 LF（含检出）
+* text=auto eol=lf
+
+# ---------------------------------------------------------------------------
+# 第三方 / 上游 vendored 源码：保持字节原样，不做文本判定与行尾转换。
+# 这些目录本就含 CRLF，且已在 check_all.sh 的 crlf stage 排除名单内。
+# ---------------------------------------------------------------------------
+application/qfirehose/** -text
+driver/** -text
+application/qmodem/src/quectel_CM_5G_M/** -text
+application/qmodem/src/sms-tool_q/** -text
+
+# ---------------------------------------------------------------------------
+# 二进制资产
+# ---------------------------------------------------------------------------
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svgz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# 构建产物 / 归档（不应入库，兜底避免被当作文本 diff）
+*.o binary
+*.a binary
+*.so binary
+*.so.* binary
+*.bin binary
+*.ipk binary
+*.apk binary
+*.gz binary
+*.xz binary
+*.zip binary
+*.tar binary

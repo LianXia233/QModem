@@ -2,7 +2,7 @@
 //!
 //! The C daemon registers a ubus handler for `qmodem.at.urc` events with
 //! `owner == "qmodem.sms"` and `urc_id == "sms-new"` (see `urc_event` in
-//! `application/qmodem_smsd/src/main.c`). In the Rust port the same payload
+//! `application/qmodem/src/qmodem_smsd/src/main.c`). In the Rust port the same payload
 //! arrives through a trait so multiple transports can feed the daemon:
 //!
 //! * [`MockUrcSource`] — in-process fan-out hub used by tests and the

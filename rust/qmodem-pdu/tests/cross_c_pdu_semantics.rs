@@ -1,5 +1,5 @@
 //! Cross-validation of the Rust codec against the semantics of the C
-//! reference implementation `application/libqmodem-sms/src/pdu.c`.
+//! reference implementation `application/qmodem/src/libqmodem-sms/src/pdu.c`.
 //!
 //! Every test cites the exact pdu.c lines its vector is derived from.
 //! Where the Rust rewrite intentionally diverges from C (documented in

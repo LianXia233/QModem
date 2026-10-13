@@ -15,13 +15,13 @@
 | enable_pcie_scan | bool | `'1'` | 0/1 | `application/qmodem/files/etc/init.d/qmodem_init:46`；默认值由 `application/qmodem/files/etc/uci-defaults/99-qmodem-board:69` 生成 |
 | start_delay | int（秒） | `'0'` | >=0 | `application/qmodem/files/etc/init.d/qmodem_init:72` |
 | scan_log_level | string | `'info'` | 日志级别（透传给 modem_scand 环境变量） | `application/qmodem/files/etc/init.d/qmodem_init:128` |
-| scan_workers | int | `'4'` | >0 | `application/modem_scan/src/modem_scand.c:1733` |
-| at_probe_workers | int | `'4'` | >0 | `application/modem_scan/src/modem_scand.c:1735` |
-| at_timeout_fast | int（秒） | `'2'` | >0 | `application/modem_scan/src/modem_scand.c:1737` |
-| at_timeout_model | int（秒） | `'8'` | >0 | `application/modem_scan/src/modem_scand.c:1739` |
+| scan_workers | int | `'4'` | >0 | `application/qmodem/src/modem_scan/src/modem_scand.c:1733` |
+| at_probe_workers | int | `'4'` | >0 | `application/qmodem/src/modem_scan/src/modem_scand.c:1735` |
+| at_timeout_fast | int（秒） | `'2'` | >0 | `application/qmodem/src/modem_scan/src/modem_scand.c:1737` |
+| at_timeout_model | int（秒） | `'8'` | >0 | `application/qmodem/src/modem_scan/src/modem_scand.c:1739` |
 | hotplug_add_delay | int（秒） | `'8'` | >=0 | `application/qmodem/files/etc/hotplug.d/usb/20-modem-usb:6`；`application/qmodem/files/etc/hotplug.d/net/20-modem-net:7` |
-| add_retry_delay | int（秒） | `'8'` | >=0 | `application/modem_scan/src/modem_scand.c:1741` |
-| add_retry_max | int | `'5'` | >=0 | `application/modem_scan/src/modem_scand.c:1743` |
+| add_retry_delay | int（秒） | `'8'` | >=0 | `application/qmodem/src/modem_scan/src/modem_scand.c:1741` |
+| add_retry_max | int | `'5'` | >=0 | `application/qmodem/src/modem_scan/src/modem_scand.c:1743` |
 | usage_stats_nvram_save | bool | `'0'` | 0/1 | `application/qmodem/files/etc/init.d/qmodem_usage_stats:58` |
 | usage_stats_nvram_interval | int（秒） | `'300'` | sanitize_interval 允许的正整数 | `application/qmodem/files/etc/init.d/qmodem_usage_stats:38,61` |
 | at_tool | int | `'0'` | 0=tom_modem/ubus at-daemon；1=sms_tool_q 直连 TTY；2=qmodem-atd（unix socket，不回退） | `application/qmodem/files/usr/share/qmodem/modem_util.sh:245,255` |
@@ -39,29 +39,29 @@
 
 | 选项 | 类型 | 默认值 | 取值域 | 消费者 |
 |---|---|---|---|---|
-| name | string | 扫描识别的型号 | 型号串 | `application/qmodem/files/usr/share/qmodem/modem_util.sh:49,73`；`application/qmodem/files/usr/libexec/rpcd/qmodem:76` 所在 qmodem_collect `:76`；`application/qmodem/files/usr/share/qmodem/vendor/foxconn.sh:11`；`vendor/fibocom.sh:34`；`application/voipd/files/usr/lib/qmodem_voip/at_daemon_adapter.sh:20`；写：`application/modem_scan/src/modem_scand.c` |
+| name | string | 扫描识别的型号 | 型号串 | `application/qmodem/files/usr/share/qmodem/modem_util.sh:49,73`；`application/qmodem/files/usr/libexec/rpcd/qmodem:76` 所在 qmodem_collect `:76`；`application/qmodem/files/usr/share/qmodem/vendor/foxconn.sh:11`；`vendor/fibocom.sh:34`；`application/voipd/files/usr/lib/qmodem_voip/at_daemon_adapter.sh:20`；写：`application/qmodem/src/modem_scan/src/modem_scand.c` |
 | manufacturer | string | 扫描识别 | 厂商标识 | `application/qmodem/files/usr/share/qmodem/modem_ctrl.sh:10`；`rpcd/qmodem:132,167`；`qmodem_collect:74`；`qmodem_usage_stats`（config_get）；写：`modem_scand.c` |
 | platform | string | 扫描识别 | 平台标识 | `modem_ctrl.sh:11`；`rpcd/qmodem:134,168`；`qmodem_collect:75` |
 | path | string | — | /sys 设备路径 | `modem_ctrl.sh:16`；`rpcd/qmodem:139,566`；`application/qmodem/files/etc/init.d/qmodem_led:32`；`at_daemon_adapter.sh:7`；`99-qmodem-board:188` |
-| at_port | string | — | /dev/ttyUSB* 端口 | `modem_ctrl.sh:6,104`；`rpcd/qmodem:128,150,197`；`application/qmodem_smsd/src/main.c:220`；`qmodem_led:184`；`at_daemon_adapter.sh:22,53` |
-| override_at_port | string | — | /dev/ttyUSB* 端口 | `modem_ctrl.sh:7,103`；`rpcd/qmodem:129,151,196`；`application/qmodem_smsd/src/main.c:218` |
-| sms_at_port | string | — | /dev/ttyUSB* 端口 | `modem_ctrl.sh:9`；`rpcd/qmodem:131,155`；`application/qmodem_smsd/src/main.c:219` |
+| at_port | string | — | /dev/ttyUSB* 端口 | `modem_ctrl.sh:6,104`；`rpcd/qmodem:128,150,197`；`application/qmodem/src/qmodem_smsd/src/main.c:220`；`qmodem_led:184`；`at_daemon_adapter.sh:22,53` |
+| override_at_port | string | — | /dev/ttyUSB* 端口 | `modem_ctrl.sh:7,103`；`rpcd/qmodem:129,151,196`；`application/qmodem/src/qmodem_smsd/src/main.c:218` |
+| sms_at_port | string | — | /dev/ttyUSB* 端口 | `modem_ctrl.sh:9`；`rpcd/qmodem:131,155`；`application/qmodem/src/qmodem_smsd/src/main.c:219` |
 | ports | list（空格分隔串） | — | 端口列表 | `modem_ctrl.sh:92`；`rpcd/qmodem:185` |
 | valid_at_ports | list（空格分隔串） | — | AT 有效端口列表 | `modem_ctrl.sh:98`；`rpcd/qmodem:191` |
 | pdp_index | int | 回退 suggest_pdp_index | PDU 序号 | `modem_ctrl.sh:12`；`rpcd/qmodem:135` |
 | suggest_pdp_index | int | 扫描写入 | PDU 序号 | `modem_ctrl.sh:13`；`rpcd/qmodem:136`；`modem_dial.sh:523`；写：`modem_scand.c:1220` |
-| use_ubus | bool | `'1'`（smsd 侧默认；uci-defaults 写 1） | 0/1 | `modem_ctrl.sh:14`；`application/qmodem/files/usr/share/qmodem/modem_hook.sh:14`；`rpcd/qmodem:137,159`；`application/qmodem/files/etc/init.d/qmodem_led:184`；`application/qmodem_smsd/src/main.c:221`；`application/qmodem_settings/files/usr/sbin/qmodem-settings:121`；`at_daemon_adapter.sh:34-35`；`application/qmodem/files/etc/uci-defaults/91-qmodem-use-ubus:16` |
-| sms_mode | string | `database_poll`（use_ubus=1）/`direct` | database_poll / direct / database_urc | `application/qmodem_smsd/src/main.c:223,1143,1346`；`qmodem-settings:114`；`91-qmodem-use-ubus:18`（写 direct） |
-| sms_storage_mem1 | string | `'SM'` | SIM/ME 存储名（"SM"/"ME"） | `application/qmodem_smsd/src/main.c:226` |
-| sms_db_path | string | `'/etc/qmodem'` | 目录路径 | `application/qmodem_smsd/src/main.c:228` |
-| sms_auto_delete_from_sim | bool | `'1'`（smsd 侧默认） | 0/1 | `application/qmodem_smsd/src/main.c:229`（config_get 经 option_string） |
-| sms_forwarding | bool | `'0'` | 0/1 | `application/qmodem_smsd/src/main.c:231` |
-| sms_poll_interval | int（秒） | `'300'` | 60–3600（越界回落 300） | `application/qmodem_smsd/src/main.c:232` |
+| use_ubus | bool | `'1'`（smsd 侧默认；uci-defaults 写 1） | 0/1 | `modem_ctrl.sh:14`；`application/qmodem/files/usr/share/qmodem/modem_hook.sh:14`；`rpcd/qmodem:137,159`；`application/qmodem/files/etc/init.d/qmodem_led:184`；`application/qmodem/src/qmodem_smsd/src/main.c:221`；`application/qmodem/files/usr/sbin/qmodem-settings:121`；`at_daemon_adapter.sh:34-35`；`application/qmodem/files/etc/uci-defaults/91-qmodem-use-ubus:16` |
+| sms_mode | string | `database_poll`（use_ubus=1）/`direct` | database_poll / direct / database_urc | `application/qmodem/src/qmodem_smsd/src/main.c:223,1143,1346`；`qmodem-settings:114`；`91-qmodem-use-ubus:18`（写 direct） |
+| sms_storage_mem1 | string | `'SM'` | SIM/ME 存储名（"SM"/"ME"） | `application/qmodem/src/qmodem_smsd/src/main.c:226` |
+| sms_db_path | string | `'/etc/qmodem'` | 目录路径 | `application/qmodem/src/qmodem_smsd/src/main.c:228` |
+| sms_auto_delete_from_sim | bool | `'1'`（smsd 侧默认） | 0/1 | `application/qmodem/src/qmodem_smsd/src/main.c:229`（config_get 经 option_string） |
+| sms_forwarding | bool | `'0'` | 0/1 | `application/qmodem/src/qmodem_smsd/src/main.c:231` |
+| sms_poll_interval | int（秒） | `'300'` | 60–3600（越界回落 300） | `application/qmodem/src/qmodem_smsd/src/main.c:232` |
 | state | string | 扫描写入 `enabled`/`disabled` | enabled / disabled | `application/qmodem/files/usr/libexec/rpcd/modem_ctrl:5,15,33,42`；`modem_scand.c:1177-1212`；`modem_dial.sh:509`；`qmodem_usage_stats`（config_get） |
 | alias | string | 扫描写入 | 别名串 | 写：`modem_scand.c:1201`；读：`application/qmodem/files/usr/share/qmodem/led_scripts/c2000_max.sh:30`、`led_scripts/m60k63.sh:29`、`led_scripts/misectel_modem_status.sh:17`、`qmodem_led:184` |
 | metric | int | 扫描写入 | 网络跃点 | 写：`modem_scand.c:1213`；读：`modem_dial.sh:515,866,899`；`qmodem_led init.d:40` |
 | slot | string | — | usb slot（如 `2-1`）或 pcie slot | `application/qmodem/files/usr/share/qmodem/generic.sh:675`；`modem_dial.sh:53`；`99-qmodem-board:179` |
-| associated_usb | string | — | usb slot | `application/modem_scan/src/modem_scand.c:693`；写/改：`99-qmodem-board:300-301` |
+| associated_usb | string | — | usb slot | `application/qmodem/src/modem_scan/src/modem_scand.c:693`；写/改：`99-qmodem-board:300-301` |
 | network | string | 扫描写入 | 网卡名列表 | `modem_scand.c:1173-1217`；`vendor/fibocom.sh:1987` |
 | data_interface | string | 扫描写入 | usb / pcie 等 slot_type | 写：`modem_scand.c:1206`；读：`at_daemon_adapter.sh:21` |
 | voice_pcm_port | string | 扫描写入 | PCM 端口 | 写：`modem_scand.c:1240-1241`（未识别时删除 `:1186`）；读：`at_daemon_adapter.sh:23,63` |
@@ -110,13 +110,13 @@
 
 | 选项 | 类型 | 默认值 | 取值域 | 消费者 |
 |---|---|---|---|---|
-| database | string | `'/etc/qmodem/sms.sqlite3'` | sqlite 文件路径 | `application/qmodem_smsd/files/etc/init.d/qmodem-smsd:9`；`application/qmodem_smsd/src/main.c:178` |
-| multipart_wait | int（秒） | `'300'` | 1–3600（越界回落 300） | `application/qmodem_smsd/src/main.c:179` |
-| late_fragment_window | int（秒） | `'3600'` | 1–86400（越界回落 3600） | `application/qmodem_smsd/src/main.c:183` |
-| received_retention | int（条） | `'5000'` | >=1（越界回落 5000） | `application/qmodem_smsd/src/main.c:187` |
-| sent_retention | int（条） | `'1000'` | >=1（越界回落 1000） | `application/qmodem_smsd/src/main.c:191` |
+| database | string | `'/etc/qmodem/sms.sqlite3'` | sqlite 文件路径 | `application/qmodem/src/qmodem_smsd/files/etc/init.d/qmodem-smsd:9`；`application/qmodem/src/qmodem_smsd/src/main.c:178` |
+| multipart_wait | int（秒） | `'300'` | 1–3600（越界回落 300） | `application/qmodem/src/qmodem_smsd/src/main.c:179` |
+| late_fragment_window | int（秒） | `'3600'` | 1–86400（越界回落 3600） | `application/qmodem/src/qmodem_smsd/src/main.c:183` |
+| received_retention | int（条） | `'5000'` | >=1（越界回落 5000） | `application/qmodem/src/qmodem_smsd/src/main.c:187` |
+| sent_retention | int（条） | `'1000'` | >=1（越界回落 1000） | `application/qmodem/src/qmodem_smsd/src/main.c:191` |
 
-## 包 `qmodem_ttl`（配置文件不在本仓库 application/ 下，随 luci-app-qmodem-ttl / luci-app-qmodem-ttlfw4 安装）
+## 包 `qmodem_ttl`（配置文件不在本仓库 application/ 下，随 luci-app-qmodem-ttl / luci-app-qmodem 安装）
 
 ### 节 `main`
 

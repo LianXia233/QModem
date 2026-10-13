@@ -5,6 +5,12 @@
 - 基线：`main@c49654e`；完整变更清单见 [CHANGELOG.md](../../CHANGELOG.md) /
   [CHANGELOG.zh-CN.md](../../CHANGELOG.zh-CN.md)
 
+> **现状提示（2026-10-13）**：本文档记录 v1.0.0 发布**当时**的状态，作为历史记录保留。
+> 此后组件已整合为 `qmodem` + `luci-app-qmodem` 两个包，文中出现的包名与仓库路径可能
+> 已变化。当前包布局与保留清单见
+> [docs/refactor/integration-scope.zh-cn.md](../refactor/integration-scope.zh-cn.md)，
+> 变更摘要见 [CHANGELOG.zh-CN.md](../../CHANGELOG.zh-CN.md)。
+
 ## 本次 rc1 的三大主线
 
 ### 1. 止血加固（审计驱动的安全与内存安全修复）

@@ -1,6 +1,6 @@
 //! 3GPP TS 23.038 SMS PDU codec.
 //!
-//! Rust rewrite of `application/libqmodem-sms/src/pdu.c` with corrected,
+//! Rust rewrite of `application/qmodem/src/libqmodem-sms/src/pdu.c` with corrected,
 //! memory-safe semantics:
 //!
 //! * every index access is bounds-checked; truncated input yields

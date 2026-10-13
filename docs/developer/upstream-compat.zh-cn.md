@@ -65,14 +65,14 @@ grep -rhoE '(application|luci|rust|scripts|docs/refactor)/[A-Za-z0-9_./-]+' \
 | `application/qmodem/files/usr/share/qmodem/vendor/*.sh`（12 个厂商脚本） | 全量迁移 qmodem_lib、残留清理、ql_regex_pick 加固 | [journal-vendor-full.md](../refactor/journal-vendor-full.md)、[journal-vendor-residue.md](../refactor/journal-vendor-residue.md)、[journal-regex-pick.md](../refactor/journal-regex-pick.md) |
 | `application/qmodem/files/usr/libexec/rpcd/qmodem` | 去 eval、原子缓存、bashism 清零、get_stats/get_current_band 新端点 | [journal-rpcd.md](../refactor/journal-rpcd.md)、[journal-rpcd-gap.md](../refactor/journal-rpcd-gap.md)、[journal-tests-expand.md](../refactor/journal-tests-expand.md) |
 | `rust/`（qmodem-pdu / qmodem-atd / qmodem-smsd） | Rust 异步核心与测试 | [journal-rust-core.md](../refactor/journal-rust-core.md)、[journal-pdu-conform.md](../refactor/journal-pdu-conform.md)、[journal-ffi-ubus.md](../refactor/journal-ffi-ubus.md)、[journal-smsd-rs.md](../refactor/journal-smsd-rs.md)、[bench-atd.md](../refactor/bench-atd.md) |
-| `application/ubus_at_daemon/` | C 层内存安全修复（C1–C7）、M1–M5 收尾 | [journal-c-core.md](../refactor/journal-c-core.md)、[journal-atd-quality.md](../refactor/journal-atd-quality.md) |
-| `application/tom_modem/` | 去重与 C14/C15 修复 | [journal-tom-modem.md](../refactor/journal-tom-modem.md) |
-| `application/libqmodem-sms/`、`extlib/pdu_decoder.c` | 边界修复、审计收尾 | [journal-c-core.md](../refactor/journal-c-core.md)、[journal-sms-c-audit.md](../refactor/journal-sms-c-audit.md) |
-| `application/modem_scan/`（scand/scanc） | socket 权限、白名单、写循环修复 | [journal-c-scan.md](../refactor/journal-c-scan.md)、[journal-scan-c-final.md](../refactor/journal-scan-c-final.md) |
-| `application/qmodem_smsd/` | C4/C10/C12 修复 | [journal-c-smsd.md](../refactor/journal-c-smsd.md) |
-| `application/qmodem_monitor/` | 注入修复、心跳 schema、并发锁 | [journal-monitor-dial.md](../refactor/journal-monitor-dial.md)、[journal-monitor-hard.md](../refactor/journal-monitor-hard.md) |
+| `application/qmodem/src/ubus_at_daemon/` | C 层内存安全修复（C1–C7）、M1–M5 收尾 | [journal-c-core.md](../refactor/journal-c-core.md)、[journal-atd-quality.md](../refactor/journal-atd-quality.md) |
+| `application/qmodem/src/tom_modem/` | 去重与 C14/C15 修复 | [journal-tom-modem.md](../refactor/journal-tom-modem.md) |
+| `application/qmodem/src/libqmodem-sms/`、`extlib/pdu_decoder.c` | 边界修复、审计收尾 | [journal-c-core.md](../refactor/journal-c-core.md)、[journal-sms-c-audit.md](../refactor/journal-sms-c-audit.md) |
+| `application/qmodem/src/modem_scan/`（scand/scanc） | socket 权限、白名单、写循环修复 | [journal-c-scan.md](../refactor/journal-c-scan.md)、[journal-scan-c-final.md](../refactor/journal-scan-c-final.md) |
+| `application/qmodem/src/qmodem_smsd/` | C4/C10/C12 修复 | [journal-c-smsd.md](../refactor/journal-c-smsd.md) |
+| `application/qmodem/files/`（原 `application/qmodem_monitor/`） | 注入修复、心跳 schema、并发锁 | [journal-monitor-dial.md](../refactor/journal-monitor-dial.md)、[journal-monitor-hard.md](../refactor/journal-monitor-hard.md) |
 | `modem_dial.sh` / `modem_util.sh` / `modem_hook.sh` / `modem_monitor.sh` | APN/zone 修复、at_tool=2 通路、公共 DNS 收编 | [journal-shell-pkg.md](../refactor/journal-shell-pkg.md)、[journal-monitor-dial.md](../refactor/journal-monitor-dial.md)、[journal-atd-bridge.md](../refactor/journal-atd-bridge.md)、[journal-dial-zone.md](../refactor/journal-dial-zone.md) |
-| `luci/luci-app-qmodem-next/` | 组件化、ACL、stats/band 端点、TTL 视图 | [journal-luci-next.md](../refactor/journal-luci-next.md)、[journal-luci-comp.md](../refactor/journal-luci-comp.md)、[journal-luci-final.md](../refactor/journal-luci-final.md)、[journal-luci-gap.md](../refactor/journal-luci-gap.md)、[journal-retire-ttl.md](../refactor/journal-retire-ttl.md) |
+| `luci/luci-app-qmodem/` | 组件化、ACL、stats/band 端点、TTL 视图 | [journal-luci-next.md](../refactor/journal-luci-next.md)、[journal-luci-comp.md](../refactor/journal-luci-comp.md)、[journal-luci-final.md](../refactor/journal-luci-final.md)、[journal-luci-gap.md](../refactor/journal-luci-gap.md)、[journal-retire-ttl.md](../refactor/journal-retire-ttl.md) |
 | 旧栈 luci 包（`luci-app-qmodem`、`-sms`、`-ttl`、`-ttlfw4`、`-mwan`、`-voip`、`-hc`、`-monitor`） | 注入修复、退役标注、决策 1–4 处置 | [journal-lua-retire.md](../refactor/journal-lua-retire.md)、[journal-retire-s1.md](../refactor/journal-retire-s1.md)、[journal-retire-mwan.md](../refactor/journal-retire-mwan.md)、[journal-retire-voip.md](../refactor/journal-retire-voip.md)、[journal-retire-hc.md](../refactor/journal-retire-hc.md) |
 | 各包 `Makefile` 与 init 脚本 | PKG 规范化、依赖梳理 | [journal-shell-pkg.md](../refactor/journal-shell-pkg.md)、[journal-pkg-audit-all.md](../refactor/journal-pkg-audit-all.md) |
 
@@ -84,8 +84,8 @@ grep -rhoE '(application|luci|rust|scripts|docs/refactor)/[A-Za-z0-9_./-]+' \
   （合入后跑 `scripts/update_support_list.py` 校验与 `docs/support_list.md` 一致，
   见 `.github/workflows/commit_check_supportlist.yaml`）。
 - 独立 vendored 组件：`application/qfirehose/`（许可禁本地修改，安全修复按 ADR 0001
-  决策 7 走上游补丁跟踪，不本地深改）、`application/quectel_CM_5G_M/`、`application/ndisc6/`、
-  `application/qmodem-seal/`、`application/voipd/`、`application/qmodem_sipd/`。
+  决策 7 走上游补丁跟踪，不本地深改）、`application/qmodem/src/quectel_CM_5G_M/`、`application/ndisc6/`、
+  `application/qmodem/src/qmodem-seal/`、`application/voipd/`、`application/qmodem_sipd/`。
 - 文档：`docs/` 中用户向内容（`support_list.md`、`tom-modem-manual*` 等）；本仓库新增的
   `docs/refactor/`、`docs/developer/`（async-daemon、at-tool-selection 等）、`docs/adr/`、
   `docs/release/` 属反向，不参与上游覆盖。

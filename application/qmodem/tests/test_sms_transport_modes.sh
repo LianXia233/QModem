@@ -3,7 +3,7 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../.." && pwd)
-backend="$ROOT/application/qmodem_smsd/src/main.c"
+backend="$ROOT/application/qmodem/src/qmodem_smsd/main.c"
 migration="$ROOT/application/qmodem/files/etc/uci-defaults/91-qmodem-use-ubus"
 docs="$ROOT/docs/wiki/SIP-SMS-VoIP-Configuration.zh-cn.md"
 

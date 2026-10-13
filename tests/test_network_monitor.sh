@@ -3,7 +3,7 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 NM_LIBRARY_ONLY=1
 export NM_LIBRARY_ONLY
-. "$ROOT/application/qmodem_monitor/files/usr/share/qmodem/monitor_recovery.sh"
+. "$ROOT/application/qmodem/files/usr/share/qmodem/monitor_recovery.sh"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT INT TERM
 NM_RUN=$TMP/run NM_INTENTS=$TMP/intents Modem_ID=test
@@ -95,7 +95,7 @@ nm_probe_round || fail middle_success
 echo 'network monitor threshold tests passed'
 
 (
-    . "$ROOT/application/qmodem_monitor/files/usr/share/qmodem/monitor_recovery.sh"
+    . "$ROOT/application/qmodem/files/usr/share/qmodem/monitor_recovery.sh"
     nm_init_state
     Connectivity=online
     nm_state online tested

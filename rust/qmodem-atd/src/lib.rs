@@ -1,7 +1,7 @@
 //! qmodem-atd: AT command daemon (std::thread actor model, zero external
 //! crates).
 //!
-//! Rust rewrite of `application/ubus_at_daemon` replacing the C model of
+//! Rust rewrite of `application/qmodem/src/ubus_at_daemon` replacing the C model of
 //! "one pthread per port + condition variables + a single
 //! `waiting_for_response` slot" with per-port actor threads:
 //!

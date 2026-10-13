@@ -2,7 +2,7 @@
 
 [简体中文](async-daemon.zh-cn.md) | [English](async-daemon.en.md)
 
-> 状态：**实验性（experimental）**。`rust/qmodem-atd` 是 `application/ubus_at_daemon`（C 版）的并行可选项，目前**不替换任何现有组件的打包路径**。设计说明与修复对照的权威来源是 `rust/README.md` 与 `docs/refactor/journal-rust-core.md`，本文是面向开发者的架构导览。
+> 状态：**实验性（experimental）**。`rust/qmodem-atd` 是 `application/qmodem/src/ubus_at_daemon`（C 版）的并行可选项，目前**不替换任何现有组件的打包路径**。设计说明与修复对照的权威来源是 `rust/README.md` 与 `docs/refactor/journal-rust-core.md`，本文是面向开发者的架构导览。
 
 ## 1. 线程-actor 模型
 
@@ -45,7 +45,7 @@
 
 ## 2. 与 C 版 ubus_at_daemon 的对照
 
-C 源：`application/ubus_at_daemon/src/`。逐项"问题 → Rust 消除方式"素材取自 `docs/refactor/journal-rust-core.md` 第 3 节：
+C 源：`application/qmodem/src/ubus_at_daemon/src/`。逐项"问题 → Rust 消除方式"素材取自 `docs/refactor/journal-rust-core.md` 第 3 节：
 
 | # | C 问题 | C 位置 | Rust 设计如何消除 |
 |---|---|---|---|

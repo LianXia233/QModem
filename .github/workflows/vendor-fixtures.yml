@@ -24,8 +24,8 @@ jobs:
       - name: Build and test qmodem-seal
         run: |
           gcc -std=c11 -O2 -Wall -Wextra -Werror \
-            -o /tmp/qmodem-seal application/qmodem-seal/src/qmodem-seal.c -lsodium
-          application/qmodem-seal/tests/test_qmodem_seal.sh /tmp/qmodem-seal
+            -o /tmp/qmodem-seal application/qmodem/src/qmodem-seal/qmodem-seal.c -lsodium
+          application/qmodem/tests/qmodem-seal/test_qmodem_seal.sh /tmp/qmodem-seal
       - name: Check shell syntax
         run: bash scripts/check_all.sh --only shell
       - name: Enforce command boundary
@@ -34,7 +34,7 @@ jobs:
           application/qmodem/tests/test_core_cmds.sh
           application/qmodem/tests/test_sms_forwarder_conflicts.sh
           application/qmodem/tests/test_sms_transport_modes.sh
-          node luci/luci-app-qmodem-next/tests/test_sms_service.js
+          node luci/luci-app-qmodem/tests/test_sms_service.js
           application/qmodem/tests/test_fixture_collection_bytes.sh
           application/qmodem/tests/test_recognition_collection.sh
           application/qmodem/tests/test_recognition_fixtures.sh

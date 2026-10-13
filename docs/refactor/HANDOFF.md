@@ -3,6 +3,34 @@
 > 面向"下一个接手的人 / 下一个会话"：本页说明当前重构做到哪、怎么验证、怎么继续。
 > 各子代理的详细改动记录见 `docs/refactor/journal-*.md`，总进度见根目录 `REFACTOR_ROADMAP.md`。
 
+## 0. 当前状态：Phase 5 单包整合与前端三层统一（2026-10-13）
+
+**仓库形态已从"十余个包"收敛为两个包**，请先读这两份文档再动代码：
+
+| 主题 | 文档 |
+|---|---|
+| 哪些包被并入谁、哪些保留、为什么，验收判据 | [integration-scope.zh-cn.md](integration-scope.zh-cn.md) |
+| 前端三层统一的覆盖范围、调用路径、测试方式、"完美兼容"判据 | [journal-next-into-generic-compat.zh-cn.md](journal-next-into-generic-compat.zh-cn.md) |
+
+要点速览：
+
+- **`qmodem`**（`application/qmodem/`）：一体化后端。C 工程源码在 `src/<组件>/`
+  （`libqmodem-sms`、`tom_modem`、`sms-tool_q`、`ubus_at_daemon`、`modem_scan`、
+  `qmodem_smsd`、`quectel_CM_5G_M`、`qmodem-seal`），`sms-tool_q` 的两个补丁在
+  `patches-src/sms-tool_q/`（**刻意不放在 `patches/`**，避免被 OpenWrt 默认 Patch 阶段
+  以错误的 `-p1` 根路径误用）；脚本与服务载荷在 `files/`（120 个文件）。
+  Makefile 里 `Build/Compile` 的**顺序即依赖顺序**：`libqmodem-sms` 先构建并发布到
+  `$(STAGING_DIR)`，之后 `tom_modem` / `qmodem_smsd` 才能 `-lqmodem-sms` 链接。
+- **`luci-app-qmodem`**（`luci/luci-app-qmodem/`）：唯一前端。`qmodem.controls` 是唯一
+  对外入口（110 项导出），`qmodem.ui` / `qmodem.theme` / `qmodem.sms` 是内部实现层，
+  视图只 `require qmodem.controls`。
+- **改完必须跑的门禁**：`node --check` 全量前端 JS、`compat_matrix.py`（端点）、
+  `verify_layers.py`（导出面 / 孤儿引用）、`final_check.py`（i18n / 样式类 / CRLF），
+  以及 `application/qmodem/tests/*.sh` 中的一致性断言脚本。
+- **动手前先确认没有隐藏的跨包同名文件**：两个包都往 `/usr/share/rpcd/acl.d/`、
+  `/etc/init.d/` 落文件，历史上曾出现 `luci-app-qmodem.json` 被两包同时安装的冲突，
+  现已由前端包单独提供。新增文件前建议先 `grep` 一遍安装规则。
+
 ## 1. 本次重构范围与原则
 
 范围：评估报告（高危 26 项）中**不依赖大规模迁移即可落地的全部止血项** + Rust 异步核心的第一块可验证交付（PDU crate + tokio at-daemon 骨架）。
@@ -18,8 +46,8 @@
 # Rust
 cd rust && cargo test --workspace
 
-# LuCI next 冒烟
-node luci/luci-app-qmodem-next/tests/test_sms_service.js
+# LuCI 前端冒烟
+node luci/luci-app-qmodem/tests/test_sms_service.js
 
 # Shell 语法（改动的脚本）
 sh -n application/qmodem/files/usr/share/qmodem/modem_hook.sh
@@ -27,7 +55,7 @@ sh -n application/qmodem/files/usr/share/qmodem/modem_dial.sh
 sh -n application/qmodem/files/usr/libexec/rpcd/qmodem
 
 # C 语法级检查
-gcc -fsyntax-only -I application/ubus_at_daemon/inc application/ubus_at_daemon/src/*.c
+gcc -fsyntax-only -I application/qmodem/src/ubus_at_daemon application/qmodem/src/ubus_at_daemon/*.c
 ```
 
 ## 3. 交接注意事项

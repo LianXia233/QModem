@@ -1,6 +1,6 @@
 # qmodem-atd
 
-tokio 全异步 AT 命令守护进程，对应 C 版 `application/ubus_at_daemon` 的异步重构骨架。
+tokio 全异步 AT 命令守护进程，对应 C 版 `application/qmodem/src/ubus_at_daemon` 的异步重构骨架。
 
 ## 架构：C 线程模型 → tokio actor
 
@@ -36,7 +36,7 @@ AtPort actor 任务（tokio::select! 循环，独占 SerialPort 所有权）
 
 ## ubus FFI 与 mock transport（同语义双路径）
 
-生产传输是 ubus（`application/ubus_at_daemon` 的 `sendat` 方法，`ubus_at_daemon.h:269-293`）。
+生产传输是 ubus（`application/qmodem/src/ubus_at_daemon` 的 `sendat` 方法，`ubus_at_daemon.h:269-293`）。
 主机/CI 没有 libubus，因此拆成两层，**共享同一套请求解码/响应编码代码**：
 
 ```

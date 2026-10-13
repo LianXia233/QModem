@@ -4,8 +4,8 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 REPO=$(CDPATH= cd -- "$ROOT/../.." && pwd)
 VOIP="$REPO/application/voipd"
-SMSD="$REPO/application/qmodem_smsd"
-FORWARDER="$REPO/application/sms_forwarder_next"
+SMSD="$REPO/application/qmodem/src/qmodem_smsd"
+FORWARDER="$REPO/application/qmodem/files/usr/bin"
 LUCI="$REPO/luci/luci-app-qmodem-voip"
 
 "$ROOT/tests/registration-retry.sh"
@@ -28,13 +28,13 @@ grep -q 'schedule_outbound_register_retry' "$ROOT/src/sip_consumer.c"
 grep -q '"registration_attempts"' "$ROOT/src/sip_consumer.c"
 grep -q '"retry_scheduled"' "$ROOT/src/sip_consumer.c"
 
-grep -q 'UBUS_METHOD("send_managed"' "$SMSD/src/main.c"
-grep -q 'managed send requires database mode' "$SMSD/src/main.c"
-grep -q 'managed_sends' "$SMSD/src/sms_db.c"
+grep -q 'UBUS_METHOD("send_managed"' "$SMSD/main.c"
+grep -q 'managed send requires database mode' "$SMSD/main.c"
+grep -q 'managed_sends' "$SMSD/sms_db.c"
 grep -q "conn.call('qmodem.sip', 'send_message'" \
-	"$FORWARDER/files/sms_forwarder_next"
-grep -q "api_type == 'sip'" "$FORWARDER/files/sms_forwarder_next"
-grep -q 'SIP forwarding failed:' "$FORWARDER/files/sms_forwarder_next"
+	"$FORWARDER/sms_forwarder_next"
+grep -q "api_type == 'sip'" "$FORWARDER/sms_forwarder_next"
+grep -q 'SIP forwarding failed:' "$FORWARDER/sms_forwarder_next"
 grep -q '\.name = "recipient_uri"' "$ROOT/src/sip_control.c"
 grep -q '\.name = "content"' "$ROOT/src/sip_control.c"
 grep -q '\.name = "message_id"' "$ROOT/src/sip_control.c"

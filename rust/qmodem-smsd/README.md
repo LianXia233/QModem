@@ -1,6 +1,6 @@
 # qmodem-smsd (Rust skeleton)
 
-Rust 骨架，对应 C 守护进程 `application/qmodem_smsd`（`qmodem_smsd` 二进制，ubus 对象 `qmodem.sms`）。
+Rust 骨架，对应 C 守护进程 `application/qmodem/src/qmodem_smsd`（`qmodem_smsd` 二进制，ubus 对象 `qmodem.sms`）。
 零新增外部 crate；PDU 解码复用 workspace 内 [`qmodem-pdu`](../qmodem-pdu)。
 
 ## 模块结构

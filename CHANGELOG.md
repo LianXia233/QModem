@@ -25,7 +25,43 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   published with an `-immortalwrt` suffix so they do not overwrite the
   identically named OpenWrt assets inside a Release.
 
+### Changed
+- **Unified frontend (visual / component / data layers)**: the LuCI adaptation from
+  `luci-app-qmodem-generic` was ported wholesale into `luci-app-qmodem`, and the ten
+  business views of `luci-app-qmodem-next` now go through the single entry point
+  `qmodem.controls` instead of each carrying its own style layer and private component
+  layer. The unified surface exports 110 symbols: the full original generic surface, the
+  component layer (`ModemSelector` / `formatTime` / `relativeTime` / `pollGuard` /
+  `hasCssClass`), the data layer (`controls.sms.*`) and legacy next aliases
+  (`getStats` / `callGetSimSwitchCapabilities` / `rcStatus`). All 61 ubus endpoints used
+  by next are preserved; the unified frontend resolves 79 endpoints in total. Coverage,
+  module/call paths and the acceptance criteria for "fully compatible" are documented in
+  [docs/refactor/journal-next-into-generic-compat.zh-cn.md](docs/refactor/journal-next-into-generic-compat.zh-cn.md).
+- **Consolidated backend `qmodem`**: eleven previously separate packages
+  (`libqmodem-sms`, `tom_modem`, `sms_tool_q`, `ubus-at-daemon`, `modem_scan`,
+  `qmodem-smsd`, `qmodem-settings`, `qmodem_monitor`, `sms-forwarder-next`,
+  `quectel-CM-5G-M`, `qmodem-seal`) are physically merged into `qmodem`, with sources
+  under `src/<component>/` built in dependency order by a single `Build/Compile`.
+  Installing is now `qmodem` + `luci-app-qmodem` (installing the frontend pulls the
+  backend automatically). Scope, retained packages and the reasons are documented in
+  [docs/refactor/integration-scope.zh-cn.md](docs/refactor/integration-scope.zh-cn.md).
+
+### Removed
+- Retired `luci-app-qmodem-next`, `luci-app-qmodem-monitor`, `luci-app-qmodem-ttlfw4`,
+  `luci-app-qmodem-ttl` and `luci-app-qmodem-sms`: their views and services were merged
+  into `luci-app-qmodem` (`luci-app-qmodem-ttl` was the legacy iptables Lua stack sharing
+  `/etc/config/qmodem_ttl` with the fw4 variant — an outright conflict, hence retired).
+- Retired the `qmodem-suite` meta-package: its only real job was to `enable` the backend
+  daemons one by one, which now happens inside `qmodem` itself.
+- Retired the legacy Lua stack `luci/luci-app-qmodem/luasrc/**` (controller / model /
+  view). Its service scripts, `board.d` / `hotplug.d` hooks, vendor command library and
+  rpcd plugins moved into `qmodem` at unchanged install paths.
+
 ### Fixed
+- **Removed a cross-package file conflict**: both `qmodem` and `luci-app-qmodem` used to
+  install `/usr/share/rpcd/acl.d/luci-app-qmodem.json`. It is now provided solely by the
+  frontend package (which absorbed the `luci-mod-status-index → modem_ctrl` grant that
+  used to live in the backend ACL), and the backend installs only `qmodem.json`.
 - **Release assets are now directly installable** (`main.yml`,
   `publish-existing-release.yml`): artifacts are no longer repacked into
   `QModem-<arch>_*.tar.gz`; the Release ships loose `.ipk` / `.apk` files
@@ -35,12 +71,44 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `opkg install *.ipk` / `apk add --allow-untrusted *.apk` — no extraction.
   The v1.0.0 Release was migrated accordingly (6 tar.gz assets replaced by
   80 loose packages).
-- **`qmodem-suite` meta-package is built again**: it was missing from the SDK
-  build list, so the "single install delivers the full stack" promise had no
-  shippable artifact. Added to `qmodem_package_generic` and to the
-  required-package gate in `main.yml` (its `DEPENDS`
-  `qmodem_monitor` / `luci-app-qmodem-monitor` / `luci-app-qmodem-ttlfw4`
-  are pulled in by the same compile).
+- **Added `.gitattributes` to pin the line-ending policy**: both the repository and
+  the `crlf` stage of `scripts/check_all.sh` assume LF everywhere, but no
+  `.gitattributes` existed. With `core.autocrlf=true` on Windows the working tree is
+  written as CRLF on checkout, so the local `crlf` gate reported many false positives
+  unrelated to the committed content (the index was LF all along). The file now
+  declares `* text=auto eol=lf`, and third-party/upstream vendored trees
+  (`application/qfirehose/`, `driver/`, `application/qmodem/src/quectel_CM_5G_M/`,
+  `application/qmodem/src/sms-tool_q/`) are marked `-text` to keep their bytes
+  untouched, matching the exclusions in the `crlf` stage.
+- **Fixed stale path references missed in the previous consolidation pass**: the gate
+  command blocks in `docs/refactor/HANDOFF.md` and `docs/refactor/README.md` still
+  pointed at the retired `luci/luci-app-qmodem-next/` and
+  `application/ubus_at_daemon/{inc,src}` for the JS smoke test and the C syntax
+  check; the async-daemon tour and the upstream-sync table under `docs/developer/`
+  likewise referenced pre-merge directories. All now use the post-merge paths
+  (`luci/luci-app-qmodem/tests/`, `application/qmodem/src/ubus_at_daemon/`,
+  `application/qmodem/files/`).
+- **Fixed the `crlf` gate's criterion and implementation**: the previous implementation
+  scanned working-tree files with `grep -I -q -l $'\r'`, which failed in both directions —
+  on Windows `core.autocrlf=true` checks files out as CRLF, so every file matched
+  regardless of the committed content (false positives); and MSYS/Cygwin `grep` reads
+  files in text mode and discards CR, so files that do contain CR were reported as clean
+  (a file with 36 CRs was measured as not matching — false negatives). The stage now
+  decides from the `i/<eol>` field of `git ls-files --eol`, i.e. the content about to be
+  committed, which is deterministic and platform-independent; it also drops from
+  minutes (a full scan of 688 files took ~3.7 min) to about 2 seconds. Validated
+  negatively by injecting a CRLF blob into the index, confirming it FAILs and names
+  the file.
+- **The `rust` and `c` stages now recognise "not applicable on this host"**: the `rust`
+  stage runs `cargo test --workspace`, but `qmodem-atd` depends on `std::os::unix`
+  (unix sockets and serial ports) and cannot compile on a Windows host; the `c` stage
+  fails under MinGW because the UCRT does not provide `timegm` / `strsep` and similar
+  POSIX symbols, producing implicit-declaration errors. Both are host differences, not
+  code defects, so they now degrade to SKIP with the reason stated, under strict
+  conditions (`rust`: only when the sole failing crate is `qmodem-atd` and the log
+  really contains that platform error; `c`: only when recompiling with a header that
+  merely declares those POSIX functions succeeds, so genuine syntax errors still
+  FAIL). CI (ubuntu-latest) still runs both stages.
 
 ## [1.0.0] - 2026-10-12
 

@@ -129,3 +129,27 @@ Phase 1-4（后续，见评估报告）：vendor 层配置驱动下沉 → smsd/
 
   门禁复核：check_all 7 PASS+1 SKIP、cargo test 121、tests/sh 36、lua 16。
   发版：v1.1.0-rc1 tag + GitHub Release 由编排者经 API 执行。
+
+- **T6（2026-10-13）**：Phase 5 —— **单包整合与前端三层统一**（用户指令：把 generic 的 LuCI
+  适配移植进 QModem、尽可能合并所有包、并让 next 的页面套用 generic 的 UI 样式而不是重做）。
+
+| # | 工作包 | 关键产出 |
+|---|--------|----------|
+| W55 | 前端三层统一（视觉 / 组件 / 数据） | `generic` 的 `theme.js` / `ui.js` / `controls.js` 作为统一基座；`next` 的 10 个视图改接 `qmodem.controls`，删除自有样式层 `qmodem-next.css` 与 `qmodem.css`；统一导出面 110 项；端点丢失 0 |
+| W56 | 后端 11 组件物理并入 `qmodem` | `src/`（117 文件：libqmodem-sms / tom_modem / sms-tool_q / ubus_at_daemon / modem_scan / qmodem_smsd / quectel_CM_5G_M / qmodem-seal）、`patches-src/sms-tool_q/`（2 补丁）、`tests/`（54 文件）、`files/`（120 载荷）；generic 的运行时资产下沉到后端包，落盘路径不变 |
+| W57 | `application/qmodem/Makefile` 全量重写 | 单 `Build/Prepare` 复制 8 个 C 工程 + 显式应用 2 个补丁；`Build/Compile` 按依赖顺序构建并在 `STAGING_DIR` 发布 `libqmodem-sms`；安装规则汇总原 11 包；新增 `postinst`；新增 `PKG_PROVIDES` / `PKG_CONFLICTS`（11 个旧包名 + `sms-forwarder`）；conffiles 6 项 |
+| W58 | `luci/luci-app-qmodem/Makefile` | `LUCI_DEPENDS:=+luci-base +qmodem`、`LUCI_PKGARCH:=all`、`LUCI_MINIFY_JS:=0`、`PKG_PROVIDES:=qmodem-luci-ui`、`PKG_CONFLICTS:=luci-app-qmodem-generic luci-app-qmodem-next`；`postinst` 重启 rpcd + 清 LuCI 缓存 |
+| W59 | 旧包退役与 CI 收敛 | 退役 `luci-app-qmodem-{next,monitor,ttlfw4,ttl,sms}` 与 `application/qmodem-suite`；`qmodem_package_generic` 收敛为两个源包；删除 `qmodem_package_arch`；更新 `main.yml` 必检清单、`openwrt_package.config`、`extract-i18n.yml`、`vendor-fixtures.yml` |
+| W60 | 文档与更新日志同步 | 新增 `docs/refactor/integration-scope.zh-cn.md`；CHANGELOG 中英 Unreleased 段落；README 中英安装章节；`docs/user/install-suite.*` 重写为两包安装指南；旧包路径在全仓库现行文档中批量校正；**GitHub 首页改为中文**（`README.md` = 简体中文，英文移至 `README.en.md`，原 `README.zh-cn.md` 保留为跳转桩） |
+| W61 | 门禁自检与推送 | 见下方门禁表；版本提升至 `3.4.0_rc4` |
+
+  门禁复核（编排者）：`node --check` 26/26 PASS；视图 ubus 端点缺失 0；页面未解析
+  `controls.*` 调用 0；孤儿 `qmUI` / `smsService` 引用 0；菜单死链 0；包内独立 `.css` 0；
+  样式类丢失 0（2 项为迁移前既有遗留）；i18n 合并 1852 条、需翻译覆盖率 87.3%；
+  组件合并 137 文件、0 缺源 / 0 碰撞 / 0 重名；CRLF 0。
+
+  遗留与边界：`kmod-*` 因 vermagic 与内核构建期约束无法合并；`ndisc6` / `qfirehose` /
+  `quectel-cm` 为上游独立项目；`qmodem-voip` + `qmodem-sipd` + `luci-app-qmodem-voip`
+  为重依赖实验栈；`luci-app-qmodem-hc` / `-mwan` 为硬件/场景专用；`application/sms_forwarder`
+  与内置 `sms-forwarder-next` 共用 `/etc/init.d/sms_forwarder` 路径，双方互斥保留。
+  详见 `docs/refactor/integration-scope.zh-cn.md`。

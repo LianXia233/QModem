@@ -1,6 +1,6 @@
 //! Core data types shared by the smsd skeleton.
 //!
-//! Mirrors the C types in `application/qmodem_smsd/src/sms_db.h`
+//! Mirrors the C types in `application/qmodem/src/qmodem_smsd/src/sms_db.h`
 //! (`sms_segment_t`, `sms_import_result_t`) plus the delivery rows used by
 //! the `deliveries` table.
 

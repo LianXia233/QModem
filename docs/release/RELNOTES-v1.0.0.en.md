@@ -5,6 +5,13 @@
 - Baseline: `main@c49654e`; full change list in
   [CHANGELOG.md](../../CHANGELOG.md) / [CHANGELOG.zh-CN.md](../../CHANGELOG.zh-CN.md)
 
+> **Status note (2026-10-13)**: this document records the state **at the time of** the
+> v1.0.0 release and is kept as a historical record. Components have since been
+> consolidated into two packages, `qmodem` and `luci-app-qmodem`, so package names and
+> repository paths below may have changed. See
+> [docs/refactor/integration-scope.zh-cn.md](../refactor/integration-scope.zh-cn.md) for
+> the current layout and [CHANGELOG.md](../../CHANGELOG.md) for the summary.
+
 ## Three main lines of this rc1
 
 ### 1. Stop-the-bleed hardening (audit-driven security & memory-safety fixes)

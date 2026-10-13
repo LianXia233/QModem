@@ -1,55 +1,56 @@
 # QModem
 
-English | [简体中文](README.zh-cn.md)
+简体中文 | [English](README.en.md)
 
 [![OpenWrt SDK build](https://github.com/FUjr/modem_feeds/actions/workflows/main.yml/badge.svg)](https://github.com/FUjr/modem_feeds/actions/workflows/main.yml)
 
-QModem is a cellular modem management and dialing stack for OpenWrt and ImmortalWrt. It discovers USB and PCIe modems, manages AT and data interfaces, and provides dialing, status, SMS, and vendor-specific controls through LuCI.
+QModem 是面向 OpenWrt 和 ImmortalWrt 的蜂窝模组管理与拨号组件。它负责发现 USB、PCIe 模组，管理 AT 端口和数据接口，并通过 LuCI 提供拨号、状态监控、短信和厂商高级功能。
 
-It is intended for custom 4G/5G routers, embedded gateways, and multi-modem devices. It is not a desktop ModemManager replacement and cannot compensate for kernel drivers missing from the target firmware.
+QModem 适合自制 4G/5G 路由器、工业网关和多模组设备。它不是通用桌面 ModemManager，也不能替代目标固件缺失的内核驱动。
 
-## Capabilities
+## 主要能力
 
-| Area | Scope |
+| 能力 | 说明 |
 | --- | --- |
-| Discovery | USB and PCIe modems with physical-slot binding |
-| Data sessions | QMI, MBIM, NCM, ECM, RNDIS, and others depending on modem and driver |
-| Status | SIM, registration, signal, cell, and firmware information |
-| Advanced controls | RAT preference, band/cell locking, SIM switching, depending on vendor and model |
-| SMS | Send, receive, PDU, and optional forwarding; long-SMS behavior varies by modem |
-| OpenWrt integration | UCI, ubus, rpcd, procd, and LuCI |
+| 模组发现 | USB、PCIe，按物理卡槽稳定绑定 |
+| 数据连接 | QMI、MBIM、NCM、ECM、RNDIS 等，具体取决于模组和驱动 |
+| 模组状态 | SIM、注册网络、信号、小区和固件信息 |
+| 高级控制 | 网络制式、锁频、锁小区、SIM 切换等，具体取决于厂商和型号 |
+| 短信 | 收发、PDU 和可选转发；部分模组的长短信行为存在差异 |
+| 多模组 | 独立配置、拨号、状态和物理卡槽管理 |
+| OpenWrt 集成 | UCI、ubus、rpcd、procd 和 LuCI |
 
-An entry in the [support list](docs/support_list.md) means that a matching project profile exists. It does not mean every firmware, interface composition, or advanced operation has been verified on hardware by the maintainers.
+模组出现在[支持列表](docs/support_list.md)中，表示项目中存在对应配置，不等同于所有固件、接口模式和高级功能都经过维护者实机验证。
 
-## Architecture
+## 软件组成
 
 ```text
 LuCI
   |
 rpcd / ubus
   |
-QModem control and dialer ---- modem_scand discovery daemon
+QModem 控制与拨号层 ---- modem_scand 设备扫描器
   |
-generic + vendor adapters
+generic + vendor 厂商适配层
   |
-shared AT command wrappers
+cmds 统一 AT 命令层
   |
 ubus-at-daemon / tom_modem
   |
-USB / PCIe cellular modem
+USB / PCIe 蜂窝模组
 ```
 
-The core package is `qmodem`. The pure-JavaScript `luci-app-qmodem-next` is the recommended UI. The legacy `luci-app-qmodem` and separate SMS, MWAN, and TTL packages remain available, but the two main UIs should not be installed together.
+核心包为 `qmodem` —— 一体化后端，已把原先分散的 11 个包（`libqmodem-sms`、`tom_modem`、`sms_tool_q`、`ubus-at-daemon`、`modem_scan`、`qmodem-smsd`、`qmodem-settings`、`qmodem_monitor`、`sms-forwarder-next`、`quectel-CM-5G-M`、`qmodem-seal`）收编进包内。统一前端为纯 JavaScript 的 `luci-app-qmodem`，取代旧 Lua 版 `luci-app-qmodem` 与 `luci-app-qmodem-next`。安装 `luci-app-qmodem` 会自动拉入 `qmodem`。平台专用的 `luci-app-qmodem-hc` / `luci-app-qmodem-mwan` 与实验性语音栈仍为独立包。详见[整合范围说明](docs/refactor/integration-scope.zh-cn.md)。
 
-## Quick start
+## 快速开始
 
-Add the feed to `feeds.conf.default` in an OpenWrt source tree:
+在 OpenWrt 源码树的 `feeds.conf.default` 中添加：
 
 ```text
 src-git qmodem https://github.com/FUjr/QModem.git;main
 ```
 
-Then run:
+然后更新 Feed：
 
 ```sh
 ./scripts/feeds update qmodem
@@ -57,50 +58,73 @@ Then run:
 make menuconfig
 ```
 
-Select `luci-app-qmodem-next` under `LuCI -> Applications`. The target firmware must also contain USB, serial, QMI, MBIM, or MHI drivers matching the modem, protocol, kernel, and hardware topology.
+在 `LuCI -> Applications` 中选择 `luci-app-qmodem`。目标设备仍需具备与模组、拨号协议和当前内核匹配的 USB、串口、QMI、MBIM 或 MHI 驱动。
 
-The detailed English manuals are currently maintained in the existing [user guide](docs/user-guide.md) and [developer guide](docs/developer-guide.md). The new structured documentation is being introduced in Chinese first (three documents are also available in English):
+完整步骤见[安装指南](docs/user/installation.zh-cn.md)和[首次配置](docs/user/first-setup.zh-cn.md)。
 
-- [User documentation](docs/user/index.zh-cn.md)
-- [Developer documentation](docs/developer/index.zh-cn.md)
-- [One-package install guide (qmodem-suite)](docs/user/install-suite.zh-cn.md) ([English](docs/user/install-suite.en.md))
-- [Rust async daemon architecture](docs/developer/async-daemon.zh-cn.md) ([English](docs/developer/async-daemon.en.md))
-- [AT tool selection](docs/developer/at-tool-selection.zh-cn.md) ([English](docs/developer/at-tool-selection.en.md))
-- [Changelog](CHANGELOG.md) ([简体中文](CHANGELOG.zh-CN.md)) - [Branch and release policy](docs/release/branch-policy.zh-cn.md)
-- [Version migration and issue reporting](docs/release/version-migration.zh-cn.md)
-- [Supported hardware](docs/support_list.md)
-- [rpcd API](docs/qmodem-rpcd-interface.md)
-- [AT fixture development](testcases/README.md)
+## 使用边界
 
-## Rust async daemon (experimental)
+- 同一 AT 端口不应由多个模组管理程序同时读写，否则可能出现响应残缺、超时和模组掉线。
+- 锁频、锁小区、改 IMEI 和模组重启会改变无线行为，执行前应确认目标型号及恢复方法。
+- Release 中的内核驱动包必须与固件的内核 ABI 匹配，不建议使用 `--force-depends` 绕过内核依赖。
+- 构建成功只能证明软件包可生成，不能证明具体模组的 AT 命令和数据连接已经通过实机测试。
 
-`rust/qmodem-atd` is a zero-dependency rewrite of the C `ubus_at_daemon` (no third-party crates in `Cargo.lock`): one std-thread actor per port with an mpsc command queue, monotonic timeouts, URC broadcast, and a Unix-socket JSON test protocol. The release binary is about 731 KiB unstripped (-43.4% versus the earlier tokio build). It ships as an experimental parallel option and does not replace any packaged component yet. See the [Rust async daemon architecture](docs/developer/async-daemon.zh-cn.md) and the [Rust workspace README](rust/README.md).
+## 文档
 
-The AT command path is selectable via `qmodem.main.at_tool`: `0` tom_modem/ubus at-daemon, `1` sms_tool_q direct, or `2` (new in this version) qmodem-atd over a Unix socket. See [AT tool selection (Chinese)](docs/developer/at-tool-selection.zh-cn.md).
+### 用户
 
-## One-package install (qmodem-suite) (experimental)
+- [用户文档入口](docs/user/index.zh-cn.md)
+- [安装指南](docs/user/installation.zh-cn.md)
+- [首次配置](docs/user/first-setup.zh-cn.md)
+- [故障排查](docs/user/troubleshooting.zh-cn.md)
+- [硬件支持列表](docs/support_list.md)
+- [旧版完整用户手册](docs/user-guide.zh-cn.md)
 
-`qmodem-suite` is an all-arch metapackage that installs the `qmodem` core together with the recommended `luci-app-qmodem-next` frontend, the SMS daemon, and the network monitor in one command (opkg or apk); the guide also covers post-install service checks, minimal UCI configuration, and troubleshooting. See the [one-package install guide](docs/user/install-suite.zh-cn.md).
+### 开发者
 
-## Important boundaries
+- [开发者文档入口](docs/developer/index.zh-cn.md)
+- [系统架构](docs/developer/architecture.zh-cn.md)
+- [适配新模组](docs/developer/modem-adaptation.zh-cn.md)
+- [测试与验证](docs/developer/testing.zh-cn.md)
+- [rpcd 接口](docs/qmodem-rpcd-interface.zh-cn.md)
+- [AT fixture 格式与回放](testcases/README.md)
+- [更新日志](CHANGELOG.zh-CN.md) ([English](CHANGELOG.md))
 
-- Do not let multiple management applications read and write the same AT port concurrently.
-- Band locking, cell locking, IMEI changes, and modem resets can disrupt service; confirm model support and recovery steps first.
-- Kernel packages from a release must match the target firmware ABI. Do not treat `--force-depends` as a compatibility solution.
-- A successful package build does not prove that AT operations or data sessions work on a specific modem.
+## Rust 异步守护进程（实验性）
 
-## Reporting issues
+`rust/qmodem-atd` 是 C 版 `ubus_at_daemon` 的零依赖重写（`Cargo.lock` 无任何第三方 crate）：每端口一个 std::thread actor（mpsc 命令队列 + 单调超时 + URC 广播），并提供 Unix socket JSON 测试协议。产物二进制约 731 KiB（未 strip，较早期 tokio 版本 -43.4%）。当前以实验性并行可选项交付，不替换任何已打包组件。详见 [Rust 异步守护进程架构](docs/developer/async-daemon.zh-cn.md) 与 [Rust 工作区 README](rust/README.md)。
 
-Include the router model, firmware and QModem versions, exact modem model, USB/PCIe topology, dialing protocol, and reproducible steps. Redact IMEI, IMSI, ICCID, phone numbers, APNs, credentials, and SMS content before publishing logs or fixtures.
+AT 命令通路可经 `qmodem.main.at_tool` 选择：`0` tom_modem/ubus at-daemon、`1` sms_tool_q 直连、`2`（本版本引入）qmodem-atd unix socket。详见 [AT 通路选择](docs/developer/at-tool-selection.zh-cn.md)。
 
-## Contributing
+## 安装
 
-AT commands used by vendor and dialing implementations must be defined through `cmd_*` wrappers under `application/qmodem/files/usr/share/qmodem/cmds/`. CI enforces this boundary. Real-device, redacted fixtures are preferred over screenshots or model-name-only support claims.
+整套只剩两个包：`qmodem`（后端，按目标架构编译）与 `luci-app-qmodem`（前端，架构 `all`）。
+前端依赖后端，因此一条命令即可：
 
-## License
+```sh
+opkg update && opkg install luci-app-qmodem    # opkg
+apk add luci-app-qmodem                        # apk（ImmortalWrt 25.12+ / OpenWrt snapshot）
+```
 
-The repository [LICENSE](LICENSE) contains the Mozilla Public License 2.0 text plus an additional restriction prohibiting commercial use. It is therefore not an unmodified standard MPL 2.0 grant. Read the complete license before using, distributing, or integrating the project.
+`qmodem` 的 `postinst` 与其 `uci-defaults` 钩子会补脚本权限、启用各后端守护进程并重启
+`rpcd`，装完即可用。安装后服务核查、最小 UCI 配置与故障排查见
+[安装指南](docs/user/install-suite.zh-cn.md)。原 `qmodem-suite` 元包已退役，
+原因见[整合范围说明](docs/refactor/integration-scope.zh-cn.md)。
 
-## Acknowledgments
+## 反馈问题
 
-QModem uses or builds on work from the 5G-Modem-Support, luci-app-4gmodem, sms_tool, gl-modem-at, sendat, and qosmio/nss-packages communities. Consult the files and Git history in each component for exact provenance and licensing.
+提交 Issue 前，请先阅读[故障排查](docs/user/troubleshooting.zh-cn.md)。至少提供路由器型号、固件版本、QModem 版本、模组完整型号、USB/PCIe 连接方式、拨号协议和复现步骤。日志、配置和 AT 响应可能包含 IMEI、IMSI、ICCID、手机号、APN 或短信内容，公开前必须脱敏。
+
+QModem 支持在设备上采集 AT fixture 和反馈包。开发者应优先提交可回放、已脱敏的 fixture，而不是只提交截图。
+
+## 贡献
+
+新增厂商或型号前，请阅读[模组适配流程](docs/developer/modem-adaptation.zh-cn.md)。Vendor 和拨号实现发送的 AT 指令必须通过 `application/qmodem/files/usr/share/qmodem/cmds/` 中的 `cmd_*` 封装；CI 会检查该边界。
+
+## 许可证
+
+仓库的 [LICENSE](LICENSE) 以 Mozilla Public License 2.0 正文为基础，并附加了禁止商业使用的条款。因此它不是未经修改的标准 MPL 2.0 授权。使用、分发或集成本项目之前，请阅读完整许可证；项目维护者后续应统一许可证名称和 README 表述。
+
+## 致谢
+
+QModem 使用或参考了 5G-Modem-Support、luci-app-4gmodem、sms_tool、gl-modem-at、sendat 和 qosmio/nss-packages 等社区项目。具体来源和许可证应以各目录中的文件及 Git 历史为准。

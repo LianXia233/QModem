@@ -27,10 +27,10 @@
 | 路径 | 职责 |
 | --- | --- |
 | `application/qmodem/` | 核心 shell、rpcd、UCI、服务和板级脚本 |
-| `application/modem_scan/` | C 实现的设备扫描守护进程及客户端 |
-| `application/ubus_at_daemon/` | 串口复用与 ubus AT 服务 |
-| `application/tom_modem/` | AT 和短信底层工具 |
-| `application/qmodem-seal/` | 反馈包加密工具 |
+| `application/qmodem/src/modem_scan/` | C 实现的设备扫描守护进程及客户端 |
+| `application/qmodem/src/ubus_at_daemon/` | 串口复用与 ubus AT 服务 |
+| `application/qmodem/src/tom_modem/` | AT 和短信底层工具 |
+| `application/qmodem/src/qmodem-seal/` | 反馈包加密工具 |
 | `luci/` | 新旧 LuCI 主界面及可选插件 |
 | `driver/` | 厂商 USB、QMI、MHI 和 NSS 驱动包 |
 | `testcases/` | 按厂商、平台和型号隔离的 AT fixture |

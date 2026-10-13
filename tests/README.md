@@ -33,7 +33,7 @@
   - `case_rpcd_endpoints.sh` — rpcd 新端点 `get_stats`/`get_current_band` 家族：mock jshn json_* API + sed 提取 generic/quectel 实现函数，钉住累计计数透传与不可用回退、supported:false 分支（脚本或函数缺失则 SKIP）；
   - `case_qmodem_lib.sh` — `cmds/qmodem_lib.sh` 的 ql_* 助手（库文件未交付或函数缺失时逐条 SKIP）；
   - `case_fixture_parse.sh` — 用 testcases/ 两个真实 AT+CGSN fixture 做"解码 response_hex → 喂 vendor get_imei()"解析一致性冒烟（路径硬编码）。
-- `lua/smoke.sh` — `luci/*/luasrc/**/*.lua`（不含 JS 技术栈 luci-app-qmodem-next）语法检查。
+- `lua/smoke.sh` — `luci/*/luasrc/**/*.lua` 语法检查（luci-app-qmodem 已改为纯 JS 前端，无 luasrc）。
 - `browser/` — 既有 Playwright 前端冒烟（独立运行，不属于本套件）。
 
 ## 用例发现机制

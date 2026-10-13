@@ -24,7 +24,40 @@
   ImmortalWrt 资产在 Release 中带 `-immortalwrt` 后缀，避免覆盖同名的 OpenWrt
   资产。
 
+### 变更（Changed）
+- **前端统一（视觉 / 组件 / 数据三层）**：`luci-app-qmodem-generic` 的 LuCI 适配整体
+  移植进 `luci-app-qmodem`，原 `luci-app-qmodem-next` 的 10 个业务视图改接统一入口
+  `qmodem.controls`，不再各自维护样式层与私有组件层。统一后对外导出 110 项，覆盖
+  generic 原面 + 组件层（`ModemSelector` / `formatTime` / `relativeTime` /
+  `pollGuard` / `hasCssClass`）+ 数据层（`controls.sms.*`）以及 next 旧名别名
+  （`getStats` / `callGetSimSwitchCapabilities` / `rcStatus`）。next 原有 61 个 ubus
+  端点零丢失，统一前端合计可解析 79 个端点。验证方法、模块与调用路径、以及
+  「完美兼容」的判定标准见
+  [docs/refactor/journal-next-into-generic-compat.zh-cn.md](docs/refactor/journal-next-into-generic-compat.zh-cn.md)。
+- **后端一体化 `qmodem`**：原 11 个独立包（`libqmodem-sms`、`tom_modem`、
+  `sms_tool_q`、`ubus-at-daemon`、`modem_scan`、`qmodem-smsd`、`qmodem-settings`、
+  `qmodem_monitor`、`sms-forwarder-next`、`quectel-CM-5G-M`、`qmodem-seal`）物理并入
+  `qmodem`，源码置于 `src/<组件>/`，按依赖顺序在单个 `Build/Compile` 内构建。
+  用户侧安装简化为 `qmodem` + `luci-app-qmodem`（仅装前端会自动拉入后端）。
+  整合范围、未合并项及其原因见
+  [docs/refactor/integration-scope.zh-cn.md](docs/refactor/integration-scope.zh-cn.md)。
+
+### 移除（Removed）
+- 退役 `luci-app-qmodem-next`、`luci-app-qmodem-monitor`、`luci-app-qmodem-ttlfw4`、
+  `luci-app-qmodem-ttl`、`luci-app-qmodem-sms`：视图与服务分别并入
+  `luci-app-qmodem`（其中 `luci-app-qmodem-ttl` 是旧 iptables Lua 栈，与 fw4 变体
+  共用 `/etc/config/qmodem_ttl`，语义冲突，直接退役）。
+- 退役 `qmodem-suite` 元包：其唯一实质职责是逐个 `enable` 后端守护进程，该职责已
+  下沉到 `qmodem` 自身。
+- 退役旧 Lua 栈 `luci/luci-app-qmodem/luasrc/**`（controller / model / view）；
+  其携带的服务脚本、`board.d` / `hotplug.d` 钩子、厂商命令库与 rpcd 插件下沉到
+  `qmodem`，落盘路径不变。
+
 ### 修复（Fixed）
+- **移除跨包文件冲突**：`qmodem` 与 `luci-app-qmodem` 此前都会安装
+  `/usr/share/rpcd/acl.d/luci-app-qmodem.json`。现由前端包单独提供（并把原先位于
+  后端 ACL 中的 `luci-mod-status-index → modem_ctrl` 授权合并进来），后端只装
+  `qmodem.json`。
 - **Release 资产改为可直接安装的散装包**（`main.yml`、
   `publish-existing-release.yml`）：不再把构建产物二次打包为
   `QModem-<arch>_*.tar.gz`，Release 直接上传散装 `.ipk` / `.apk`。
@@ -32,11 +65,34 @@
   （如 `qmodem-3.4.0_rc3-r1_aarch64.apk`）。下载后直接
   `opkg install *.ipk` / `apk add --allow-untrusted *.apk`，无需解压。
   v1.0.0 Release 已同步迁移（6 个 tar.gz 资产替换为 80 个散装包）。
-- **`qmodem-suite` 元包恢复构建**：该包此前不在 SDK 构建清单中，导致
-  "一次安装交付完整栈"的承诺没有可分发产物。已加入
-  `qmodem_package_generic` 与 `main.yml` 的必检清单（其依赖
-  `qmodem_monitor` / `luci-app-qmodem-monitor` / `luci-app-qmodem-ttlfw4`
-  由同一次编译自动拉入）。
+- **新增 `.gitattributes` 统一行尾策略**：仓库与 `scripts/check_all.sh` 的 crlf
+  stage 都以「一律 LF」为前提，但此前没有 `.gitattributes`，Windows 上
+  `core.autocrlf=true` 会在检出时把工作区写成 CRLF，使本地 crlf 门禁报出大量
+  与提交内容无关的误报（索引里其实仍是 LF）。现显式声明 `* text=auto eol=lf`，
+  检出即 LF；第三方/上游 vendored 目录（`application/qfirehose/`、`driver/`、
+  `application/qmodem/src/quectel_CM_5G_M/`、`application/qmodem/src/sms-tool_q/`）
+  以 `-text` 保持字节原样，与 crlf stage 的排除名单一致。
+- **补交上一轮整合遗漏的失效路径引用**：`docs/refactor/HANDOFF.md` 与
+  `docs/refactor/README.md` 的门禁命令块中，JS 冒烟路径与 C 语法检查路径仍指向
+  已退役的 `luci/luci-app-qmodem-next/` 与 `application/ubus_at_daemon/{inc,src}`；
+  `docs/developer/` 下的异步守护进程导览与上游同步策略表同样引用了合并前的旧
+  目录。全部改为合并后路径（`luci/luci-app-qmodem/tests/`、
+  `application/qmodem/src/ubus_at_daemon/`、`application/qmodem/files/`）。
+- **修复 `crlf` 门禁的判据与实现**：原实现用 `grep -I -q -l $'\r'` 扫工作区文件，
+  存在两个反向缺陷——Windows 上 `core.autocrlf=true` 会让工作区检出为 CRLF，与提交
+  内容无关却全部命中（误报）；而 MSYS/Cygwin 的 grep 以文本模式读文件会吞掉 CR，
+  对含 CR 的文件同样返回不匹配（实测含 36 个 CR 的文件亦不命中，漏报）。现改用
+  `git ls-files --eol` 的 `i/<eol>` 字段判定即将提交的内容，确定性且跨平台；同时
+  把该 stage 从分钟级（全量扫 688 个文件约 3.7 分钟）降到约 2 秒。已用「向索引注入
+  CRLF blob」做过负向验证，确认能正确 FAIL 并点名文件。
+- **`rust` 与 `c` 两个 stage 增加「宿主平台不适用」判别**：`rust` 跑
+  `cargo test --workspace`，而 `qmodem-atd` 依赖 `std::os::unix`（unix socket 与
+  串口），在 Windows 宿主上无法编译；`c` 在 MinGW 下会因 UCRT 不提供 `timegm` /
+  `strsep` 等 POSIX 符号而报隐式声明。两者都是平台差异而非代码缺陷，现按严格判据
+  降级为 SKIP 并说明原因（`rust`：仅当失败者全为 `qmodem-atd` 且日志确有该平台
+  错误；`c`：用一份仅含这些 POSIX 声明的补丁头重试编译，补上声明后即通过，才判定
+  为宿主缺口——真实的语法错误仍照常 FAIL）。CI（ubuntu-latest）仍照常执行这两个
+  stage。
 
 ## [1.0.0] - 2026-10-12
 

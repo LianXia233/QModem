@@ -25,7 +25,7 @@ model_segment()
     fi
 }
 
-scanner_source="$REPO_ROOT/application/modem_scan/src/modem_scand.c"
+scanner_source="$REPO_ROOT/application/qmodem/src/modem_scan/modem_scand.c"
 fail=0
 mapfile -t fixture_files < <(
     find "$REPO_ROOT/testcases/recognition" -mindepth 4 -maxdepth 4 -type f -name '*.json' 2>/dev/null | sort

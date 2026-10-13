@@ -39,7 +39,7 @@ uci commit qmodem && /etc/init.d/qmodem_init restart
 
 Notes:
 
-- `at_tool` is a global option that applies to the `at()`/`fastat()` calls of all modems; the Settings page of `luci-app-qmodem-next` provides an `Alternative AT Tools` toggle corresponding to `at_tool='1'` (see `luci/luci-app-qmodem-next/htdocs/luci-static/resources/view/qmodem/settings.js`).
+- `at_tool` is a global option that applies to the `at()`/`fastat()` calls of all modems; the Settings page of `luci-app-qmodem` provides an `Alternative AT Tools` toggle corresponding to `at_tool='1'` (see `luci/luci-app-qmodem/htdocs/luci-static/resources/view/qmodem/settings.js`).
 - Path 2 requires `qmodem-atd` to be running and to have registered the target port. For daemon startup, port registration, and JSON protocol details, see [Rust async daemon architecture](async-daemon.zh-cn.md).
 
 ## 3. Failover behavior

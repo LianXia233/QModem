@@ -4,6 +4,14 @@
 - **Date**: 2026-10-12
 - **Related**: `REFACTOR_ROADMAP.md` (W23 legacy-stack retirement Step 1), `docs/refactor/journal-retire-s1.md` §3 endpoint gap table, retire/audit journals (referenced per decision)
 
+> **Status note (2026-10-13)**: some decisions below have been superseded by the later
+> consolidation — for example "Decision 1: Merge TTL into the next ecosystem (ttlfw4 as the
+> carrier, into qmodem-suite)": `qmodem-suite` is now retired and TTL ships with `qmodem`,
+> while the carrier packages `luci-app-qmodem-next` / `-ttlfw4` are merged into
+> `luci-app-qmodem`. The original text is kept for traceability; see
+> [integration-scope.zh-cn.md](../refactor/integration-scope.zh-cn.md) for the
+> superseding layout.
+
 ## Context
 
 Phases 0–3 completed C-layer memory-safety fixes, the LuCI next frontend, the Rust async core (qmodem-pdu / qmodem-atd), and the qmodem-suite meta-package. Phase 4 (legacy-stack retirement and packaging wrap-up) faces 7 pending decisions: the overlapping TTL packages, whether to keep/migrate/retire mwan/voip/HC, when to switch the AT path and PDU packaging to Rust, and how to handle qfirehose's three high-severity vulnerabilities. This ADR records the final decisions based on the retire journals and the gap table.

@@ -2,7 +2,7 @@
 
 [简体中文](async-daemon.zh-cn.md) | English
 
-> Status: **experimental**. `rust/qmodem-atd` is a parallel alternative to `application/ubus_at_daemon` (the C version) and currently **does not replace the packaging path of any existing component**. The authoritative sources for design notes and fix cross-references are `rust/README.md` and `docs/refactor/journal-rust-core.md`; this document is a developer-oriented architecture tour.
+> Status: **experimental**. `rust/qmodem-atd` is a parallel alternative to `application/qmodem/src/ubus_at_daemon` (the C version) and currently **does not replace the packaging path of any existing component**. The authoritative sources for design notes and fix cross-references are `rust/README.md` and `docs/refactor/journal-rust-core.md`; this document is a developer-oriented architecture tour.
 
 ## 1. Thread-actor model
 
@@ -45,7 +45,7 @@ The default build (the `service` feature) does not touch serial ports or libubus
 
 ## 2. Comparison with the C version ubus_at_daemon
 
-C sources: `application/ubus_at_daemon/src/`. The per-item "problem → how Rust eliminates it" material is taken from section 3 of `docs/refactor/journal-rust-core.md`:
+C sources: `application/qmodem/src/ubus_at_daemon/src/`. The per-item "problem → how Rust eliminates it" material is taken from section 3 of `docs/refactor/journal-rust-core.md`:
 
 | # | C problem | C location | How the Rust design eliminates it |
 |---|---|---|---|

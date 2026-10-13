@@ -103,9 +103,9 @@ stage_node() {
     return 0
 }
 
-# ---------- stage: js-test (luci-app-qmodem-next 单测) ----------
+# ---------- stage: js-test (luci-app-qmodem 单测) ----------
 stage_js_test() {
-    local t="luci/luci-app-qmodem-next/tests/test_sms_service.js"
+    local t="luci/luci-app-qmodem/tests/test_sms_service.js"
     [ -f "$t" ] || { record SKIP js-test "测试文件不存在"; return 0; }
     have node || { record SKIP js-test "node 未安装"; return 0; }
     if [ "$CHANGED" -eq 1 ] && ! changed_files | grep -q '^luci/'; then
@@ -129,7 +129,20 @@ stage_rust() {
         return 0
     fi
     ( cd rust && cargo test --workspace >/tmp/check_all_cargo.log 2>&1 ) \
-        || { record FAIL rust "cargo test 失败 (见 /tmp/check_all_cargo.log)"; return 0; }
+        || {
+            # qmodem-atd 依赖 std::os::unix（unix socket / 串口），在非 Unix 宿主上
+            # 无法编译。仅当「失败的全部都是 qmodem-atd」且日志中确有该平台错误时，
+            # 才按 SKIP 处理（CI 在 ubuntu-latest 上正常执行本 stage）。
+            local other_failed
+            other_failed="$(sed -n 's/.*could not compile `\([^`]*\)`.*/\1/p' /tmp/check_all_cargo.log \
+                | sort -u | grep -v '^qmodem-atd$' || true)"
+            if grep -q 'cannot find `unix` in `os`' /tmp/check_all_cargo.log \
+                && [ -z "$other_failed" ]; then
+                record SKIP rust "非 Unix 宿主：qmodem-atd 依赖 std::os::unix，本机不可编译（CI 在 Linux 上执行）"
+                return 0
+            fi
+            record FAIL rust "cargo test 失败 (见 /tmp/check_all_cargo.log)"; return 0;
+        }
     ( cd rust && cargo clippy --workspace -- -D warnings >>/tmp/check_all_cargo.log 2>&1 ) \
         || { record FAIL rust "cargo clippy -D warnings 失败 (见 /tmp/check_all_cargo.log)";
              echo "---- clippy log tail ----" >&2
@@ -151,24 +164,43 @@ stage_c() {
         files="$(changed_files | grep '\.c$')" || true
         [ -n "$files" ] || { record SKIP c "C 文件无改动"; return 0; }
     fi
-    local missing_headers=0
+    local missing_headers=0 host_posix_gap=0
+    # 非 Unix 宿主（Windows / MinGW）的 UCRT 不提供 timegm / strsep 等 POSIX 符号，
+    # 源文本本身正确却会报 implicit declaration（并级联出 int-conversion）。
+    # 判据：用一份仅含这些声明的「补丁头」重试编译，补上声明后即通过 => 宿主缺口。
+    local is_unix=0 shim=""
+    case "$(uname -s 2>/dev/null)" in Linux|Darwin|*BSD*) is_unix=1 ;; esac
+    if [ "$is_unix" -eq 0 ]; then
+        shim="$(mktemp)"
+        cat > "$shim" <<'POSIX_SHIM_EOF'
+#include <time.h>
+#include <string.h>
+#include <stdlib.h>
+extern time_t timegm(struct tm *tm);
+extern char *strsep(char **stringp, const char *delim);
+POSIX_SHIM_EOF
+    fi
     while IFS= read -r f; do
         total=$((total + 1))
         if ! gcc -fsyntax-only "$f" 2>/tmp/check_all_c_err; then
             if grep -qi 'No such file or directory' /tmp/check_all_c_err; then
                 missing_headers=$((missing_headers + 1))
+            elif [ "$is_unix" -eq 0 ] \
+                && gcc -fsyntax-only -include "$shim" "$f" 2>/dev/null; then
+                host_posix_gap=$((host_posix_gap + 1))
             else
                 record FAIL c "$f: $(head -3 /tmp/check_all_c_err)"
                 fail=$((fail + 1))
             fi
         fi
     done <<< "$files"
+    [ -n "$shim" ] && rm -f "$shim"
     if [ "$fail" -gt 0 ]; then
         record FAIL c "$fail 个 C 文件语法错误"
-    elif [ "$missing_headers" -eq "$total" ]; then
-        record SKIP c "本机缺少 OpenWrt/系统头文件，$total 个文件无法编译检查"
-    elif [ "$missing_headers" -gt 0 ]; then
-        record PASS c "gcc -fsyntax-only 通过（$missing_headers 个文件因缺头文件跳过）"
+    elif [ "$((missing_headers + host_posix_gap))" -eq "$total" ]; then
+        record SKIP c "本机缺少 OpenWrt/系统头文件或 POSIX 符号，$total 个文件无法编译检查"
+    elif [ "$((missing_headers + host_posix_gap))" -gt 0 ]; then
+        record PASS c "gcc -fsyntax-only 通过（$((missing_headers + host_posix_gap)) 个文件因缺头文件/宿主 POSIX 符号跳过）"
     else
         record PASS c "gcc -fsyntax-only 通过 $total 个文件"
     fi
@@ -176,20 +208,28 @@ stage_c() {
 }
 
 # ---------- stage: crlf (CRLF 检查) ----------
-# 排除第三方 vendor 目录（quectel 上游源码，预存 CRLF，不做门禁）
+# 排除第三方 vendor 目录（quectel 上游源码，预存 CRLF，不做门禁）。
+#
+# 判据取「索引（即将提交的内容）」的行尾，而不是工作区行尾：
+#   - 工作区行尾受 core.autocrlf 影响。Windows 上 core.autocrlf=true 会在检出时把
+#     工作区写成 CRLF，与真正提交的内容无关，据此判定会产生大量误报；仓库已通过
+#     根目录 .gitattributes（`* text=auto eol=lf`）固定检出为 LF。
+#   - 反过来，MSYS/Cygwin 的 grep 以文本模式读文件会吞掉 CR，`grep $'\r'` 在本机
+#     恒不命中（实测：含 36 个 CR 的文件亦返回不匹配），据此判定又会漏报。
+#   - `git ls-files --eol` 的 `i/<eol>` 字段直接给出索引内容的行尾，确定性、跨平台，
+#     并把原先分钟级的全量扫描降到毫秒级。
 stage_crlf() {
     have git || { record SKIP crlf "git 不可用"; return 0; }
     local files
-    files="$(git ls-files \
-        | grep -vE '^(driver/|application/qfirehose/|application/quectel_CM_5G_M/)' \
-        | while IFS= read -r f; do
-            [ -f "$f" ] && grep -I -q -l $'\r' "$f" 2>/dev/null && echo "$f"
-        done)"
+    files="$(git ls-files --eol 2>/dev/null \
+        | awk -F'\t' '{ split($1, a, /[ \t]+/); if (a[1] == "i/crlf" || a[1] == "i/mixed") print $NF }' \
+        | grep -vE '^(driver/|application/qfirehose/|application/qmodem/src/quectel_CM_5G_M/|application/qmodem/src/sms-tool_q/)' \
+        || true)"
     if [ -n "$files" ]; then
-        record FAIL crlf "以下文件含 CRLF:
+        record FAIL crlf "以下文件在索引中为 CRLF:
 $files"
     else
-        record PASS crlf "无 CRLF 文件"
+        record PASS crlf "索引中无 CRLF 文件"
     fi
     return 0
 }

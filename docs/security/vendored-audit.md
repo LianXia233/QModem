@@ -21,10 +21,10 @@
 | 1 | `application/qfirehose/src/firehose_protocol.c:547,990,1639-1976`（同型 `qfirehose.c:236,540`、`md5.c:322,421`、`sahara.c:452`） | `system(zip_cmd_buf)`，路径含升级包内 `file_name_image_dir` | 恶意升级包 shell 元字符注入 | 高 |
 | 2 | `application/qfirehose/src/firehose_protocol.c:276`（strncpy 无 NUL）+ `:242-266` `fh_xml_set_value` strcpy 回写固定 512 `fh_cmd.xml_original_data` | 缓冲区溢出 | 构造 rawprogram XML（本地包） | 高 |
 | 3 | `application/qfirehose/src/usb2tcp.c:189-216` | `bind(INADDR_ANY)` 无鉴权 TCP → USB 直通管道 | 远端主机直连可刷机 | 高（启用条件：CLI 传 `usb2tcp_port`） |
-| 4 | `application/quectel_CM_5G_M/src/udhcpc.c:278` | `while(!system(shell_cmd));` 忙循环重试 | 逻辑缺陷/卡死（非注入） | 中 |
-| 5 | `application/quectel_CM_5G_M/src/udhcpc_script.c:84-101` | `system()` 拼接 `getenv(IFUP_SCRIPT)` | 环境变量可控命令执行（本地） | 中 |
-| 6 | `application/quectel_CM_5G_M/src/udhcpc.c:112-116,259-304`、`atc.c:610` | `system()` 拼接 ifname/ip/gw | 变量均经 `ipv4Str/ipv6Str/inet_ntop` 或 sysfs 枚举，无网络文本 | 低-中 |
-| 7 | `application/quectel_CM_5G_M/src/qrtr.c:171,238,321` + `QCQMUX.c` TLV 解析 | 信任 modem 侧长度字段 | modem 被攻陷 → host 半可信边界 | 中（架构性） |
+| 4 | `application/qmodem/src/quectel_CM_5G_M/src/udhcpc.c:278` | `while(!system(shell_cmd));` 忙循环重试 | 逻辑缺陷/卡死（非注入） | 中 |
+| 5 | `application/qmodem/src/quectel_CM_5G_M/src/udhcpc_script.c:84-101` | `system()` 拼接 `getenv(IFUP_SCRIPT)` | 环境变量可控命令执行（本地） | 中 |
+| 6 | `application/qmodem/src/quectel_CM_5G_M/src/udhcpc.c:112-116,259-304`、`atc.c:610` | `system()` 拼接 ifname/ip/gw | 变量均经 `ipv4Str/ipv6Str/inet_ntop` 或 sysfs 枚举，无网络文本 | 低-中 |
+| 7 | `application/qmodem/src/quectel_CM_5G_M/src/qrtr.c:171,238,321` + `QCQMUX.c` TLV 解析 | 信任 modem 侧长度字段 | modem 被攻陷 → host 半可信边界 | 中（架构性） |
 | 8 | `application/qmodem_sipd/src/rtp_transport.c:178-190`（voipd 同型 `rtp_transport.c:178`） | recvfrom 仅校验源 IP，未校验源端口 | 同 IP 伪造 RTP 流 | 低 |
 | 9 | `application/qmodem_sipd/src/sip_consumer.c:1946` `strcpy(app.lan_address, argv[4])` | argv 无长度拷贝 | 前置 `:1899` `valid_lan_address` 校验，缓解 | 低 |
 | 10 | `application/qfirehose/src/usb_linux.c:292,305` sprintf 拼接 sysfs 路径 | sprintf 到固定缓冲 | udev 枚举输入，路径长度受内核限制 | 低 |

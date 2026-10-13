@@ -1,0 +1,112 @@
+{
+	"admin/modem": {
+		"title": "Mobile Network",
+		"order": 25,
+		"action": {
+			"type": "firstchild"
+		}
+	},
+	"admin/modem/qmodem": {
+		"title": "Modem Manager",
+		"order": 10,
+		"action": {
+			"type": "firstchild"
+		},
+		"depends": {
+			"acl": [ "luci-app-qmodem" ]
+		}
+	},
+
+	"admin/modem/qmodem/overview": {
+		"title": "Overview",
+		"order": 1,
+		"action": { "type": "view", "path": "qmodem/status" }
+	},
+	"admin/modem/qmodem/stats": {
+		"title": "Statistics",
+		"order": 2,
+		"action": { "type": "view", "path": "qmodem/stats" }
+	},
+	"admin/modem/qmodem/connection": {
+		"title": "Mobile Data",
+		"order": 3,
+		"action": { "type": "view", "path": "qmodem/connection" }
+	},
+	"admin/modem/qmodem/network": {
+		"title": "Radio and Cells",
+		"order": 4,
+		"action": { "type": "view", "path": "qmodem/network" }
+	},
+	"admin/modem/qmodem/network_config": {
+		"title": "Dial and Network",
+		"order": 5,
+		"action": { "type": "view", "path": "qmodem/network_config" }
+	},
+
+	"admin/modem/qmodem/sms": {
+		"title": "Messages",
+		"order": 6,
+		"action": { "type": "view", "path": "qmodem/sms" }
+	},
+	"admin/modem/qmodem/sms/conversation/*": {
+		"title": "SMS Conversation",
+		"action": { "type": "view", "path": "qmodem/sms_conversation" }
+	},
+	"admin/modem/qmodem/sms_sim": {
+		"title": "SIM Messages",
+		"order": 6.2,
+		"action": { "type": "view", "path": "qmodem/sms_sim" }
+	},
+	"admin/modem/qmodem/sms_forward": {
+		"title": "SMS Forwarding",
+		"order": 6.4,
+		"action": { "type": "view", "path": "qmodem/sms_forward" }
+	},
+
+	"admin/modem/qmodem/system": {
+		"title": "Module and SIM",
+		"order": 7,
+		"action": { "type": "view", "path": "qmodem/system" }
+	},
+	"admin/modem/qmodem/sim_switch": {
+		"title": "SIM Switch",
+		"order": 8,
+		"action": { "type": "view", "path": "qmodem/sim_switch" }
+	},
+	"admin/modem/qmodem/terminal": {
+		"title": "AT Console",
+		"order": 9,
+		"action": { "type": "view", "path": "qmodem/terminal" }
+	},
+	"admin/modem/qmodem/monitor": {
+		"title": "Network Monitor",
+		"order": 10,
+		"action": { "type": "view", "path": "qmodem/monitor" }
+	},
+
+	"admin/modem/qmodem/advanced": {
+		"title": "Advanced",
+		"order": 11,
+		"action": { "type": "view", "path": "qmodem/advanced" }
+	},
+	"admin/modem/qmodem/modem_config": {
+		"title": "Modem Features",
+		"order": 12,
+		"action": { "type": "view", "path": "qmodem/modem_config" }
+	},
+	"admin/modem/qmodem/ttl": {
+		"title": "TTL",
+		"order": 13,
+		"action": { "type": "view", "path": "qmodem/ttl" }
+	},
+	"admin/modem/qmodem/device": {
+		"title": "Device Parameters",
+		"order": 14,
+		"action": { "type": "view", "path": "qmodem/device" }
+	},
+	"admin/modem/qmodem/service": {
+		"title": "Service and Scan",
+		"order": 15,
+		"action": { "type": "view", "path": "qmodem/service" }
+	}
+}

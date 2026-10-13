@@ -4,6 +4,12 @@
 - **日期**：2026-10-12
 - **关联**：`REFACTOR_ROADMAP.md`（W23 旧栈退役 Step 1）、`docs/refactor/journal-retire-s1.md` §3 端点 Gap 表、各 retire/audit journal（见各决策引用）
 
+> **现状提示（2026-10-13）**：本 ADR 的部分决策已被后续整合取代——例如「决策 1：TTL 并入
+> next 生态、纳入 `qmodem-suite`」中的 `qmodem-suite` 已退役、TTL 现随 `qmodem` 携带；
+> `luci-app-qmodem-next` / `-ttlfw4` 等载体包已并入 `luci-app-qmodem`。决策原文保留不改，
+> 以便追溯当时依据。取代关系见
+> [integration-scope.zh-cn.md](../refactor/integration-scope.zh-cn.md)。
+
 ## 背景
 
 Phase 0–3 已完成 C 层内存安全修复、LuCI next 前端、Rust 异步核心（qmodem-pdu / qmodem-atd）与 qmodem-suite 元包。Phase 4（旧栈退役与打包收尾）面临 7 项待决问题：TTL 双包重叠、mwan/voip/HC 的去留、AT 通路与 PDU 打包的 Rust 切换时机、qfirehose 三项高危漏洞的处置。本 ADR 依据各 retire journal 与 gap 表给出最终决策。

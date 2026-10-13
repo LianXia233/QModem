@@ -1,7 +1,7 @@
 //! Storage abstraction.
 //!
 //! [`Storage`] captures exactly the persistence operations the C daemon
-//! performs against `sms.sqlite3` (see `application/qmodem_smsd/src/sms_db.c`):
+//! performs against `sms.sqlite3` (see `application/qmodem/src/qmodem_smsd/src/sms_db.c`):
 //! deduplicated imports keyed by `(modem_id, storage, source_index, pdu)`,
 //! `sync_runs` bookkeeping, URC epoch/sequence tracking and the
 //! `deliveries` claim/ack state machine.
