@@ -60,7 +60,7 @@ var CSS_TOKENS = [
 	'--qm-warn-soft:rgba(245,158,11,.12);--qm-warn-border:rgba(245,158,11,.38);',
 	'--qm-danger-soft:rgba(239,68,68,.10);--qm-danger-border:rgba(239,68,68,.36);',
 	'--qm-accent-gradient:linear-gradient(135deg,#0072f5 0%,#2563eb 100%);',
-	'--qm-hero-gradient:linear-gradient(135deg,#0f172a 0%,#2563eb 100%);',
+	'--qm-hero-gradient:linear-gradient(135deg,#0f172a 0%,#1e40af 100%);',
 	'--qm-surface-gradient:linear-gradient(135deg,rgba(255,255,255,.92) 0%,rgba(240,246,255,.72) 100%);',
 	'--qm-glow-a:radial-gradient(circle,rgba(0,114,245,.12) 0%,rgba(16,185,129,.04) 50%,transparent 70%);',
 	'--qm-glow-b:radial-gradient(circle,rgba(99,102,241,.09) 0%,rgba(14,165,233,.05) 50%,transparent 70%);',
@@ -93,7 +93,7 @@ var CSS_TOKENS = [
 	'--qm-warn-soft:rgba(251,191,36,.14);--qm-warn-border:rgba(251,191,36,.40);',
 	'--qm-danger-soft:rgba(248,113,113,.14);--qm-danger-border:rgba(248,113,113,.40);',
 	'--qm-accent-gradient:linear-gradient(135deg,var(--qm-accent) 0%,#1d4ed8 100%);',
-	'--qm-hero-gradient:linear-gradient(135deg,#0b1220 0%,var(--qm-accent) 100%);',
+	'--qm-hero-gradient:linear-gradient(135deg,#0b1220 0%,#14315c 100%);',
 	'--qm-surface-gradient:linear-gradient(135deg,rgba(30,37,47,.92) 0%,rgba(23,30,40,.82) 100%);',
 	'--qm-glow-a:radial-gradient(circle,rgba(56,189,248,.10) 0%,rgba(52,211,153,.04) 50%,transparent 70%);',
 	'--qm-glow-b:radial-gradient(circle,rgba(129,140,248,.09) 0%,rgba(56,189,248,.05) 50%,transparent 70%);',
@@ -114,7 +114,7 @@ var CSS_TOKENS = [
 	'--qm-danger-border:color-mix(in srgb,var(--qm-danger) 36%,var(--qm-surface));',
 	'--qm-glass:color-mix(in srgb,var(--qm-surface) 90%,transparent);',
 	'--qm-accent-gradient:linear-gradient(135deg,var(--qm-accent) 0%,color-mix(in srgb,var(--qm-accent) 60%,#0b1220) 100%);',
-	'--qm-hero-gradient:linear-gradient(135deg,color-mix(in srgb,var(--qm-accent) 72%,#060b14) 0%,var(--qm-accent) 100%);',
+	'--qm-hero-gradient:linear-gradient(135deg,color-mix(in srgb,var(--qm-accent) 24%,#05080f) 0%,color-mix(in srgb,var(--qm-accent) 42%,#05080f) 100%);',
 	'--qm-glow-a:radial-gradient(circle,color-mix(in srgb,var(--qm-accent) 14%,transparent) 0%,color-mix(in srgb,var(--qm-ok) 5%,transparent) 50%,transparent 70%);',
 	'--qm-glow-b:radial-gradient(circle,color-mix(in srgb,var(--qm-accent-2) 12%,transparent) 0%,color-mix(in srgb,var(--qm-accent) 6%,transparent) 50%,transparent 70%);',
 	'}}'
@@ -351,8 +351,10 @@ var CSS_LEGACY = [
 	selDesc(HERO_CLASSES, ' *') + '{color:var(--qm-on-hero)!important;',
 	'border-color:rgba(255,255,255,.28)!important;-webkit-text-fill-color:var(--qm-on-hero)!important}',
 	selDesc(HERO_CLASSES.concat(HERO_INNER_CLASSES), ' svg') + '{stroke:var(--qm-on-hero)!important}',
+	selDesc(HERO_CLASSES, ' [class*="-sub"]') + ',' + selDesc(HERO_CLASSES, ' [class*="-meta"]') +
+	'{color:rgba(255,255,255,.90)!important;-webkit-text-fill-color:rgba(255,255,255,.90)!important}',
 	selDesc(HERO_CLASSES, ' [class*="badge"]') + ',' + selDesc(HERO_CLASSES, ' [class*="-dot"]') +
-		'{background:rgba(255,255,255,.18)!important}',
+		'{background:rgba(0,0,0,.22)!important;border-color:rgba(255,255,255,.34)!important}',
 
 	/* 进度条 / 条形图轨道 */
 	'.qm-app .qm-mini-bar,.qm-app .mt-sbar-track,.qm-app .mt-sbar{background:var(--qm-surface-3);border-radius:999px;overflow:hidden}',

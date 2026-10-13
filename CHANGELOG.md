@@ -133,6 +133,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **Hero text unreadable on light-primary themes**: the hero gradient ended in
+  the raw theme primary (`color-mix(primary 72%,#060b14) → var(--qm-accent)`, same
+  in the dark fallback) while hero text is forced white. With a light primary
+  (e.g. luci-theme-aurora) the gradient end became light blue and white text
+  scored only 1.51–4.44 (≈2.53 for aurora), all below WCAG AA. Both stops are now
+  darkened (`color-mix(primary 24%/42%,#05080f)`, fallbacks `#0f172a→#1e40af` and
+  `#0b1220→#14315c`) with the primary used only as a hue source: white text now
+  scores 4.96–16.02 (still 4.96 even for a pure-white primary). Hero chips switched
+  from translucent white to translucent dark (white text 4.27 → 5.9+ on light
+  themes) and hero sub/meta text dropped to 90% white for hierarchy.
 - **`qmodem-atd` crash loop on device**: the package was built with default
   features only (`service`), but `--port` requires the `tty` feature — without it
   the daemon exits immediately ("--port requires building with --features tty"),
