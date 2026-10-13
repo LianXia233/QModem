@@ -93,6 +93,22 @@
   错误；`c`：用一份仅含这些 POSIX 声明的补丁头重试编译，补上声明后即通过，才判定
   为宿主缺口——真实的语法错误仍照常 FAIL）。CI（ubuntu-latest）仍照常执行这两个
   stage。
+- **恢复合并过程中丢失的 38 个可执行位**：本机 `core.fileMode=false`（Windows
+  默认），git 不记录工作区的 x 位，因此本轮新增/重写的文件一律以 `100644` 入索引。
+  其中 37 个是 `Makefile` 中由 `$(INSTALL_BIN)` 安装、落盘必须为 `0755` 的运行时
+  脚本（`/etc/init.d/*`、`/etc/uci-defaults/*`、`/usr/bin/*`、`/usr/sbin/*`、
+  `/usr/libexec/rpcd/*`、`/usr/lib/qmodem/*`、netifd proto 脚本、
+  `sms_forwarder` 通知脚本等）；另 1 个是
+  `tests/qmodem-seal/test_qmodem_seal.sh`——它在合并前就是 `100755`，内容逐字节
+  未变、仅模式丢失，而 `vendor-fixtures.yml` 直接把它当可执行文件调用，模式丢失
+  即导致该工作流在第 3 行 `Permission denied`（exit 126）失败。现对这 38 个文件
+  `git update-index --chmod=+x`，索引模式已全部复核为 `100755`，`git diff --cached`
+  确认纯模式变更、无内容改动。
+  同类审计中另有 `files/usr/share/qmodem/ref-rmnet-dhcp`（原
+  `application/quectel_CM_5G_M/files/dhcp`）在旧树里是 `100755`，但它是一份
+  dnsmasq 配置参考（`/etc/config/dhcp` 样式），且旧 `quectel_CM_5G_M/Makefile`
+  从未安装过它；本轮以 `$(INSTALL_DATA)` 安装（落盘 `0644`），**有意保持
+  `100644`**——旧树的 x 位系上游遗留，恢复反而与安装语义不符。
 
 ## [1.0.0] - 2026-10-12
 

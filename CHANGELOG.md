@@ -109,6 +109,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   really contains that platform error; `c`: only when recompiling with a header that
   merely declares those POSIX functions succeeds, so genuine syntax errors still
   FAIL). CI (ubuntu-latest) still runs both stages.
+- **Restored 38 executable bits lost during the consolidation**: this machine has
+  `core.fileMode=false` (the Windows default), so git does not track the working-tree
+  x bit and every file added or rewritten this round entered the index as `100644`.
+  37 of them are runtime scripts installed via `$(INSTALL_BIN)` and required to land
+  as `0755` (`/etc/init.d/*`, `/etc/uci-defaults/*`, `/usr/bin/*`, `/usr/sbin/*`,
+  `/usr/libexec/rpcd/*`, `/usr/lib/qmodem/*`, the netifd proto scripts, the
+  `sms_forwarder` notifier scripts, …); the last one is
+  `tests/qmodem-seal/test_qmodem_seal.sh`, which was already `100755` before the
+  merge — byte-identical in content, with only the mode lost — and is invoked
+  directly as an executable by `vendor-fixtures.yml`, so losing the mode made that
+  workflow fail with `Permission denied` (exit 126) on its third line. All 38 files
+  are now restored via `git update-index --chmod=+x`; the index modes have been
+  re-verified as `100755` and `git diff --cached` confirms mode-only changes with no
+  content edits.
+  The same audit also surfaced `files/usr/share/qmodem/ref-rmnet-dhcp` (formerly
+  `application/quectel_CM_5G_M/files/dhcp`), which was `100755` in the old tree.
+  It is a dnsmasq config reference (an `/etc/config/dhcp`-style file) and the old
+  `quectel_CM_5G_M/Makefile` never installed it at all; this round installs it with
+  `$(INSTALL_DATA)` (landing as `0644`), so it is **deliberately kept at `100644`** —
+  the old x bit was an upstream leftover and restoring it would contradict the
+  install semantics.
 
 ## [1.0.0] - 2026-10-12
 
