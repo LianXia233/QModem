@@ -66,6 +66,12 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **Runner 固定为 `ubuntu-26.04`**：8 个工作流共 11 处 `runs-on` 原先都写
+  `ubuntu-latest`，而它将于 2026-10-19 起迁移到 Ubuntu 26.04
+  （actions/runner-images#14748），GitHub 已对每次运行弹出该警告。现已显式
+  固定为 `ubuntu-26.04`，既消除警告，也把镜像版本的选择变成一次主动决策
+  （OpenWrt SDK 构建依赖 `libncurses5-dev` / `gcc-multilib` 等特定 apt 包，
+  不应被动跟着标签漂移）。下次升级镜像时再主动改标签。
 - **CI 工作流合并（11 → 8）**：把重叠的测试/校验工作流合并为两个，覆盖面不减：
   - `ci.yml`（新增）取代 `quality.yml` + `vendor-fixtures.yml` + `rust-build.yml`。
     合并时同时消掉三处重复检查：shell 语法检查只由 `check_all.sh` 跑一遍

@@ -77,6 +77,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **Runners pinned to `ubuntu-26.04`**: all 11 `runs-on` entries across the 8
+  workflows used `ubuntu-latest`, which migrates to Ubuntu 26.04 from
+  2026-10-19 (actions/runner-images#14748) — GitHub was flagging every run
+  with that warning. Labels are now pinned explicitly to `ubuntu-26.04`,
+  which both silences the warning and makes the image version deliberate
+  rather than something that shifts under us (the OpenWrt SDK build depends
+  on specific apt packages like `libncurses5-dev` / `gcc-multilib`).
+  Bump the label deliberately when we are ready for the next image.
 - **CI workflows consolidated (11 → 8)**: merged overlapping test/validation
   workflows into two, without weakening coverage:
   - `ci.yml` (new) replaces `quality.yml` + `vendor-fixtures.yml` +
