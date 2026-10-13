@@ -133,6 +133,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **White-on-white hero chips and button**: the hero rule
+  `* { color:#fff !important }` forces white text on every descendant, while
+  `.qm-hero-op` (operator), `.qm-pill-tag` (mode / interface) and
+  `.qm-refresh-btn` (refresh) use white or light backgrounds inherited from the
+  theme — i.e. white on white (confirmed on device). They now use a translucent
+  dark background with white text, plus explicit hover (darker) and disabled
+  (dimmed but still ≥4.5) states: white text contrast 8.32–17.94, all AA. <br>`
 - **"Network Monitor" page and title untranslated**: 61 strings on the monitor
   page had no Chinese translation (some were not even wrapped in `_()`), and the
   menu title `Network Monitor` had no po entry at all. 17 hard-coded English

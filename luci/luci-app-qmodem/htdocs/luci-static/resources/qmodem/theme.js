@@ -355,6 +355,26 @@ var CSS_LEGACY = [
 	'{color:rgba(255,255,255,.90)!important;-webkit-text-fill-color:rgba(255,255,255,.90)!important}',
 	selDesc(HERO_CLASSES, ' [class*="badge"]') + ',' + selDesc(HERO_CLASSES, ' [class*="-dot"]') +
 		'{background:rgba(0,0,0,.22)!important;border-color:rgba(255,255,255,.34)!important}',
+	/* hero 内"浅底元素"必须改成深底：hero 文字被上面的 * 规则强制白色，
+	 * 而 qm-hero-op（运营商）/ qm-pill-tag（模式、接口）/ qm-refresh-btn（刷新）
+	 * / qm-status-badge 的默认底色是白或浅灰（跟随主题），白底白字等于不可见
+	 * （实机截图确认）。这里统一改成深色半透明底 + 白字，保证任何主题下可读。 */
+	selDesc(HERO_CLASSES, ' .qm-hero-op') + ',' +
+	selDesc(HERO_CLASSES, ' .qm-pill-tag') + ',' +
+	selDesc(HERO_CLASSES, ' .qm-refresh-btn') + ',' +
+	selDesc(HERO_CLASSES, ' .qm-status-badge') +
+	'{background:rgba(0,0,0,.30)!important;border:1px solid rgba(255,255,255,.34)!important;',
+	'color:rgba(255,255,255,.92)!important;-webkit-text-fill-color:rgba(255,255,255,.92)!important}',
+	selDesc(HERO_CLASSES, ' .qm-pill-tag strong') + ',' +
+	selDesc(HERO_CLASSES, ' .qm-hero-op strong') + ',' +
+	selDesc(HERO_CLASSES, ' .qm-status-badge strong') +
+	'{color:#fff!important;-webkit-text-fill-color:#fff!important}',
+	selDesc(HERO_CLASSES, ' .qm-refresh-btn:hover') +
+	'{background:rgba(0,0,0,.44)!important;border-color:rgba(255,255,255,.52)!important}',
+	selDesc(HERO_CLASSES, ' button:disabled') +
+	'{background:rgba(0,0,0,.18)!important;border-color:rgba(255,255,255,.20)!important;',
+	'color:rgba(255,255,255,.55)!important;-webkit-text-fill-color:rgba(255,255,255,.55)!important;',
+	'cursor:not-allowed!important}',
 
 	/* 进度条 / 条形图轨道 */
 	'.qm-app .qm-mini-bar,.qm-app .mt-sbar-track,.qm-app .mt-sbar{background:var(--qm-surface-3);border-radius:999px;overflow:hidden}',
