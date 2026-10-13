@@ -108,6 +108,10 @@
   `qmodem`，落盘路径不变。
 
 ### 修复（Fixed）
+- **qmodem-atd 一启动就崩溃循环（实机实测）**：打包时只用默认 feature（仅
+  `service`），缺 `tty` 时守护进程收到 `--port` 直接退出（"--port requires
+  building with --features tty"），procd 反复重启、socket 始终不存在，AT 默认
+  通路上的全部请求失败。构建改为 `--features service,tty`。
 - **LuCI 页面白屏 / "factory yields invalid constructor"**：`qmodem/compat.js`
   是纯副作用模块，结尾 `return {}`，而 LuCI 的 `require()` 会校验工厂返回值是
   合法 class（luci.js：`if (!Class.isSubclass(_class))`），普通对象直接触发该报错，

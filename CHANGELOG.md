@@ -124,6 +124,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **`qmodem-atd` crash loop on device**: the package was built with default
+  features only (`service`), but `--port` requires the `tty` feature — without it
+  the daemon exits immediately ("--port requires building with --features tty"),
+  so procd respawned it forever, the socket never appeared and every AT request
+  on the default path failed. The build now passes `--features service,tty`.
 - **LuCI views stuck at "Loading view" with `factory yields invalid constructor`**:
   `qmodem/compat.js` is a side-effect-only module that ended with `return {}`, but
   LuCI's `require()` validates the factory result as a class
