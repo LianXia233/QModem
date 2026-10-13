@@ -3,12 +3,16 @@ config qmodem-atd 'main'
     option socket '/var/run/qmodem/atd.sock'
 
 # 端口来源见 /etc/init.d/qmodem-atd：优先用这里显式声明的 port 段；
-# 未声明时自动收集 /etc/config/qmodem 各 modem-device 的 at_port。
-# baudrate 等参数当前由守护进程以默认配置打开（AtPortConfig::default），
-# 待 atd 实现配置加载后接入。
-config port
-    option at_port '/dev/ttyUSB2'
-    option baudrate '115200'
-    option databits '8'
-    option parity '0'
-    option stopbits '1'
+# 未声明时自动收集 /etc/config/qmodem 各 modem-device 的 at_port（推荐的默认行为）。
+#
+# 这里刻意**不预置**任何 config port 段：曾内置过示例端口 /dev/ttyUSB2，
+# 结果在 AT 口实际为 /dev/ttyUSB1 的设备上把守护进程绑到了错误设备，
+# 使 AT 控制台与所有 AT 消费者失败。需要覆盖时再手动 `uci add qmodem-atd port`。
+#
+# 示例（按需启用）：
+# config port
+#     option at_port '/dev/ttyUSB1'
+#     option baudrate '115200'
+#     option databits '8'
+#     option parity '0'
+#     option stopbits '1'

@@ -317,7 +317,7 @@ traffic_reset_build_line()
     local reset_type="$2"
     local hour="$3"
     local day="$4"
-    local minute="$TRAFFIC_RESET_DEFAULT_MINUTE"
+    local minute="${5:-$TRAFFIC_RESET_DEFAULT_MINUTE}"
     local marker
 
     marker=$(traffic_reset_get_marker "$config_section")
@@ -430,16 +430,21 @@ traffic_reset_dump_set_json()
 traffic_reset_get_schedule()
 {
     local config_section="$1"
-    local enabled reset_type hour day line
+    local enabled reset_type hour minute day line
 
     enabled=$(traffic_reset_normalize_bool "$(uci -q get "qmodem.${config_section}.usage_reset_enabled")")
     reset_type=$(uci -q get "qmodem.${config_section}.usage_reset_type")
     hour=$(uci -q get "qmodem.${config_section}.usage_reset_hour")
     day=$(uci -q get "qmodem.${config_section}.usage_reset_day")
+    minute=$(uci -q get "qmodem.${config_section}.usage_reset_minute")
 
     [ -n "$reset_type" ] || reset_type="$TRAFFIC_RESET_DEFAULT_TYPE"
     [ -n "$hour" ] || hour="$TRAFFIC_RESET_DEFAULT_HOUR"
     [ -n "$day" ] || day="$TRAFFIC_RESET_DEFAULT_DAY"
+    [ -n "$minute" ] || minute="$TRAFFIC_RESET_DEFAULT_MINUTE"
+    if ! traffic_reset_is_integer "$minute" || [ "$minute" -lt 0 ] || [ "$minute" -gt 59 ]; then
+        minute="$TRAFFIC_RESET_DEFAULT_MINUTE"
+    fi
 
     if [ "$reset_type" != "daily" ] && [ "$reset_type" != "monthly" ]; then
         reset_type="$TRAFFIC_RESET_DEFAULT_TYPE"
@@ -454,19 +459,23 @@ traffic_reset_get_schedule()
     fi
 
     line=$(traffic_reset_get_line "$config_section")
-    traffic_reset_dump_json "$enabled" "$reset_type" "$hour" "$day" "$TRAFFIC_RESET_DEFAULT_MINUTE" "$line"
+    traffic_reset_dump_json "$enabled" "$reset_type" "$hour" "$day" "$minute" "$line"
 }
 
 traffic_reset_set_schedule()
 {
     local input_json="$1"
-    local config_section enabled reset_type hour day line cron_backup
+    local config_section enabled reset_type hour minute day line cron_backup
 
     config_section=$(_rpc_field config_section "$input_json")
     enabled=$(traffic_reset_normalize_bool "$(_rpc_field enabled "$input_json")")
     reset_type=$(_rpc_field reset_type "$input_json")
     hour=$(_rpc_field hour "$input_json")
+    minute=$(_rpc_field minute "$input_json")
     day=$(_rpc_field day "$input_json")
+
+    # 未提供 minute 时沿用默认值（保持与旧前端兼容）
+    [ -n "$minute" ] || minute="$TRAFFIC_RESET_DEFAULT_MINUTE"
 
     [ -n "$config_section" ] || traffic_reset_fail "Missing config_section"
     valid_section "$config_section" || traffic_reset_fail "Invalid config_section"
@@ -481,6 +490,9 @@ traffic_reset_set_schedule()
 
     traffic_reset_is_integer "$hour" || traffic_reset_fail "Invalid hour: $hour"
     [ "$hour" -ge 0 ] && [ "$hour" -le 23 ] || traffic_reset_fail "Hour out of range: $hour"
+
+    traffic_reset_is_integer "$minute" || traffic_reset_fail "Invalid minute: $minute"
+    [ "$minute" -ge 0 ] && [ "$minute" -le 59 ] || traffic_reset_fail "Minute out of range: $minute"
 
     traffic_reset_is_integer "$day" || traffic_reset_fail "Invalid day: $day"
     [ "$day" -ge 1 ] && [ "$day" -le 31 ] || traffic_reset_fail "Day out of range: $day"
@@ -515,6 +527,12 @@ traffic_reset_set_schedule()
         rm -f "$cron_backup"
         traffic_reset_fail "Failed to update usage_reset_hour"
     }
+    uci -q set "qmodem.${config_section}.usage_reset_minute=$minute" || {
+        uci -q revert qmodem
+        cat "$cron_backup" > "$TRAFFIC_RESET_CRON_FILE" 2>/dev/null || true
+        rm -f "$cron_backup"
+        traffic_reset_fail "Failed to update usage_reset_minute"
+    }
     uci -q set "qmodem.${config_section}.usage_reset_day=$day" || {
         uci -q revert qmodem
         cat "$cron_backup" > "$TRAFFIC_RESET_CRON_FILE" 2>/dev/null || true
@@ -523,7 +541,7 @@ traffic_reset_set_schedule()
     }
 
     if [ "$enabled" = "1" ]; then
-        line=$(traffic_reset_build_line "$config_section" "$reset_type" "$hour" "$day")
+        line=$(traffic_reset_build_line "$config_section" "$reset_type" "$hour" "$day" "$minute")
         printf "%s\n" "$line" >> "$TRAFFIC_RESET_CRON_FILE" || {
             uci -q revert qmodem
             cat "$cron_backup" > "$TRAFFIC_RESET_CRON_FILE" 2>/dev/null || true
@@ -548,7 +566,7 @@ traffic_reset_set_schedule()
 
     rm -f "$cron_backup"
 
-    traffic_reset_dump_set_json "true" "$config_section" "$enabled" "$reset_type" "$hour" "$day" "$TRAFFIC_RESET_DEFAULT_MINUTE" "$line"
+    traffic_reset_dump_set_json "true" "$config_section" "$enabled" "$reset_type" "$hour" "$day" "$minute" "$line"
 }
 
 # ---------------------------------------------------------------------------
@@ -933,6 +951,7 @@ case "$1" in
         "enabled": "bool",
         "reset_type": "string",
         "hour": "int",
+        "minute": "int",
         "day": "int"
     },
     "sim_info": {
@@ -1250,6 +1269,31 @@ EOF
                 cmd=$(_rpc_jq .at "$params")
                 port=$(_rpc_jq .port "$params")
                 use_ubus_flag=$(_rpc_jq .use_ubus_flag "$params")
+                # 兼容前端历史上传的 use_ubus 键名（两种写法都接受）
+                [ -n "$use_ubus_flag" ] || use_ubus_flag=$(_rpc_jq .use_ubus "$params")
+
+                # 未显式给端口时按该 section 的 UCI 配置解析（at_port /
+                # override_at_port）。AT 控制台/缓存任务都只传 {at}，若此处不
+                # 回退，at "" 会以空设备名调用 tom_modem/sms_tool/atd 必然失败，
+                # 表现为 status=0 且没有 res（实机已复现）。
+                if [ -z "$port" ]; then
+                    _saved_ubus_flag="$use_ubus_flag"
+                    use_ubus_flag=""
+                    get_at_port_config "$config_section" 0
+                    port="$at_port"
+                    [ -n "$_saved_ubus_flag" ] && use_ubus_flag="$_saved_ubus_flag"
+                fi
+
+                if [ -z "$cmd" ] || [ -z "$port" ]; then
+                    json_init
+                    json_add_object at_cfg
+                    json_add_string status "0"
+                    json_add_string error "missing at command or resolvable AT port"
+                    json_close_object
+                    json_dump
+                    exit 0
+                fi
+
                 if [ "$use_ubus_flag" = "1" ]; then
                     use_ubus_flag="-u"
                 else

@@ -131,6 +131,37 @@
   `qmodem`，落盘路径不变。
 
 ### 修复（Fixed）
+- **AT 控制台在 AT 独占（qmodem-atd）模式下不可用**：实机联调定位到 6 个叠加
+  缺陷，全部修复——
+  1. `qmodem-atd` init 用 `config_get "$section" type` 判断节类型，而 UCI 里
+     `config modem-device '2_1'` 的 `modem-device` 是**节类型**不是 option，
+     取值为空 → 未显式配置 `config port` 时收集不到任何端口，atd 直接不启动；
+  2. 出厂 `/etc/config/qmodem-atd` 预置了示例端口 `/dev/ttyUSB2`，会把守护
+     进程绑到**错误设备**（本机 AT 口实际为 `/dev/ttyUSB1`）→ 控制台请求在 atd
+     侧查不到端口；现改为不预置端口段（自动收集），并跳过不存在的 tty 节点；
+  3. `qmodem.send_at` 在调用方未给端口时不解析 UCI，直接 `at "" <cmd>` 必然
+     失败（表现为 `status=0` 且无 `res`）；现按 `at_port`/`override_at_port`
+     回退解析，并在命令/端口缺失时返回明确错误体；
+  4. 前端传 `use_ubus`、后端读 `use_ubus_flag` → "走 ubus"开关被静默忽略；
+     后端兼容两种键名，前端统一为 `use_ubus_flag`；
+  5. atd 桥接 helper 的 curl 兜底用 `-d` 传正文，而 `-d` 会按 urlencoded 语义
+     **删除换行**，atd 按行读取永远等不到完整请求行；同时判停条件写成"文件末尾
+     是换行"，会被 HTTP 头行产生的 bad json 回复提前打断。改为 `--data-binary
+     @-` + `-N`（禁缓冲）+ 以「出现 `{"status":...}` 应答行」为判停条件；顺带
+     把 busybox 不支持的 `sleep 0.1` 换掉，并在 busybox `nc` 无 `-U` 时直接走
+     curl（避免一次必然失败的传输）；
+  6. Rust atd 打开串口时 `B115200` 常量误写为 `0o100002`（正确值 `0o10002`），
+     属于未定义速率 → `tcsetattr` 后串口速率异常，**永远读不到模组字节**；
+     已修正，并让 termios 设置失败显式报错（不再静默"能打开但读不到数据"）。
+- **AT 独占被遗留 C 组件破坏**：实机 `ls -l /proc/*/fd` 显示遗留
+  `ubus-at-daemon` 与 `qmodem-atd` **同时持有** `/dev/ttyUSB1`，导致 atd 收到的
+  应答被偷走（形似"AT 超时"）。现在 `qmodem-atd` 启动前会停止并停用遗留
+  `ubus-at-daemon`，保证 AT 串口只有一个持有者。
+- **流量清零计划保存无效（前后端参数不匹配）**：前端发嵌套 `params` 对象，后端
+  `set_traffic_reset_schedule` 接收的是扁平字段（`enabled`/`reset_type`/`hour`/
+  `day`）→ 计划从未真正写入；且后端缺少 `minute` 字段，前端的分钟选择器永远
+  存不进去。现在前端显式映射为扁平字段，后端补齐 `minute`（校验 0–59、写入
+  `usage_reset_minute`、进入 cron 行与返回体）。
 - **二级页签未汉化**：菜单标题 `Dial and Network`、`Device Parameters`、
   `Modem Features`、`Service and Scan`、`SIM Messages`、`SMS Forwarding` 在 po
   中没有条目，导致第二行页签显示英文。现已补齐（`TTL` 作为术语保留原文）。

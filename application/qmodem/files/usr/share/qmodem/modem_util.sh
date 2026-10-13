@@ -146,6 +146,14 @@ qmodem_atd_json_lines()
 #  status ok      -> print response lines, return 0
 #  status timeout -> print partial lines, return 1
 #  status error / transport failure -> log, return 1 (NO fallback to at_tool 0/1)
+#可移植的亚秒等待：busybox 的 sleep 不接受小数（sleep: invalid number '0.1'），
+#GNU timeout 在精简构建下也会把 0.1 截断为 0，因此统一退化为整数秒 tick。
+#调用方在拿到完整 JSON 行后立即退出循环，单条 AT 的实际额外延迟≈1 个 tick。
+qmodem_atd_tick()
+{
+	sleep 1
+}
+
 qmodem_atd_sendat()
 {
 	local at_port="$1" atcmd="$2" timeout_ms="${3:-3000}"
@@ -172,17 +180,26 @@ qmodem_atd_sendat()
 	#HTTP header lines each trigger a "bad json" reply and the sendat response
 	#is not reliably readable through curl; it is only a last-resort fallback.
 	res_file=$(mktemp /tmp/qmodem_atd_res.XXXXXX) || return 1
-	budget=$(( (timeout_ms / 100) + 20 ))
+	#budget 单位为 tick（1 tick = 1s）；+2 覆盖传输自身的启动与收尾
+	budget=$(( (timeout_ms + 999) / 1000 + 2 ))
 
-	if command -v nc >/dev/null 2>&1; then
+	#busybox nc 多数构建未启用 FEATURE_UNIX_LOCAL（无 -U），此时直接走 curl 兜底，
+	#避免白白启动一次必然失败的传输
+	_nc_unix=""; 
+	if command -v nc >/dev/null 2>&1 && nc -h 2>&1 | grep -q -- '-U'; then
+		_nc_unix=1
+	fi
+	if [ -n "$_nc_unix" ]; then
 		printf '%s\n' "$req" | nc -U "$sock" >"$res_file" 2>/dev/null &
 		bg=$!
 		poll=0
 		while [ "$poll" -lt "$budget" ]; do
-			#complete when the last byte is a newline (one full json line received)
-			[ "$(tail -c1 "$res_file" 2>/dev/null | wc -l)" = "1" ] && break
+			#完成条件必须是"出现了真正的应答行"（{"status":...}）：curl 通道下每个
+			#HTTP 头行都会换来一条 bad json 回复，按"末尾是换行"判停会立刻打断
+			#传输并丢掉真应答（实机已复现）
+			grep -aq '"status"' "$res_file" 2>/dev/null && break
 			kill -0 "$bg" 2>/dev/null || break
-			sleep 0.1
+			qmodem_atd_tick
 			poll=$((poll + 1))
 		done
 		kill "$bg" 2>/dev/null
@@ -192,15 +209,22 @@ qmodem_atd_sendat()
 	#curl fallback (busybox nc built without FEATURE_UNIX_LOCAL lacks -U)
 	if [ ! -s "$res_file" ] && command -v curl >/dev/null 2>&1; then
 		: > "$res_file"
-		#HTTP/0.9 mode: accept the raw reply stream of the line protocol server
-		curl -s --http0.9 -m $(( (timeout_ms / 1000) + 2 )) \
-			--unix-socket "$sock" -d "$req" http://localhost/ >"$res_file" 2>/dev/null &
+		#http0.9：接受行协议服务的裸回复流；-N 关闭缓冲，使回复一到达就能被
+		#上面的轮询看到（否则数据要等 curl 退出才落盘）。
+		#必须用 --data-binary 而不是 -d：-d 会按 urlencoded 语义**删除正文里的
+		#换行**，atd 按行读取时永远等不到完整请求行（实机已复现：只收到 HTTP
+		#头行对应的 bad json 回复，真正的 sendat 请求从未被处理）。
+		printf '%s\n' "$req" | curl -s -N --http0.9 -m $(( (timeout_ms / 1000) + 3 )) \
+			--unix-socket "$sock" --data-binary @- http://localhost/ >"$res_file" 2>/dev/null &
 		bg=$!
 		poll=0
 		while [ "$poll" -lt "$budget" ]; do
-			[ "$(tail -c1 "$res_file" 2>/dev/null | wc -l)" = "1" ] && break
+			#完成条件必须是"出现了真正的应答行"（{"status":...}）：curl 通道下每个
+			#HTTP 头行都会换来一条 bad json 回复，按"末尾是换行"判停会立刻打断
+			#传输并丢掉真应答（实机已复现）
+			grep -aq '"status"' "$res_file" 2>/dev/null && break
 			kill -0 "$bg" 2>/dev/null || break
-			sleep 0.1
+			qmodem_atd_tick
 			poll=$((poll + 1))
 		done
 		kill "$bg" 2>/dev/null
@@ -209,7 +233,10 @@ qmodem_atd_sendat()
 
 	#the last json line is our response (curl path also contains bad-json
 	#replies for its own HTTP header lines, which precede the real response)
-	res=$(tail -n 1 "$res_file" 2>/dev/null)
+	#取最后一条 {"status":...} 行：curl 通道下 HTTP 头行会各自触发一条
+	#bad json 回复，真正的应答在它们之后。
+	res=$(grep -a '"status"' "$res_file" 2>/dev/null | tail -n 1)
+	[ -n "$res" ] || res=$(tail -n 1 "$res_file" 2>/dev/null)
 	rm -f "$res_file"
 	case "$res" in
 		'{'*'}') ;;

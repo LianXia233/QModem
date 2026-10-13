@@ -80,7 +80,10 @@ pub mod tty {
     const O_NOCTTY: i32 = 0o400;
     const O_NONBLOCK: i32 = 0o4000;
     const TCSANOW: i32 = 0;
-    const B115200: u32 = 0o100002;
+    // Linux B115200 = 0010002(八进制) = 0o10002。此前误写成 0o100002（多一位），
+    // 属于未定义速率常数 → tcsetattr 后串口速率异常、读不到任何字节
+    // （实机表现为 atd 始终返回 {"status":"timeout","lines":[]}）。
+    const B115200: u32 = 0o10002;
 
     // c_iflag / c_oflag / c_lflag clears for raw mode.
     const IGNBRK: u32 = 1;
@@ -145,10 +148,21 @@ pub mod tty {
             t.c_cflag &= !(CSIZE | PARENB | CSTOPB);
             t.c_cflag |= CS8 | CREAD | CLOCAL;
             // SAFETY: valid pointers as above.
-            unsafe {
-                cfsetispeed(&mut t, B115200);
-                cfsetospeed(&mut t, B115200);
-                tcsetattr(fd, TCSANOW, &t);
+            // SAFETY: 指针指向本栈上的 Termios，fd 由本次 open 成功返回。
+            let (r_in, r_out, r_attr) = unsafe {
+                (
+                    cfsetispeed(&mut t, B115200),
+                    cfsetospeed(&mut t, B115200),
+                    tcsetattr(fd, TCSANOW, &t),
+                )
+            };
+            if r_in != 0 || r_out != 0 || r_attr != 0 {
+                // 速率/属性设置失败必须显式失败：否则会以默认速率打开端口，
+                // 表现为"能打开但永远读不到数据"，极难排查
+                unsafe { close(fd) };
+                return Err(io::Error::other(format!(
+                    "termios setup failed on {path:?} (ispeed={r_in}, ospeed={r_out}, tcsetattr={r_attr})"
+                )));
             }
             Ok(TtyPort { fd })
         }

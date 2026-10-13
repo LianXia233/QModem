@@ -30,16 +30,33 @@ qmodem_atd_port_section()
 	qmodem_atd_collect_port "$(config_get "$section" at_port)"
 }
 
+# 注意：UCI 里 `config modem-device '2_1'` 的 "modem-device" 是**节类型**而不是
+# option，config_get "$section" type 取不到值；config_foreach 的第二个参数已经
+# 按节类型过滤，这里不能再做 type 判断，否则永远收集不到端口（实机表现为
+# 未显式配置 port 段时 atd 完全不启动）。
 qmodem_atd_modem_section()
 {
 	local section="$1"
-	[ "$(config_get "$section" type)" = "modem-device" ] || return 0
 	qmodem_atd_collect_port "$(config_get "$section" at_port)"
+}
+
+# 独占约束：AT 串口只允许 qmodem-atd 持有。C 版 ubus-at-daemon 会直接打开同一
+# tty，两者并存时应答互相被偷（实机实测：atd 收到的 lines 恒为空，形似"AT 超时"）。
+# 因此在启动前主动停止并停用遗留守护进程。
+qmodem_atd_ensure_exclusive()
+{
+	local legacy="/etc/init.d/ubus-at-daemon"
+	[ -x "$legacy" ] || return 0
+	"$legacy" running >/dev/null 2>&1 && "$legacy" stop >/dev/null 2>&1
+	"$legacy" enabled >/dev/null 2>&1 && "$legacy" disable >/dev/null 2>&1
+	return 0
 }
 
 start_service()
 {
 	local enabled socket
+
+	qmodem_atd_ensure_exclusive
 	enabled=$(uci -q get qmodem-atd.main.enabled 2>/dev/null)
 	[ "$enabled" = "1" ] || return 0
 
@@ -60,6 +77,24 @@ start_service()
 		echo "qmodem-atd: no AT port found (set /etc/config/qmodem-atd port sections)" >&2
 		return 0
 	fi
+
+	# 只保留当前真实存在的 tty 节点：写死/过期的端口段不应把守护进程带偏
+	#
+	# （端口顺序保持 UCI 收集顺序，去重已在 collect_port 内完成）
+	local _keep="" _p
+	for _p in $qmodem_atd_ports; do
+		if [ -c "$_p" ]; then
+			_keep="$_keep $_p"
+		else
+			echo "qmodem-atd: skip missing tty $_p" >&2
+		fi
+	done
+	qmodem_atd_ports="$_keep"
+	if [ -z "$qmodem_atd_ports" ]; then
+		echo "qmodem-atd: no existing AT port among configured values" >&2
+		return 0
+	fi
+	echo "qmodem-atd: ports$qmodem_atd_ports" >&2
 
 	qmodem_atd_args="--socket $socket"
 	for p in $qmodem_atd_ports; do

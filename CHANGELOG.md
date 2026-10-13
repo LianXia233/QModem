@@ -155,6 +155,49 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **AT console unusable under the exclusive `qmodem-atd` mode**: device-level
+  integration surfaced six stacked defects, all fixed —
+  1. the `qmodem-atd` init script tested section type with
+     `config_get "$section" type`, but in UCI `config modem-device '2_1'` the
+     `modem-device` part is the **section type**, not an option, so the lookup is
+     empty and no port was ever collected unless `config port` was declared
+     explicitly — atd then did not start at all;
+  2. the shipped `/etc/config/qmodem-atd` hard-coded an example port
+     `/dev/ttyUSB2`, binding the daemon to the **wrong device** (this board's AT
+     port is `/dev/ttyUSB1`); the shipped config no longer pre-declares a port
+     (auto-collection is used) and non-existent tty nodes are skipped;
+  3. `qmodem.send_at` did not resolve a port when the caller omitted it and ran
+     `at "" <cmd>`, which can only fail (`status=0`, no `res`); it now falls back
+     to `at_port`/`override_at_port` and returns an explicit error payload when
+     the command or port is missing;
+  4. the frontend sent `use_ubus` while the backend read `use_ubus_flag`, so the
+     "use ubus" toggle was silently ignored; the backend accepts both names and
+     the frontend now sends `use_ubus_flag`;
+  5. the atd bridge helper's curl fallback used `-d`, which strips newlines from
+     the body per urlencoded semantics, so the line-oriented atd never saw a
+     complete request line; its completion test ("file ends with a newline") was
+     also satisfied by the bad-json replies generated for curl's own HTTP header
+     lines, aborting the transfer before the real reply arrived. It now uses
+     `--data-binary @-` plus `-N` (unbuffered) and waits for an actual
+     `{"status":...}` line; the busybox-incompatible `sleep 0.1` is gone and
+     curl is used directly when busybox `nc` lacks `-U`;
+  6. the Rust atd opened the tty with `B115200` mis-typed as `0o100002` instead
+     of `0o10002` — an undefined speed constant, so after `tcsetattr` the port
+     ran at a bogus rate and **no bytes were ever read**; fixed, and termios
+     setup failures are now reported instead of silently yielding a port that
+     never receives data.
+- **Exclusivity broken by a legacy C component**: on the device, `ls -l
+  /proc/*/fd` showed the legacy `ubus-at-daemon` holding `/dev/ttyUSB1` at the
+  same time as `qmodem-atd`, stealing its replies (looking exactly like "AT
+  timeout"). `qmodem-atd` now stops and disables the legacy `ubus-at-daemon`
+  before starting, keeping a single owner of the AT port.
+- **Traffic-reset schedule never saved (frontend/backend parameter mismatch)**:
+  the frontend sent a nested `params` object while the backend
+  `set_traffic_reset_schedule` expects flat fields (`enabled`/`reset_type`/
+  `hour`/`day`), so the schedule was never written; the backend also lacked a
+  `minute` field, making the minute picker impossible to persist. The frontend
+  now maps to flat fields and the backend handles `minute` end-to-end (validated
+  0–59, stored as `usage_reset_minute`, included in the cron line and response).
 - **Second-level tabs were untranslated**: the menu titles `Dial and Network`,
   `Device Parameters`, `Modem Features`, `Service and Scan`, `SIM Messages` and
   `SMS Forwarding` had no po entries, so the second tab row rendered in English.

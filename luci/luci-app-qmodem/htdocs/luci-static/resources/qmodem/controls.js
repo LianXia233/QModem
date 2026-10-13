@@ -79,7 +79,7 @@ var callSetSimSlot = rpc.declare({ object: 'qmodem', method: 'set_sim_slot', par
 var callDoReboot = rpc.declare({ object: 'qmodem', method: 'do_reboot', params: ['config_section', 'params'], expect: { }, nobatch: true });
 var callClearDialLog = rpc.declare({ object: 'qmodem', method: 'clear_dial_log', params: ['config_section'], expect: { }, nobatch: true });
 var callClearStats = rpc.declare({ object: 'qmodem', method: 'clear_stats', params: ['config_section'], expect: { }, nobatch: true });
-var callSetTrafficResetSchedule = rpc.declare({ object: 'qmodem', method: 'set_traffic_reset_schedule', params: ['config_section', 'params'], expect: { }, nobatch: true });
+var callSetTrafficResetSchedule = rpc.declare({ object: 'qmodem', method: 'set_traffic_reset_schedule', params: ['config_section', 'enabled', 'reset_type', 'hour', 'minute', 'day'], expect: { }, nobatch: true });
 var callSetNeighborCell = rpc.declare({ object: 'qmodem', method: 'set_neighborcell', params: ['config_section', 'params'], expect: { }, nobatch: true });
 var callSetSmsStorage = rpc.declare({ object: 'qmodem', method: 'set_sms_storage', params: ['config_section', 'storage'], expect: { }, nobatch: true });
 var callModemDial = rpc.declare({ object: 'qmodem', method: 'modem_dial', params: ['config_section'], expect: { }, nobatch: true });
@@ -931,7 +931,7 @@ function syncSupport(section) {
 function sendAt(section, atPort, command, useUbus) {
 	var params = { at: command };
 	if (atPort) params.port = atPort;
-	if (useUbus !== undefined && useUbus !== null) params.use_ubus = useUbus;
+	if (useUbus !== undefined && useUbus !== null) params.use_ubus_flag = useUbus;
 	var direct = function() { return withTimeoutReject(callSendAt(section, params), DIRECT_RPC_TIMEOUT, _('AT command timed out')); };
 
 	if (!cacheLayerUsable())
@@ -994,8 +994,19 @@ function clearStats(section) {
 		function() { return withTimeoutReject(callClearStats(section), DIRECT_RPC_TIMEOUT, _('Clearing counters timed out')); }, 60000);
 }
 function setTrafficResetSchedule(section, params) {
-	return qmodemAction(section, 'set_traffic_reset_schedule', { params: params },
-		function() { return withTimeoutReject(callSetTrafficResetSchedule(section, params), DIRECT_RPC_TIMEOUT, _('Saving schedule timed out')); }, 60000);
+	/* 后端 rpcd 的 set_traffic_reset_schedule 接收的是扁平字段
+	 * （config_section/enabled/reset_type/hour/minute/day），不接受嵌套
+	 * params 对象；这里做一次显式映射，避免"保存计划"静默失败。 */
+	params = params || {};
+	var args = {
+		enabled: (params.enabled === true || params.enabled === 1 || params.enabled === '1') ? 1 : 0,
+		reset_type: params.reset_type || 'monthly',
+		hour: Number(params.hour) || 0,
+		minute: Number(params.minute) || 0,
+		day: Number(params.day) || 1
+	};
+	return qmodemAction(section, 'set_traffic_reset_schedule', args,
+		function() { return withTimeoutReject(callSetTrafficResetSchedule(section, args.enabled, args.reset_type, args.hour, args.minute, args.day), DIRECT_RPC_TIMEOUT, _('Saving schedule timed out')); }, 60000);
 }
 function setNeighborCell(section, params) {
 	return qmodemAction(section, 'set_neighborcell', { params: params },
