@@ -8,11 +8,12 @@ name: Rust cross build
 # 在脚本合入前，构建步骤以 continue-on-error 允许失败（见 job 内注释）。
 
 on:
+  # 与 main.yml 一致的按需策略：Rust 代码改动本身不再触发推送构建；
+  # 需要校验时手动 Run workflow，或由 PR 的 paths 过滤触发（保留合并前校验）。
+  workflow_dispatch:
   push:
-    paths:
-      - 'rust/**'
-      - 'scripts/cross-build-rust.sh'
-      - '.github/workflows/rust-build.yml'
+    tags:
+      - 'v*'
   pull_request:
     paths:
       - 'rust/**'

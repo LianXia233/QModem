@@ -87,7 +87,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
     `version.mk`**, and merely validates the version and pushes a tag (seconds,
     no compilation). The tag push then triggers `main.yml`, so the release path
     is unchanged.
-  Routine code pushes no longer start any build.
+  Routine code pushes no longer start any build. `rust-build.yml` follows the
+  same policy (tags / manual / PRs touching Rust paths); only the lightweight
+  Quality gate and Vendor fixture tests still run on pushes — static checks,
+  not compilation.
 - **Tab hierarchy refined**: the theme appends multiple `ul.tabs` rows inside
   `#tabmenu` (row 1 = top level, row 2 = children of the active entry). The
   second row is now visually subordinate — smaller type (12px) and padding
