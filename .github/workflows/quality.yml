@@ -28,10 +28,10 @@ jobs:
   check-all:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
 
@@ -76,7 +76,7 @@ jobs:
           cd rust
           cargo build --release --workspace || true
           ls -l target/release/ | tee ../rust-binary-size.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: hashFiles('rust/Cargo.toml') != ''
         with:
           name: rust-binary-size

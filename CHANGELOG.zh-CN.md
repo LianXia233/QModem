@@ -59,6 +59,20 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **CI 提速**：
+  - OpenWrt SDK 缓存键不再包含 `github.sha`，SDK 与其 `build_dir` 可跨提交复用，
+    不必每次提交都重新下载 SDK、重新拉 feeds、重编依赖（此前最大耗时项）
+  - 新增 `swatinem/rust-cache` 步骤缓存 cargo registry 与 `rust/target`，
+    第二次构建只重编变动的 crate
+  - 新增 `concurrency.cancel-in-progress`：同一分支的新推送会取消排队中的旧运行，
+    迭代不再堆积
+- **CI 流程汉化**：工作流标题与 job / step 名称改为中文（`自动生成版本标签`、
+  `准备发布元数据`、`构建 QModem`、`发布产物` 等）。job id、矩阵名、产物名、
+  env 文件名保持原样，因为它们被跨 job 引用
+- **CI action 升级到 Node 24 运行时**，消除「Node.js 20 is deprecated … being
+  forced to run on Node.js 24」警告：`checkout` v4→v7、`upload-artifact`
+  v4→v7、`download-artifact` v4→v8、`cache` v4→v6、`setup-node` v4→v7、
+  `setup-python` v5→v7、`softprops/action-gh-release` v2.2.2/v2→v3
 - **CI 构建矩阵收敛为 arm64**：`main.yml` 现在只构建 `arm64_ipk` / `arm64_apk` /
   `arm64_apk_immortalwrt`，`mmips_*`（mipsel）与 `x64_*` 移出矩阵。mipsel musl
   是 Rust tier-3 目标，需要 nightly + `-Z build-std`，其 std 链接步骤在 OpenWrt

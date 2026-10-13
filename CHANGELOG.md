@@ -68,6 +68,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **Faster CI builds + localized workflow** (`main.yml` and friends):
+  - the OpenWrt SDK cache key no longer contains `github.sha`, so the SDK and its
+    `build_dir` are reused across pushes instead of being re-downloaded, re-fed
+    and rebuilt on every single commit (the dominant cost before);
+  - a `swatinem/rust-cache` step caches the cargo registry and `rust/target`, so
+    only changed crates are recompiled;
+  - `concurrency.cancel-in-progress` drops queued superseded runs so iterations
+    no longer pile up behind slow builds.
+- **CI workflows localized to Chinese**: job / step names and workflow titles are
+  now Chinese (`自动生成版本标签`, `准备发布元数据`, `构建 QModem`, `发布产物`, …).
+  Job ids, matrix names, artifact names and env file names are unchanged because
+  they are referenced across jobs.
+- **CI actions moved to the Node 24 runtime**, removing the
+  "Node.js 20 is deprecated … being forced to run on Node.js 24" warning:
+  `checkout` v4→v7, `upload-artifact` v4→v7, `download-artifact` v4→v8,
+  `cache` v4→v6, `setup-node` v4→v7, `setup-python` v5→v7,
+  `softprops/action-gh-release` v2.2.2/v2→v3.
 - **CI build matrix narrowed to arm64**: `main.yml` now builds `arm64_ipk` /
   `arm64_apk` / `arm64_apk_immortalwrt` only. The `mmips_*` (mipsel) and `x64_*`
   targets were removed from the matrix. mipsel musl is a Rust tier-3 target that

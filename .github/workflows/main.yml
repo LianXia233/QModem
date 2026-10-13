@@ -1,4 +1,4 @@
-name: "Auto compile with OpenWrt SDK"
+name: "OpenWrt SDK 自动编译"
 permissions:
   contents: write
 
@@ -27,8 +27,15 @@ on:
 env:
   TZ: Asia/Shanghai
 
+# 同一 ref 多次推送时取消仍在排队的旧运行：SDK 缓存已可跨提交复用，
+# 保留最新一次即可，避免慢构建互相排队吃掉 runner 时间。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   job_auto_tag:
+    name: 自动生成版本标签
     runs-on: ubuntu-latest
     # main owns pre-release tags; stable owns final release tags.
     if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/stable') && github.event_name == 'push'
@@ -37,13 +44,13 @@ jobs:
       tag_created: ${{ steps.create_tag.outputs.tag_created }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: 检出代码
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: Check if version.mk changed
+    - name: 检查 version.mk 是否变更
       id: check_version_change
       run: |
         # 检查version.mk是否在这次提交中被修改
@@ -55,7 +62,7 @@ jobs:
           echo "version_changed=false" >> $GITHUB_OUTPUT
         fi
     
-    - name: Extract version from version.mk
+    - name: 提取 version.mk 版本号
       id: extract_version
       if: steps.check_version_change.outputs.version_changed == 'true'
       run: |
@@ -84,7 +91,7 @@ jobs:
         echo "tag_name=$tag_name" >> $GITHUB_OUTPUT
         echo "Generated tag name: $tag_name"
     
-    - name: Check if tag already exists
+    - name: 检查标签是否已存在
       id: check_tag
       if: steps.check_version_change.outputs.version_changed == 'true'
       run: |
@@ -99,7 +106,7 @@ jobs:
           echo "tag_exists=false" >> $GITHUB_OUTPUT
         fi
     
-    - name: Create and push tag
+    - name: 创建并推送标签
       id: create_tag
       if: steps.check_version_change.outputs.version_changed == 'true' && steps.check_tag.outputs.tag_exists == 'false'
       run: |
@@ -121,6 +128,7 @@ jobs:
         echo "tag_created=true" >> $GITHUB_OUTPUT
 
   job_prepare:
+    name: 准备发布元数据
     runs-on: ubuntu-latest
     needs: [job_auto_tag]
     if: always()  # 总是运行，不管 auto_tag 是否运行或是否成功
@@ -131,7 +139,7 @@ jobs:
       is_pr: ${{ steps.determine_push.outputs.is_pr }}
 
     steps:
-      - name: Determine push type
+      - name: 判定推送类型
         id: determine_push
         run: |
             # 如果 auto_tag job 创建了新标签，使用新标签
@@ -151,7 +159,7 @@ jobs:
             is_pr=$([[ "${{ github.event_name }}" == "pull_request" ]] && echo 1 || echo 0)
             echo "is_pr=${is_pr}" >> $GITHUB_OUTPUT
 
-      - name: Validate release tag source
+      - name: 校验发布标签来源
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         shell: bash
         run: |
@@ -181,27 +189,27 @@ jobs:
               ;;
           esac
 
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: 检出代码
+        uses: actions/checkout@v7
         with:
           path: 'qmodem'
 
-      - name: Generate Release Note
+      - name: 生成发布说明
         id: update_modem_support_list
         run: |
           cd qmodem
           python3 ./scripts/update_support_list.py temp_support_list ./application/qmodem/files/usr/share/qmodem/modem_support.json
           mv temp_support_list_release_notes.md ./release_note.md
       
-      - name: Upload Release Note
+      - name: 上传发布说明
         id: upload_release_note
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Release Note
           path: ./qmodem/release_note.md
 
   job_build_qmodem:
-    name: Build QModem
+    name: 构建 QModem
     needs: [job_prepare]
     if: ${{ always() && needs.job_prepare.result == 'success' }}
     strategy:
@@ -215,7 +223,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Install packages
+      - name: 安装编译依赖
         run: |
           sudo -E apt-get -qq update
           sudo -E apt-get -qq install zstd build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-venv rsync unzip zlib1g-dev file wget
@@ -223,16 +231,16 @@ jobs:
           sudo -E apt-get -qq clean
 
       
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: 检出代码
+        uses: actions/checkout@v7
         with:
           path: 'qmodem'
 
 
-      - name: Import Env
+      - name: 导入架构环境变量
         run: cat qmodem/.github/workflows/${{ matrix.build_arch }}.env >> "$GITHUB_ENV"
 
-      - name: Resolve snapshot SDK
+      - name: 解析 snapshot SDK
         id: resolve-sdk
         if: env.SDK_PREFIX != ''
         run: |
@@ -258,14 +266,16 @@ jobs:
           echo "SDK_SHA256=${sdk_sha256}" >> "$GITHUB_ENV"
           echo "sdk_name=${sdk_name}" >> "$GITHUB_OUTPUT"
 
-      - name: Cache openwrt SDK
+      - name: 缓存 OpenWrt SDK
         id: cache-sdk
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: sdk
-          key: openwrt-sdk-${{ matrix.build_arch }}-${{ env.SDK_NAME }}${{ steps.resolve-sdk.outputs.sdk_name }}-${{ github.sha }}
+          # 缓存键不含 github.sha：SDK 与其 build_dir 可跨提交复用，
+          # 只有 SDK 版本（或缓存格式版本 v1）变化才重建。
+          key: openwrt-sdk-${{ matrix.build_arch }}-${{ env.SDK_NAME }}${{ steps.resolve-sdk.outputs.sdk_name }}-v1
 
-      - name: Initialization environment
+      - name: 初始化 SDK 环境
         if: steps.cache-sdk.outputs.cache-hit != 'true'
         env:
           url_sdk: ${{ env.SDK_URL }}${{ env.SDK_NAME}}.${{ env.SDK_EXT }}
@@ -353,19 +363,27 @@ jobs:
       # SDK 自带工具链，保证与目标 sysroot 的 musl/libubus ABI 一致）。
       # aarch64 / x86_64 musl 是 tier 2，稳定版即可；mipsel musl 是 tier 3
       # （std 可用但 rustup 无预编译），需要 nightly + rust-src + -Z build-std。
-      - name: Install Rust toolchain
+      - name: 安装 Rust 工具链
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
           targets: aarch64-unknown-linux-musl,x86_64-unknown-linux-musl
-      - name: Install Nightly Rust for mipsel (build-std)
+      - name: 安装 nightly Rust（mipsel build-std 专用）
         if: startsWith(matrix.build_arch, 'mmips_')
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
           components: rust-src
 
-      - name: Compile QModem
+      - name: 缓存 Rust 构建产物
+        # 缓存 cargo registry 与 rust/target：第二次构建只重编变动的 crate，
+        # 不必再拉依赖、再编一遍全部依赖树。
+        uses: swatinem/rust-cache@v2.9.2
+        with:
+          workspaces: qmodem/rust
+          key: ${{ matrix.build_arch }}
+
+      - name: 编译 QModem
         id: compile
         run: |
           set -euo pipefail
@@ -397,41 +415,41 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
           echo "FIRMWARE=$(pwd)/$package_dir/" >> $GITHUB_ENV
 
-      - name: Upload QModem
+      - name: 上传 QModem 产物
         if: ${{ steps.compile.outputs.status == 'success' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: QModem-${{ matrix.build_arch }}
           path: ${{ env.FIRMWARE }}*
           retention-days: 7
 
   job_release_artifacts:
-    name: Release Artifacts
+    name: 发布产物
     needs: [job_build_qmodem, job_prepare]
     runs-on: ubuntu-latest
     # job_prepare recognizes both direct tag pushes and tags created by
     # job_auto_tag during a stable branch run.
     if: ${{ always() && needs.job_prepare.result == 'success' && needs.job_build_qmodem.result == 'success' && needs.job_prepare.outputs.push_type == 'tag' }}
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - name: 下载全部构建产物
+        uses: actions/download-artifact@v8
         with:
           pattern: QModem-*
           path: artifacts
         
-      - name: Download Release Note
-        uses: actions/download-artifact@v4
+      - name: 下载发布说明
+        uses: actions/download-artifact@v8
         with:
           name: Release Note
           path: release_note
 
-      - name: Create releases directory
+      - name: 创建发布目录
         run: mkdir -p releases
 
       # 交付策略：Release 资产必须是可直接安装的散装包（.ipk / .apk），
       # 绝不做 tar.gz/zip 二次打包——用户下载后应能直接
       # `opkg install xxx.ipk` / `apk add xxx.apk`。
-      - name: Collect installable packages
+      - name: 收集可安装包
         run: |
           set -eu
           # ImmortalWrt 变体与 OpenWrt 变体产出的包名完全一致（apk/ipk 文件名
@@ -454,8 +472,8 @@ jobs:
           }
           ls -l releases/
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2.2.2
+      - name: 创建 GitHub Release
+        uses: softprops/action-gh-release@v3
         if: ${{ always() && needs.job_prepare.outputs.push_type == 'tag' }}
         with:
           body_path: release_note/release_note.md
