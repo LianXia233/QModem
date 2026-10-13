@@ -136,3 +136,20 @@ file target/aarch64-unknown-linux-musl/release/qmodem-atd
 4. **交叉编译集成**：`--features ubus` 需链接 libubus/libubox，走 OpenWrt SDK sysroot（此时不再适用第 4 节的纯 musl 零系统库路径）。
 
 后续更大的迁移（vendor 规则引擎、smsd、TtyPort AsyncFd 加固）见 `rust/README.md` 的"后续迁移计划"。
+
+## 6. AT 口独占唯一原则（硬约束）
+
+AT 串口是**独占资源**，全系统只允许一个进程持有它——`qmodem-atd`。这是架构硬约束，不是风格建议：
+
+1. **唯一持有者**：只有 `qmodem-atd` 允许打开 modem 的 AT 串口（`/dev/ttyUSB*` 等）。每个端口由单个 actor 线程独占 `Box<dyn SerialPort>`，读写路径零共享（见第 1 节）。
+2. **消费方一律走 socket**：shell（`modem_util.sh` → `qmodem_atd_sendat`）、LuCI、voipd、smsd、stats 等所有需要 AT 数据的组件，只能通过 `/var/run/qmodem/atd.sock` 的 `sendat` 请求（命令在 per-port 队列中严格串行）或 `subscribe` 订阅 URC 流，**禁止自行 open 串口**。
+3. **禁止混用通路**：过渡期遗留的直连后端（`at_tool=0` 的 `tom_modem`、`at_tool=1` 的 `sms_tool_q`、C 版 `ubus_at_daemon`）在退役前与 `qmodem-atd` 互斥——同一端口绝不允许两条通路同时活跃。`at_tool=2`（默认）即 qmodem-atd 独占模式。
+4. **单实例**：`/etc/init.d/qmodem-atd` 由 procd 托管，保证守护进程单实例；不要手工再起第二个 `qmodem-atd` 指向同一 socket/端口。
+
+违背后果（已在实机观测到）：多个进程并发直连同一 ttyUSB 口时，modem 的 AT 响应按到达顺序回给任意一个打开者，A 进程的 `AT+CPIN?` 会拿到 B 进程命令的响应（响应串线），URC 被抢、诊断完全失真。qmodem-atd 的队列化单点访问从根上消除这一类问题。
+
+新增组件需要 AT 能力时的检查清单：
+
+- [ ] 是否经 socket（`sendat` / `subscribe`）访问，代码中无 `open`/`tom_modem`/`sms_tool` 直连？
+- [ ] 是否处理 `status: timeout`（部分行）与 `error: port_closed`？
+- [ ] 是否避免高频轮询（排队会拉长同端口其他请求的延迟）？

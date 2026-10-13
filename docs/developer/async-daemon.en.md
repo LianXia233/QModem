@@ -136,3 +136,20 @@ Notes (consistent with the downgrade path in `rust/README.md`):
 4. **Cross-compilation integration**: `--features ubus` requires linking libubus/libubox via the OpenWrt SDK sysroot (the pure-musl zero-system-library path in section 4 no longer applies in that case).
 
 For larger follow-up migrations (the vendor rule engine, smsd, TtyPort AsyncFd hardening), see "Follow-up migration plan" in `rust/README.md`.
+
+## 6. AT port exclusivity (hard constraint)
+
+The AT serial port is an **exclusive resource**. Exactly one process in the whole system may hold it — `qmodem-atd`. This is an architectural hard constraint, not a style suggestion:
+
+1. **Single holder**: only `qmodem-atd` may open the modem's AT serial ports (`/dev/ttyUSB*` etc.). Each port is owned exclusively by a single actor thread holding `Box<dyn SerialPort>` with zero shared read/write paths (see section 1).
+2. **All consumers go through the socket**: every component that needs AT data — shell (`modem_util.sh` → `qmodem_atd_sendat`), LuCI, voipd, smsd, stats — must use the `sendat` command on `/var/run/qmodem/atd.sock` (commands execute strictly serially in the per-port queue) or `subscribe` for the URC stream. **Opening the serial port directly is forbidden.**
+3. **No mixed paths**: during the transition the legacy direct backends (`at_tool=0` → `tom_modem`, `at_tool=1` → `sms_tool_q`, the C `ubus_at_daemon`) are mutually exclusive with `qmodem-atd` until retirement — two active paths on the same port are never allowed. `at_tool=2` (the default) is the qmodem-atd exclusive mode.
+4. **Single instance**: `/etc/init.d/qmodem-atd` is procd-managed, guaranteeing one daemon instance; never start a second `qmodem-atd` against the same socket/ports by hand.
+
+Consequences of violating this (observed on a real device): when several processes open the same ttyUSB port concurrently, the modem delivers AT responses to whichever process happens to read first — process A's `AT+CPIN?` receives the response to process B's command (crossed responses), URCs get stolen, and diagnostics become meaningless. qmodem-atd's queued single-point access eliminates this class of failure at the root.
+
+Checklist when a new component needs AT access:
+
+- [ ] Does it go through the socket (`sendat` / `subscribe`), with no direct `open`/`tom_modem`/`sms_tool` calls in the code?
+- [ ] Does it handle `status: timeout` (partial lines) and `error: port_closed`?
+- [ ] Does it avoid high-frequency polling (queuing inflates latency for other requests on the same port)?
