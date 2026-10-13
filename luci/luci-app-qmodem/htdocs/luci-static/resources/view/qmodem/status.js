@@ -391,7 +391,7 @@ return view.extend({
 	signalQuality: function(kind, value) {
 		var percentage, levels, index;
 		if (isNaN(value))
-			return { label:_('暂无数据'), cls:'unknown', percentage:0, strokeColor:'#94a3b8' };
+			return { label:_('暂无数据'), cls:'unknown', percentage:0, strokeColor:'var(--qm-text-muted)' };
 		if (kind === 'rsrp') { percentage = (value + 120) * 2.5; levels = [ -80, -90, -100 ]; }
 		else if (kind === 'rsrq') { percentage = (value + 25) * 4; levels = [ -10, -15, -20 ]; }
 		else { percentage = (value + 10) * 2.5; levels = [ 20, 13, 0 ]; }
@@ -535,7 +535,7 @@ return view.extend({
 			E('div', { 'class': 'qm-card-head' }, [
 				E('div', {}, [
 					E('div', { 'class': 'qm-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 20V4"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 20V4"/></svg>'),
 						_('信号')
 					]),
 					E('div', { 'class': 'qm-card-sub' }, _('射频与信道环境质量'))
@@ -624,7 +624,7 @@ return view.extend({
 			E('div', { 'class': 'qm-card-head' }, [
 				E('div', {}, [
 					E('div', { 'class': 'qm-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>'),
 						_('载波聚合状态')
 					]),
 					E('div', { 'class': 'qm-card-sub' }, info.mode || _('移动网络'))
@@ -648,7 +648,7 @@ return view.extend({
 			E('div', { 'class': 'qm-card-head' }, [
 				E('div', {}, [
 					E('div', { 'class': 'qm-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>'),
 						_('移动 IP')
 					]),
 					E('div', { 'class': 'qm-card-sub' }, joinValues(session.device, session.proto) || _('已分配地址'))
@@ -755,7 +755,7 @@ return view.extend({
 			E('div', { 'class': 'qm-card-head' }, [
 				E('div', {}, [
 					E('div', { 'class': 'qm-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>'),
 						_('模组')
 					]),
 					E('div', { 'class': 'qm-card-sub' }, _('硬件与固件信息'))
@@ -781,7 +781,7 @@ return view.extend({
 			E('div', { 'class': 'qm-card-head' }, [
 				E('div', {}, [
 					E('div', { 'class': 'qm-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="8" y="10" width="8" height="8" rx="1"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="8" y="10" width="8" height="8" rx="1"/></svg>'),
 						_('SIM 与订阅')
 					]),
 					E('div', { 'class': 'qm-card-sub' }, _('订阅身份与运营商 QoS'))
@@ -857,7 +857,7 @@ return view.extend({
 		var head = E('div', { 'class': 'qm-card-head' }, [
 			E('div', {}, [
 				E('div', { 'class': 'qm-card-title' }, [
-					svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'),
+					svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'),
 					_('流量统计')
 				]),
 				E('div', { 'class': 'qm-card-sub' }, _('接口计数器 %s').format(interfaceName || '--'))

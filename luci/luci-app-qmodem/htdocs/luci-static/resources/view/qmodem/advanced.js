@@ -4,6 +4,7 @@
 'require ui';
 'require dom';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 
 /*
  * 高级设置（Advanced Settings）— 现代白色毛玻璃 (Glassmorphism) + 动态硬件总线 SVG 重构
@@ -278,28 +279,28 @@ return view.extend({
 			'<svg class="mt-adv-topo-svg" viewBox="0 0 540 86">',
 			'  <!-- 节点 1: 主机处理器与总线 (Host Controller) -->',
 			'  <g transform="translate(15, 14)">',
-			'    <rect x="0" y="0" width="125" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <rect x="12" y="16" width="24" height="24" rx="5" fill="#0072f5"/>',
-			'    <text x="44" y="27" font-size="12" font-weight="750" fill="#0f172a">Host Processor</text>',
-			'    <text x="44" y="42" font-size="10" fill="#64748b">PCIe / USB 3.0</text>',
+			'    <rect x="0" y="0" width="125" height="56" rx="12" fill="var(--qm-surface-sub)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <rect x="12" y="16" width="24" height="24" rx="5" fill="var(--qm-accent)"/>',
+			'    <text x="44" y="27" font-size="12" font-weight="750" fill="var(--qm-text)">Host Processor</text>',
+			'    <text x="44" y="42" font-size="10" fill="var(--qm-text-muted)">PCIe / USB 3.0</text>',
 			'  </g>',
 			'  <!-- 动态总线通道 1 -->',
-			'  <line x1="140" y1="42" x2="215" y2="42" stroke="#0072f5" stroke-width="2.6" class="qm-bus-stream"/>',
+			'  <line x1="140" y1="42" x2="215" y2="42" stroke="var(--qm-accent)" stroke-width="2.6" class="qm-bus-stream"/>',
 			'  <!-- 节点 2: QModem 硬件接入与控制中枢 -->',
 			'  <g transform="translate(215, 14)">',
-			'    <rect x="0" y="0" width="135" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <circle cx="22" cy="28" r="6" fill="#10b981"/>',
-			'    <text x="36" y="27" font-size="12" font-weight="750" fill="#0f172a">QModem Bus Ctrl</text>',
-			'    <text x="36" y="42" font-size="10" fill="#64748b">AT &amp; Channel Mgr</text>',
+			'    <rect x="0" y="0" width="135" height="56" rx="12" fill="var(--qm-surface-sub)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <circle cx="22" cy="28" r="6" fill="var(--qm-ok)"/>',
+			'    <text x="36" y="27" font-size="12" font-weight="750" fill="var(--qm-text)">QModem Bus Ctrl</text>',
+			'    <text x="36" y="42" font-size="10" fill="var(--qm-text-muted)">AT &amp; Channel Mgr</text>',
 			'  </g>',
 			'  <!-- 动态总线通道 2 -->',
-			'  <line x1="350" y1="42" x2="415" y2="42" stroke="#10b981" stroke-width="2.6" class="qm-bus-stream" style="animation-duration:1.2s;"/>',
+			'  <line x1="350" y1="42" x2="415" y2="42" stroke="var(--qm-ok)" stroke-width="2.6" class="qm-bus-stream" style="animation-duration:1.2s;"/>',
 			'  <!-- 节点 3: 模组端基带射频硬件 -->',
 			'  <g transform="translate(415, 14)">',
-			'    <rect x="0" y="0" width="115" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <circle cx="20" cy="28" r="6" fill="#0ea5e9"/>',
-			'    <text x="34" y="27" font-size="12" font-weight="750" fill="#0f172a">Cellular Core</text>',
-			'    <text x="34" y="42" font-size="10" fill="#64748b">Hardware Target</text>',
+			'    <rect x="0" y="0" width="115" height="56" rx="12" fill="var(--qm-surface-sub)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <circle cx="20" cy="28" r="6" fill="var(--qm-mint)"/>',
+			'    <text x="34" y="27" font-size="12" font-weight="750" fill="var(--qm-text)">Cellular Core</text>',
+			'    <text x="34" y="42" font-size="10" fill="var(--qm-text-muted)">Hardware Target</text>',
 			'  </g>',
 			'</svg>'
 		].join('');
@@ -730,6 +731,7 @@ return view.extend({
 
 	paintContent: function(res) {
 		res = res || {};
+		theme.apply();
 		var warnings = (res.errors || []).map(function(msg) {
 			return E('div', { 'class': 'alert-message warning mt-hardware-warning' }, msg);
 		});
@@ -745,14 +747,13 @@ return view.extend({
 				[ this.styleNode(), controls.styleNode() ],
 				warnings,
 				[ modemBar,
-				E('section', { 'class': 'mt-adv-card mt-hardware-head' }, [
-					E('div', {}, [
-						E('h2', {}, _('高级设置')),
-						E('p', {}, _('模组能力、重启与无线策略，全部经 QModem 的 qmodem ubus 下发。'))
-					])
-				]),
-				E('div', { 'class': 'alert-message warning mt-hardware-warning' },
-					_('未检测到模组（请确认 QModem 已识别该设备）。')),
+				theme.emptyState({
+					title: _('未检测到模组'),
+					desc: _('QModem 尚未识别到可用的模组设备，若本模组尚未被 QModem 收录，可写入内置定义。'),
+					mascotMood: 'confused',
+					actionText: _('刷新检测'),
+					onAction: function() { window.location.reload(); }
+				}),
 				E('section', { 'class': 'mt-control-section' }, [
 					E('div', { 'class': 'mt-control-section-head' }, [
 						E('h3', {}, _('模组支持库')),
@@ -802,14 +803,15 @@ return view.extend({
 				E('div', {}, [
 					E('h2', {}, _('高级设置与硬件控制')),
 					E('p', {}, _('硬件总线模式、重启能力、驻网策略与底层 AT 透传调试。'))
-				])
+				]),
+				theme.themeToggleBtn()
 			])
 		].concat(warnings).concat([
 			/* 动态 SVG 硬件总线拓扑 */
 			E('section', { 'class': 'mt-adv-card mt-adv-topo-card' }, [
 				E('div', { 'class': 'mt-control-section-head', 'style': 'margin-bottom:10px' }, [
 					E('h3', {}, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>'),
 						_('硬件总线与数据通路架构')
 					]),
 					E('p', {}, _('主机处理器、QModem 守护进程与模组蜂窝核心交互链路'))
@@ -956,7 +958,7 @@ return view.extend({
 			E('details', { 'class': 'mt-adv-card', 'style': 'margin-top:16px' }, [
 				E('summary', { 'style': 'cursor:pointer;font-size:13.5px;font-weight:750;color:var(--qm-text);list-style:none;display:flex;justify-content:space-between;align-items:center' }, [
 					E('span', { 'style': 'display:flex;align-items:center;gap:8px' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'),
 						_('技术细节（QModem 原始数据）')
 					]),
 					E('span', { 'style': 'font-size:18px;color:var(--qm-text-muted);font-weight:700' }, '›')

@@ -492,11 +492,11 @@ return view.extend({
 			                      (parts > 1 ? ' (' + parts + ' parts)' : '');
 			
 			if (text.length > maxLength * 5) {
-				counter.style.color = 'red';
+				counter.style.color = 'var(--qm-danger)';
 			} else if (parts > 1) {
-				counter.style.color = 'orange';
+				counter.style.color = 'var(--qm-warn)';
 			} else {
-				counter.style.color = '#666';
+				counter.style.color = 'var(--qm-text-muted)';
 			}
 		};
 
