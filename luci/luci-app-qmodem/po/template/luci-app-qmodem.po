@@ -129,7 +129,7 @@ msgstr ""
 msgid "8.8.8.8 or www.example.com"
 msgstr ""
 
-#: qmodem/controls.js:1495
+#: qmodem/controls.js:1506
 msgid "A module restart or airplane-mode cycle is required before this change takes effect."
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 msgid "Alternative AT Tools"
 msgstr ""
 
-#: qmodem/controls.js:1511
+#: qmodem/controls.js:1522
 #: view/qmodem/modem_config.js:246
 #: view/qmodem/modem_config.js:251
 #: view/qmodem/modem_config.js:254
@@ -525,7 +525,7 @@ msgstr ""
 msgid "Bridge Port"
 msgstr ""
 
-#: qmodem/controls.js:1497
+#: qmodem/controls.js:1508
 #: view/qmodem/network_config.js:997
 #: view/qmodem/service.js:284
 #: view/qmodem/sms.js:422
@@ -1029,7 +1029,7 @@ msgstr ""
 msgid "Dial disabled for this modem"
 msgstr ""
 
-#: qmodem/controls.js:1010
+#: qmodem/controls.js:1021
 msgid "Dial request timed out"
 msgstr ""
 
@@ -1333,10 +1333,10 @@ msgstr ""
 msgid "Ethernet"
 msgstr ""
 
-#: qmodem/controls.js:1294
-#: qmodem/controls.js:1299
-#: qmodem/controls.js:1304
+#: qmodem/controls.js:1305
 #: qmodem/controls.js:1310
+#: qmodem/controls.js:1315
+#: qmodem/controls.js:1321
 msgid "Excellent"
 msgstr ""
 
@@ -1546,10 +1546,10 @@ msgstr ""
 msgid "Failure Threshold"
 msgstr ""
 
-#: qmodem/controls.js:1296
-#: qmodem/controls.js:1301
-#: qmodem/controls.js:1306
+#: qmodem/controls.js:1307
 #: qmodem/controls.js:1312
+#: qmodem/controls.js:1317
+#: qmodem/controls.js:1323
 msgid "Fair"
 msgstr ""
 
@@ -1699,10 +1699,10 @@ msgstr ""
 msgid "Globe Prepaid (PH)"
 msgstr ""
 
-#: qmodem/controls.js:1295
-#: qmodem/controls.js:1300
-#: qmodem/controls.js:1305
+#: qmodem/controls.js:1306
 #: qmodem/controls.js:1311
+#: qmodem/controls.js:1316
+#: qmodem/controls.js:1322
 msgid "Good"
 msgstr ""
 
@@ -1726,7 +1726,7 @@ msgstr ""
 msgid "Hang command sent successfully"
 msgstr ""
 
-#: qmodem/controls.js:1014
+#: qmodem/controls.js:1025
 msgid "Hangup request timed out"
 msgstr ""
 
@@ -2258,7 +2258,7 @@ msgstr ""
 msgid "Mobile Equipment (ME)"
 msgstr ""
 
-#: qmodem/controls.js:1533
+#: qmodem/controls.js:1544
 #: view/qmodem/status.js:1016
 msgid "Mobile Network"
 msgstr ""
@@ -2311,7 +2311,7 @@ msgstr ""
 msgid "Model Name"
 msgstr ""
 
-#: qmodem/controls.js:1270
+#: qmodem/controls.js:1281
 #: view/qmodem/monitor.js:418
 msgid "Modem"
 msgstr ""
@@ -2487,7 +2487,7 @@ msgstr ""
 msgid "Neighbor Cell List"
 msgstr ""
 
-#: qmodem/controls.js:1002
+#: qmodem/controls.js:1013
 msgid "Neighbour cell request timed out"
 msgstr ""
 
@@ -2976,10 +2976,10 @@ msgstr ""
 msgid "Poll Interval (seconds)"
 msgstr ""
 
-#: qmodem/controls.js:1297
-#: qmodem/controls.js:1302
-#: qmodem/controls.js:1307
+#: qmodem/controls.js:1308
 #: qmodem/controls.js:1313
+#: qmodem/controls.js:1318
+#: qmodem/controls.js:1324
 msgid "Poor"
 msgstr ""
 
@@ -3263,7 +3263,7 @@ msgstr ""
 msgid "Redial command sent successfully"
 msgstr ""
 
-#: qmodem/controls.js:1018
+#: qmodem/controls.js:1029
 msgid "Redial request timed out"
 msgstr ""
 
@@ -3673,7 +3673,7 @@ msgstr ""
 msgid "Save command"
 msgstr ""
 
-#: qmodem/controls.js:998
+#: qmodem/controls.js:1009
 msgid "Saving schedule timed out"
 msgstr ""
 
@@ -3885,7 +3885,7 @@ msgstr ""
 msgid "Setting SMS Storage"
 msgstr ""
 
-#: qmodem/controls.js:1006
+#: qmodem/controls.js:1017
 msgid "Setting SMS storage timed out"
 msgstr ""
 
@@ -3901,7 +3901,7 @@ msgstr ""
 msgid "Setting..."
 msgstr ""
 
-#: qmodem/controls.js:1505
+#: qmodem/controls.js:1516
 msgid "Settings applied."
 msgstr ""
 
@@ -4532,7 +4532,7 @@ msgstr ""
 msgid "configSection (modem_id) is required"
 msgstr ""
 
-#: qmodem/controls.js:1420
+#: qmodem/controls.js:1431
 msgid "d"
 msgstr ""
 
@@ -4566,11 +4566,11 @@ msgstr ""
 msgid "enable modem soft reboot"
 msgstr ""
 
-#: qmodem/controls.js:1420
+#: qmodem/controls.js:1431
 msgid "h"
 msgstr ""
 
-#: qmodem/controls.js:1420
+#: qmodem/controls.js:1431
 msgid "min"
 msgstr ""
 
