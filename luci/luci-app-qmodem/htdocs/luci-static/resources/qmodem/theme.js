@@ -31,77 +31,73 @@
  * 主题提供了变量 → 自动跟随主题；没有变量的老主题 → 用内置调色板。 */
 
 var CSS_TOKENS = [
-	/* 亮色（默认） */
+	/* 亮色（默认）：Soft Anime × Pastel Glass × Modern Dashboard */
 	'.qm-app{',
-	'--qm-maxw:1360px;--qm-gap:16px;--qm-radius:14px;--qm-radius-sm:10px;--qm-radius-xs:8px;',
-	'--qm-surface:var(--background-color-high,#ffffff);',
-	'--qm-surface-2:var(--background-color-low,#f4f6f9);',
-	'--qm-surface-3:var(--background-color-normal,#eaeef3);',
-	'--qm-glass:var(--background-color-high,#ffffff);',
-	'--qm-border:var(--border-color-medium,#d7dde5);',
-	'--qm-border-soft:var(--border-color-low,#e7ecf2);',
-	'--qm-border-strong:var(--border-color-high,rgba(15,23,42,.22));',
-	'--qm-text:var(--text-color-high,#16202c);',
-	'--qm-text-soft:var(--text-color-medium,#3d4756);',
-	'--qm-text-muted:var(--text-color-low,#6b7684);',
-	'--qm-accent:var(--primary-color,var(--link-color,#0072f5));',
-	'--qm-accent-2:var(--primary-color,#38bdf8);',
-	'--qm-accent-3:var(--primary-color,#0d9488);',
-	'--qm-ok:var(--success-color,#10b981);',
-	'--qm-warn:var(--warning-color,#f59e0b);',
-	'--qm-danger:var(--error-color,#ef4444);',
-	'--qm-on-accent:#ffffff;--qm-on-hero:#ffffff;--qm-scrim:rgba(15,23,42,.45);',
-	'--qm-shadow-color:rgba(15,23,42,.10);',
-	'--qm-shadow:0 2px 8px var(--qm-shadow-color);',
-	'--qm-shadow-md:0 6px 18px var(--qm-shadow-color);',
-	'--qm-shadow-lg:0 14px 34px var(--qm-shadow-color);',
-	'--qm-accent-soft:rgba(0,114,245,.10);--qm-accent-border:rgba(0,114,245,.32);',
-	'--qm-ok-soft:rgba(16,185,129,.12);--qm-ok-border:rgba(16,185,129,.38);',
-	'--qm-warn-soft:rgba(245,158,11,.12);--qm-warn-border:rgba(245,158,11,.38);',
-	'--qm-danger-soft:rgba(239,68,68,.10);--qm-danger-border:rgba(239,68,68,.36);',
-	'--qm-accent-gradient:linear-gradient(135deg,#0072f5 0%,#2563eb 100%);',
-	'--qm-hero-gradient:linear-gradient(135deg,#0f172a 0%,#1e40af 100%);',
-	'--qm-surface-gradient:linear-gradient(135deg,rgba(255,255,255,.92) 0%,rgba(240,246,255,.72) 100%);',
-	'--qm-glow-a:radial-gradient(circle,rgba(0,114,245,.12) 0%,rgba(16,185,129,.04) 50%,transparent 70%);',
-	'--qm-glow-b:radial-gradient(circle,rgba(99,102,241,.09) 0%,rgba(14,165,233,.05) 50%,transparent 70%);',
-	'--qm-terminal-gradient:linear-gradient(135deg,#111820,#1d2733);',
-	'--qm-font-mono:var(--font-family-monospace,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);',
-	/* 界面字体栈：各视图不再各自内联一份 -apple-system…（原 6 处重复），
-	 * 统一在此定义；主题若提供 --font-family 则跟随主题。 */
-	'--qm-font:var(--font-family,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif);',
+	'--qm-maxw:1360px;--qm-gap:16px;',
+	'--qm-sp-1:4px;--qm-sp-2:8px;--qm-sp-3:12px;--qm-sp-4:16px;--qm-sp-5:20px;--qm-sp-6:24px;--qm-sp-8:32px;--qm-sp-10:40px;',
+	'--qm-radius-badge:999px;--qm-radius-sm:9px;--qm-radius:16px;--qm-radius-lg:20px;--qm-radius-xs:8px;',
+	'--qm-bg:#F7F6FC;--qm-page-bg:#F7F6FC;',
+	'--qm-surface:#FFFFFF;--qm-surface-card:#FFFFFF;--qm-surface-sub:#FBFAFF;',
+	'--qm-surface-2:#F0EEFA;--qm-surface-3:#EEEBF6;--qm-divider:#EEEBF6;',
+	'--qm-glass:rgba(255,255,255,0.88);--qm-glass-border:#E7E2F4;',
+	'--qm-border:#E7E2F4;--qm-border-soft:#EEEBF6;--qm-border-strong:#D5CDE8;',
+	'--qm-text:#34334B;--qm-text-soft:#77758F;--qm-text-muted:#9997AE;',
+	'--qm-accent:#8875E8;--qm-accent-hover:#7561D7;',
+	'--qm-purple-soft:#EEE9FF;--qm-sakura:#EFA8CB;--qm-mint-blue:#8CCFE2;--qm-mint-green:#79CDB0;',
+	'--qm-accent-2:#8CCFE2;--qm-accent-3:#79CDB0;',
+	'--qm-ok:#36AD87;--qm-warn:#E2A44D;--qm-danger:#D96883;--qm-info:#6BAFE8;',
+	'--qm-on-accent:#FFFFFF;--qm-on-hero:#FFFFFF;--qm-scrim:rgba(52,51,75,0.45);',
+	'--qm-shadow-color:rgba(136,117,232,0.08);',
+	'--qm-shadow:0 4px 16px rgba(136,117,232,0.08),0 1px 3px rgba(52,51,75,0.04);',
+	'--qm-shadow-md:0 8px 26px rgba(136,117,232,0.12),0 2px 6px rgba(52,51,75,0.05);',
+	'--qm-shadow-lg:0 16px 40px rgba(136,117,232,0.16),0 4px 12px rgba(52,51,75,0.06);',
+	'--qm-glass-shadow:0 8px 32px rgba(136,117,232,0.08),0 2px 6px rgba(52,51,75,0.04);',
+	'--qm-accent-soft:#EEE9FF;--qm-accent-border:rgba(136,117,232,0.35);',
+	'--qm-ok-soft:rgba(54,173,135,0.12);--qm-ok-border:rgba(54,173,135,0.35);',
+	'--qm-warn-soft:rgba(226,164,77,0.12);--qm-warn-border:rgba(226,164,77,0.35);',
+	'--qm-danger-soft:rgba(217,104,131,0.12);--qm-danger-border:rgba(217,104,131,0.35);',
+	'--qm-info-soft:rgba(107,175,232,0.12);--qm-info-border:rgba(107,175,232,0.35);',
+	'--qm-accent-gradient:linear-gradient(135deg,#8875E8 0%,#7561D7 100%);',
+	'--qm-hero-gradient:linear-gradient(135deg,#7A68E6 0%,#9583F4 45%,#EFA8CB 100%);',
+	'--qm-surface-gradient:linear-gradient(135deg,rgba(255,255,255,0.96) 0%,rgba(240,238,250,0.88) 100%);',
+	'--qm-glow-a:radial-gradient(circle,rgba(136,117,232,0.14) 0%,rgba(239,168,203,0.08) 45%,transparent 70%);',
+	'--qm-glow-b:radial-gradient(circle,rgba(140,207,226,0.14) 0%,rgba(136,117,232,0.06) 45%,transparent 70%);',
+	'--qm-terminal-gradient:linear-gradient(135deg,#1C1938,#2A244E);',
+	'--qm-font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;',
+	'--qm-font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;',
 	'font-family:var(--qm-font);',
 	'color:var(--qm-text);',
-
 	'}',
 
-	/* 暗色：主题变量优先，fallback 换成暗色调色板 */
+	/* 暗色：Soft Anime 暗色调色板 */
 	'.qm-app.qm-dark{',
-	'--qm-surface:var(--background-color-high,#161b22);',
-	'--qm-surface-2:var(--background-color-low,#1d232c);',
-	'--qm-surface-3:var(--background-color-normal,#232a34);',
-	'--qm-glass:var(--background-color-high,#161b22);',
-	'--qm-border:var(--border-color-medium,#2d3540);',
-	'--qm-border-soft:var(--border-color-low,#242c36);',
-	'--qm-border-strong:var(--border-color-high,rgba(255,255,255,.24));',
-	'--qm-text:var(--text-color-high,#e6edf3);',
-	'--qm-text-soft:var(--text-color-medium,#c2ccd6);',
-	'--qm-text-muted:var(--text-color-low,#93a0ad);',
-	'--qm-ok:var(--success-color,#34d399);',
-	'--qm-warn:var(--warning-color,#fbbf24);',
-	'--qm-danger:var(--error-color,#f87171);',
-	'--qm-accent-2:var(--primary-color,#7dd3fc);',
-	'--qm-scrim:rgba(0,0,0,.60);',
-	'--qm-shadow-color:rgba(0,0,0,.45);',
-	'--qm-accent-soft:rgba(56,189,248,.14);--qm-accent-border:rgba(56,189,248,.40);',
-	'--qm-ok-soft:rgba(52,211,153,.14);--qm-ok-border:rgba(52,211,153,.40);',
-	'--qm-warn-soft:rgba(251,191,36,.14);--qm-warn-border:rgba(251,191,36,.40);',
-	'--qm-danger-soft:rgba(248,113,113,.14);--qm-danger-border:rgba(248,113,113,.40);',
-	'--qm-accent-gradient:linear-gradient(135deg,var(--qm-accent) 0%,#1d4ed8 100%);',
-	'--qm-hero-gradient:linear-gradient(135deg,#0b1220 0%,#14315c 100%);',
-	'--qm-surface-gradient:linear-gradient(135deg,rgba(30,37,47,.92) 0%,rgba(23,30,40,.82) 100%);',
-	'--qm-glow-a:radial-gradient(circle,rgba(56,189,248,.10) 0%,rgba(52,211,153,.04) 50%,transparent 70%);',
-	'--qm-glow-b:radial-gradient(circle,rgba(129,140,248,.09) 0%,rgba(56,189,248,.05) 50%,transparent 70%);',
-	'--qm-terminal-gradient:linear-gradient(135deg,#0b1017,#151d27);',
+	'--qm-bg:#111522;--qm-page-bg:#111522;',
+	'--qm-surface:#1B2236;--qm-surface-card:#1B2236;--qm-surface-sub:#171C2D;',
+	'--qm-surface-2:#171C2D;--qm-surface-popover:#222A41;--qm-surface-3:#2B3046;--qm-divider:#2B3046;',
+	'--qm-glass:rgba(27,34,54,0.88);--qm-glass-border:#34334D;',
+	'--qm-border:#34334D;--qm-border-soft:#2B3046;--qm-border-strong:rgba(255,255,255,0.22);',
+	'--qm-text:#EEEAFB;--qm-text-soft:#B0AEC8;--qm-text-muted:#8887A4;',
+	'--qm-accent:#B4A4FF;--qm-accent-hover:#C5B9FF;',
+	'--qm-purple-soft:#302B4D;--qm-sakura:#EFA6D0;--qm-mint-blue:#80D4EC;--qm-mint-green:#75D6B1;',
+	'--qm-accent-2:#80D4EC;--qm-accent-3:#75D6B1;',
+	'--qm-ok:#42D8A7;--qm-warn:#EBB663;--qm-danger:#E87A95;--qm-info:#82C0F7;',
+	'--qm-scrim:rgba(0,0,0,0.65);',
+	'--qm-shadow-color:rgba(0,0,0,0.45);',
+	'--qm-shadow:0 4px 14px rgba(0,0,0,0.35);',
+	'--qm-shadow-md:0 8px 24px rgba(0,0,0,0.45);',
+	'--qm-shadow-lg:0 16px 36px rgba(0,0,0,0.55);',
+	'--qm-glass-shadow:0 8px 32px rgba(0,0,0,0.45);',
+	'--qm-accent-soft:rgba(180,164,255,0.16);--qm-accent-border:rgba(180,164,255,0.38);',
+	'--qm-ok-soft:rgba(66,216,167,0.16);--qm-ok-border:rgba(66,216,167,0.38);',
+	'--qm-warn-soft:rgba(235,182,99,0.16);--qm-warn-border:rgba(235,182,99,0.38);',
+	'--qm-danger-soft:rgba(232,122,149,0.16);--qm-danger-border:rgba(232,122,149,0.38);',
+	'--qm-info-soft:rgba(130,192,247,0.16);--qm-info-border:rgba(130,192,247,0.38);',
+	'--qm-accent-gradient:linear-gradient(135deg,#B4A4FF 0%,#8875E8 100%);',
+	'--qm-hero-gradient:linear-gradient(135deg,#1C1938 0%,#2A244E 50%,#352542 100%);',
+	'--qm-surface-gradient:linear-gradient(135deg,rgba(27,34,54,0.95) 0%,rgba(23,28,45,0.85) 100%);',
+	'--qm-glow-a:radial-gradient(circle,rgba(180,164,255,0.12) 0%,rgba(239,166,208,0.06) 45%,transparent 70%);',
+	'--qm-glow-b:radial-gradient(circle,rgba(128,212,236,0.12) 0%,rgba(180,164,255,0.05) 45%,transparent 70%);',
+	'--qm-terminal-gradient:linear-gradient(135deg,#0B1017,#151D27);',
 	'}',
 
 	/* 浏览器支持 color-mix 时，半透明/渐变令牌全部从主题主色实时派生，
@@ -156,6 +152,25 @@ var CSS_COMPONENTS = [
 	'.qm-grid-3{display:grid;gap:var(--qm-gap);grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}',
 	'.qm-span-all{grid-column:1/-1}',
 
+	/* 12 列自适应网格规范 */
+	'.qm-dashboard-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--qm-gap);margin-bottom:16px}',
+	'.qm-col-3{grid-column:span 3}.qm-col-4{grid-column:span 4}.qm-col-6{grid-column:span 6}.qm-col-8{grid-column:span 8}.qm-col-12{grid-column:span 12}',
+
+	/* Soft Anime 二次元科技看板娘插画与微动效 */
+	'.qm-anime-mascot{display:block;max-width:100%;height:auto;filter:drop-shadow(0 6px 18px rgba(136,117,232,0.22));transition:transform .28s cubic-bezier(.2,.8,.4,1)}',
+	'.qm-anime-mascot:hover{transform:translateY(-3px) scale(1.02);filter:drop-shadow(0 8px 24px rgba(136,117,232,0.32))}',
+	'.qm-hero-mascot-wrap{position:relative;flex:0 0 auto;display:flex;align-items:center;justify-content:center;z-index:2}',
+
+	/* 空状态二次元插画容器 */
+	'.qm-empty-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;text-align:center}',
+	'.qm-empty-mascot{margin-bottom:16px;opacity:.95}',
+	'.qm-empty-title{font-size:15px;font-weight:750;color:var(--qm-text);margin-bottom:6px}',
+	'.qm-empty-sub{font-size:12px;color:var(--qm-text-muted);max-width:360px;line-height:1.55}',
+
+	/* 主题即时切换按钮 (阳光/月亮) */
+	'.qm-theme-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:999px;background:var(--qm-glass);border:1px solid var(--qm-border-soft);color:var(--qm-text);cursor:pointer;transition:all .2s ease;font-size:14px}',
+	'.qm-theme-toggle-btn:hover{background:var(--qm-surface);border-color:var(--qm-accent);transform:scale(1.06);box-shadow:0 2px 8px var(--qm-shadow-color)}',
+
 	'.qm-card{position:relative;padding:16px 18px;border:1px solid var(--qm-border);border-radius:var(--qm-radius);',
 	'background:var(--qm-surface);box-shadow:var(--qm-shadow);transition:box-shadow .18s ease,border-color .18s ease}',
 	'.qm-card:hover{box-shadow:var(--qm-shadow-md);border-color:var(--qm-border-strong)}',
@@ -180,9 +195,9 @@ var CSS_COMPONENTS = [
 	'color:var(--qm-text);text-align:left}',
 	'.qm-stat-sub{font-size:11px;color:var(--qm-text-muted)}',
 
-	'.qm-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;',
+	'.qm-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--qm-radius-badge);',
 	'border:1px solid var(--qm-border);background:var(--qm-surface-2);color:var(--qm-text-soft);',
-	'font-size:11px;font-weight:650;line-height:1.5;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}',
+	'font-size:11px;font-weight:700;line-height:1.5;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}',
 	'.qm-badge.is-ok{background:var(--qm-ok-soft);border-color:var(--qm-ok-border);color:var(--qm-ok)}',
 	'.qm-badge.is-warn{background:var(--qm-warn-soft);border-color:var(--qm-warn-border);color:var(--qm-warn)}',
 	'.qm-badge.is-danger{background:var(--qm-danger-soft);border-color:var(--qm-danger-border);color:var(--qm-danger)}',
@@ -191,16 +206,17 @@ var CSS_COMPONENTS = [
 	'.qm-dot.is-ok{background:var(--qm-ok)}.qm-dot.is-warn{background:var(--qm-warn)}',
 	'.qm-dot.is-danger{background:var(--qm-danger)}.qm-dot.is-accent{background:var(--qm-accent)}',
 
-	'.qm-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:7px 14px;',
+	'.qm-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:8px 16px;',
 	'border:1px solid var(--qm-border);border-radius:var(--qm-radius-sm);background:var(--qm-surface);',
-	'color:var(--qm-text);font-size:12.5px;font-weight:650;cursor:pointer;transition:background-color .16s ease,border-color .16s ease}',
-	'.qm-btn:hover{background:var(--qm-surface-2);border-color:var(--qm-border-strong)}',
-	'.qm-btn-primary{background:var(--qm-accent);border-color:var(--qm-accent);color:var(--qm-on-accent)}',
-	'.qm-btn-primary:hover{background:var(--qm-accent);filter:brightness(1.06)}',
+	'color:var(--qm-text);font-size:13px;font-weight:650;cursor:pointer;transition:background-color .16s ease,border-color .16s ease,transform .16s ease}',
+	'.qm-btn:hover{background:var(--qm-surface-2);border-color:var(--qm-border-strong);transform:translateY(-1px)}',
+	'.qm-btn-primary{background:var(--qm-accent-gradient);border-color:var(--qm-accent);color:var(--qm-on-accent);box-shadow:0 4px 14px rgba(136,117,232,0.28)}',
+	'.qm-btn-primary:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 6px 18px rgba(136,117,232,0.36)}',
 	'.qm-btn:active{transform:translateY(1px)}',
 	'.qm-btn-primary:active{filter:brightness(.94);transform:translateY(1px)}',
-	'.qm-btn-danger{background:var(--qm-danger);border-color:var(--qm-danger);color:#fff}',
-	'.qm-btn[disabled]{opacity:.55;cursor:not-allowed}',
+	'.qm-btn-danger{background:var(--qm-danger-soft);border-color:var(--qm-danger-border);color:var(--qm-danger)}',
+	'.qm-btn-danger:hover{background:var(--qm-danger);color:#fff}',
+	'.qm-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none!important}',
 
 	'.qm-alert{display:flex;gap:8px;padding:10px 12px;border-radius:var(--qm-radius-sm);border:1px solid var(--qm-border);',
 	'background:var(--qm-surface-2);color:var(--qm-text-soft);font-size:12px;line-height:1.55}',
@@ -526,6 +542,7 @@ var CSS_RESPONSIVE = [
 	/* ≤1024：卡片最小宽度下调，Hero 收紧 */
 	'@media (max-width:1024px){',
 	'.qm-app{--qm-gap:14px}',
+	'.qm-col-3{grid-column:span 6}.qm-col-4{grid-column:span 6}.qm-col-8{grid-column:span 12}',
 	sel(GRID_CLASSES) + '{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}',
 	sel(HERO_CLASSES) + '{padding:18px 20px;border-radius:16px}',
 	'.qm-app .qm-shell,' + sel(['mt-ui-page', 'mtconn-page', 'mt-diag-page']) + '{padding-bottom:18px}',
@@ -534,6 +551,8 @@ var CSS_RESPONSIVE = [
 	/* ≤820：平板/竖屏 —— 卡片单列或双列、表单堆叠、表格可横滑 */
 	'@media (max-width:820px){',
 	'.qm-app{--qm-gap:12px;--qm-radius:12px}',
+	'.qm-col-4,.qm-col-6,.qm-col-3{grid-column:span 12}',
+	'.qm-hero-mascot-wrap .qm-anime-mascot{width:86px;height:86px}',
 	'.qm-app .qm-grid,.qm-app .qm-grid-2,.qm-app .qm-grid-3,' + sel(GRID_CLASSES) +
 		'{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}',
 	sel(HERO_CLASSES) + '{flex-direction:column;align-items:flex-start;gap:14px;padding:18px}',
@@ -565,6 +584,9 @@ var CSS_RESPONSIVE = [
 	/* ≤560：手机 —— 全部单列，触摸优先 */
 	'@media (max-width:560px){',
 	'.qm-app{--qm-gap:10px;--qm-radius:12px;--qm-maxw:100%}',
+	'.qm-dashboard-grid{grid-template-columns:1fr;gap:12px}',
+	'.qm-col-3,.qm-col-4,.qm-col-6,.qm-col-8,.qm-col-12{grid-column:span 1}',
+	'.qm-hero-mascot-wrap{display:none}',
 	'.qm-app .qm-grid,.qm-app .qm-grid-2,.qm-app .qm-grid-3,' + sel(GRID_CLASSES) + '{grid-template-columns:1fr}',
 	sel(CARD_CLASSES) + '{padding:13px 14px;border-radius:12px}',
 	'.qm-app .qm-card-head,' + sel(ROW_CLASSES) + '{gap:8px}',
@@ -625,9 +647,17 @@ function luminance(value) {
 	return null;
 }
 
-/* 明暗探测：① 主题变量 → ② body 背景计算色 → ③ 系统偏好。
- * 主题自带变量始终优先，探测结果只决定内置 fallback 调色板。 */
+/* 明暗探测：① 手动切换偏好 → ② 主题变量 → ③ body 背景计算色 → ④ 系统偏好。
+ * 手动偏好优先，其次跟随 LuCI 主题变量，最后跟随系统。 */
 function detectTone() {
+	try {
+		if (typeof localStorage !== 'undefined') {
+			var saved = localStorage.getItem('qm-theme-mode');
+			if (saved === 'dark' || saved === 'light')
+				return saved;
+		}
+	} catch (e) { /* 忽略 storage 限制 */ }
+
 	var dark = false, decided = false;
 	try {
 		var root = window.getComputedStyle(document.documentElement);
@@ -651,6 +681,29 @@ function detectTone() {
 	return dark ? 'dark' : 'light';
 }
 
+function getThemeMode() {
+	return detectTone();
+}
+
+function setThemeMode(mode) {
+	try {
+		if (typeof localStorage !== 'undefined') {
+			if (mode === 'dark' || mode === 'light')
+				localStorage.setItem('qm-theme-mode', mode);
+			else
+				localStorage.removeItem('qm-theme-mode');
+		}
+	} catch (e) { }
+	apply();
+}
+
+function toggleTheme() {
+	var current = getThemeMode();
+	var next = (current === 'dark') ? 'light' : 'dark';
+	setThemeMode(next);
+	return next;
+}
+
 /* 整体的 try/catch 兜底：极简 DOM 替身（单元测试）或异常环境下一律静默跳过，
  * 绝不让"注入皮肤"这件事本身把页面/测试搞崩。 */
 function apply() {
@@ -658,12 +711,20 @@ function apply() {
 		if (typeof document === 'undefined' || !document.createElement)
 			return null;
 		injectOnce();
+		var tone = detectTone();
 		var body = document.body || document.documentElement;
 		if (body && body.classList) {
 			body.classList.add('qm-app');
 			body.classList.remove('qm-light');
 			body.classList.remove('qm-dark');
-			body.classList.add('qm-' + detectTone());
+			body.classList.add('qm-' + tone);
+		}
+		/* 同步页面上所有主题切换按钮的状态与文案 */
+		var toggles = document.querySelectorAll('.qm-theme-toggle-btn');
+		for (var i = 0; i < toggles.length; i++) {
+			toggles[i].innerHTML = (tone === 'dark') ? '☀️' : '🌙';
+			toggles[i].title = (tone === 'dark') ? '切换为浅色模式 (Light Mode)' : '切换为暗色模式 (Dark Mode)';
+			toggles[i].setAttribute('aria-label', toggles[i].title);
 		}
 	} catch (e) { /* 忽略 */ }
 	return null;
@@ -745,8 +806,90 @@ function alertBox(text, tone) {
 	return el('div', 'qm-alert' + (tone ? ' is-' + tone : ''), text);
 }
 
-function empty(text) {
-	return el('div', 'qm-empty', text);
+function mascotSvg(opts) {
+	opts = opts || {};
+	var s = opts.size || 108;
+	var mood = opts.mood || 'cheer';
+	var eyeL = '<circle cx="51" cy="59" r="4.5" fill="#34334B"/><circle cx="52.5" cy="57.5" r="1.5" fill="#FFFFFF"/>';
+	var eyeR = '<circle cx="69" cy="59" r="4.5" fill="#34334B"/><circle cx="70.5" cy="57.5" r="1.5" fill="#FFFFFF"/>';
+	var mouth = '<path d="M57 66 Q60 69 63 66" fill="none" stroke="#EFA8CB" stroke-width="2" stroke-linecap="round"/>';
+	var sweatOrStar = '<polygon points="80,44 82,49 87,49 83,52 85,57 80,54 75,57 77,52 73,49 78,49" fill="#EFA8CB"/>';
+
+	if (mood === 'sleep') {
+		eyeL = '<path d="M47 59 Q51 63 55 59" fill="none" stroke="#34334B" stroke-width="2.5" stroke-linecap="round"/>';
+		eyeR = '<path d="M65 59 Q69 63 73 59" fill="none" stroke="#34334B" stroke-width="2.5" stroke-linecap="round"/>';
+		mouth = '<circle cx="60" cy="67" r="2" fill="#EFA8CB"/>';
+		sweatOrStar = '<text x="75" y="48" font-family="sans-serif" font-weight="bold" font-size="13" fill="#8875E8">Zzz</text>';
+	} else if (mood === 'idle') {
+		mouth = '<path d="M58 66 L62 66" fill="none" stroke="#EFA8CB" stroke-width="2" stroke-linecap="round"/>';
+	} else if (mood === 'alert') {
+		mouth = '<ellipse cx="60" cy="67" rx="3" ry="2" fill="#E2A44D"/>';
+		sweatOrStar = '<circle cx="78" cy="46" r="3" fill="#E2A44D"/>';
+	}
+
+	return [
+		'<svg class="qm-anime-mascot" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="' + s + '" height="' + s + '" role="img" aria-label="QModem Mascot">',
+		'<defs>',
+		'<linearGradient id="qmMascotHair" x1="0" y1="0" x2="1" y2="1">',
+		'<stop offset="0%" stop-color="#A594F9"/>',
+		'<stop offset="100%" stop-color="#EFA8CB"/>',
+		'</linearGradient>',
+		'<linearGradient id="qmMascotSkin" x1="0" y1="0" x2="0" y2="1">',
+		'<stop offset="0%" stop-color="#FFF5F0"/>',
+		'<stop offset="100%" stop-color="#FFEBE5"/>',
+		'</linearGradient>',
+		'<linearGradient id="qmMascotHeadset" x1="0" y1="0" x2="1" y2="1">',
+		'<stop offset="0%" stop-color="#8875E8"/>',
+		'<stop offset="100%" stop-color="#8CCFE2"/>',
+		'</linearGradient>',
+		'</defs>',
+		'<circle cx="60" cy="60" r="54" fill="var(--qm-accent-soft)" opacity="0.45"/>',
+		'<path d="M34 56 C34 32, 86 32, 86 56" fill="none" stroke="url(#qmMascotHeadset)" stroke-width="5" stroke-linecap="round"/>',
+		'<path d="M34 36 L24 22 L40 28 Z" fill="#8875E8"/>',
+		'<path d="M86 36 L96 22 L80 28 Z" fill="#EFA8CB"/>',
+		'<rect x="29" y="50" width="8" height="18" rx="4" fill="#8875E8"/>',
+		'<rect x="83" y="50" width="8" height="18" rx="4" fill="#8875E8"/>',
+		'<path d="M33 54 C28 72, 32 94, 42 102 C46 95, 42 80, 42 70 Z" fill="url(#qmMascotHair)"/>',
+		'<path d="M87 54 C92 72, 88 94, 78 102 C74 95, 78 80, 78 70 Z" fill="url(#qmMascotHair)"/>',
+		'<path d="M44 92 L60 106 L76 92 L68 114 L52 114 Z" fill="var(--qm-accent)" opacity="0.9"/>',
+		'<path d="M52 92 L60 99 L68 92" fill="none" stroke="#FFFFFF" stroke-width="2"/>',
+		'<path d="M38 52 C38 72, 48 84, 60 84 C72 84, 82 72, 82 52 C82 38, 72 36, 60 36 C48 36, 38 38, 38 52 Z" fill="url(#qmMascotSkin)"/>',
+		'<path d="M36 48 C42 56, 48 46, 52 52 C56 46, 64 46, 68 52 C72 46, 78 56, 84 48 C82 34, 72 32, 60 32 C48 32, 38 34, 36 48 Z" fill="url(#qmMascotHair)"/>',
+		'<ellipse cx="46" cy="65" rx="5" ry="2.5" fill="#EFA8CB" opacity="0.65"/>',
+		'<ellipse cx="74" cy="65" rx="5" ry="2.5" fill="#EFA8CB" opacity="0.65"/>',
+		eyeL, eyeR,
+		mouth,
+		sweatOrStar,
+		'<circle cx="87" cy="59" r="2.5" fill="#79CDB0"/>',
+		'</svg>'
+	].join('');
+}
+
+function empty(text, sub, mood) {
+	var box = el('div', 'qm-empty-box', [
+		el('div', 'qm-empty-mascot', mascotSvg({ size: 84, mood: mood || 'idle' })),
+		el('div', 'qm-empty-title', text || '暂无数据'),
+		sub ? el('div', 'qm-empty-sub', sub) : null
+	].filter(Boolean));
+	return box;
+}
+
+function emptyState(title, sub, mood) {
+	return empty(title, sub, mood);
+}
+
+function themeToggleBtn() {
+	var currentTone = detectTone();
+	var btn = el('button', 'qm-theme-toggle-btn', (currentTone === 'dark') ? '☀️' : '🌙', {
+		type: 'button',
+		title: (currentTone === 'dark') ? '切换为浅色模式 (Light Mode)' : '切换为暗色模式 (Dark Mode)',
+		'aria-label': 'Toggle Theme'
+	});
+	btn.addEventListener('click', function(e) {
+		e.preventDefault();
+		toggleTheme();
+	});
+	return btn;
 }
 
 function progress(pct, tone) {
@@ -769,6 +912,12 @@ var API = {
 	apply: apply,
 	stylesheet: stylesheet,
 	detectTone: detectTone,
+	getThemeMode: getThemeMode,
+	setThemeMode: setThemeMode,
+	toggleTheme: toggleTheme,
+	mascotSvg: mascotSvg,
+	themeToggleBtn: themeToggleBtn,
+	emptyState: emptyState,
 	card: card,
 	kv: kv,
 	stat: stat,

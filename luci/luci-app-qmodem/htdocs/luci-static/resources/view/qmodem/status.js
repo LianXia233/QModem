@@ -2,6 +2,7 @@
 'require view';
 'require qmodem.compat';
 'require uci';
+'require qmodem.theme as theme';
 'require qmodem.controls as controls';
 
 /*
@@ -288,36 +289,35 @@ return view.extend({
 			/* 页面容器：宽度/字体由 theme.js 统一（--qm-maxw 令牌 + 皮肤字体栈） */
 			'.qmodem-glass-page{position:relative;width:100%;max-width:var(--qm-maxw);margin:0 auto;color:var(--qm-text);padding-bottom:30px}',
 
-			/* 卡片通用白色毛玻璃效果 */
-			'.qm-glass-card{position:relative;z-index:1;background:var(--qm-glass-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--qm-glass-border);border-radius:20px;box-shadow:var(--qm-glass-shadow);padding:20px;transition:transform .24s cubic-bezier(.2,.8,.4,1),box-shadow .24s ease}',
-			'.qm-glass-card:hover{transform:translateY(-2px);box-shadow:0 12px 40px var(--qm-shadow-color),0 2px 6px var(--qm-shadow-color)}',
+			/* 卡片通用柔和毛玻璃效果 */
+			'.qm-glass-card{position:relative;z-index:1;background:var(--qm-surface);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border:1px solid var(--qm-border);border-radius:var(--qm-radius);box-shadow:var(--qm-shadow);padding:18px 20px;transition:transform .24s cubic-bezier(.2,.8,.4,1),box-shadow .24s ease,border-color .24s ease}',
+			'.qm-glass-card:hover{transform:translateY(-2px);box-shadow:var(--qm-shadow-md);border-color:var(--qm-border-strong)}',
 
 			/* 顶部 Hero 玻璃卡片 */
-			'.qm-hero{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:26px 30px;margin-bottom:16px;background:var(--qm-surface-gradient)}',
-			'.qm-hero-title{margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-.02em;background:var(--qm-hero-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}',
+			'.qm-hero{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 26px;margin-bottom:16px;background:var(--qm-surface-gradient);border:1px solid var(--qm-border)}',
+			'.qm-hero-title{margin:0 0 6px;font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--qm-text)}',
 			'.qm-hero-sub{font-size:13px;color:var(--qm-text-muted);line-height:1.5}',
-			'.qm-hero-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-top:14px;font-size:12px;color:var(--qm-text-soft)}',
-			'.qm-hero-op{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:10px;background:var(--qm-glass);border:1px solid var(--qm-border-soft);font-weight:700;color:var(--qm-text)}',
+			'.qm-hero-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:14px;font-size:12px;color:var(--qm-text-soft)}',
+			'.qm-hero-op{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:10px;background:var(--qm-surface-2);border:1px solid var(--qm-border-soft);font-weight:700;color:var(--qm-text)}',
 			'.qm-hero-op img{width:22px;height:22px;object-fit:contain}',
-			'.qm-pill-tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--qm-surface-2);font-size:11px;font-weight:600;color:var(--qm-text-soft)}',
+			'.qm-pill-tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--qm-radius-badge);background:var(--qm-surface-2);font-size:11px;font-weight:600;color:var(--qm-text-soft)}',
 			'.qm-pill-tag strong{color:var(--qm-text)}',
 
 			/* 状态指示徽章 & SVG 脉冲光圈 */
-			'.qm-hero-actions{display:flex;align-items:center;gap:12px}',
-			'.qm-status-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:var(--qm-glass);border:1px solid var(--qm-border-soft);box-shadow:0 2px 8px var(--qm-shadow-color);font-size:12px;font-weight:700}',
-			'.qm-pulse-circle{width:10px;height:10px;border-radius:50%;background:var(--qm-border);position:relative}',
+			'.qm-hero-actions{display:flex;align-items:center;gap:10px}',
+			'.qm-status-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:var(--qm-radius-badge);background:var(--qm-surface-2);border:1px solid var(--qm-border);box-shadow:0 2px 6px var(--qm-shadow-color);font-size:12px;font-weight:700;color:var(--qm-text-soft)}',
+			'.qm-pulse-circle{width:10px;height:10px;border-radius:50%;background:var(--qm-text-muted);position:relative}',
 			'.qm-status-badge.online{color:var(--qm-ok);background:var(--qm-ok-soft);border-color:var(--qm-ok-border)}',
 			'.qm-status-badge.online .qm-pulse-circle{background:var(--qm-ok);box-shadow:0 0 0 0 var(--qm-ok-soft);animation:qmPulse 2s infinite}',
 			'@keyframes qmPulse{0%{box-shadow:0 0 0 0 var(--qm-ok-soft)}70%{box-shadow:0 0 0 8px var(--qm-ok-soft)}100%{box-shadow:0 0 0 0 var(--qm-ok-soft)}}',
-			'.qm-refresh-btn{padding:8px 18px;border-radius:999px;border:1px solid var(--qm-border);background:var(--qm-glass);color:var(--qm-text-soft);font-weight:600;font-size:12px;cursor:pointer;transition:all .2s ease}',
-			'.qm-refresh-btn:hover{background:var(--qm-surface);color:var(--qm-accent);border-color:var(--qm-accent-border);transform:scale(1.02)}',
+			'.qm-refresh-btn{padding:7px 16px;border-radius:var(--qm-radius-badge);border:1px solid var(--qm-border);background:var(--qm-surface);color:var(--qm-text);font-weight:650;font-size:12px;cursor:pointer;transition:all .2s ease}',
+			'.qm-refresh-btn:hover{background:var(--qm-surface-2);color:var(--qm-accent);border-color:var(--qm-accent-border);transform:scale(1.02)}',
 
-			/* 核心聚焦 3 列网格 */
-			'.qm-grid-3{display:grid;grid-template-columns:1.08fr 1.02fr 1fr;gap:16px;margin-bottom:16px}',
+			/* 卡片内结构 */
 			'.qm-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}',
 			'.qm-card-title{font-size:15px;font-weight:750;color:var(--qm-text);display:flex;align-items:center;gap:8px}',
-			'.qm-card-sub{font-size:11px;color:var(--qm-text-muted);margin-top:2px}',
-			'.qm-badge{padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}',
+			'.qm-card-sub{font-size:11.5px;color:var(--qm-text-muted);margin-top:2px}',
+			'.qm-badge{padding:3px 10px;border-radius:var(--qm-radius-badge);font-size:10.5px;font-weight:700;letter-spacing:.02em}',
 			'.qm-badge.excellent{background:var(--qm-ok-soft);color:var(--qm-ok);border:1px solid var(--qm-ok-border)}',
 			'.qm-badge.good{background:var(--qm-accent-soft);color:var(--qm-accent);border:1px solid var(--qm-accent-border)}',
 			'.qm-badge.fair{background:var(--qm-warn-soft);color:var(--qm-warn);border:1px solid var(--qm-warn-border)}',
@@ -333,8 +333,8 @@ return view.extend({
 
 			/* 信号小指标微卡片 */
 			'.qm-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}',
-			'.qm-mini-item{padding:9px 10px;border-radius:12px;background:var(--qm-surface-2);border:1px solid var(--qm-surface-2);text-align:center}',
-			'.qm-mini-label{font-size:10px;color:var(--qm-text-muted);font-weight:600}',
+			'.qm-mini-item{padding:9px 10px;border-radius:var(--qm-radius-sm);background:var(--qm-surface-2);border:1px solid var(--qm-border-soft);text-align:center}',
+			'.qm-mini-label{font-size:10.5px;color:var(--qm-text-muted);font-weight:600}',
 			'.qm-mini-val{font-size:13px;font-weight:750;color:var(--qm-text);margin:2px 0 4px;font-variant-numeric:tabular-nums}',
 			'.qm-mini-bar{height:4px;border-radius:999px;background:var(--qm-border-soft);overflow:hidden}',
 			'.qm-mini-bar i{display:block;height:100%;border-radius:inherit;transition:width .4s ease}',
@@ -345,47 +345,46 @@ return view.extend({
 			'@keyframes qmDashFlow{to{stroke-dashoffset:-36}}',
 			'.qm-flow-line{stroke-dasharray:6,4;animation:qmDashFlow 1.6s linear infinite}',
 			'.qm-cc-container{display:flex;flex-direction:column;gap:6px;max-height:175px;overflow-y:auto;padding-right:2px;margin:8px 0}',
-			'.qm-cc-card{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:12px;background:var(--qm-surface-2);border:1px solid var(--qm-border-soft)}',
+			'.qm-cc-card{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:var(--qm-radius-sm);background:var(--qm-surface-2);border:1px solid var(--qm-border-soft)}',
 			'.qm-cc-left{display:flex;align-items:center;gap:8px}',
-			'.qm-cc-badge{padding:2px 6px;border-radius:6px;font-size:9px;font-weight:750}',
-			'.qm-cc-badge.pcc{background:var(--qm-accent);color:var(--qm-on-hero)}',
-			'.qm-cc-badge.scc{background:var(--qm-border-soft);color:var(--qm-text-soft)}',
+			'.qm-cc-badge{padding:2px 6px;border-radius:6px;font-size:9.5px;font-weight:750}',
+			'.qm-cc-badge.pcc{background:var(--qm-accent);color:var(--qm-on-accent)}',
+			'.qm-cc-badge.scc{background:var(--qm-surface-3);color:var(--qm-text-soft)}',
 			'.qm-cc-band{font-size:12px;font-weight:700;color:var(--qm-text)}',
-			'.qm-cc-metrics{font-size:10px;color:var(--qm-text-muted);display:flex;gap:8px;font-variant-numeric:tabular-nums}',
+			'.qm-cc-metrics{font-size:10.5px;color:var(--qm-text-muted);display:flex;gap:8px;font-variant-numeric:tabular-nums}',
 
 			/* IP网络会话卡片 */
 			'.qm-ip-box{display:flex;flex-direction:column;gap:8px}',
-			'.qm-ip-row{padding:10px 12px;border-radius:12px;background:var(--qm-surface-2);border:1px solid var(--qm-border-soft)}',
+			'.qm-ip-row{padding:10px 12px;border-radius:var(--qm-radius-sm);background:var(--qm-surface-2);border:1px solid var(--qm-border-soft)}',
 			'.qm-ip-header{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--qm-text-muted);margin-bottom:4px}',
-			'.qm-ip-val{font:600 12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--qm-text);word-break:break-all}',
-			'.qm-ip-link{display:inline-flex;align-items:center;gap:4px;color:var(--qm-accent);font-size:11px;font-weight:700;text-decoration:none;margin-top:auto;padding-top:10px}',
+			'.qm-ip-val{font:600 12px/1.4 var(--qm-font-mono);color:var(--qm-text);word-break:break-all}',
+			'.qm-ip-link{display:inline-flex;align-items:center;gap:4px;color:var(--qm-accent);font-size:11.5px;font-weight:700;text-decoration:none;margin-top:auto;padding-top:10px}',
 
-			/* 双列信息网格 */
-			'.qm-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}',
-			'.qm-list-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--qm-border-soft);font-size:12px}',
+			/* 列表行 */
+			'.qm-list-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--qm-border-soft);font-size:12.5px}',
 			'.qm-list-row:last-child{border-bottom:0}',
 			'.qm-list-row span{color:var(--qm-text-muted)}',
 			'.qm-list-row strong{color:var(--qm-text);font-weight:600;text-align:right}',
 
 			/* 流量统计面板 & SVG 图表 */
 			'.qm-traffic-layout{display:grid;grid-template-columns:repeat(3,minmax(0,.7fr)) minmax(320px,1.9fr);gap:12px;margin-top:14px}',
-			'.qm-stat-card{padding:14px;border-radius:14px;background:var(--qm-surface-2);border:1px solid var(--qm-border-soft);display:flex;flex-direction:column;justify-content:center}',
-			'.qm-stat-label{font-size:11px;color:var(--qm-text-muted);font-weight:600;display:flex;align-items:center;gap:6px}',
-			'.qm-stat-val{font-size:20px;font-weight:800;color:var(--qm-text);margin:5px 0 2px;letter-spacing:-.02em}',
-			'.qm-stat-sub{font-size:10px;color:var(--qm-text-muted)}',
-			'.qm-traffic-chart-box{background:var(--qm-surface-2);border-radius:14px;border:1px solid var(--qm-border-soft);padding:12px 14px}',
+			'.qm-stat-card{padding:14px;border-radius:var(--qm-radius-sm);background:var(--qm-surface-2);border:1px solid var(--qm-border-soft);display:flex;flex-direction:column;justify-content:center}',
+			'.qm-stat-label{font-size:11.5px;color:var(--qm-text-muted);font-weight:600;display:flex;align-items:center;gap:6px}',
+			'.qm-stat-val{font-size:22px;font-weight:800;color:var(--qm-text);margin:5px 0 2px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}',
+			'.qm-stat-sub{font-size:10.5px;color:var(--qm-text-muted)}',
+			'.qm-traffic-chart-box{background:var(--qm-surface-2);border-radius:var(--qm-radius-sm);border:1px solid var(--qm-border-soft);padding:12px 14px}',
 			'.qm-traffic-chart-svg{width:100%;height:115px;display:block}',
 
 			/* 快捷导航 */
 			'.qm-shortcuts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}',
 			'.qm-shortcut-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;color:inherit;text-decoration:none}',
-			'.qm-shortcut-item strong{display:block;font-size:13px;color:var(--qm-text)}',
-			'.qm-shortcut-item span{display:block;font-size:11px;color:var(--qm-text-muted);margin-top:3px}',
+			'.qm-shortcut-item strong{display:block;font-size:13.5px;color:var(--qm-text)}',
+			'.qm-shortcut-item span{display:block;font-size:11.5px;color:var(--qm-text-muted);margin-top:3px}',
 			'.qm-shortcut-item i{font-style:normal;font-size:18px;color:var(--qm-accent);font-weight:700}',
 
 			/* 响应式适配 */
-			'@media(max-width:980px){.qm-grid-3{grid-template-columns:1fr 1fr}.qm-address-card{grid-column:1/-1}.qm-traffic-layout{grid-template-columns:repeat(3,1fr)}.qm-traffic-chart-box{grid-column:1/-1}}',
-			'@media(max-width:680px){.qm-hero{flex-direction:column;align-items:flex-start}.qm-hero-actions{width:100%;justify-content:space-between}.qm-grid-3,.qm-grid-2,.qm-shortcuts,.qm-traffic-layout{grid-template-columns:1fr}.qm-address-card,.qm-traffic-chart-box{grid-column:auto}}'
+			'@media(max-width:980px){.qm-traffic-layout{grid-template-columns:repeat(3,1fr)}.qm-traffic-chart-box{grid-column:1/-1}}',
+			'@media(max-width:680px){.qm-hero{flex-direction:column;align-items:flex-start}.qm-hero-actions{width:100%;justify-content:space-between}.qm-shortcuts,.qm-traffic-layout{grid-template-columns:1fr}.qm-traffic-chart-box{grid-column:auto}}'
 		].join(''));
 	},
 
@@ -479,14 +478,14 @@ return view.extend({
 		var radius = 64;
 		var totalArcLen = Math.PI * radius; // 180度半圆弧长约 201
 		var activeLen = (quality.percentage / 100) * totalArcLen;
-		var color = quality.strokeColor || '#0072f5';
+		var color = quality.strokeColor || 'var(--qm-accent)';
 
 		var svgStr = [
 			'<svg class="qm-signal-dial-svg" viewBox="0 0 160 95">',
 			'  <defs>',
 			'    <linearGradient id="qmDialGrad" x1="0%" y1="0%" x2="100%" y2="0%">',
-			'      <stop offset="0%" stop-color="#0072f5"/>',
-			'      <stop offset="60%" stop-color="#10b981"/>',
+			'      <stop offset="0%" stop-color="var(--qm-accent)"/>',
+			'      <stop offset="60%" stop-color="var(--qm-accent-2)"/>',
 			'      <stop offset="100%" stop-color="' + color + '"/>',
 			'    </linearGradient>',
 			'    <filter id="qmDialGlow" x="-20%" y="-20%" width="140%" height="140%">',
@@ -495,7 +494,7 @@ return view.extend({
 			'    </filter>',
 			'  </defs>',
 			'  <!-- 底轨圆弧 -->',
-			'  <path d="M 16 80 A 64 64 0 0 1 144 80" fill="none" stroke="rgba(226,232,240,0.8)" stroke-width="10" stroke-linecap="round"/>',
+			'  <path d="M 16 80 A 64 64 0 0 1 144 80" fill="none" stroke="var(--qm-border-soft)" stroke-width="10" stroke-linecap="round"/>',
 			'  <!-- 动态指示圆弧 -->',
 			'  <path d="M 16 80 A 64 64 0 0 1 144 80" fill="none" stroke="url(#qmDialGrad)" stroke-width="10" stroke-linecap="round"',
 			'        stroke-dasharray="' + activeLen.toFixed(1) + ' ' + totalArcLen.toFixed(1) + '"',
@@ -555,34 +554,34 @@ return view.extend({
 	/* 动态 SVG 载波拓扑图 */
 	renderSvgCarrierTopo: function(info) {
 		var hasCa = info.carriers && info.carriers.length > 1;
-		var lineStroke1 = hasCa ? '#0072f5' : '#64748b';
-		var lineStroke2 = '#10b981';
+		var lineStroke1 = hasCa ? 'var(--qm-accent)' : 'var(--qm-text-muted)';
+		var lineStroke2 = 'var(--qm-mint)';
 
 		var svgStr = [
 			'<svg class="qm-carrier-topo-svg" viewBox="0 0 320 85">',
 			'  <defs>',
 			'    <linearGradient id="qmTowerGlow" x1="0%" y1="0%" x2="100%" y2="100%">',
-			'      <stop offset="0%" stop-color="#0072f5"/>',
-			'      <stop offset="100%" stop-color="#60a5fa"/>',
+			'      <stop offset="0%" stop-color="var(--qm-accent)"/>',
+			'      <stop offset="100%" stop-color="var(--qm-accent-2)"/>',
 			'    </linearGradient>',
 			'  </defs>',
 			'  <!-- 基站塔 -->',
 			'  <g transform="translate(20, 14)">',
 			'    <path d="M16 2 L22 46 L10 46 Z" fill="none" stroke="url(#qmTowerGlow)" stroke-width="2.2" stroke-linejoin="round"/>',
-			'    <line x1="8" y1="20" x2="24" y2="20" stroke="#0072f5" stroke-width="1.8"/>',
-			'    <line x1="11" y1="32" x2="21" y2="32" stroke="#0072f5" stroke-width="1.8"/>',
-			'    <circle cx="16" cy="2" r="3.5" fill="#0072f5"/>',
-			'    <path d="M10 -2 A 8 8 0 0 1 22 -2" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round"/>',
-			'    <text x="16" y="58" font-size="9" fill="#64748b" text-anchor="middle" font-weight="600">gNB/eNB</text>',
+			'    <line x1="8" y1="20" x2="24" y2="20" stroke="var(--qm-accent)" stroke-width="1.8"/>',
+			'    <line x1="11" y1="32" x2="21" y2="32" stroke="var(--qm-accent)" stroke-width="1.8"/>',
+			'    <circle cx="16" cy="2" r="3.5" fill="var(--qm-accent)"/>',
+			'    <path d="M10 -2 A 8 8 0 0 1 22 -2" fill="none" stroke="var(--qm-accent-2)" stroke-width="1.8" stroke-linecap="round"/>',
+			'    <text x="16" y="58" font-size="9" fill="var(--qm-text-muted)" text-anchor="middle" font-weight="600">gNB/eNB</text>',
 			'  </g>',
 			'  <!-- 动态传输波束连线 -->',
 			'  <path d="M 52 26 C 110 10, 160 18, 240 22" fill="none" stroke="' + lineStroke1 + '" stroke-width="2" class="qm-flow-line"/>',
 			hasCa ? '  <path d="M 52 32 C 110 48, 160 42, 240 38" fill="none" stroke="' + lineStroke2 + '" stroke-width="2" class="qm-flow-line" style="animation-duration:1.2s;"/>' : '',
 			'  <!-- 终端/模组汇聚 -->',
 			'  <g transform="translate(244, 12)">',
-			'    <rect x="0" y="4" width="48" height="34" rx="8" fill="rgba(241,245,249,0.9)" stroke="#94a3b8" stroke-width="1.6"/>',
-			'    <text x="24" y="21" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">' + (hasCa ? info.count + 'CA' : '1CC') + '</text>',
-			'    <text x="24" y="32" font-size="8" font-weight="600" fill="#64748b" text-anchor="middle">' + (info.carriers[0] ? (info.carriers[0].band || 'Modem') : 'Modem') + '</text>',
+			'    <rect x="0" y="4" width="48" height="34" rx="8" fill="var(--qm-surface-2)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <text x="24" y="21" font-size="10" font-weight="700" fill="var(--qm-text)" text-anchor="middle">' + (hasCa ? info.count + 'CA' : '1CC') + '</text>',
+			'    <text x="24" y="32" font-size="8" font-weight="600" fill="var(--qm-text-muted)" text-anchor="middle">' + (info.carriers[0] ? (info.carriers[0].band || 'Modem') : 'Modem') + '</text>',
 			'  </g>',
 			'</svg>'
 		].join('');
@@ -833,15 +832,15 @@ return view.extend({
 			var dateLabel = String(d.date || '').slice(5);
 
 			return [
-				'<rect x="' + x + '" y="' + (80 - rxH) + '" width="' + barW + '" height="' + rxH + '" rx="3" fill="#0072f5"/>',
-				'<rect x="' + (x + barW + 3) + '" y="' + (80 - txH) + '" width="' + barW + '" height="' + txH + '" rx="3" fill="#10b981"/>',
-				'<text x="' + (x + barW) + '" y="94" font-size="8" fill="#94a3b8" text-anchor="middle">' + dateLabel + '</text>'
+				'<rect x="' + x + '" y="' + (80 - rxH) + '" width="' + barW + '" height="' + rxH + '" rx="3" fill="var(--qm-accent)"/>',
+				'<rect x="' + (x + barW + 3) + '" y="' + (80 - txH) + '" width="' + barW + '" height="' + txH + '" rx="3" fill="var(--qm-mint)"/>',
+				'<text x="' + (x + barW) + '" y="94" font-size="8" fill="var(--qm-text-muted)" text-anchor="middle">' + dateLabel + '</text>'
 			].join('');
 		}).join('');
 
 		var fullChart = [
 			'<svg class="qm-traffic-chart-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '">',
-			'  <line x1="0" y1="80" x2="' + svgW + '" y2="80" stroke="rgba(226,232,240,0.8)" stroke-width="1"/>',
+			'  <line x1="0" y1="80" x2="' + svgW + '" y2="80" stroke="var(--qm-border-soft)" stroke-width="1"/>',
 			barsSvg,
 			'</svg>'
 		].join('');
@@ -994,8 +993,11 @@ return view.extend({
 		if (!res.section) {
 			return E('div', { 'class': 'qmodem-glass-page' }, [
 				this.styleNode(), controls.styleNode(),
-				E('div', { 'class': 'qm-glass-card', 'style': 'color:var(--qm-danger);background:var(--qm-danger-soft)' },
-					_('No modem detected (make sure QModem has recognised the device).')),
+				theme.emptyState(
+					_('未检测到可用移动模组'),
+					_('请检查设备 USB/M.2 接口硬件连接或确认 QModem 服务是否正常运行。'),
+					'sleep'
+				),
 				(res.errors || []).map(function(msg) {
 					return E('div', { 'class': 'qm-glass-card', 'style': 'margin-top:10px;color:var(--qm-danger)' }, msg);
 				})
@@ -1045,47 +1047,43 @@ return view.extend({
 						E('span', { 'class': 'qm-pill-tag' }, [ _('接口:'), E('strong', {}, data.network_interface || '--') ])
 					])
 				]),
+				E('div', { 'class': 'qm-hero-mascot-wrap' }, [
+					svgNode(theme.mascotSvg({ size: 104, mood: connected ? 'cheer' : 'idle' }))
+				]),
 				E('div', { 'class': 'qm-hero-actions' }, [
 					E('div', { 'class': 'qm-status-badge' + (connected ? ' online' : '') }, [
 						E('span', { 'class': 'qm-pulse-circle' }),
 						connected ? _('已连接') : reachable ? _('在线') : _('不可用')
 					]),
+					theme.themeToggleBtn(),
 					E('button', { 'class': 'qm-refresh-btn', 'click': function() { window.location.reload(); } }, _('刷新'))
 				])
 			]),
 
-			/* 核心聚焦 3 栏网格 (信号 / 载波 / 会话IP) */
-			E('div', { 'class': 'qm-grid-3' }, [
-				this.signalCard(data),
-				this.carrierCard(carrierInfo, res.devStatus),
-				this.addressCard(session)
-			]),
-
-			/* 模组与 SIM 硬件卡片 */
-			E('div', { 'class': 'qm-grid-2' }, [
-				this.moduleCard(data),
-				this.simCard(data)
-			]),
-
-			/* 流量监控面板与 SVG 图表 */
-			this.trafficPanel(res.usage, data.network_interface, res.daily),
-
-			/* 流量清零计划 */
-			isTrafficAvailable(res.usage) ? this.trafficScheduleCard(res.trafficResetSchedule, res.section) : null,
-
-			/* 快捷跳转 */
-			E('div', { 'class': 'qm-shortcuts' }, [
-				this.shortcut(_('移动数据'), _('APN、拨号、IP 详情与会话计数'), 'admin/modem/qmodem/connection'),
-				this.shortcut(_('射频与小区'), _('频段、小区、射频策略与诊断'), 'admin/modem/qmodem/connection/network'),
-				this.shortcut(_('模组与 SIM'), _('模组身份、SIM 信息与维护'), 'admin/modem/qmodem/system')
-			]),
-
-			/* 原始底层完整信息 */
-			E('div', { 'class': 'qm-glass-card' }, [
-				E('h3', { 'style': 'margin:0 0 6px;font-size:15px;font-weight:750;color:var(--qm-text)' }, _('完整模组信息')),
-				E('p', { 'style': 'margin:0 0 16px;color:var(--qm-text-muted);font-size:11px' }, _('该模组由 QModem 上报的全部字段，按类别分组展示。')),
-				E('div', { 'class': 'mt-info-grid-all' }, controls.renderInfoGrouped(res.allInfo))
-			])
+			/* 12 列自适应网格规范 */
+			E('div', { 'class': 'qm-dashboard-grid' }, [
+				E('div', { 'class': 'qm-col-4' }, [ this.signalCard(data) ]),
+				E('div', { 'class': 'qm-col-4' }, [ this.carrierCard(carrierInfo, res.devStatus) ]),
+				E('div', { 'class': 'qm-col-4' }, [ this.addressCard(session) ]),
+				E('div', { 'class': 'qm-col-6' }, [ this.moduleCard(data) ]),
+				E('div', { 'class': 'qm-col-6' }, [ this.simCard(data) ]),
+				E('div', { 'class': 'qm-col-12' }, [ this.trafficPanel(res.usage, data.network_interface, res.daily) ]),
+				isTrafficAvailable(res.usage) ? E('div', { 'class': 'qm-col-12' }, [ this.trafficScheduleCard(res.trafficResetSchedule, res.section) ]) : null,
+				E('div', { 'class': 'qm-col-12' }, [
+					E('div', { 'class': 'qm-shortcuts' }, [
+						this.shortcut(_('移动数据'), _('APN、拨号、IP 详情与会话计数'), 'admin/modem/qmodem/connection'),
+						this.shortcut(_('射频与小区'), _('频段、小区、射频策略与诊断'), 'admin/modem/qmodem/connection/network'),
+						this.shortcut(_('模组与 SIM'), _('模组身份、SIM 信息与维护'), 'admin/modem/qmodem/system')
+					])
+				]),
+				E('div', { 'class': 'qm-col-12' }, [
+					E('div', { 'class': 'qm-glass-card' }, [
+						E('h3', { 'style': 'margin:0 0 6px;font-size:15px;font-weight:750;color:var(--qm-text)' }, _('完整模组信息')),
+						E('p', { 'style': 'margin:0 0 16px;color:var(--qm-text-muted);font-size:11px' }, _('该模组由 QModem 上报的全部字段，按类别分组展示。')),
+						E('div', { 'class': 'mt-info-grid-all' }, controls.renderInfoGrouped(res.allInfo))
+					])
+				])
+			].filter(Boolean))
 		]);
 	},
 

@@ -5,6 +5,7 @@
 'require uci';
 'require ui';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 
 /*
  * 设备参数（Settings）— 现代白色毛玻璃 (Glassmorphism) + 动态配置流 SVG 重构
@@ -89,28 +90,28 @@ return view.extend({
 			'<svg class="mt-diag-topo-svg" viewBox="0 0 540 85">',
 			'  <!-- 节点 1: UCI 配置文件 /etc/config/qmodem -->',
 			'  <g transform="translate(15, 14)">',
-			'    <rect x="0" y="0" width="135" height="54" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <rect x="14" y="15" width="24" height="24" rx="5" fill="#0072f5"/>',
-			'    <text x="46" y="26" font-size="12" font-weight="750" fill="#0f172a">UCI Config</text>',
-			'    <text x="46" y="41" font-size="10" fill="#64748b">/etc/config/qmodem</text>',
+			'    <rect x="0" y="0" width="135" height="54" rx="12" fill="var(--qm-surface-2)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <rect x="14" y="15" width="24" height="24" rx="5" fill="var(--qm-accent)"/>',
+			'    <text x="46" y="26" font-size="12" font-weight="750" fill="var(--qm-text)">UCI Config</text>',
+			'    <text x="46" y="41" font-size="10" fill="var(--qm-text-muted)">/etc/config/qmodem</text>',
 			'  </g>',
 			'  <!-- 动态同步通信总线 -->',
-			'  <line x1="150" y1="41" x2="225" y2="41" stroke="#0072f5" stroke-width="2.6" class="qm-cfg-stream"/>',
+			'  <line x1="150" y1="41" x2="225" y2="41" stroke="var(--qm-accent)" stroke-width="2.6" class="qm-cfg-stream"/>',
 			'  <!-- 节点 2: QModem 守护解析器 -->',
 			'  <g transform="translate(225, 14)">',
-			'    <rect x="0" y="0" width="135" height="54" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <circle cx="22" cy="27" r="6" fill="#10b981"/>',
-			'    <text x="36" y="26" font-size="12" font-weight="750" fill="#0f172a">QModem Parser</text>',
-			'    <text x="36" y="41" font-size="10" fill="#64748b">' + shown(section) + '</text>',
+			'    <rect x="0" y="0" width="135" height="54" rx="12" fill="var(--qm-surface-2)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <circle cx="22" cy="27" r="6" fill="var(--qm-mint)"/>',
+			'    <text x="36" y="26" font-size="12" font-weight="750" fill="var(--qm-text)">QModem Parser</text>',
+			'    <text x="36" y="41" font-size="10" fill="var(--qm-text-muted)">' + shown(section) + '</text>',
 			'  </g>',
 			'  <!-- 动态总线通道 2 -->',
-			'  <line x1="360" y1="41" x2="425" y2="41" stroke="#10b981" stroke-width="2.6" class="qm-cfg-stream" style="animation-duration:1.2s;"/>',
+			'  <line x1="360" y1="41" x2="425" y2="41" stroke="var(--qm-mint)" stroke-width="2.6" class="qm-cfg-stream" style="animation-duration:1.2s;"/>',
 			'  <!-- 节点 3: 模组设备实例与 AT 驱动 -->',
 			'  <g transform="translate(425, 14)">',
-			'    <rect x="0" y="0" width="105" height="54" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <circle cx="20" cy="27" r="6" fill="#0ea5e9"/>',
-			'    <text x="34" y="26" font-size="12" font-weight="750" fill="#0f172a">Modem Node</text>',
-			'    <text x="34" y="41" font-size="10" fill="#64748b">Active Port</text>',
+			'    <rect x="0" y="0" width="105" height="54" rx="12" fill="var(--qm-surface-2)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <circle cx="20" cy="27" r="6" fill="var(--qm-accent-2)"/>',
+			'    <text x="34" y="26" font-size="12" font-weight="750" fill="var(--qm-text)">Modem Node</text>',
+			'    <text x="34" y="41" font-size="10" fill="var(--qm-text-muted)">Active Port</text>',
 			'  </g>',
 			'</svg>'
 		].join('');
@@ -141,13 +142,15 @@ return view.extend({
 						E('h2', { 'class': 'mt-diag-title' }, _('设备参数')),
 						E('p', { 'class': 'mt-diag-sub' }, _('编辑 QModem 配置（/etc/config/qmodem）中当前模组的设备参数。'))
 					]),
-					E('span', { 'class': 'mt-diag-badge' }, [
-						E('span', { 'class': 'mt-diag-dot' }),
-						'QModem'
+					E('div', { 'style': 'display:flex;align-items:center;gap:12px' }, [
+						theme.themeToggleBtn(),
+						E('span', { 'class': 'mt-diag-badge' }, [
+							E('span', { 'class': 'mt-diag-dot' }),
+							'QModem'
+						])
 					])
 				]),
-				E('div', { 'class': 'alert-message warning' },
-					_('未检测到模组（请确认 QModem 已识别该设备）。'))
+				theme.emptyState(_('未检测到模组'), _('请确认 QModem 已接入并识别该设备，然后刷新页面重试。'))
 			].concat(warnings));
 
 		var section = res.section;
@@ -230,9 +233,12 @@ return view.extend({
 						E('h2', { 'class': 'mt-diag-title' }, _('设备参数')),
 						E('p', { 'class': 'mt-diag-sub' }, _('编辑 QModem 配置中当前模组的设备参数（配置节：%s）。').format(shown(section)))
 					]),
-					E('span', { 'class': 'mt-diag-badge' }, [
-						E('span', { 'class': 'mt-diag-dot' }),
-						_('由 QModem 管理')
+					E('div', { 'style': 'display:flex;align-items:center;gap:12px' }, [
+						theme.themeToggleBtn(),
+						E('span', { 'class': 'mt-diag-badge' }, [
+							E('span', { 'class': 'mt-diag-dot' }),
+							_('由 QModem 管理')
+						])
 					])
 				]),
 
@@ -240,7 +246,7 @@ return view.extend({
 				E('section', { 'class': 'mt-diag-card mt-diag-topo-card' }, [
 					E('div', { 'class': 'mt-diag-card-head' }, [
 						E('h3', {}, [
-							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'),
+							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'),
 							_('UCI 配置与设备节点映射拓扑')
 						]),
 						E('p', {}, _('展示 UCI 配置节、QModem 守护进程与硬件设备节点之间的同步流向。'))
@@ -252,7 +258,7 @@ return view.extend({
 				E('section', { 'class': 'mt-diag-card' }, [
 					E('div', { 'class': 'mt-diag-card-head' }, [
 						E('h3', {}, [
-							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'),
+							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'),
 							_('模组设备配置')
 						]),
 						E('p', {}, _('这些选项写入 /etc/config/qmodem 的 modem-device 配置节。除非自动识别有误，否则无需修改 AT 端口与拨号模式。'))
