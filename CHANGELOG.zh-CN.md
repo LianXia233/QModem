@@ -66,6 +66,14 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **LuCI 界面排版与视觉升级**：统一页面宽度——`status` / `network` /
+  `system` / `advanced` / `connection` / `device` 六个视图原先各自写死
+  `max-width:1160px`（`device` 是 `960px`），现统一读 theme.js 的
+  `--qm-maxw` 令牌，一处即可控制所有页面；删除 12 条 `bg-glow` 死规则
+  （theme.js 已用 `display:none!important` 屏蔽）与重复 6 次的字体栈，
+  收敛为 `--qm-font` 单一令牌并跟随 LuCI 主题的 `--font-family`。
+  theme.js 组件视觉升级：滚动列表表头吸顶、长表格斑马纹、行悬停对比度
+  加强、按钮按下态。样式段净减 1.4KB。
 - **Runner 固定为 `ubuntu-26.04`**：8 个工作流共 11 处 `runs-on` 原先都写
   `ubuntu-latest`，而它将于 2026-10-19 起迁移到 Ubuntu 26.04
   （actions/runner-images#14748），GitHub 已对每次运行弹出该警告。现已显式

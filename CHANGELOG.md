@@ -77,6 +77,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **LuCI layout + visual upgrade**: unified page width across 6 views
+  (`status` / `network` / `system` / `advanced` / `connection` / `device`
+  each hard-coded `max-width:1160px`, `device` used `960px`) — they now all
+  read `--qm-maxw` from theme.js, so one token controls every page.
+  Removed 12 dead `bg-glow` rules (theme.js already neutralizes them with
+  `display:none!important`) and the font stack duplicated 6× — it is now a
+  single `--qm-font` token following the LuCI theme's `--font-family`.
+  Upgraded theme.js components: sticky table headers in scrollable lists,
+  zebra striping, stronger row-hover contrast, and pressed states for
+  buttons. Net effect on the style sections: −1.4KB.
 - **Runners pinned to `ubuntu-26.04`**: all 11 `runs-on` entries across the 8
   workflows used `ubuntu-latest`, which migrates to Ubuntu 26.04 from
   2026-10-19 (actions/runner-images#14748) — GitHub was flagging every run
