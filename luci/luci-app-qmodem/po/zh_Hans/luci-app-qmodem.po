@@ -7863,3 +7863,195 @@ msgstr "后台任务被拒绝"
 
 msgid "Task timed out"
 msgstr "后台任务超时"
+
+msgid "Ping target to check connectivity"
+msgstr "用于检测连通性的 Ping 目标"
+
+msgid "Ping Type"
+msgstr "Ping 类型"
+
+msgid "IP Address / Domain"
+msgstr "IP 地址 / 域名"
+
+msgid "DNS Server"
+msgstr "DNS 服务器"
+
+msgid "Target IP / Domain"
+msgstr "目标 IP / 域名"
+
+msgid "IP Version"
+msgstr "IP 版本"
+
+msgid "HTTP Request"
+msgstr "HTTP 请求"
+
+msgid "HTTP request to check connectivity"
+msgstr "用于检测连通性的 HTTP 请求"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Switch SIM Slot"
+msgstr "切换 SIM 卡槽"
+
+msgid "Switch to another SIM slot"
+msgstr "切换到另一个 SIM 卡槽"
+
+msgid "Send AT Commands"
+msgstr "发送 AT 指令"
+
+msgid "Send AT commands to modem"
+msgstr "向模组发送 AT 指令"
+
+msgid "AT Commands"
+msgstr "AT 指令"
+
+msgid "Run Scripts"
+msgstr "运行脚本"
+
+msgid "Run custom scripts"
+msgstr "运行自定义脚本"
+
+msgid "Script Paths"
+msgstr "脚本路径"
+
+msgid "QModem Monitor Configuration"
+msgstr "QModem 监控配置"
+
+msgid "Configure monitoring methods and actions for modem connectivity."
+msgstr "配置模组连通性的监控方式与触发动作。"
+
+msgid "Global Monitor Settings"
+msgstr "全局监控设置"
+
+msgid "Monitor Service"
+msgstr "监控服务"
+
+msgid "Service Control"
+msgstr "服务控制"
+
+msgid "Monitor service started successfully"
+msgstr "监控服务已启动"
+
+msgid "Failed to start monitor: "
+msgstr "启动监控失败："
+
+msgid "Monitor service stopped successfully"
+msgstr "监控服务已停止"
+
+msgid "Failed to stop monitor: "
+msgstr "停止监控失败："
+
+msgid "Monitor service restarted successfully"
+msgstr "监控服务已重启"
+
+msgid "Failed to restart monitor: "
+msgstr "重启监控失败："
+
+msgid "Monitor service enabled successfully"
+msgstr "监控服务已设为开机自启"
+
+msgid "Failed to enable monitor: "
+msgstr "启用监控失败："
+
+msgid "Monitor service disabled successfully"
+msgstr "监控服务已取消开机自启"
+
+msgid "Failed to disable monitor: "
+msgstr "禁用监控失败："
+
+msgid "User Scripts Management"
+msgstr "用户脚本管理"
+
+msgid "Security Warning"
+msgstr "安全警告"
+
+msgid "User scripts run with root privileges. Only upload scripts from trusted sources. Malicious scripts can damage your system or compromise security. Review script contents before uploading."
+msgstr "用户脚本以 root 权限运行。仅上传来自可信来源的脚本；恶意脚本可能损坏系统或危害安全。上传前请检查脚本内容。"
+
+msgid "Upload Script"
+msgstr "上传脚本"
+
+msgid "Please select a file to upload"
+msgstr "请选择要上传的文件"
+
+msgid "Invalid file type. Only .sh, .py, and .lua files are allowed."
+msgstr "文件类型无效。仅允许 .sh、.py 与 .lua 文件。"
+
+msgid "Script uploaded successfully: "
+msgstr "脚本上传成功："
+
+msgid "Failed to upload script: "
+msgstr "脚本上传失败："
+
+msgid "Scripts will be uploaded to "
+msgstr "脚本将上传到"
+
+msgid ". Allowed types: .sh, .py, .lua"
+msgstr "。允许的类型：.sh、.py、.lua"
+
+msgid "Uploaded Scripts"
+msgstr "已上传脚本"
+
+msgid "No scripts uploaded yet"
+msgstr "尚未上传脚本"
+
+msgid "Are you sure you want to delete this script?"
+msgstr "确定要删除该脚本吗？"
+
+msgid "Script deleted successfully: "
+msgstr "脚本删除成功："
+
+msgid "Failed to delete script: "
+msgstr "脚本删除失败："
+
+msgid "Modem Monitor Configuration"
+msgstr "模组监控配置"
+
+msgid "Monitor Configuration"
+msgstr "监控配置"
+
+msgid "Method"
+msgstr "方式"
+
+msgid "Actions"
+msgstr "动作"
+
+msgid "Monitor Method"
+msgstr "监控方式"
+
+msgid "Gateway"
+msgstr "网关"
+
+msgid "8.8.8.8 or www.example.com"
+msgstr "8.8.8.8 或 www.example.com"
+
+msgid "Enter an IP address or domain name. Note: Using a domain name may cause false disconnection detection if DNS resolution fails."
+msgstr "请输入 IP 地址或域名。注意：使用域名时若 DNS 解析失败，可能导致误判为断线。"
+
+msgid "Check Interval (seconds)"
+msgstr "检查间隔（秒）"
+
+msgid "Failure Threshold"
+msgstr "失败阈值"
+
+msgid "Number of consecutive failures before triggering actions"
+msgstr "触发动作前允许的连续失败次数"
+
+msgid "Actions to perform when monitor threshold is reached"
+msgstr "达到监控阈值时执行的动作"
+
+msgid "AT commands to send when action is triggered"
+msgstr "触发动作时发送的 AT 指令"
+
+msgid "Scripts to execute when action is triggered. You can upload scripts in the User Scripts Management section above."
+msgstr "触发动作时执行的脚本。可在上方的「用户脚本管理」中上传脚本。"
+
+msgid "Network Monitor"
+msgstr "网络监控"
+
+msgid "Statistics"
+msgstr "统计"
+
+msgid "Network Monitor Configuration"
+msgstr "网络监控配置"

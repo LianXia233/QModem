@@ -133,6 +133,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **"Network Monitor" page and title untranslated**: 61 strings on the monitor
+  page had no Chinese translation (some were not even wrapped in `_()`), and the
+  menu title `Network Monitor` had no po entry at all. 17 hard-coded English
+  literals are now wrapped in `_()` (placeholders, sample values and AT command
+  examples untouched) and 64 po entries were added (13 in the template). `URL` is
+  intentionally kept as-is per terminology rules.
 - **Hero text unreadable on light-primary themes**: the hero gradient ended in
   the raw theme primary (`color-mix(primary 72%,#060b14) → var(--qm-accent)`, same
   in the dark fallback) while hero text is forced white. With a light primary

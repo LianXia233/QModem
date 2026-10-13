@@ -6391,3 +6391,42 @@ msgstr ""
 #: view/qmodem/network.js:240
 msgid "高通调制解调器接口（QMI）"
 msgstr ""
+
+msgid "Ping target to check connectivity"
+msgstr ""
+
+msgid "HTTP Request"
+msgstr ""
+
+msgid "HTTP request to check connectivity"
+msgstr ""
+
+msgid "Switch SIM Slot"
+msgstr ""
+
+msgid "Switch to another SIM slot"
+msgstr ""
+
+msgid "Send AT Commands"
+msgstr ""
+
+msgid "Send AT commands to modem"
+msgstr ""
+
+msgid "Run Scripts"
+msgstr ""
+
+msgid "Run custom scripts"
+msgstr ""
+
+msgid "8.8.8.8 or www.example.com"
+msgstr ""
+
+msgid "Network Monitor"
+msgstr ""
+
+msgid "Statistics"
+msgstr ""
+
+msgid "Network Monitor Configuration"
+msgstr ""

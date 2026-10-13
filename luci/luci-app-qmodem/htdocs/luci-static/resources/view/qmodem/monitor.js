@@ -39,25 +39,25 @@ function listUserScripts() {
 var monitorMethods = {
 	'ping': {
 		name: 'Ping',
-		description: 'Ping target to check connectivity',
+		description: _('Ping target to check connectivity'),
 		params: {
 			'monitor_ping_type': {
-				title: 'Ping Type',
+				title: _('Ping Type'),
 				type: 'select',
 				values: {
-					'ip': 'IP Address / Domain',
+					'ip': _('IP Address / Domain'),
 					'gateway': 'Gateway',
-					'dns': 'DNS Server'
+					'dns': _('DNS Server')
 				},
 				default: 'gateway'
 			},
 			'monitor_ping_dest': {
-				title: 'Target IP / Domain',
+				title: _('Target IP / Domain'),
 				type: 'string',
 				placeholder: '8.8.8.8'
 			},
 			'monitor_ping_ip_version': {
-				title: 'IP Version',
+				title: _('IP Version'),
 				type: 'select',
 				values: { '4': 'IPv4', '6': 'IPv6' },
 				default: '4'
@@ -65,11 +65,11 @@ var monitorMethods = {
 		}
 	},
 	'curl': {
-		name: 'HTTP Request',
-		description: 'HTTP request to check connectivity',
+		name: _('HTTP Request'),
+		description: _('HTTP request to check connectivity'),
 		params: {
 			'monitor_http_url': {
-				title: 'URL',
+				title: _('URL'),
 				type: 'string',
 				placeholder: 'http://www.example.com',
 				default: 'http://www.baidu.com'
@@ -81,27 +81,27 @@ var monitorMethods = {
 // Action definitions with their specific parameters
 var actionTypes = {
 	'switch_sim_slot': {
-		name: 'Switch SIM Slot',
-		description: 'Switch to another SIM slot',
+		name: _('Switch SIM Slot'),
+		description: _('Switch to another SIM slot'),
 		params: {}
 	},
 	'send_at_commands': {
-		name: 'Send AT Commands',
-		description: 'Send AT commands to modem',
+		name: _('Send AT Commands'),
+		description: _('Send AT commands to modem'),
 		params: {
 			'at_command': {
-				title: 'AT Commands',
+				title: _('AT Commands'),
 				type: 'list',
 				placeholder: 'AT+CFUN=1,1'
 			}
 		}
 	},
 	'run_scripts': {
-		name: 'Run Scripts',
-		description: 'Run custom scripts',
+		name: _('Run Scripts'),
+		description: _('Run custom scripts'),
 		params: {
 			'script': {
-				title: 'Script Paths',
+				title: _('Script Paths'),
 				type: 'list',
 				placeholder: '/usr/bin/my_script.sh'
 			}
@@ -475,7 +475,7 @@ return view.extend({
 		// monitor_ping_dest: Target for IP type (IP address or domain name)
 		o = s.option(form.Value, 'monitor_ping_dest', _('Target IP / Domain'));
 		o.modalonly = true;
-		o.placeholder = '8.8.8.8 or www.example.com';
+		o.placeholder = _('8.8.8.8 or www.example.com');
 		o.description = _('Enter an IP address or domain name. Note: Using a domain name may cause false disconnection detection if DNS resolution fails.');
 		o.depends({ 'monitor_method': 'ping', 'monitor_ping_type': 'ip' });
 
