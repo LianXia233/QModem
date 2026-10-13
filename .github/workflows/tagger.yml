@@ -9,7 +9,6 @@ on:
   push:
     branches:
       - main
-      - stable
     paths:
       - 'version.mk'
   workflow_dispatch:
@@ -23,7 +22,6 @@ jobs:
     name: 自动生成版本标签
     runs-on: ubuntu-latest
     # 轻量作业：只判断版本号并打标签，不做任何编译（编译由 tag 触发的 main.yml 负责）
-    # main owns pre-release tags; stable owns final release tags.
     # 由 paths 过滤保证只在 version.mk 变更时触发；手动触发时也允许运行
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
@@ -60,9 +58,10 @@ jobs:
           exit 1
         fi
 
+        # stable 分支已删除：main 上同时接受正式版（x.y.z）与预发布版（x.y.z-rcN）
         case "${GITHUB_REF#refs/heads/}:$version" in
           main:*[_-][0-9a-zA-Z]*) ;;
-          stable:[0-9]*.[0-9]*.[0-9]*) ;;
+          main:[0-9]*.[0-9]*.[0-9]*) ;;
           *)
             echo "QMODEM_VERSION does not match its release branch: ${GITHUB_REF#refs/heads/}:$version" >&2
             exit 1
