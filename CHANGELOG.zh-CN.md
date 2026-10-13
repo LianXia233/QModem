@@ -108,6 +108,10 @@
   `qmodem`，落盘路径不变。
 
 ### 修复（Fixed）
+- **LuCI 页面白屏 / "factory yields invalid constructor"**：`qmodem/compat.js`
+  是纯副作用模块，结尾 `return {}`，而 LuCI 的 `require()` 会校验工厂返回值是
+  合法 class（luci.js：`if (!Class.isSubclass(_class))`），普通对象直接触发该报错，
+  所有依赖它的视图停在 Loading view。改为 `return L.Class.extend({})`。
 - **`mmips`（mipsel）构建因 Rust 目标三元组为空而失败**：MIPS 平台的 `$(ARCH)` 是
   `mipsel_24kc`（必须带 ISA 后缀），精确匹配的 `ifeq ($(ARCH),mipsel)` 永远不成立，
   `Build/CompileRust` 在 cargo 启动前就中止（且诊断被 OpenWrt 吞掉）。三元组推导改为

@@ -124,6 +124,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **LuCI views stuck at "Loading view" with `factory yields invalid constructor`**:
+  `qmodem/compat.js` is a side-effect-only module that ended with `return {}`, but
+  LuCI's `require()` validates the factory result as a class
+  (`luci.js`: `if (!Class.isSubclass(_class))`). Plain objects trip that check and
+  every view requiring the module failed to load. It now returns
+  `L.Class.extend({})`.
 - **`mmips` (mipsel) builds failed with an empty Rust target triple**: `$(ARCH)` on
   MIPS platforms is `mipsel_24kc` (CPU/ISA suffix mandatory), so the exact-match
   `ifeq ($(ARCH),mipsel)` never fired and `Build/CompileRust` aborted before cargo

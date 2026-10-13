@@ -118,4 +118,11 @@
 	}
 })();
 
-return {};
+/*
+ * LuCI 的 require() 会把模块体编译成工厂函数，并校验返回值是合法 class
+ * （luci.js: `if (!Class.isSubclass(_class))` → "factory yields invalid
+ * constructor"）。本模块只做副作用注入，也必须返回一个空 class，不能返回
+ * 普通对象（`return {}` 会直接触发上面的报错，整个页面停在 Loading view）。
+ * 工厂作用域里 L 可用（工厂签名 function(window, document, L, ...)）。
+ */
+return L.Class.extend({});
