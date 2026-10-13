@@ -33,15 +33,19 @@ STAGING_DIR="${STAGING_DIR:-}"
 # tier 3 的 mips/mipsel 需要 nightly 与 rust-src；其余用稳定版。
 # 注意：tier 3 目标在 rustup 里没有可下载的 std，`rustup target add` 会直接
 # 报错，因此只在 tier 2 分支执行 target add；tier 3 的 std 由 build-std 现编。
+# build-std 里列出 panic_abort 时，必须同时给 -C panic=abort，否则
+# panic 运行时与 profile 的 unwind 策略不一致，编译 std 时即报错。
 case "$RUST_TARGET_TRIPLE" in
 	mips-unknown-linux-musl | mipsel-unknown-linux-musl)
 		TOOLCHAIN=nightly
 		STD_FLAGS="-Zbuild-std=std,panic_abort"
+		EXTRA_RUSTFLAGS="-C panic=abort"
 		rustup component add rust-src --toolchain nightly >&2
 		;;
 	*)
 		TOOLCHAIN=stable
 		STD_FLAGS=""
+		EXTRA_RUSTFLAGS=""
 		rustup target add "$RUST_TARGET_TRIPLE" --toolchain stable >&2
 		;;
 esac
@@ -58,17 +62,26 @@ AR="${LINKER%gcc}ar"
 # -L $(STAGING_DIR)/usr/lib 动态链接（届时另设 RUSTFLAGS，见 Makefile 注释）。
 eval "export CARGO_TARGET_${UP}_LINKER=\"\$LINKER\""
 [ -n "$AR" ] && eval "export CARGO_TARGET_${UP}_AR=\"\$AR\""
-eval "export CARGO_TARGET_${UP}_RUSTFLAGS=\"-C target-feature=+crt-static\""
+eval "export CARGO_TARGET_${UP}_RUSTFLAGS=\"-C target-feature=+crt-static $EXTRA_RUSTFLAGS\""
 
 echo "==> rust toolchain: $TOOLCHAIN / target: $RUST_TARGET_TRIPLE"
 echo "==> linker: $LINKER"
 
-# shellcheck disable=SC2086
-( cd "$RUST_DIR" && \
-	cargo +"$TOOLCHAIN" build --release --target "$RUST_TARGET_TRIPLE" \
-		$STD_FLAGS -p qmodem-atd )
-
 mkdir -p "$OUT_DIR"
+LOG="$OUT_DIR/cargo-build.log"
+# OpenWrt 默认详细度不会透出 Build/Compile 的输出，cargo 的报错会被
+# 「failed to build」一行盖掉；因此把输出落盘，失败时原样倒给 stderr。
+# shellcheck disable=SC2086
+if ( cd "$RUST_DIR" && \
+	cargo +"$TOOLCHAIN" build --release --target "$RUST_TARGET_TRIPLE" \
+		$STD_FLAGS -p qmodem-atd ) >"$LOG" 2>&1; then
+	echo "==> cargo build OK"
+else
+	echo "!! cargo build failed, log follows" >&2
+	cat "$LOG" >&2
+	exit 1
+fi
+
 cp "$RUST_DIR/target/$RUST_TARGET_TRIPLE/release/qmodem-atd" "$OUT_DIR/qmodem-atd"
 
 echo "==> built:"
