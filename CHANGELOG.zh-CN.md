@@ -59,6 +59,12 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **CI 构建矩阵收敛为 arm64**：`main.yml` 现在只构建 `arm64_ipk` / `arm64_apk` /
+  `arm64_apk_immortalwrt`，`mmips_*`（mipsel）与 `x64_*` 移出矩阵。mipsel musl
+  是 Rust tier-3 目标，需要 nightly + `-Z build-std`，其 std 链接步骤在 OpenWrt
+  SDK 交叉 gcc 下无法解析 musl 启动文件与 `-lunwind`（详见
+  `application/qmodem/build-rust.sh` 注释）；tier 3 路径保留实现，待链接链路
+  打通后再加回。
 - **前端统一（视觉 / 组件 / 数据三层）**：`luci-app-qmodem-generic` 的 LuCI 适配整体
   移植进 `luci-app-qmodem`，原 `luci-app-qmodem-next` 的 10 个业务视图改接统一入口
   `qmodem.controls`，不再各自维护样式层与私有组件层。统一后对外导出 110 项，覆盖

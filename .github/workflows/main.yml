@@ -206,7 +206,12 @@ jobs:
     if: ${{ always() && needs.job_prepare.result == 'success' }}
     strategy:
       matrix:
-        build_arch: ['arm64_ipk',"arm64_apk","arm64_apk_immortalwrt","x64_apk","x64_ipk","mmips_ipk","mmips_apk" ]
+        # 当前只产出 arm64（tier 2，rustup 有预编译 std，稳定版工具链即可）。
+        # mipsel 目标（mmips_*）已移出矩阵：它是 tier 3，需要 nightly +
+        # -Z build-std，std 链接阶段在 OpenWrt SDK 的交叉 gcc 上无法解析
+        # musl 启动文件/-lunwind（详见 CHANGELOG 与 build-rust.sh 注释），
+        # 待该链接链路打通后再加回。
+        build_arch: ['arm64_ipk',"arm64_apk","arm64_apk_immortalwrt"]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:

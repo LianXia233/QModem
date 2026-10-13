@@ -68,6 +68,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **CI build matrix narrowed to arm64**: `main.yml` now builds `arm64_ipk` /
+  `arm64_apk` / `arm64_apk_immortalwrt` only. The `mmips_*` (mipsel) and `x64_*`
+  targets were removed from the matrix. mipsel musl is a Rust tier-3 target that
+  needs nightly + `-Z build-std`, and its std link step cannot resolve the musl
+  startfiles / `-lunwind` through the OpenWrt SDK cross gcc (see the comments in
+  `application/qmodem/build-rust.sh`); the tier-3 path remains implemented and is
+  re-enabled once that link chain is fixed.
 - **Unified frontend (visual / component / data layers)**: the LuCI adaptation from
   `luci-app-qmodem-generic` was ported wholesale into `luci-app-qmodem`, and the ten
   business views of `luci-app-qmodem-next` now go through the single entry point
