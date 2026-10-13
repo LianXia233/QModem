@@ -72,12 +72,23 @@ if [ "$TOOLCHAIN" = nightly ]; then
 	echo "==> probe: $LINKER -print-sysroot = $("$LINKER" -print-sysroot 2>/dev/null || true)" >&2
 	echo "==> probe: crt1.o = $("$LINKER" -print-file-name=crt1.o 2>/dev/null || true)" >&2
 
-	XSYSROOT=$("$LINKER" -print-sysroot 2>/dev/null | tail -1)
-	case "$XSYSROOT" in
-		/*) if [ -d "$XSYSROOT" ]; then
-			EXTRA_RUSTFLAGS="$EXTRA_RUSTFLAGS -C link-arg=--sysroot=$XSYSROOT"
-			echo "==> fix A: link-arg --sysroot=$XSYSROOT" >&2
-		fi ;;
+	# OpenWrt 交叉 gcc 不配置 --sysroot（-print-sysroot 为空），启动文件按
+	# 可执行文件相对前缀解析（<tc>/lib/gcc/<target>/<ver>/../../../../
+	# <target>/lib/crt1.o）。rustc 会把 nightly sysroot 以 --sysroot 传给
+	# 链接驱动，覆盖掉该解析 → gcc 把裸文件名透传给 ld → cannot find。
+	# 从 crt1.o 探针路径反推 <tc>/<target>/ 作为 sysroot，追加为最后一个
+	# --sysroot（gcc 取最后一个生效），恢复启动文件与 libc 解析。
+	CRT1=$("$LINKER" -print-file-name=crt1.o 2>/dev/null | tail -1)
+	case "$CRT1" in
+		*/crt1.o)
+			if [ -f "$CRT1" ]; then
+				XSYSROOT=$(cd "$(dirname "$CRT1")/.." && pwd)
+				EXTRA_RUSTFLAGS="$EXTRA_RUSTFLAGS -C link-arg=--sysroot=$XSYSROOT"
+				echo "==> fix A: link-arg --sysroot=$XSYSROOT" >&2
+			else
+				echo "!! fix A skipped: probe crt1.o not a real file: $CRT1" >&2
+			fi ;;
+		*) echo "!! fix A skipped: cannot locate crt1.o via $LINKER" >&2 ;;
 	esac
 
 	UNWIND_DIR="$OUT_DIR/fake-unwind"
@@ -99,6 +110,9 @@ eval "export CARGO_TARGET_${UP}_RUSTFLAGS=\"-C target-feature=+crt-static $EXTRA
 
 echo "==> rust toolchain: $TOOLCHAIN / target: $RUST_TARGET_TRIPLE"
 echo "==> linker: $LINKER"
+# nightly（build-std）分支默认开 -v：rustc 会完整回显链接命令，排查
+# sysroot / 启动文件问题必需；tier 2 保持安静。
+[ "$TOOLCHAIN" = nightly ] && CARGO_VERBOSE="-v" || CARGO_VERBOSE=""
 
 mkdir -p "$OUT_DIR"
 LOG="$OUT_DIR/cargo-build.log"
@@ -106,7 +120,7 @@ LOG="$OUT_DIR/cargo-build.log"
 # 「failed to build」一行盖掉；因此把输出落盘，失败时原样倒给 stderr。
 # shellcheck disable=SC2086
 if ( cd "$RUST_DIR" && \
-	cargo +"$TOOLCHAIN" build --release --target "$RUST_TARGET_TRIPLE" \
+	cargo +"$TOOLCHAIN" build $CARGO_VERBOSE --release --target "$RUST_TARGET_TRIPLE" \
 		$STD_FLAGS -p qmodem-atd ) >"$LOG" 2>&1; then
 	echo "==> cargo build OK"
 else
