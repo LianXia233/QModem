@@ -151,7 +151,7 @@ fixtures) and reports each gap individually.
 - [ ] recognition fixtures committed with correct `expected_identity` (replay passes)
 - [ ] `scripts/check_modem_registry.py` exits 0
 - [ ] `docs/support_list.md` updated (script-generated)
-- [ ] CI (quality.yml / vendor-fixtures.yml) green; hardware validation level stated
+- [ ] CI (ci.yml) green; hardware validation level stated
 
 Run `git diff --check` before submitting to catch CRLF/trailing whitespace
 (this repo is LF-only).

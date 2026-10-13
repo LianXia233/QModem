@@ -91,7 +91,7 @@ checked out directly:
 
 - Data files: `modem_support.json`, `modem_port_rule.json`, `at_commands_en/zh.json`
   (after merging, run `scripts/update_support_list.py` to verify consistency with
-  `docs/support_list.md`, see `.github/workflows/commit_check_supportlist.yaml`).
+  `docs/support_list.md`, see `.github/workflows/support-list.yml`).
 - Independent vendored components: `application/qfirehose/` (license forbids local
   modification; security fixes follow ADR 0001 Decision 7 via upstream patch tracking, no
   local deep changes), `application/qmodem/src/quectel_CM_5G_M/`, `application/ndisc6/`,
@@ -134,7 +134,7 @@ against interface drift between upstream files and the refactored surface.
    legacy-style pipelines directly.
 3. **Feature gating**: complete or disable features via the `get_disabled_features` case in
    `modem_ctrl.sh`.
-4. **Validation**: gated by `commit_check_supportlist.yaml` (JSON validity +
+4. **Validation**: gated by `support-list.yml` (JSON validity +
    `docs/support_list.md` diff) and `scripts/update_support_list.py`; the planned
    `check_modem_registry` should replace the manual part of this check.
 5. **Fixtures**: when hardware is available, add AT fixtures per `testcases/README.md` and

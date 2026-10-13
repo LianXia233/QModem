@@ -1,0 +1,189 @@
+name: CI
+
+# 说明：本文件由 quality.yml + vendor-fixtures.yml + rust-build.yml 合并而来，
+# 只保留质量门禁与 Rust 交叉编译校验；发布链（main.yml / release.yml / tagger.yml）
+# 保持独立，互不影响。
+#
+# 三处重复已在合并时消除：
+#   1) shell 语法检查只由 check_all.sh 跑一遍（原先 vendor-fixtures 又跑一次 --only shell）；
+#   2) cargo test --workspace + clippy 只由 check_all.sh 的 rust stage 跑一遍
+#      （原先 rust-build.yml 的 test job 与之完全重叠）；
+#   3) js 单测（test_sms_service.js）由 check_all.sh 的 js-test stage 跑一遍
+#      （原先 vendor-fixtures 又单独 node 调一次）。
+# 被删工作流的历史引用不改写，见 docs/refactor/journal-*.md。
+
+on:
+  push:
+    paths:
+      - 'application/**'
+      - 'luci/**'
+      - 'rust/**'
+      - 'driver/**'
+      - 'testcases/**'
+      - 'scripts/check_all.sh'
+      - 'scripts/check_modem_registry.py'
+      - 'scripts/import_testcases.sh'
+      - 'scripts/cross-build-rust.sh'
+      - 'docs/support_list.md'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'application/**'
+      - 'luci/**'
+      - 'rust/**'
+      - 'driver/**'
+      - 'testcases/**'
+      - 'scripts/check_all.sh'
+      - 'scripts/check_modem_registry.py'
+      - 'scripts/import_testcases.sh'
+      - 'scripts/cross-build-rust.sh'
+      - 'docs/support_list.md'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: 质量门禁
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+
+      - name: Setup Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      # 尽力而为：lua 语法检查失败不阻塞门禁
+      - name: Install lua5.1 (best effort)
+        continue-on-error: true
+        run: sudo apt-get update && sudo apt-get install -y lua5.1
+
+      # 一站式门禁：shell / node / js-test / rust(cargo test + clippy) / c / crlf
+      - name: Run check_all.sh
+        run: bash scripts/check_all.sh
+
+      # shell 回归测试套件（存在才跑；退出码 0 = 通过，含 SKIP）
+      - name: Run shell regression tests
+        if: hashFiles('tests/sh/run_tests.sh') != ''
+        run: bash tests/sh/run_tests.sh
+
+      # 模组注册一致性门禁（存在才跑）：核对 modem_support.json / support_list.md /
+      # vendor 函数 / recognition fixture 三处登记齐全。
+      # 当前为 --baseline 模式：存量 vendor 函数缺口只报告不 FAIL，
+      # 转严格方法见 docs/refactor/modem-registry-baseline.md（移除 --baseline 即严格，退出码 0/1）。
+      - name: modem-registry consistency gate
+        if: hashFiles('scripts/check_modem_registry.py') != ''
+        run: python3 scripts/check_modem_registry.py --baseline
+
+      # 反馈包加密（qmodem-seal）与 vendor 回放测试共用该二进制，先编一次
+      - name: Build qmodem-seal
+        run: |
+          set -e
+          sudo apt-get install -y libsodium-dev
+          gcc -std=c11 -O2 -Wall -Wextra -Werror \
+            -o /tmp/qmodem-seal application/qmodem/src/qmodem-seal/qmodem-seal.c -lsodium
+
+      - name: Enforce command boundary
+        run: |
+          application/qmodem/tests/test_vendor_cmds_boundary.sh
+          application/qmodem/tests/test_core_cmds.sh
+          application/qmodem/tests/test_sms_forwarder_conflicts.sh
+          application/qmodem/tests/test_sms_transport_modes.sh
+          application/qmodem/tests/test_fixture_collection_bytes.sh
+          application/qmodem/tests/test_recognition_collection.sh
+          application/qmodem/tests/test_recognition_fixtures.sh
+          application/qmodem/tests/test_fixture_profiles.sh
+          QMODEM_TEST_SEAL_BIN=/tmp/qmodem-seal \
+            application/qmodem/tests/test_collect_encryption.sh
+
+      - name: Replay vendor fixtures
+        run: application/qmodem/tests/test_vendor_fixtures.sh
+
+      # markdownlint 可选检查：文档告警不阻塞门禁
+      - name: markdownlint (optional)
+        continue-on-error: true
+        run: |
+          npx --yes markdownlint-cli \
+            '*.md' 'docs/**/*.md' \
+            --ignore 'node_modules'
+
+      # 体积门禁占位：上传 rust release 二进制清单供人工核对体积，不设硬阈值
+      - name: Upload rust binary size listing
+        if: hashFiles('rust/Cargo.toml') != ''
+        run: |
+          cd rust
+          cargo build --release --workspace || true
+          ls -l target/release/ | tee ../rust-binary-size.txt
+      - uses: actions/upload-artifact@v7
+        if: hashFiles('rust/Cargo.toml') != ''
+        with:
+          name: rust-binary-size
+          path: rust-binary-size.txt
+          if-no-files-found: ignore
+
+  cross-build:
+    name: cross build (${{ matrix.target }})
+    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-musl
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install musl-tools
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Setup Rust stable (${{ matrix.target }})
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      # 产出 aarch64/x86_64 musl 静态二进制，供 SDK 源码构建不可行时的
+      # 预编译注入路线使用（见 rust/README.md）。该产物不属于 Release 资产，
+      # 失败也不阻塞合并与发版（main.yml 的 SDK 构建自会重编），故允许失败。
+      - name: Cross build via scripts/cross-build-rust.sh
+        continue-on-error: true
+        run: bash scripts/cross-build-rust.sh --target ${{ matrix.target }}
+
+      - name: Collect binaries + sha256
+        id: collect
+        run: |
+          set -e
+          # cross-build-rust.sh 产物约定：scripts/dist/<target>/；兼容回退 rust/target/<target>/release/
+          dir="scripts/dist/${{ matrix.target }}"
+          [ -d "$dir" ] || dir="rust/target/${{ matrix.target }}/release"
+          out="dist/${{ matrix.target }}"
+          mkdir -p "$out"
+          if [ -d "$dir" ]; then
+            for f in "$dir"/*; do
+              [ -f "$f" ] || continue
+              if [ -x "$f" ] && file "$f" | grep -q 'ELF'; then
+                cp "$f" "$out/"
+              fi
+            done
+          fi
+          if [ -n "$(ls -A "$out" 2>/dev/null)" ]; then
+            (cd "$out" && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+            echo "has_bins=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_bins=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload artifacts
+        if: steps.collect.outputs.has_bins == '1'
+        uses: actions/upload-artifact@v7
+        with:
+          name: rust-binaries-${{ matrix.target }}
+          path: dist/${{ matrix.target }}/
+          if-no-files-found: error

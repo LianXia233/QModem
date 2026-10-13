@@ -33,7 +33,7 @@ application/qmodem/tests/test_fixture_profiles.sh
 application/qmodem/tests/test_vendor_fixtures.sh
 ```
 
-反馈包加密测试需要先构建 `qmodem-seal`，具体命令以 `.github/workflows/vendor-fixtures.yml` 为准。
+反馈包加密测试需要先构建 `qmodem-seal`，具体命令以 `.github/workflows/ci.yml` 为准。
 
 通用提交检查：
 

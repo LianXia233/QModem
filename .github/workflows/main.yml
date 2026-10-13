@@ -36,7 +36,7 @@ concurrency:
 jobs:
   job_prepare:
     name: 准备发布元数据
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       branch_name: ${{ steps.determine_push.outputs.branch_name }}
       tag_name: ${{ steps.determine_push.outputs.tag_name }}
@@ -122,7 +122,7 @@ jobs:
         # musl 启动文件/-lunwind（详见 CHANGELOG 与 build-rust.sh 注释），
         # 待该链接链路打通后再加回。
         build_arch: ['arm64_ipk',"arm64_apk","arm64_apk_immortalwrt"]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 45
     steps:
       - name: 安装编译依赖
@@ -328,7 +328,7 @@ jobs:
   job_release_artifacts:
     name: 发布产物
     needs: [job_build_qmodem, job_prepare]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # 发布只在 tag 推送时进行（tag 可能来自 tagger.yml 的自动打标签，也可能是人工推送）。
     if: ${{ always() && needs.job_prepare.result == 'success' && needs.job_build_qmodem.result == 'success' && needs.job_prepare.outputs.push_type == 'tag' }}
     steps:

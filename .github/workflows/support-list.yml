@@ -1,0 +1,78 @@
+name: Support List
+
+# 说明：本文件由 commit_check_supportlist.yaml + pr_check_supportlist.yaml 合并而来。
+# 两个旧工作流的校验逻辑（JSON 合法性 + docs/support_list.md 差异）本就一致，
+# 区别只在推送后自动提交文档、PR 时改发评论。合并后同一个脚本只维护一份。
+
+on:
+  push:
+    branches:
+      - main
+    # 仅当模组支持列表被改动时触发
+    paths:
+      - 'application/qmodem/files/usr/share/qmodem/modem_support.json'
+      - '.github/workflows/support-list.yml'
+  pull_request:
+    paths:
+      - 'application/qmodem/files/usr/share/qmodem/modem_support.json'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  sync-support-list:
+    name: 同步 / 校验支持列表
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # PR 场景需要 base 分支做差异对比
+          fetch-depth: 0
+
+      # 推送到 main：重新生成 support_list.md，有差异则自动提交
+      - name: Update docs/support_list.md
+        if: github.event_name == 'push'
+        run: |
+          set -eu
+          python3 ./scripts/update_support_list.py temp_support_list \
+            ./application/qmodem/files/usr/share/qmodem/modem_support.json
+          if ! diff ./temp_support_list.md ./docs/support_list.md >/dev/null; then
+            mv temp_support_list.md ./docs/support_list.md
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add ./docs/support_list.md
+            git commit -m "chore: update support list [skip ci]"
+            git push origin "${{ github.ref_name }}"
+          fi
+
+      # PR：对比 base 分支的 support_list.md，把差异作为评论贴回 PR；
+      # JSON 非法则评论并关闭 PR。
+      - name: Check PR support list
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          if ! python3 ./scripts/update_support_list.py temp_support_list \
+              ./application/qmodem/files/usr/share/qmodem/modem_support.json; then
+            gh pr comment "${{ github.event.pull_request.number }}" \
+              --body "模组支持列表 JSON 非法，本 PR 已自动关闭，请修复后再提。"
+            gh pr close "${{ github.event.pull_request.number }}"
+            exit 0
+          fi
+          body_file="$(mktemp)"
+          {
+            echo '```diff'
+            diff -u ./docs/support_list.md ./temp_support_list.md || true
+            echo '```'
+          } > "$body_file"
+          if ! diff -q ./docs/support_list.md ./temp_support_list.md >/dev/null; then
+            echo "" >> "$body_file"
+            echo "支持列表有更新，请检查上述差异并同步提交 \`docs/support_list.md\`。" >> "$body_file"
+          fi
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file "$body_file"

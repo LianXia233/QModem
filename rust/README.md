@@ -90,7 +90,7 @@ bash scripts/cross-build-rust.sh
    （`$(TARGET_CC)`），保证与目标 sysroot 的 musl 配置及后续 libubus 等库的
    ABI 一致；mipsel 为 Rust tier 3（std 可用但无预编译），由脚本切到
    nightly + `-Z build-std=std,panic_abort`；
-2. **预编译注入（备用）**：CI（`.github/workflows/rust-build.yml`）按 target
+2. **预编译注入（备用）**：CI（`.github/workflows/ci.yml`）按 target
    产出静态二进制 artifact，按 ARCH 注入。仅当 SDK 内构建不可行时再启用。
 
 注意：mipsel 构建需要 CI 预装 nightly + rust-src（`main.yml` 已按矩阵变体处理）。
