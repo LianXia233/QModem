@@ -3,6 +3,7 @@
 'require qmodem.compat';
 'require ui';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 
 /*
  * 模组与 SIM（Module & SIM）— 现代白色毛玻璃 (Glassmorphism) + 动态 SVG 芯片拓扑重构
@@ -151,34 +152,34 @@ return view.extend({
 	/* 动态 SVG 模组 SoC 与 SIM 物理拓扑链路 */
 	renderSvgChipTopo: function(slot, slotSupported, simOk) {
 		var activeSlot = slot !== '' ? slot : '0';
-		var simColor = simOk ? '#10b981' : '#f59e0b';
+		var simColor = simOk ? 'var(--qm-ok)' : 'var(--qm-warn)';
 		var simText = simOk ? _('SIM 在位 · 就绪') : _('SIM 异常 / 未就绪');
 
 		var svgStr = [
 			'<svg class="mt-sys-topo-svg" viewBox="0 0 540 86">',
 			'  <!-- 节点 1: 蜂窝通信基带芯片 (Modem SoC) -->',
 			'  <g transform="translate(20, 14)">',
-			'    <rect x="0" y="0" width="130" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <rect x="14" y="16" width="24" height="24" rx="5" fill="#0072f5" class="qm-chip-glow"/>',
-			'    <text x="46" y="27" font-size="12" font-weight="750" fill="#0f172a">基带 SoC</text>',
-			'    <text x="46" y="42" font-size="10" fill="#64748b">射频核心 RF</text>',
+			'    <rect x="0" y="0" width="130" height="56" rx="12" fill="var(--qm-surface-sub)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <rect x="14" y="16" width="24" height="24" rx="5" fill="var(--qm-accent)" class="qm-chip-glow"/>',
+			'    <text x="46" y="27" font-size="12" font-weight="750" fill="var(--qm-text)">基带 SoC</text>',
+			'    <text x="46" y="42" font-size="10" fill="var(--qm-text-muted)">射频核心 RF</text>',
 			'  </g>',
 			'  <!-- 通信总线链路 -->',
-			'  <line x1="150" y1="42" x2="225" y2="42" stroke="#0072f5" stroke-width="2.4" stroke-dasharray="6,4" class="qm-stream-line"/>',
+			'  <line x1="150" y1="42" x2="225" y2="42" stroke="var(--qm-accent)" stroke-width="2.4" stroke-dasharray="6,4" class="qm-stream-line"/>',
 			'  <!-- 节点 2: 卡槽复用切换开关 (SIM Multiplexer) -->',
 			'  <g transform="translate(225, 14)">',
-			'    <rect x="0" y="0" width="115" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <circle cx="22" cy="28" r="5.5" fill="#0072f5"/>',
-			'    <text x="36" y="27" font-size="12" font-weight="750" fill="#0f172a">SIM 切换开关</text>',
-			'    <text x="36" y="42" font-size="10" fill="#64748b">' + (slotSupported ? _('支持双槽切换') : _('单卡槽架构')) + '</text>',
+			'    <rect x="0" y="0" width="115" height="56" rx="12" fill="var(--qm-surface-sub)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <circle cx="22" cy="28" r="5.5" fill="var(--qm-accent)"/>',
+			'    <text x="36" y="27" font-size="12" font-weight="750" fill="var(--qm-text)">SIM 切换开关</text>',
+			'    <text x="36" y="42" font-size="10" fill="var(--qm-text-muted)">' + (slotSupported ? _('支持双槽切换') : _('单卡槽架构')) + '</text>',
 			'  </g>',
 			'  <!-- 通信链路到活动卡槽 -->',
 			'  <line x1="340" y1="42" x2="400" y2="42" stroke="' + simColor + '" stroke-width="2.4" stroke-linecap="round"/>',
 			'  <!-- 节点 3: 活动 SIM 卡槽 -->',
 			'  <g transform="translate(400, 14)">',
-			'    <rect x="0" y="0" width="125" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
+			'    <rect x="0" y="0" width="125" height="56" rx="12" fill="var(--qm-surface-sub)" stroke="var(--qm-border)" stroke-width="1.6"/>',
 			'    <circle cx="20" cy="28" r="5.5" fill="' + simColor + '"/>',
-			'    <text x="34" y="27" font-size="12" font-weight="750" fill="#0f172a">' + _('SIM 卡槽 %s').format(activeSlot) + '</text>',
+			'    <text x="34" y="27" font-size="12" font-weight="750" fill="var(--qm-text)">' + _('SIM 卡槽 %s').format(activeSlot) + '</text>',
 			'    <text x="34" y="42" font-size="10" fill="' + simColor + '">' + simText + '</text>',
 			'  </g>',
 			'</svg>'
@@ -333,12 +334,18 @@ return view.extend({
 	paintContent: function(res) {
 		var self = this;
 		res = res || {};
+		theme.apply();
 
 		if (!res.section) {
 			return E('div', { 'class': 'mt-system' }, [
 				this.styleNode(), controls.styleNode(),
-				E('div', { 'class': 'mt-system-card', 'style': 'color:var(--qm-danger);background:var(--qm-danger-soft)' },
-					_('未检测到模组（请确认 QModem 已识别该设备）。')),
+				theme.emptyState({
+					title: _('未检测到模组'),
+					desc: _('QModem 尚未识别到可用的模组设备，请确认硬件接口已正确连接并被系统识别。'),
+					mascotMood: 'pout',
+					actionText: _('刷新页面'),
+					onAction: function() { window.location.reload(); }
+				}),
 				(res.errors || []).length ? E('div', { 'class': 'mt-system-card', 'style': 'margin-top:10px;color:var(--qm-danger)' }, (res.errors || []).join(' / ')) : null
 			]);
 		}
@@ -408,19 +415,22 @@ return view.extend({
 					E('h2', { 'class': 'mt-system-title' }, model),
 					E('div', { 'class': 'mt-system-sub' }, revision || _('硬件标识与订阅卡管理'))
 				]),
-				E('div', { 'class': 'mt-system-temp-box' }, [
-					svgNode('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>'),
-					E('div', {}, [
-						E('div', { 'class': 'mt-system-temp-val' }, temperature || '--'),
-						E('div', { 'class': 'mt-system-temp-desc' }, _('模组温度'))
-					])
+				E('div', { 'style': 'display:flex;align-items:center;gap:12px' }, [
+					E('div', { 'class': 'mt-system-temp-box' }, [
+						svgNode('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>'),
+						E('div', {}, [
+							E('div', { 'class': 'mt-system-temp-val' }, temperature || '--'),
+							E('div', { 'class': 'mt-system-temp-desc' }, _('模组温度'))
+						])
+					]),
+					theme.themeToggleBtn()
 				])
 			]),
 
 			/* 动态 SVG 芯片与 SIM 卡槽物理链路拓扑 */
 			E('section', { 'class': 'mt-system-card mt-sys-topo-card' }, [
 				E('div', { 'class': 'mt-card-title' }, [
-					svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>'),
+					svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>'),
 					_('模组基带与卡槽架构拓扑')
 				]),
 				this.renderSvgChipTopo(currentSlot, slotSupported, simOk)
@@ -430,7 +440,7 @@ return view.extend({
 			E('div', { 'class': 'mt-system-grid' }, [
 				E('section', { 'class': 'mt-system-card' }, [
 					E('div', { 'class': 'mt-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'),
 						_('模组信息')
 					]),
 					this.row(_('型号'), model),
@@ -441,7 +451,7 @@ return view.extend({
 				]),
 				E('section', { 'class': 'mt-system-card' }, [
 					E('div', { 'class': 'mt-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="8" y="10" width="8" height="8" rx="1"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="8" y="10" width="8" height="8" rx="1"/></svg>'),
 						_('SIM 与订阅')
 					]),
 					this.row(_('手机号码'), simNumber),
@@ -452,7 +462,7 @@ return view.extend({
 				]),
 				E('section', { 'class': 'mt-system-card' }, [
 					E('div', { 'class': 'mt-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'),
 						_('运行状态')
 					]),
 					this.row(_('SIM 状态'), simStatus),
@@ -462,7 +472,7 @@ return view.extend({
 				]),
 				E('section', { 'class': 'mt-system-card' }, [
 					E('div', { 'class': 'mt-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'),
 						_('热保护状态')
 					]),
 					this.row(_('当前温度'), temperature || '--'),
@@ -474,7 +484,7 @@ return view.extend({
 				/* 宽卡片：SIM 与射频高级控制 */
 				E('section', { 'class': 'mt-system-card wide' }, [
 					E('div', { 'class': 'mt-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'),
 						_('SIM 与射频控制')
 					]),
 					E('div', { 'style': 'font-size:12px;color:var(--qm-text-muted);margin-bottom:12px' }, _('日常 SIM 与射频控制，经由 QModem ubus 接口执行。')),
@@ -537,7 +547,7 @@ return view.extend({
 			E('section', { 'class':'mt-system-card mt-system-maintenance' }, [
 				E('div', {}, [
 					E('div', { 'class': 'mt-card-title', 'style': 'margin-bottom:4px' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'),
 						_('防护与维护')
 					]),
 					E('p', { 'style': 'margin:0;font-size:12px;color:var(--qm-text-muted)' }, _('模组防护、恢复与通信排障工具。'))
@@ -562,7 +572,7 @@ return view.extend({
 			E('details', { 'class': 'mt-system-card mt-system-details' }, [
 				E('summary', {}, [
 					E('span', { 'style': 'display:flex;align-items:center;gap:8px' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>'),
 						_('技术细节（QModem 原始 JSON）')
 					]),
 					E('span', { 'style': 'font-size:18px;color:var(--qm-text-muted);font-weight:700' }, '›')

@@ -4,6 +4,7 @@
 'require form';
 'require uci';
 'require ui';
+'require qmodem.theme as theme';
 'require qmodem.controls as controls';
 
 /*
@@ -247,44 +248,44 @@ return view.extend({
 	/* 动态 SVG 网络数据通路与拨号隧道图 */
 	renderSvgDataTunnel: function(res, connected) {
 		var iface = res.iface || 'wwan0';
-		var strokeColor = connected ? '#0072f5' : '#94a3b8';
+		var strokeColor = connected ? 'var(--qm-accent)' : 'var(--qm-text-muted)';
 		var streamLineClass = connected ? 'qm-stream-line' : '';
 		var statusText = connected ? _('链路活跃 · 通路畅通') : _('拨号中断 · 离线中');
-		var dotColor = connected ? '#10b981' : '#94a3b8';
+		var dotColor = connected ? 'var(--qm-ok)' : 'var(--qm-text-muted)';
 
 		var svgStr = [
 			'<svg class="mtconn-topo-svg" viewBox="0 0 540 86">',
 			'  <defs>',
 			'    <linearGradient id="qmTunnelGrad" x1="0%" y1="0%" x2="100%" y2="0%">',
-			'      <stop offset="0%" stop-color="#0072f5"/>',
-			'      <stop offset="50%" stop-color="#10b981"/>',
-			'      <stop offset="100%" stop-color="#0ea5e9"/>',
+			'      <stop offset="0%" stop-color="var(--qm-accent)"/>',
+			'      <stop offset="50%" stop-color="var(--qm-mint)"/>',
+			'      <stop offset="100%" stop-color="var(--qm-accent-2)"/>',
 			'    </linearGradient>',
 			'  </defs>',
 			'  <!-- 节点 1: 主机网卡 / 逻辑接口 -->',
 			'  <g transform="translate(15, 14)">',
-			'    <rect x="0" y="0" width="115" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <circle cx="22" cy="28" r="6" fill="#0072f5"/>',
-			'    <text x="36" y="25" font-size="12" font-weight="750" fill="#0f172a">' + iface + '</text>',
-			'    <text x="36" y="41" font-size="10" fill="#64748b">' + _('网络接口') + '</text>',
+			'    <rect x="0" y="0" width="115" height="56" rx="12" fill="var(--qm-surface-2)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <circle cx="22" cy="28" r="6" fill="var(--qm-accent)"/>',
+			'    <text x="36" y="25" font-size="12" font-weight="750" fill="var(--qm-text)">' + iface + '</text>',
+			'    <text x="36" y="41" font-size="10" fill="var(--qm-text-muted)">' + _('网络接口') + '</text>',
 			'  </g>',
 			'  <!-- 传输链路 1 -->',
 			'  <line x1="130" y1="42" x2="200" y2="42" stroke="' + strokeColor + '" stroke-width="2.6" stroke-linecap="round" class="' + streamLineClass + '"/>',
 			'  <!-- 节点 2: QModem 核心守护驱动 -->',
 			'  <g transform="translate(200, 14)">',
-			'    <rect x="0" y="0" width="135" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
+			'    <rect x="0" y="0" width="135" height="56" rx="12" fill="var(--qm-surface-2)" stroke="var(--qm-border)" stroke-width="1.6"/>',
 			'    <circle cx="24" cy="28" r="6" fill="' + dotColor + '"/>',
-			'    <text x="38" y="25" font-size="12" font-weight="750" fill="#0f172a">QModem Core</text>',
-			'    <text x="38" y="41" font-size="10" fill="#64748b">' + statusText + '</text>',
+			'    <text x="38" y="25" font-size="12" font-weight="750" fill="var(--qm-text)">QModem Core</text>',
+			'    <text x="38" y="41" font-size="10" fill="var(--qm-text-muted)">' + statusText + '</text>',
 			'  </g>',
 			'  <!-- 传输链路 2 -->',
 			'  <line x1="335" y1="42" x2="405" y2="42" stroke="' + strokeColor + '" stroke-width="2.6" stroke-linecap="round" class="' + streamLineClass + '" style="animation-duration:1.2s;"/>',
 			'  <!-- 节点 3: 蜂窝基站与公网 -->',
 			'  <g transform="translate(405, 14)">',
-			'    <rect x="0" y="0" width="120" height="56" rx="12" fill="rgba(241,245,249,0.85)" stroke="#cbd5e1" stroke-width="1.6"/>',
-			'    <circle cx="22" cy="28" r="6" fill="#0ea5e9"/>',
-			'    <text x="36" y="25" font-size="12" font-weight="750" fill="#0f172a">蜂窝广域网</text>',
-			'    <text x="36" y="41" font-size="10" fill="#64748b">' + (connected ? 'IPv4 / IPv6' : _('离线')) + '</text>',
+			'    <rect x="0" y="0" width="120" height="56" rx="12" fill="var(--qm-surface-2)" stroke="var(--qm-border)" stroke-width="1.6"/>',
+			'    <circle cx="22" cy="28" r="6" fill="var(--qm-mint)"/>',
+			'    <text x="36" y="25" font-size="12" font-weight="750" fill="var(--qm-text)">蜂窝广域网</text>',
+			'    <text x="36" y="41" font-size="10" fill="var(--qm-text-muted)">' + (connected ? 'IPv4 / IPv6' : _('离线')) + '</text>',
 			'  </g>',
 			'</svg>'
 		].join('');
@@ -326,7 +327,7 @@ return view.extend({
 				E('div', { 'class': 'mtconn-sec-head' }, [
 					E('div', {}, [
 						E('div', { 'class': 'mtconn-sec-title' }, [
-							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>'),
+							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>'),
 							_('地址与 DNS')
 						]),
 						E('div', { 'class': 'mtconn-sec-sub' }, _('由 QModem 上报的逻辑接口地址与协商参数'))
@@ -349,7 +350,7 @@ return view.extend({
 				E('div', { 'class': 'mtconn-sec-head' }, [
 					E('div', {}, [
 						E('div', { 'class': 'mtconn-sec-title' }, [
-							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'),
+							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'),
 							_('拨号状态')
 						]),
 						E('div', { 'class': 'mtconn-sec-sub' }, _('QModem dial_status 实时状态上报'))
@@ -415,8 +416,10 @@ return view.extend({
 				self.styleNode(),
 				controls.styleNode(),
 				modemBar,
-				E('div', { 'class': 'mtconn-card', 'style': 'color:var(--qm-danger);background:var(--qm-danger-soft);margin-top:16px' },
-					_('未检测到模组（请确认 QModem 已识别该设备）。')),
+				theme.emptyState(
+					_('未检测到模组'),
+					_('请确认 QModem 已接入并识别该设备，然后刷新页面重试。')
+				),
 				(res.errors || []).map(function(msg) {
 					return E('div', { 'class': 'mtconn-card', 'style': 'margin-top:10px;color:var(--qm-danger)' }, msg);
 				})
@@ -444,7 +447,7 @@ return view.extend({
 		}, [
 			E('summary', {}, [
 				E('span', { 'style': 'display:flex;align-items:center;gap:8px' }, [
-					svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>'),
+					svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>'),
 					_('最近拨号日志')
 				]),
 				E('span', { 'class': 'mtconn-chevron' }, '›')
@@ -494,9 +497,12 @@ return view.extend({
 						E('h2', { 'class': 'mtconn-title' }, _('移动数据')),
 						E('div', { 'class': 'mtconn-sub' }, _('管理移动网络连接会话、配置 APN 及拨号策略。'))
 					]),
-					E('div', { 'class': 'mtconn-state' + (connected ? ' online' : '') }, [
-						E('span', { 'class': 'mtconn-dot' }),
-						connected ? _('已连接') : _('未连接')
+					E('div', { 'style': 'display:flex;align-items:center;gap:12px' }, [
+						theme.themeToggleBtn(),
+						E('div', { 'class': 'mtconn-state' + (connected ? ' online' : '') }, [
+							E('span', { 'class': 'mtconn-dot' }),
+							connected ? _('已连接') : _('未连接')
+						])
 					])
 				]),
 
@@ -525,7 +531,7 @@ return view.extend({
 					E('div', { 'class': 'mtconn-topo-head' }, [
 						E('div', {}, [
 							E('div', { 'class': 'mtconn-topo-title' }, [
-								svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'),
+								svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'),
 								_('动态数据通路拓扑')
 							]),
 							E('div', { 'class': 'mtconn-topo-sub' }, _('主机网卡接口、QModem 驱动核心与移动蜂窝 WAN 实时链路'))
@@ -575,7 +581,7 @@ return view.extend({
 					E('div', { 'class': 'mtconn-sec-head' }, [
 						E('div', {}, [
 							E('div', { 'class': 'mtconn-sec-title' }, [
-								svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>'),
+								svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>'),
 								_('拨号设置 (APN)')
 							]),
 							E('div', { 'class': 'mtconn-sec-sub' }, _('参数保存后写入 /etc/config/qmodem，点击「重新拨号」即可应用生效。'))
@@ -598,7 +604,7 @@ return view.extend({
 				E('details', { 'class': 'mtconn-card mtconn-details' }, [
 					E('summary', {}, [
 						E('span', { 'style': 'display:flex;align-items:center;gap:8px' }, [
-							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'),
+							svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'),
 							_('高级连接信息与数据通路')
 						]),
 						E('span', { 'class': 'mtconn-chevron' }, '›')

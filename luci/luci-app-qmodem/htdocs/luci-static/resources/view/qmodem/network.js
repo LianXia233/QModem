@@ -6,6 +6,7 @@
 'require form';
 'require uci';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 
 /*
  * 网络与小区（Radio & Cells）— 现代白色毛玻璃 (Glassmorphism) + 动态 SVG 射频仪表重构
@@ -403,7 +404,7 @@ return view.extend({
 	metricGauge: function(label, kind, rawValue, unit) {
 		var n = num(rawValue), has = !isNaN(n), pct = 0, cls = 'unknown', ql = '';
 		var tags = { excellent: _('优秀'), good: _('良好'), fair: _('一般'), weak: _('较弱') };
-		var strokeColor = '#94a3b8';
+		var strokeColor = 'var(--qm-text-muted)';
 		if (has) {
 			if (kind === 'rsrp') { pct = (n + 120) * 2.5; cls = n >= -80 ? 'excellent' : n >= -90 ? 'good' : n >= -100 ? 'fair' : 'weak'; }
 			else if (kind === 'rsrq') { pct = (n + 25) * 4; cls = n >= -10 ? 'excellent' : n >= -15 ? 'good' : n >= -20 ? 'fair' : 'weak'; }
@@ -411,7 +412,7 @@ return view.extend({
 			else { pct = (n - 20) / 60 * 100; cls = n < 45 ? 'excellent' : n < 55 ? 'good' : n < 65 ? 'fair' : 'weak'; }
 			pct = Math.max(5, Math.min(100, pct));
 			ql = tags[cls] || '';
-			strokeColor = cls === 'excellent' ? '#10b981' : cls === 'good' ? '#0072f5' : cls === 'fair' ? '#f59e0b' : '#ef4444';
+			strokeColor = cls === 'excellent' ? 'var(--qm-ok)' : cls === 'good' ? 'var(--qm-accent)' : cls === 'fair' ? 'var(--qm-warn)' : 'var(--qm-danger)';
 		}
 
 		var radius = 38;
@@ -420,7 +421,7 @@ return view.extend({
 
 		var svgStr = [
 			'<svg class="mt-gauge-svg" viewBox="0 0 100 58">',
-			'  <path d="M 12 50 A 38 38 0 0 1 88 50" fill="none" stroke="rgba(226,232,240,0.8)" stroke-width="8" stroke-linecap="round"/>',
+			'  <path d="M 12 50 A 38 38 0 0 1 88 50" fill="none" stroke="var(--qm-border-soft)" stroke-width="8" stroke-linecap="round"/>',
 			'  <path d="M 12 50 A 38 38 0 0 1 88 50" fill="none" stroke="' + strokeColor + '" stroke-width="8" stroke-linecap="round"',
 			'        stroke-dasharray="' + activeLen.toFixed(1) + ' 120" style="transition: stroke-dasharray .5s cubic-bezier(.2,.8,.4,1);"/>',
 			'</svg>'
@@ -694,7 +695,7 @@ return view.extend({
 
 		return E('section', { 'class': 'mt-net-card', 'style': 'margin-bottom:16px' }, [
 			E('div', { 'class': 'mt-card-title' }, [
-				svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49"/></svg>'),
+				svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49"/></svg>'),
 				_('当前频段与载波聚合（%d 个载波）').format(cells.length)
 			]),
 			E('div', { 'class': 'mt-ssb-serving' }, [
@@ -748,7 +749,7 @@ return view.extend({
 
 		return E('section', { 'class': 'mt-net-card', 'style': 'margin-bottom:16px' }, [
 			E('div', { 'class': 'mt-card-title' }, [
-				svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'),
+				svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'),
 				_('邻区信息（%d）').format(list.length)
 			]),
 			cards.length ? E('div', { 'class': 'mt-lock-cell-grid' }, cards)
@@ -821,7 +822,7 @@ return view.extend({
 			return E('div', { 'class': 'mt-net' }, [
 				this.styleNode(),
 				controls.styleNode(),
-				E('div', { 'class': 'mt-net-card', 'style': 'color:var(--qm-danger)' }, _('未检测到模组（请确认 QModem 已识别该设备）。'))
+				theme.emptyState(_('未检测到模组'), _('请确认 QModem 已接入并识别该设备，然后刷新页面重试。'))
 			].concat(warnings));
 
 		var section = res.section;
@@ -915,8 +916,11 @@ return view.extend({
 					]),
 					E('div', { 'class': 'mt-net-sub' }, _('实时监控服务小区物理参数、载波聚合配置及多频段策略。'))
 				]),
-				E('span', { 'class': 'mt-net-badge' + (registered ? '' : ' off') },
-					registered ? (networkMode || _('已驻网')) : _('未驻网'))
+				E('div', { 'style': 'display:flex;align-items:center;gap:12px' }, [
+					theme.themeToggleBtn(),
+					E('span', { 'class': 'mt-net-badge' + (registered ? '' : ' off') },
+						registered ? (networkMode || _('已驻网')) : _('未驻网'))
+				])
 			]),
 
 			/* 4 列指标卡片 (动态 SVG 微仪表) */
@@ -931,7 +935,7 @@ return view.extend({
 			E('div', { 'class': 'mt-net-grid' }, [
 				E('section', { 'class': 'mt-net-card' }, [
 					E('div', { 'class': 'mt-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'),
 						_('服务小区')
 					]),
 					this.row(_('网络模式'), networkMode),
@@ -947,7 +951,7 @@ return view.extend({
 				]),
 				E('section', { 'class': 'mt-net-card' }, [
 					E('div', { 'class': 'mt-card-title' }, [
-						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0072f5" stroke-width="2.2" stroke-linecap="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>'),
+						svgNode('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--qm-accent)" stroke-width="2.2" stroke-linecap="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg>'),
 						_('无线状态')
 					]),
 					E('div', { 'class': 'mt-net-row' }, [ E('span', {}, _('运营商')), E('strong', {}, operatorName) ]),
