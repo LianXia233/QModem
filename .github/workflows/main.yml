@@ -174,8 +174,12 @@ jobs:
         with:
           path: sdk
           # 缓存键不含 github.sha：SDK 与其 build_dir 可跨提交复用，
-          # 只有 SDK 版本（或缓存格式版本 v1）变化才重建。
-          key: openwrt-sdk-${{ matrix.build_arch }}-${{ env.SDK_NAME }}${{ steps.resolve-sdk.outputs.sdk_name }}-v1
+          # 只有 SDK 版本（或缓存格式版本）变化才重建。
+          # 版本号 v2：v1 缓存是 ubuntu-24.04 runner 构建的，SDK 的
+          # staging_dir/host/bin/python3 符号链接指向 24.04 的 Python 版本，
+          # 在 26.04 上报 "not found" 导致 util-linux 编译失败；v2 在 26.04
+          # 上重建，链接随 runner 系统 Python 走。
+          key: openwrt-sdk-${{ matrix.build_arch }}-${{ env.SDK_NAME }}${{ steps.resolve-sdk.outputs.sdk_name }}-v2
 
       - name: 初始化 SDK 环境
         if: steps.cache-sdk.outputs.cache-hit != 'true'

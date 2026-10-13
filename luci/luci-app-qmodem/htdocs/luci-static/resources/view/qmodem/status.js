@@ -285,10 +285,8 @@ return view.extend({
 		return E('style', {}, [
 			/* 全局毛玻璃与流动渐变底蕴 */
 			'.qm-app{--qm-glass-bg:var(--qm-glass);--qm-glass-border:var(--qm-border);--qm-glass-shadow:var(--qm-shadow-md);--qm-primary:var(--qm-accent);--qm-success:var(--qm-ok);--qm-warning:var(--qm-warn);--qm-danger:var(--qm-danger)}',
-			'.qmodem-glass-page{position:relative;max-width:1160px;margin:0 auto;color:var(--qm-text);padding-bottom:30px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}',
-			/* 背景环境氛围光球，烘托白色毛玻璃透光感 */
-			'.qmodem-glass-bg-glow{position:absolute;top:-40px;left:5%;width:420px;height:420px;background:var(--qm-glow-a);border-radius:50%;filter:blur(50px);pointer-events:none;z-index:0}',
-			'.qmodem-glass-bg-glow2{position:absolute;top:280px;right:4%;width:380px;height:380px;background:var(--qm-glow-b);border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0}',
+			/* 页面容器：宽度/字体由 theme.js 统一（--qm-maxw 令牌 + 皮肤字体栈） */
+			'.qmodem-glass-page{position:relative;width:100%;max-width:var(--qm-maxw);margin:0 auto;color:var(--qm-text);padding-bottom:30px}',
 
 			/* 卡片通用白色毛玻璃效果 */
 			'.qm-glass-card{position:relative;z-index:1;background:var(--qm-glass-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--qm-glass-border);border-radius:20px;box-shadow:var(--qm-glass-shadow);padding:20px;transition:transform .24s cubic-bezier(.2,.8,.4,1),box-shadow .24s ease}',
