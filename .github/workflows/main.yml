@@ -206,7 +206,7 @@ jobs:
     if: ${{ always() && needs.job_prepare.result == 'success' }}
     strategy:
       matrix:
-        build_arch: ['arm64_ipk',"arm64_apk","x64_apk","x64_ipk","mmips_ipk","mmips_apk" ]
+        build_arch: ['arm64_ipk',"arm64_apk","arm64_apk_immortalwrt","x64_apk","x64_ipk","mmips_ipk","mmips_apk" ]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -281,22 +281,45 @@ jobs:
           # master requires CMake 3.31, so feeding master into a release SDK
           # breaks packages such as rpcd-mod-luci. Release SDKs therefore track
           # their own release branch; snapshot SDKs keep the development feeds.
-          if [ -n "${SDK_PREFIX:-}" ]; then
+          # Feeds must come from the same distribution the SDK was built from,
+          # otherwise the produced packages link against library ABIs the target
+          # device does not have. Concretely: OpenWrt master ships
+          # libubus20260925 while ImmortalWrt master ships libubus20260628, so an
+          # OpenWrt-built apk is uninstallable on an ImmortalWrt device.
+          feed_flavor="${SDK_FLAVOR:-openwrt}"
+          if [ "$feed_flavor" = "immortalwrt" ]; then
+            # ImmortalWrt takes immortalwrt/immortalwrt as the base feed: ubus,
+            # libubox and libblobmsg-json ABI versions all come from there.
+            # packages/luci use the ImmortalWrt mirrors; routing stays on the
+            # OpenWrt repository, matching ImmortalWrt's own feeds.conf.default.
             feed_ref=master
-            base_ref=main
+            base_ref=master
+            base_repo=https://github.com/immortalwrt/immortalwrt.git
+            packages_repo=https://github.com/immortalwrt/packages.git
+            luci_repo=https://github.com/immortalwrt/luci.git
+            routing_repo=https://github.com/openwrt/routing.git
           else
-            feed_ref="openwrt-$(echo "$SDK_NAME" | sed -n 's/^openwrt-sdk-\([0-9]*\.[0-9]*\)\..*/\1/p')"
-            if [ -z "$feed_ref" ] || [ "$feed_ref" = "openwrt-" ]; then
-              echo "cannot derive the feed branch from SDK_NAME='$SDK_NAME'" >&2
-              exit 1
+            base_repo=https://github.com/openwrt/openwrt.git
+            packages_repo=https://github.com/openwrt/packages.git
+            luci_repo=https://github.com/openwrt/luci.git
+            routing_repo=https://git.openwrt.org/feed/routing.git
+            if [ -n "${SDK_PREFIX:-}" ]; then
+              feed_ref=master
+              base_ref=main
+            else
+              feed_ref="openwrt-$(echo "$SDK_NAME" | sed -n 's/^openwrt-sdk-\([0-9]*\.[0-9]*\)\..*/\1/p')"
+              if [ -z "$feed_ref" ] || [ "$feed_ref" = "openwrt-" ]; then
+                echo "cannot derive the feed branch from SDK_NAME='$SDK_NAME'" >&2
+                exit 1
+              fi
+              base_ref="$feed_ref"
             fi
-            base_ref="$feed_ref"
           fi
-          echo "using feeds: base=$base_ref packages=$feed_ref luci=$feed_ref routing=$feed_ref"
-          echo "src-git base https://github.com/openwrt/openwrt.git;$base_ref" > feeds.conf
-          echo "src-git packages https://github.com/openwrt/packages.git;$feed_ref" >> feeds.conf
-          echo "src-git luci https://github.com/openwrt/luci.git;$feed_ref" >> feeds.conf
-          echo "src-git routing https://git.openwrt.org/feed/routing.git;$feed_ref"  >> feeds.conf
+          echo "using feeds(flavor=$feed_flavor): base=$base_ref packages=$feed_ref luci=$feed_ref routing=$feed_ref"
+          echo "src-git base $base_repo;$base_ref" > feeds.conf
+          echo "src-git packages $packages_repo;$feed_ref" >> feeds.conf
+          echo "src-git luci $luci_repo;$feed_ref" >> feeds.conf
+          echo "src-git routing $routing_repo;$feed_ref" >> feeds.conf
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           cd ..
@@ -390,7 +413,18 @@ jobs:
       - name: Collect installable packages
         run: |
           set -eu
-          find artifacts -type f \( -name '*.ipk' -o -name '*.apk' \) -exec cp -v {} releases/ \;
+          # ImmortalWrt 变体与 OpenWrt 变体产出的包名完全一致（apk/ipk 文件名
+          # 不含发行版信息），直接 cp 会互相覆盖。凡来自 immortalwrt 变体的
+          # 资产统一追加 -immortalwrt 后缀，使两类产物可以共存于同一 Release。
+          if [ -d artifacts/QModem-arm64_apk_immortalwrt ]; then
+            find artifacts/QModem-arm64_apk_immortalwrt -type f -name '*.apk' -print |
+              while IFS= read -r f; do
+                cp -v "$f" "releases/$(basename "${f%.apk}")-immortalwrt.apk"
+              done
+          fi
+          find artifacts -type f \( -name '*.ipk' -o -name '*.apk' \) \
+            -not -path 'artifacts/QModem-arm64_apk_immortalwrt/*' \
+            -exec cp -v {} releases/ \;
           # 兜底校验：至少要有 ipk 与 apk 两类，否则视为构建异常
           ls releases/*.ipk releases/*.apk >/dev/null 2>&1 || {
             echo "no installable package found under artifacts/" >&2
