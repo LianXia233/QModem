@@ -147,6 +147,9 @@ WRAPPER_EOF
 	echo "==> fix A: linker wrapper at $WRAPPER" >&2
 fi
 
+# 必须带 --features tty：默认 feature 只有 service，缺 tty 时守护进程
+# 收到 --port 会直接退出（--port requires building with --features tty），
+# 表现为 procd 崩溃循环 + socket 不存在 + 全部 AT 请求失败。
 # 纯 std 零依赖组件（qmodem-atd 的 service/tty feature）走全静态 musl，
 # 不引入任何 .so 运行时依赖；启用 ubus/uci/sqlite feature 后改由
 # -L $(STAGING_DIR)/usr/lib 动态链接（届时另设 RUSTFLAGS，见 Makefile 注释）。
@@ -170,7 +173,7 @@ LOG="$OUT_DIR/cargo-build.log"
 # shellcheck disable=SC2086
 if ( cd "$RUST_DIR" && \
 	cargo +"$TOOLCHAIN" build $CARGO_VERBOSE --release --target "$RUST_TARGET_TRIPLE" \
-		$STD_FLAGS -p qmodem-atd ) >"$LOG" 2>&1; then
+		$STD_FLAGS --features service,tty -p qmodem-atd ) >"$LOG" 2>&1; then
 	echo "==> cargo build OK"
 else
 	echo "!! cargo build failed, cargo log follows" >&2
