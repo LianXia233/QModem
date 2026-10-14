@@ -11,6 +11,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+### Fixed
+- **Missing translations for the new overview hero strings**: the Soft Anime
+  overview introduced three new UI strings (`Modem Dashboard`,
+  `%d modem(s) detected`, and the hero subtitle) that were never extracted
+  into the translation catalog, so a Chinese (`zh_Hans`) interface rendered
+  the hero band in English while the rest of the page was translated
+  (observed on a live device after installing the 1.1.1 build). The three
+  strings are now present in `po/template/qmodem-next.po` and translated in
+  `po/zh_Hans/luci-app-qmodem-next.po`.
+
 ### Deprecated
 - **Legacy Lua UI packages marked deprecated** (`luci-app-qmodem` Lua variant,
   `luci-app-qmodem-hc`, `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`,

@@ -2646,3 +2646,12 @@ msgstr "模组初始化后重新发送锁小区命令"
 # Source: view/qmodem/config_advanced.js
 msgid "Delay"
 msgstr "延迟"
+# Source: view/qmodem/overview.js:484
+msgid "Modem Dashboard"
+msgstr "模组仪表盘"
+# Source: view/qmodem/overview.js:486
+msgid "%d modem(s) detected"
+msgstr "检测到 %d 个模组"
+# Source: view/qmodem/overview.js:489
+msgid "Signal, SIM and network overview. Drag cards to reorder, click a title to collapse."
+msgstr "信号、SIM 卡与网络概览。拖拽卡片可调整顺序，点击标题可折叠。"
