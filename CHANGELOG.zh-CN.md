@@ -18,9 +18,16 @@
   `theme.pageHead` 统一化改造及后续全部定制——由上游 `luci-app-qmodem-next`
   现代 JS 前端替代（上游以独立包交付，依赖 `qmodem`、`qmodem-smsd`、
   `sms-forwarder-next`；我们的单包 `qmodem` 已通过 `PKG_PROVIDES` 提供这些
-  依赖名）。`luci/` 目录现与上游逐字节一致（新增
+  依赖名）。`luci/` 目录与上游保持一致，唯一有意适配点在
+  `luci-app-qmodem-next/Makefile`（本次对齐新增
   `luci-app-qmodem-monitor` / `-sms` / `-ttl` / `-ttlfw4` / `-next`，
-  恢复上游 `luci-app-qmodem`）。构建/CI 引用已同步适配，且仅涉及
+  恢复上游 `luci-app-qmodem`）：上游按多包架构声明
+  `+qmodem-smsd +sms-forwarder-next` 为构建期依赖，这两个包名仅存在于
+  上游的多包布局——本仓库已将其并入单包 `qmodem`（`PKG_PROVIDES` 仅供
+  安装期依赖满足），而 OpenWrt 构建期元数据解析要求依赖名真实存在于
+  包树，否则 defconfig 会丢弃该包（实测报 "missing required release
+  package: luci-app-qmodem-next"）。故构建期依赖收敛为
+  `+qmodem +luci-base`。构建/CI 引用已同步适配，且仅涉及
   luci 相关包名：`qmodem_package_generic` 改编 `luci-app-qmodem-next`、
   `main.yml` 必需包为 `luci-app-qmodem-next` + `luci-i18n-qmodem-next-zh-cn`、
   `openwrt_package.config` 选中 next 包、`extract-i18n.yml` 与 i18n 脚本

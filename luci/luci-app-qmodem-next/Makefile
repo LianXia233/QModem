@@ -8,7 +8,11 @@ include ../../version.mk
 
 LUCI_TITLE:=LuCI Modern UI for QModem
 LUCI_DESCRIPTION:=LuCI modern (JavaScript) interface for QModem.
-LUCI_DEPENDS:=+qmodem +qmodem-smsd +sms-forwarder-next +luci-base
+# 本仓库适配（2026-10-14）：上游按多包架构声明 +qmodem-smsd +sms-forwarder-next，
+# 本仓库已将二者并入单包 qmodem（PKG_PROVIDES 含其包名，安装期依赖可满足），
+# 但 OpenWrt 构建期元数据解析要求依赖名真实存在于包树，否则 defconfig 会
+# 丢弃本包（报 missing required release package）。故构建期依赖收敛为 +qmodem。
+LUCI_DEPENDS:=+qmodem +luci-base
 LUCI_PKGARCH:=all
 LUCI_MAINTAINER:=Tom <fjrcn@outlook.com>
 

@@ -21,9 +21,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `luci-app-qmodem-next` modern JS UI (which upstream ships as a separate
   package depending on `qmodem`, `qmodem-smsd` and `sms-forwarder-next`;
   our single `qmodem` package already `PKG_PROVIDES` those). The `luci/`
-  tree now matches upstream byte-for-byte (adds
-  `luci-app-qmodem-monitor` / `-sms` / `-ttl` / `-ttlfw4` / `-next`,
-  restores upstream `luci-app-qmodem`). Build/CI references were adapted
+  tree matches upstream except one deliberate adaptation in
+  `luci-app-qmodem-next/Makefile` (the realign adds
+  `luci-app-qmodem-monitor` / `-sms` / `-ttl` / `-ttlfw4` / `-next` and
+  restores upstream `luci-app-qmodem`): upstream declares
+  `+qmodem-smsd +sms-forwarder-next` as build-time dependencies, which
+  only exist as separate packages in upstream's multi-package layout —
+  here they are folded into the single `qmodem` package (`PKG_PROVIDES`
+  covers install-time only), and OpenWrt metadata resolution drops the
+  package at defconfig when a build-time dependency name does not exist
+  (observed: "missing required release package: luci-app-qmodem-next").
+  The dependency list is therefore converged to `+qmodem +luci-base`.
+  Build/CI references were adapted
   accordingly and only touch luci-related package names:
   `qmodem_package_generic` now compiles `luci-app-qmodem-next`,
   `main.yml` required packages are `luci-app-qmodem-next` +
