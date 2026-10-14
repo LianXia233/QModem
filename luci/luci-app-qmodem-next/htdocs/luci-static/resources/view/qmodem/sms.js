@@ -112,9 +112,8 @@ return view.extend({
 			timezoneSentCheckbox.checked = true;
 		}
 		
-		var timezoneHelpText = E('div', {
-			'style': 'font-size: 12px; color: #666; margin-top: 5px;'
-		}, _('Enable if SMS timestamps appear 8 hours ahead (e.g., UTC+8 local time parsed as UTC+0)'));
+		var timezoneHelpText = E('div', { 'class': 'qmodem-help-text' },
+			_('Enable if SMS timestamps appear 8 hours ahead (e.g., UTC+8 local time parsed as UTC+0)'));
 		
 		timezoneSentCell.appendChild(timezoneSentCheckbox);
 		timezoneSentCell.appendChild(E('span', { 'style': 'margin-left: 5px;' }, 
@@ -451,10 +450,7 @@ return view.extend({
 			}, [
 				E('td', { 'class': 'td' }, [
 					contact,
-					unreadCount > 0 ? E('span', { 
-						'class': 'sms-unread-badge',
-						'style': 'background: #e74c3c; color: white; border-radius: 10px; padding: 2px 6px; margin-left: 8px; font-size: 11px;'
-					}, String(unreadCount)) : ''
+					unreadCount > 0 ? E('span', { 'class': 'sms-unread-badge' }, String(unreadCount)) : ''
 				]),
 				E('td', { 'class': 'td' }, preview),
 				E('td', { 'class': 'td' }, time),
@@ -542,10 +538,7 @@ return view.extend({
 					])
 				])
 			]),
-			E('div', { 
-				'class': 'cbi-value',
-				'style': 'font-size: 12px; color: #666;'
-			}, [
+			E('div', { 'class': 'cbi-value qmodem-help-text' }, [
 				E('label', { 'class': 'cbi-value-title' }, _('Length')),
 				E('div', { 'class': 'cbi-value-field' }, [
 					E('span', { 'id': 'new-conversation-counter' }, '0/160')

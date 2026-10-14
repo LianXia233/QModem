@@ -64,6 +64,13 @@ var callRemoveModem = rpc.declare({
 	expect: { }
 });
 
+// Load shared QModem Soft Anime design system
+document.head.appendChild(E('link', {
+	'rel': 'stylesheet',
+	'type': 'text/css',
+	'href': L.resource('qmodem/qmodem-next.css')
+}));
+
 return view.extend({
 	load: function() {
 		return Promise.all([

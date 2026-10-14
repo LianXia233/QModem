@@ -15,38 +15,41 @@
 	padding-bottom: 0;
 }
 
+/* Soft Anime status cards: pastel metric blocks */
 .qvoip-status-grid {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	border-top: 1px solid var(--border-color-medium, #d8dde3);
-	border-bottom: 1px solid var(--border-color-medium, #d8dde3);
+	gap: .75rem;
 }
 
 .qvoip-status-item {
 	min-width: 0;
 	padding: .875rem 1rem;
-	border-right: 1px solid var(--border-color-medium, #d8dde3);
+	border-radius: 14px;
+	background: var(--qmd-card-2, var(--qmd-card, #FBFAFF));
+	border: 1px solid var(--qmd-border, #E7E2F4);
+	box-shadow: var(--qmd-shadow-sm, 0 1px 3px rgba(90, 82, 140, .08));
 }
 
 .qvoip-status-item:first-child {
-	padding-left: 0;
+	padding-left: 1rem;
 }
 
 .qvoip-status-item:last-child {
-	padding-right: 0;
-	border-right: 0;
+	padding-right: 1rem;
 }
 
 .qvoip-status-label {
 	margin-bottom: .35rem;
 	font-size: .82rem;
 	font-weight: 600;
-	color: var(--text-color-medium, #5f6973);
+	color: var(--qmd-text-2, #77758F);
 }
 
 .qvoip-status-detail {
 	margin-top: .4rem;
 	line-height: 1.4;
+	color: var(--qmd-text-1, #34334B);
 }
 
 .qvoip-settings-grid,
@@ -79,6 +82,7 @@
 .qvoip-section-heading h3,
 .qvoip-call-panel h4 {
 	margin-top: 0;
+	color: var(--qmd-text-1, #34334B);
 }
 
 .qvoip-section-heading .label,
@@ -90,8 +94,8 @@
 .qvoip-call-summary {
 	margin: .75rem 0;
 	padding: .8rem 0;
-	border-top: 1px solid var(--border-color-medium, #d8dde3);
-	border-bottom: 1px solid var(--border-color-medium, #d8dde3);
+	border-top: 1px solid var(--qmd-divider, #EEEBF6);
+	border-bottom: 1px solid var(--qmd-divider, #EEEBF6);
 }
 
 .qvoip-remote-party {
@@ -99,11 +103,15 @@
 	overflow-wrap: anywhere;
 	font-size: 1.15rem;
 	line-height: 1.35;
+	font-weight: 600;
+	color: var(--qmd-text-1, #34334B);
 }
 
 .qvoip-timer {
 	font-variant-numeric: tabular-nums;
 	font-size: 1.1rem;
+	color: var(--qmd-primary, #8875E8);
+	font-weight: 600;
 }
 
 .qvoip-dial-form {
@@ -180,7 +188,8 @@
 
 .qvoip-history-tools .cbi-button[aria-pressed="true"] {
 	font-weight: 700;
-	border-color: var(--primary-color-medium, #3478bf);
+	border-color: var(--qmd-primary, #8875E8);
+	color: var(--qmd-primary, #8875E8);
 }
 
 .qvoip-history-table {
@@ -202,12 +211,8 @@
 	.qvoip-status-item,
 	.qvoip-status-item:first-child,
 	.qvoip-status-item:last-child {
-		padding: .75rem 0;
-		border-right: 0;
-		border-bottom: 1px solid var(--border-color-medium, #d8dde3);
-	}
-
-	.qvoip-status-item:last-child {
+		padding: .75rem 1rem;
+		border-right: 1px solid var(--qmd-border, #E7E2F4);
 		border-bottom: 0;
 	}
 

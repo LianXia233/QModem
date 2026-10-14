@@ -8,6 +8,13 @@
 'require dom';
 'require poll';
 
+// Load shared QModem Soft Anime design system
+document.head.appendChild(E('link', {
+	'rel': 'stylesheet',
+	'type': 'text/css',
+	'href': L.resource('qmodem/qmodem-next.css')
+}));
+
 var callInitAction = rpc.declare({
 	object: 'luci',
 	method: 'setInitAction',
@@ -698,7 +705,7 @@ return view.extend({
 			}
 			container.appendChild(
 				E('span', {
-					'style': 'display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #FFA500;',
+					'class': 'qmodem-dot qmodem-dot-warn',
 					'title': _('Error: ') + err.message
 				})
 			);

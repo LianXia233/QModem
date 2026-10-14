@@ -4,6 +4,13 @@
 'require dom';
 'require qmodem.qmodem as qmodem';
 
+// Load shared QModem Soft Anime design system
+document.head.appendChild(E('link', {
+	'rel': 'stylesheet',
+	'type': 'text/css',
+	'href': L.resource('qmodem/qmodem-next.css')
+}));
+
 return view.extend({
 	load: function() {
 		return qmodem.getModemSections();
@@ -146,14 +153,14 @@ return view.extend({
 			dom.content(buttonsField, btns);
 			
 			if (!supported) {
-				buttonsField.appendChild(E('div', { 'style': 'margin-top: 10px; color: #999;' }, 
+				buttonsField.appendChild(E('div', { 'class': 'qmodem-help-text' },
 					_('This modem does not support SIM switching.')));
 			}
 			
 			// Display ExtraInfo if available
 			var extraInfo = supportResult && supportResult.ExtraInfo;
 			if (extraInfo) {
-				statusInfo.push(E('div', { 'style': 'margin-top: 5px; color: #f0ad4e;' }, [
+				statusInfo.push(E('div', { 'class': 'qmodem-note-warn' }, [
 					E('strong', {}, _('Note') + ': '),
 					E('span', {}, _(extraInfo))
 				]));

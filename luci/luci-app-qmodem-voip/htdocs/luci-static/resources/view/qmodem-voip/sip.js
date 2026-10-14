@@ -6,6 +6,9 @@
 'require qmodem-voip.rpc as rpc';
 
 document.head.appendChild(E('link', {
+	rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/soft-anime.css')
+}));
+document.head.appendChild(E('link', {
 	rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/qmodem-voip.css')
 }));
 

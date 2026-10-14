@@ -477,7 +477,34 @@ return view.extend({
 		}
 
 		var container = E('div', { 'class': 'cbi-map' });
-		
+
+		// Soft Anime hero band (brand / welcome area, CSS-only decoration)
+		var hero = E('div', { 'class': 'qmodem-hero' }, [
+			E('h1', { 'class': 'qmodem-hero-title' }, [
+				_('Modem Dashboard'),
+				E('span', { 'class': 'qmodem-chip qmodem-chip-info' },
+					_('%d modem(s) detected').format(modems.length))
+			]),
+			E('p', { 'class': 'qmodem-hero-sub' },
+				_('Signal, SIM and network overview. Drag cards to reorder, click a title to collapse.'))
+		]);
+		// CSS-only mascot (inline SVG, no external resource; parsed via innerHTML
+		// so the browser creates proper SVG namespace nodes)
+		var mascot = E('div', { 'class': 'qmodem-mascot', 'aria-hidden': 'true' });
+		mascot.innerHTML =
+			'<svg viewBox="0 0 84 64" xmlns="http://www.w3.org/2000/svg" width="84" height="64">' +
+			'<path d="M20 34 Q18 10 30 12 Q36 13 38 22 L46 22 Q48 13 54 12 Q66 10 64 34 Q64 58 42 58 Q20 58 20 34 Z" fill="#EFE9FF"/>' +
+			'<path d="M30 12 Q36 13 38 22 L33 24 Q31 17 30 12 Z" fill="#EFA8CB"/>' +
+			'<path d="M54 12 Q48 13 46 22 L51 24 Q53 17 54 12 Z" fill="#EFA8CB"/>' +
+			'<circle cx="33" cy="36" r="3" fill="#34334B"/>' +
+			'<circle cx="51" cy="36" r="3" fill="#34334B"/>' +
+			'<ellipse cx="28" cy="43" rx="4" ry="2.4" fill="#EFA8CB" opacity="0.7"/>' +
+			'<ellipse cx="56" cy="43" rx="4" ry="2.4" fill="#EFA8CB" opacity="0.7"/>' +
+			'<path d="M39 44 Q42 47 45 44" stroke="#34334B" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+			'</svg>';
+		hero.appendChild(mascot);
+		container.appendChild(hero);
+
 		// Create modem selector section
 		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
 		var selectorTable = E('table', { 'class': 'table' });
@@ -512,9 +539,8 @@ return view.extend({
 		container.appendChild(copyrightDiv);
 		
 		// Create update time display
-		var updateTimeSection = E('fieldset', { 'class': 'cbi-section' });
-		var updateTimeDiv = E('div', { 
-			'style': 'text-align: right; padding: 5px; color: #888;',
+		var updateTimeSection = E('div', { 'class': 'qmodem-last-update' });
+		var updateTimeDiv = E('span', {
 			'id': 'update_time_display'
 		}, _('Last update') + ': -');
 		updateTimeSection.appendChild(updateTimeDiv);

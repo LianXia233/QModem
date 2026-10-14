@@ -7,6 +7,14 @@
 'require poll';
 'require fs';
 
+// Load shared QModem Soft Anime design system (packaged by luci-app-qmodem-next,
+// which this package already depends on)
+document.head.appendChild(E('link', {
+	'rel': 'stylesheet',
+	'type': 'text/css',
+	'href': L.resource('qmodem/qmodem-next.css')
+}));
+
 var callInitAction = rpc.declare({
 	object: 'luci',
 	method: 'setInitAction',
@@ -279,7 +287,7 @@ return view.extend({
 		o = s.option(form.DummyValue, '_security_warning', _('Security Warning'));
 		o.rawhtml = true;
 		o.cfgvalue = function() {
-			return E('div', { 'class': 'cbi-value-description', 'style': 'color: #c00; padding: 10px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; margin-bottom: 10px;' }, [
+			return E('div', { 'class': 'qmodem-inline-warning' }, [
 				E('strong', {}, '⚠️ ' + _('Security Warning') + ': '),
 				E('span', {}, _('User scripts run with root privileges. Only upload scripts from trusted sources. Malicious scripts can damage your system or compromise security. Review script contents before uploading.'))
 			]);
@@ -372,11 +380,10 @@ return view.extend({
 			}
 			
 			var listItems = scripts.map(function(script) {
-				return E('div', { 'class': 'script-item', 'style': 'display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #eee;' }, [
-					E('span', { 'style': 'flex: 1; font-family: monospace;' }, USER_SCRIPTS_PATH + '/' + script.name),
+				return E('div', { 'class': 'script-item' }, [
+					E('span', { 'class': 'script-item-path' }, USER_SCRIPTS_PATH + '/' + script.name),
 					E('button', {
 						'class': 'cbi-button cbi-button-negative',
-						'style': 'margin-left: 10px;',
 						'data-script': script.name,
 						'click': ui.createHandlerFn(self, function(ev) {
 							var scriptName = ev.target.getAttribute('data-script');
@@ -556,11 +563,10 @@ return view.extend({
 		}
 		
 		scripts.forEach(function(script) {
-			var item = E('div', { 'class': 'script-item', 'style': 'display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #eee;' }, [
-				E('span', { 'style': 'flex: 1; font-family: monospace;' }, USER_SCRIPTS_PATH + '/' + script.name),
+			var item = E('div', { 'class': 'script-item' }, [
+				E('span', { 'class': 'script-item-path' }, USER_SCRIPTS_PATH + '/' + script.name),
 				E('button', {
 					'class': 'cbi-button cbi-button-negative',
-					'style': 'margin-left: 10px;',
 					'data-script': script.name,
 					'click': ui.createHandlerFn(self, function(ev) {
 						var scriptName = ev.target.getAttribute('data-script');

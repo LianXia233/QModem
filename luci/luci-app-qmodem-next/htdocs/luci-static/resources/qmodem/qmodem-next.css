@@ -1,24 +1,955 @@
-/* QModem Next - Additional Styles */
+/*
+ * QModem Next - Soft Anime Design System
+ * Soft Anime x Pastel Glass x Modern Dashboard
+ *
+ * Token layer (light/dark) + component layer, scoped to QModem pages.
+ * This stylesheet is only loaded by QModem views, so selectors below
+ * never leak into other LuCI applications.
+ *
+ * Dark mode resolution order:
+ *   1. [data-qmodem-theme="light"] on <html>  -> forced light
+ *   2. [data-qmodem-theme="dark"]  on <html>  -> forced dark
+ *   3. LuCI dark markers (html.dark / body.dark / data-theme="dark")
+ *   4. prefers-color-scheme: dark (system)
+ */
 
-.compat-progressbar {
-	border: 1px solid var(--border-color-high, var(--progressbarColor, var(--background-color)));
-	border-radius: 3px;
+/* ============================================================
+ * 1. Design Tokens - Light
+ * ============================================================ */
+:root {
+	/* Surfaces */
+	--qmd-bg: #F7F6FC;
+	--qmd-bg-2: #F0EEFA;
+	--qmd-card: #FFFFFF;
+	--qmd-card-2: #FBFAFF;
+	--qmd-overlay: rgba(34, 28, 66, 0.42);
+
+	/* Accents */
+	--qmd-primary: #8875E8;
+	--qmd-primary-hover: #7561D7;
+	--qmd-primary-soft: #EEE9FF;
+	--qmd-pink: #EFA8CB;
+	--qmd-blue: #8CCFE2;
+	--qmd-green: #79CDB0;
+
+	/* Text */
+	--qmd-text-1: #34334B;
+	--qmd-text-2: #77758F;
+	--qmd-text-3: #9997AE;
+
+	/* Lines */
+	--qmd-border: #E7E2F4;
+	--qmd-divider: #EEEBF6;
+
+	/* Status */
+	--qmd-ok: #36AD87;
+	--qmd-warn: #E2A44D;
+	--qmd-err: #D96883;
+	--qmd-info: #6BAFE8;
+	--qmd-ok-soft: rgba(54, 173, 135, 0.12);
+	--qmd-warn-soft: rgba(226, 164, 77, 0.14);
+	--qmd-err-soft: rgba(217, 104, 131, 0.12);
+	--qmd-info-soft: rgba(107, 175, 232, 0.13);
+
+	/* Effects */
+	--qmd-shadow-sm: 0 1px 3px rgba(90, 82, 140, 0.08);
+	--qmd-shadow-md: 0 4px 16px rgba(90, 82, 140, 0.10);
+	--qmd-shadow-lg: 0 10px 32px rgba(90, 82, 140, 0.16);
+	--qmd-glass: rgba(255, 255, 255, 0.72);
+
+	/* Radii */
+	--qmd-r-sm: 8px;
+	--qmd-r-md: 10px;
+	--qmd-r-card: 14px;
+	--qmd-r-lg: 18px;
+	--qmd-r-pill: 999px;
+
+	/* Spacing (4px system) */
+	--qmd-sp-1: 4px;
+	--qmd-sp-2: 8px;
+	--qmd-sp-3: 12px;
+	--qmd-sp-4: 16px;
+	--qmd-sp-5: 20px;
+	--qmd-sp-6: 24px;
+	--qmd-sp-8: 32px;
+	--qmd-sp-10: 40px;
+
+	/* Chart / misc */
+	--qmd-chart-grid: rgba(136, 117, 232, 0.14);
+	--qmd-chart-1: #8875E8;
+	--qmd-chart-2: #8CCFE2;
+	--qmd-chart-3: #EFA8CB;
+	--qmd-focus: rgba(136, 117, 232, 0.35);
+
+	/* LuCI compatibility aliases */
+	--qmd-input-bg: #FFFFFF;
+	--qmd-input-border: #DCD6EF;
+
+	color-scheme: light;
+}
+
+/* ============================================================
+ * 1b. Design Tokens - Dark
+ * ============================================================ */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-qmodem-theme="light"]) {
+		--qmd-bg: #111522;
+		--qmd-bg-2: #171C2D;
+		--qmd-card: #1B2236;
+		--qmd-card-2: #202842;
+		--qmd-overlay: rgba(5, 8, 18, 0.66);
+
+		--qmd-primary: #B4A4FF;
+		--qmd-primary-hover: #C5B9FF;
+		--qmd-primary-soft: #302B4D;
+		--qmd-pink: #EFA6D0;
+		--qmd-blue: #80D4EC;
+		--qmd-green: #75D6B1;
+
+		--qmd-text-1: #EEEAFB;
+		--qmd-text-2: #B0AEC8;
+		--qmd-text-3: #8887A4;
+
+		--qmd-border: #34334D;
+		--qmd-divider: #2B3046;
+
+		--qmd-ok: #4CC39A;
+		--qmd-warn: #ECB869;
+		--qmd-err: #E88AA2;
+		--qmd-info: #7FBFF0;
+		--qmd-ok-soft: rgba(76, 195, 154, 0.16);
+		--qmd-warn-soft: rgba(236, 184, 105, 0.16);
+		--qmd-err-soft: rgba(232, 138, 162, 0.15);
+		--qmd-info-soft: rgba(127, 191, 240, 0.15);
+
+		--qmd-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+		--qmd-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.38);
+		--qmd-shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.5);
+		--qmd-glass: rgba(27, 34, 54, 0.78);
+
+		--qmd-chart-grid: rgba(180, 164, 255, 0.16);
+		--qmd-focus: rgba(180, 164, 255, 0.45);
+
+		--qmd-input-bg: #222A41;
+		--qmd-input-border: #3E3D5C;
+
+		color-scheme: dark;
+	}
+}
+
+/* Explicit dark markers from LuCI themes / manual switch */
+html[data-qmodem-theme="dark"],
+body.qmodem-dark {
+	--qmd-bg: #111522;
+	--qmd-bg-2: #171C2D;
+	--qmd-card: #1B2236;
+	--qmd-card-2: #202842;
+	--qmd-overlay: rgba(5, 8, 18, 0.66);
+
+	--qmd-primary: #B4A4FF;
+	--qmd-primary-hover: #C5B9FF;
+	--qmd-primary-soft: #302B4D;
+	--qmd-pink: #EFA6D0;
+	--qmd-blue: #80D4EC;
+	--qmd-green: #75D6B1;
+
+	--qmd-text-1: #EEEAFB;
+	--qmd-text-2: #B0AEC8;
+	--qmd-text-3: #8887A4;
+
+	--qmd-border: #34334D;
+	--qmd-divider: #2B3046;
+
+	--qmd-ok: #4CC39A;
+	--qmd-warn: #ECB869;
+	--qmd-err: #E88AA2;
+	--qmd-info: #7FBFF0;
+	--qmd-ok-soft: rgba(76, 195, 154, 0.16);
+	--qmd-warn-soft: rgba(236, 184, 105, 0.16);
+	--qmd-err-soft: rgba(232, 138, 162, 0.15);
+	--qmd-info-soft: rgba(127, 191, 240, 0.15);
+
+	--qmd-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+	--qmd-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.38);
+	--qmd-shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.5);
+	--qmd-glass: rgba(27, 34, 54, 0.78);
+
+	--qmd-chart-grid: rgba(180, 164, 255, 0.16);
+	--qmd-focus: rgba(180, 164, 255, 0.45);
+
+	--qmd-input-bg: #222A41;
+	--qmd-input-border: #3E3D5C;
+
+	color-scheme: dark;
+}
+
+/* ============================================================
+ * 2. Page scaffold
+ * ============================================================ */
+.cbi-map {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	color: var(--qmd-text-1);
+	font-size: 14px;
+	line-height: 1.55;
+	-webkit-font-smoothing: antialiased;
+}
+
+.cbi-map h2,
+.cbi-map h3 {
+	color: var(--qmd-text-1);
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.cbi-map-descr,
+.cbi-map-caption {
+	color: var(--qmd-text-2);
+	font-size: 13px;
+	margin: 0 0 var(--qmd-sp-4);
+}
+
+/* Soft anime hero band (welcome / brand area) */
+.qmodem-hero {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--qmd-r-lg);
+	padding: var(--qmd-sp-5) var(--qmd-sp-6);
+	margin-bottom: var(--qmd-sp-5);
+	color: var(--qmd-text-1);
+	background:
+		radial-gradient(120% 160% at 88% 8%, rgba(239, 168, 203, 0.28) 0%, rgba(239, 168, 203, 0) 55%),
+		radial-gradient(90% 140% at 96% 88%, rgba(140, 207, 226, 0.25) 0%, rgba(140, 207, 226, 0) 60%),
+		linear-gradient(120deg, var(--qmd-primary-soft) 0%, var(--qmd-card) 70%);
+	border: 1px solid var(--qmd-border);
+	box-shadow: var(--qmd-shadow-sm);
+}
+
+.qmodem-hero::before {
+	/* Sakura dots, pure CSS, static (no repaint) */
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background-image:
+		radial-gradient(circle 3px at 12% 30%, rgba(239, 168, 203, 0.55) 98%, transparent),
+		radial-gradient(circle 2px at 28% 70%, rgba(136, 117, 232, 0.40) 98%, transparent),
+		radial-gradient(circle 2.5px at 46% 24%, rgba(140, 207, 226, 0.55) 98%, transparent),
+		radial-gradient(circle 2px at 64% 76%, rgba(239, 168, 203, 0.45) 98%, transparent),
+		radial-gradient(circle 3px at 82% 40%, rgba(121, 205, 176, 0.45) 98%, transparent);
+}
+
+.qmodem-hero > * {
+	position: relative;
+	z-index: 1;
+}
+
+.qmodem-hero-title {
+	font-size: 22px;
+	font-weight: 700;
+	margin: 0 0 4px;
+	display: flex;
+	align-items: center;
+	gap: var(--qmd-sp-2);
+	flex-wrap: wrap;
+}
+
+.qmodem-hero-sub {
+	font-size: 13px;
+	color: var(--qmd-text-2);
+	margin: 0;
+}
+
+/* CSS-only mascot: rounded blob cat peeking from the right */
+.qmodem-mascot {
+	position: absolute;
+	right: 18px;
+	bottom: 0;
+	width: 84px;
+	height: 64px;
+	pointer-events: none;
+	z-index: 0;
+	opacity: 0.9;
+}
+
+/* Status chips */
+.qmodem-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 24px;
+	padding: 0 10px;
+	border-radius: var(--qmd-r-pill);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1;
+	white-space: nowrap;
+	border: 1px solid transparent;
+}
+
+.qmodem-chip::before {
+	content: "";
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: currentColor;
+	flex: none;
+}
+
+.qmodem-chip-ok   { color: var(--qmd-ok);   background: var(--qmd-ok-soft);   border-color: color-mix(in srgb, var(--qmd-ok) 30%, transparent); }
+.qmodem-chip-warn { color: var(--qmd-warn); background: var(--qmd-warn-soft); border-color: color-mix(in srgb, var(--qmd-warn) 30%, transparent); }
+.qmodem-chip-err  { color: var(--qmd-err);  background: var(--qmd-err-soft);  border-color: color-mix(in srgb, var(--qmd-err) 30%, transparent); }
+.qmodem-chip-info { color: var(--qmd-info); background: var(--qmd-info-soft); border-color: color-mix(in srgb, var(--qmd-info) 30%, transparent); }
+.qmodem-chip-muted{ color: var(--qmd-text-3); background: var(--qmd-bg-2); border-color: var(--qmd-border); }
+
+/* ============================================================
+ * 3. Cards (cbi-section / fieldset)
+ * ============================================================ */
+.cbi-map fieldset.cbi-section,
+.cbi-map .cbi-section {
+	background: var(--qmd-card);
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-card);
+	box-shadow: var(--qmd-shadow-sm);
+	padding: var(--qmd-sp-4) var(--qmd-sp-5);
+	margin: 0 0 var(--qmd-sp-4);
+	transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.cbi-map fieldset.cbi-section:hover {
+	border-color: color-mix(in srgb, var(--qmd-primary) 32%, var(--qmd-border));
+}
+
+.cbi-map .panel-title {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--qmd-text-1);
+	margin: 0 0 var(--qmd-sp-3);
+	padding: 0;
+	border: none;
+	display: flex;
+	align-items: center;
+	gap: var(--qmd-sp-2);
+}
+
+.cbi-map .panel-title::before {
+	content: "";
+	width: 4px;
+	height: 16px;
+	border-radius: var(--qmd-r-pill);
+	background: linear-gradient(180deg, var(--qmd-primary), var(--qmd-pink));
+	flex: none;
+}
+
+.cbi-map .cbi-section-descr {
+	color: var(--qmd-text-2);
+	font-size: 12.5px;
+	margin: -6px 0 var(--qmd-sp-3);
+}
+
+.cbi-map .cbi-section > legend {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--qmd-text-1);
+	padding: 0 var(--qmd-sp-2);
+	margin-bottom: var(--qmd-sp-2);
+}
+
+/* Overview dashboard: card grid for modem info sections */
+#modem_info_container,
+.qmodem-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+	gap: var(--qmd-sp-4);
+	align-items: start;
+}
+
+#modem_info_container > .cbi-section,
+.qmodem-cards > .cbi-section {
+	margin: 0;
+	min-width: 0;
+}
+
+/* Collapsible sections */
+.cbi-map .cbi-section.collapsible > legend,
+.cbi-map .cbi-section.collapsible > .panel-title {
+	cursor: pointer;
+	user-select: none;
+	position: relative;
+	padding-right: 30px;
+}
+
+.cbi-map .cbi-section.collapsible > legend::after,
+.cbi-map .cbi-section.collapsible > .panel-title::after {
+	content: "";
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	width: 8px;
+	height: 8px;
+	transform: translateY(-65%) rotate(45deg);
+	border-right: 2px solid var(--qmd-text-3);
+	border-bottom: 2px solid var(--qmd-text-3);
+	transition: transform 0.18s ease;
+}
+
+.cbi-map .cbi-section.collapsible.collapsed > legend::after,
+.cbi-map .cbi-section.collapsible.collapsed > .panel-title::after {
+	transform: translateY(-50%) rotate(-45deg);
+}
+
+.cbi-map .cbi-section.collapsible.collapsed > table,
+.cbi-map .cbi-section.collapsible.collapsed > div:not(.panel-title):not(.qmodem-keep) {
+	display: none;
+}
+
+/* Draggable sections */
+.cbi-map .cbi-section.draggable {
+	cursor: grab;
+}
+
+.cbi-map .cbi-section.draggable.dragging {
+	opacity: 0.55;
+	cursor: grabbing;
+	box-shadow: var(--qmd-shadow-lg);
+}
+
+.cbi-map .cbi-section.draggable.drag-over {
+	border-top: 3px solid var(--qmd-primary);
+}
+
+.cbi-map .cbi-section.draggable > legend,
+.cbi-map .cbi-section.draggable > .panel-title {
+	padding-left: 24px;
+	position: relative;
+}
+
+.cbi-map .cbi-section.draggable > legend::before,
+.cbi-map .cbi-section.draggable > .panel-title::before {
+	content: "";
+	position: absolute;
+	left: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 12px;
+	height: 10px;
+	background:
+		linear-gradient(var(--qmd-text-3), var(--qmd-text-3)) 0 1px / 12px 2px no-repeat,
+		linear-gradient(var(--qmd-text-3), var(--qmd-text-3)) 0 5px / 12px 2px no-repeat,
+		linear-gradient(var(--qmd-text-3), var(--qmd-text-3)) 0 9px / 12px 2px no-repeat;
+	opacity: 0.7;
+}
+
+/* Copyright footer */
+.copyright-section {
+	background: var(--qmd-card-2);
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-md);
+	padding: var(--qmd-sp-3) var(--qmd-sp-4);
+	margin: 0 0 var(--qmd-sp-4);
+	font-size: 12px;
+	color: var(--qmd-text-3);
+	text-align: center;
+	word-break: break-word;
+}
+
+.qmodem-last-update {
+	text-align: right;
+	padding: 0 var(--qmd-sp-1) var(--qmd-sp-2);
+	color: var(--qmd-text-3);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+ * 4. Forms
+ * ============================================================ */
+.cbi-map .cbi-value {
+	display: grid;
+	grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+	gap: var(--qmd-sp-3) var(--qmd-sp-4);
+	padding: var(--qmd-sp-2) 0;
+	border-bottom: 1px dashed var(--qmd-divider);
+	align-items: start;
+}
+
+.cbi-map .cbi-value:last-of-type {
+	border-bottom: none;
+}
+
+.cbi-map .cbi-value-title {
+	font-weight: 500;
+	font-size: 13.5px;
+	color: var(--qmd-text-1);
+	padding-top: 9px; /* aligns with 38px inputs */
+	word-break: break-word;
+}
+
+.cbi-map .cbi-value-field {
+	min-width: 0;
+}
+
+.cbi-map .cbi-value-description {
+	color: var(--qmd-text-3);
+	font-size: 12px;
+	margin-top: 4px;
+	line-height: 1.5;
+}
+
+.cbi-map .cbi-section-node {
+	min-width: 0;
+}
+
+/* Inputs */
+.cbi-map input[type="text"],
+.cbi-map input[type="password"],
+.cbi-map input[type="number"],
+.cbi-map input[type="email"],
+.cbi-map input[type="url"],
+.cbi-map input[type="tel"],
+.cbi-map input[type="date"],
+.cbi-map input[type="time"],
+.cbi-map select,
+.cbi-map textarea,
+.cbi-map .cbi-input-text,
+.cbi-map .cbi-input-select,
+.cbi-map .cbi-input-value {
+	background: var(--qmd-input-bg);
+	color: var(--qmd-text-1);
+	border: 1px solid var(--qmd-input-border);
+	border-radius: var(--qmd-r-md);
+	min-height: 38px;
+	padding: 6px 12px;
+	font-size: 13.5px;
+	font-family: inherit;
+	line-height: 1.5;
+	width: 100%;
+	max-width: 480px;
+	box-sizing: border-box;
+	transition: border-color 0.16s ease, box-shadow 0.16s ease;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.cbi-map select {
+	background-image:
+		linear-gradient(45deg, transparent 50%, var(--qmd-text-3) 50%),
+		linear-gradient(135deg, var(--qmd-text-3) 50%, transparent 50%);
+	background-position:
+		calc(100% - 16px) calc(50% - 2px),
+		calc(100% - 11px) calc(50% - 2px);
+	background-size: 5px 5px, 5px 5px;
+	background-repeat: no-repeat;
+	padding-right: 32px;
+}
+
+.cbi-map textarea {
+	min-height: 80px;
+	resize: vertical;
+	max-width: none;
+}
+
+.cbi-map input[type="text"]:focus,
+.cbi-map input[type="password"]:focus,
+.cbi-map input[type="number"]:focus,
+.cbi-map select:focus,
+.cbi-map textarea:focus,
+.cbi-map .cbi-input-text:focus,
+.cbi-map .cbi-input-select:focus {
+	outline: none;
+	border-color: var(--qmd-primary);
+	box-shadow: 0 0 0 3px var(--qmd-focus);
+}
+
+.cbi-map input::placeholder,
+.cbi-map textarea::placeholder {
+	color: var(--qmd-text-3);
+	opacity: 1;
+}
+
+.cbi-map input:disabled,
+.cbi-map select:disabled,
+.cbi-map textarea:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+	background: var(--qmd-bg-2);
+}
+
+/* Radio & checkbox */
+.cbi-map input[type="radio"],
+.cbi-map input[type="checkbox"] {
+	accent-color: var(--qmd-primary);
+	width: 16px;
+	height: 16px;
+	min-height: 0;
+	margin: 0 6px 0 0;
+	cursor: pointer;
+	vertical-align: -2px;
+	flex: none;
+}
+
+.cbi-map .cbi-value-field label {
+	cursor: pointer;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	margin: 4px 14px 4px 0;
+}
+
+/* Toggle-ish Flag widgets (cbi-checkbox renders label+input) */
+.cbi-map .cbi-input-checkbox {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* ============================================================
+ * 5. Buttons
+ * ============================================================ */
+.cbi-map .cbi-button,
+.cbi-map .btn,
+.cbi-map button.cbi-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--qmd-sp-2);
+	min-height: 38px;
+	padding: 6px 16px;
+	border-radius: var(--qmd-r-md);
+	font-size: 13.5px;
+	font-weight: 500;
+	font-family: inherit;
+	line-height: 1.4;
+	cursor: pointer;
+	border: 1px solid transparent;
+	transition: background-color 0.16s ease, border-color 0.16s ease,
+		color 0.16s ease, box-shadow 0.16s ease, transform 0.1s ease;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.cbi-map .cbi-button:focus-visible,
+.cbi-map .btn:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--qmd-focus);
+}
+
+.cbi-map .cbi-button:active {
+	transform: translateY(1px);
+}
+
+.cbi-map .cbi-button[disabled],
+.cbi-map .cbi-button.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Primary action */
+.cbi-map .cbi-button-apply,
+.cbi-map .cbi-button-action,
+.cbi-map .cbi-button-save,
+.cbi-map .btn.cbi-button-action,
+.cbi-map .btn.cbi-button-positive {
+	background: var(--qmd-primary);
+	color: #FFFFFF;
+	border-color: var(--qmd-primary);
+}
+
+.cbi-map .cbi-button-apply:hover,
+.cbi-map .cbi-button-action:hover,
+.cbi-map .cbi-button-save:hover,
+.cbi-map .btn.cbi-button-action:hover,
+.cbi-map .btn.cbi-button-positive:hover {
+	background: var(--qmd-primary-hover);
+	border-color: var(--qmd-primary-hover);
+	color: #FFFFFF;
+}
+
+/* Secondary / neutral */
+.cbi-map .cbi-button-neutral,
+.cbi-map .cbi-button-reset,
+.cbi-map .btn.cbi-button-neutral,
+.cbi-map .btn.cbi-button {
+	background: var(--qmd-card);
+	color: var(--qmd-text-1);
+	border-color: var(--qmd-input-border);
+}
+
+.cbi-map .cbi-button-neutral:hover,
+.cbi-map .cbi-button-reset:hover,
+.cbi-map .btn.cbi-button-neutral:hover,
+.cbi-map .btn.cbi-button:hover {
+	background: var(--qmd-primary-soft);
+	border-color: var(--qmd-primary);
+	color: var(--qmd-primary);
+}
+
+html[data-qmodem-theme="dark"] .cbi-map .cbi-button-apply,
+html[data-qmodem-theme="dark"] .cbi-map .cbi-button-action,
+body.qmodem-dark .cbi-map .cbi-button-apply,
+body.qmodem-dark .cbi-map .cbi-button-action {
+	color: #1B2236;
+	font-weight: 600;
+}
+
+/* Danger */
+.cbi-map .cbi-button-negative,
+.cbi-map .cbi-button-remove {
+	background: var(--qmd-err-soft);
+	color: var(--qmd-err);
+	border-color: color-mix(in srgb, var(--qmd-err) 34%, transparent);
+}
+
+.cbi-map .cbi-button-negative:hover,
+.cbi-map .cbi-button-remove:hover {
+	background: var(--qmd-err);
+	border-color: var(--qmd-err);
+	color: #FFFFFF;
+}
+
+/* Page-level action bar */
+.cbi-map .cbi-page-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--qmd-sp-2);
+	justify-content: flex-end;
+	padding-top: var(--qmd-sp-4);
+	border-top: 1px solid var(--qmd-divider);
+	margin-top: var(--qmd-sp-4);
+}
+
+/* ============================================================
+ * 6. Tables
+ * ============================================================ */
+.cbi-map table.table,
+.cbi-map .table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+	min-width: 0;
+}
+
+.cbi-map .table .th,
+.cbi-map .table .td {
+	padding: 9px 12px;
+	vertical-align: middle;
+	text-align: left;
+	border-bottom: 1px solid var(--qmd-divider);
+	word-break: break-word;
+}
+
+.cbi-map .table .th {
+	background: var(--qmd-bg-2);
+	color: var(--qmd-text-2);
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: none;
+	letter-spacing: 0.01em;
+	white-space: nowrap;
+}
+
+.cbi-map .table tr:last-child .td {
+	border-bottom: none;
+}
+
+.cbi-map .table .tr:hover .td,
+.cbi-map .table tbody tr:hover .td,
+.cbi-map .cbi-section-table-row:hover > .td {
+	background: var(--qmd-card-2);
+}
+
+.cbi-map .cbi-section-table {
+	background: transparent;
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-md);
+	overflow: hidden;
+}
+
+.cbi-map .cbi-section-table .tr.cbi-section-table-titles .th {
+	border-bottom: 1px solid var(--qmd-border);
+}
+
+/* Key-value info tables on overview */
+#modem_info_container .table .td:first-child {
+	color: var(--qmd-text-2);
+	width: 40%;
+	font-size: 12.5px;
+}
+
+#modem_info_container .table .td {
+	border-bottom: 1px dashed var(--qmd-divider);
+}
+
+#modem_info_container .table .tr:last-child .td {
+	border-bottom: none;
+}
+
+/* Generic label badges inside tables */
+.cbi-map .cbi-section-table .label,
+.cbi-map .label {
+	display: inline-block;
+	padding: 2px 9px;
+	border-radius: var(--qmd-r-pill);
+	font-weight: 600;
+	font-size: 11.5px;
+	background: var(--qmd-primary-soft);
+	color: var(--qmd-primary);
+}
+
+.cbi-map .label.success,
+.cbi-map .label.positive {
+	background: var(--qmd-ok-soft);
+	color: var(--qmd-ok);
+}
+
+.cbi-map .label.warning {
+	background: var(--qmd-warn-soft);
+	color: var(--qmd-warn);
+}
+
+.cbi-map .label.error,
+.cbi-map .label.negative {
+	background: var(--qmd-err-soft);
+	color: var(--qmd-err);
+}
+
+/* Wide table horizontal scroll containment */
+.cbi-map .table-scroll,
+.cbi-map .cbi-section-node {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* ============================================================
+ * 7. Alerts & notifications
+ * ============================================================ */
+.cbi-map .alert-message,
+.cbi-map div.alert-message {
+	border-radius: var(--qmd-r-md);
+	padding: var(--qmd-sp-3) var(--qmd-sp-4);
+	font-size: 13px;
+	border: 1px solid transparent;
+	box-shadow: none;
+	background: var(--qmd-card-2);
+	color: var(--qmd-text-1);
+	display: flex;
+	align-items: flex-start;
+	gap: var(--qmd-sp-2);
+}
+
+.cbi-map .alert-message::before {
+	font-weight: 700;
+	flex: none;
+	line-height: 1.5;
+}
+
+.cbi-map .alert-message.info {
+	background: var(--qmd-info-soft);
+	border-color: color-mix(in srgb, var(--qmd-info) 30%, transparent);
+	color: var(--qmd-info);
+}
+.cbi-map .alert-message.info::before { content: "\2139"; } /* i */
+
+.cbi-map .alert-message.warning {
+	background: var(--qmd-warn-soft);
+	border-color: color-mix(in srgb, var(--qmd-warn) 30%, transparent);
+	color: var(--qmd-warn);
+}
+.cbi-map .alert-message.warning::before { content: "\26A0"; } /* triangle */
+
+.cbi-map .alert-message.error {
+	background: var(--qmd-err-soft);
+	border-color: color-mix(in srgb, var(--qmd-err) 30%, transparent);
+	color: var(--qmd-err);
+}
+.cbi-map .alert-message.error::before { content: "\2715"; } /* x */
+
+.cbi-map .alert-message.success {
+	background: var(--qmd-ok-soft);
+	border-color: color-mix(in srgb, var(--qmd-ok) 30%, transparent);
+	color: var(--qmd-ok);
+}
+.cbi-map .alert-message.success::before { content: "\2713"; } /* check */
+
+/* ============================================================
+ * 8. Tabs
+ * ============================================================ */
+.cbi-map .cbi-tabmenu {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 var(--qmd-sp-4);
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	border-bottom: 1px solid var(--qmd-divider);
+}
+
+.cbi-map .cbi-tabmenu li {
+	padding: 8px 14px;
+	margin: 0;
+	cursor: pointer;
+	border: none;
+	border-radius: var(--qmd-r-sm) var(--qmd-r-sm) 0 0;
+	background: transparent;
+	font-size: 13.5px;
+	font-weight: 500;
+	color: var(--qmd-text-2);
+	position: relative;
+	transition: color 0.16s ease, background-color 0.16s ease;
+}
+
+.cbi-map .cbi-tabmenu li:hover {
+	background: var(--qmd-primary-soft);
+	color: var(--qmd-primary);
+}
+
+.cbi-map .cbi-tabmenu li.cbi-tab {
+	background: transparent;
+	color: var(--qmd-primary);
+	font-weight: 600;
+}
+
+.cbi-map .cbi-tabmenu li.cbi-tab::after {
+	content: "";
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	bottom: -1px;
+	height: 2.5px;
+	border-radius: var(--qmd-r-pill);
+	background: linear-gradient(90deg, var(--qmd-primary), var(--qmd-pink));
+}
+
+.cbi-map .cbi-tabmenu li.cbi-tab-disabled {
+	color: var(--qmd-text-3);
+}
+
+/* ============================================================
+ * 9. Progress bars
+ * ============================================================ */
+.cbi-map .compat-progressbar,
+.cbi-map .cbi-progressbar {
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-pill);
 	position: relative;
 	min-width: 170px;
-	height: 8px;
+	height: 10px;
 	margin: 1.4em 0 4px 0;
-	background: var(--background-color-medium, var(--progressbarColor));
+	background: var(--qmd-bg-2);
+	overflow: hidden;
 }
 
-.compat-progressbar > div {
-	background: var(--progressbar, var(--primary, var(--primary-color-medium)));
+.cbi-map .compat-progressbar > div,
+.cbi-map .cbi-progressbar > div {
+	background: linear-gradient(90deg, var(--qmd-primary), var(--qmd-blue));
 	height: 100%;
-	transition: width .25s ease-in;
+	transition: width 0.25s ease-in-out;
 	width: 0%;
-	border-radius: 2px;
+	border-radius: var(--qmd-r-pill);
 }
 
-.compat-progressbar::before {
+.cbi-map .compat-progressbar::before,
+.cbi-map .cbi-progressbar::before {
 	position: absolute;
 	top: -1.4em;
 	left: 0;
@@ -26,263 +957,397 @@
 	white-space: pre;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	max-width: 100%;
+	color: var(--qmd-text-2);
+	font-size: 11.5px;
+	font-variant-numeric: tabular-nums;
 }
 
-/* Advanced Config Tab Styles */
-.cbi-tabmenu {
-	list-style: none;
-	padding: 0;
-	margin: 0 0 1em 0;
+/* ============================================================
+ * 10. SMS components
+ * ============================================================ */
+.cbi-map .sms-conversations {
+	margin: var(--qmd-sp-4) 0;
+}
+
+.cbi-map .sms-conversation-header {
 	display: flex;
+	align-items: center;
+	gap: var(--qmd-sp-2);
+	margin-bottom: var(--qmd-sp-3);
 	flex-wrap: wrap;
-	border-bottom: 2px solid var(--border-color-medium, #cccccc);
 }
 
-.cbi-tabmenu li {
-	padding: 0.5rem 1rem;
-	margin: 0 0.25rem -2px 0;
-	cursor: pointer;
-	border: 1px solid transparent;
-	border-radius: 4px 4px 0 0;
-	background: var(--background-color-medium, #f5f5f5);
-	transition: all 0.2s;
-}
-
-.cbi-tabmenu li.cbi-tab {
-	background: var(--background-color-high, #ffffff);
-	border-color: var(--border-color-medium, #cccccc);
-	border-bottom-color: var(--background-color-high, #ffffff);
-	font-weight: bold;
-	color: var(--primary-color-medium, #0066cc);
-}
-
-.cbi-tabmenu li.cbi-tab-disabled {
-	color: var(--text-color-secondary, #666666);
-}
-
-.cbi-tabmenu li.cbi-tab-disabled:hover {
-	background: var(--background-color-high, #e8e8e8);
-	border-color: var(--border-color-low, #dddddd);
-}
-
-/* Dial Mode Radio Buttons and Network Preference Checkboxes */
-.cbi-value-field input[type="radio"],
-.cbi-value-field input[type="checkbox"] {
-	margin-right: 8px;
-	cursor: pointer;
-}
-
-.cbi-value-field label {
-	cursor: pointer;
-	user-select: none;
-}
-
-/* Lock Band Styles */
-.band-container {
-	display: flex;
-	align-items: center;
-	margin: 5px 15px 5px 0;
-	min-width: 100px;
-}
-
-#lockband_content_modem h3 {
-	color: var(--primary-color-medium, #0066cc);
-	border-bottom: 1px solid var(--border-color-low, #e0e0e0);
-	padding-bottom: 5px;
-}
-
-/* Neighbor Cell Table Styles */
-#neighbor_list_modem h4 {
-	color: var(--primary-color-medium, #0066cc);
-	margin: 10px 0 5px 0;
-	font-size: 1em;
-	font-weight: bold;
-}
-
-.cbi-section-table .label {
-	display: inline-block;
-	padding: 2px 8px;
-	border-radius: 3px;
-	font-weight: bold;
-	font-size: 0.9em;
-}
-
-.cbi-section-table-row:hover {
-	background-color: var(--background-color-medium, #f5f5f5);
-}
-
-/* SMS Interface Styles */
-.sms-conversations {
-	margin: 20px 0;
-}
-
-.sms-conversation-header {
-	display: flex;
-	align-items: center;
-	margin-bottom: 10px;
-}
-
-.sms-messages-area {
+.cbi-map .sms-messages-area {
 	max-height: 500px;
 	overflow-y: auto;
-	border: 1px solid var(--border-color-medium, #cccccc);
-	border-radius: 4px;
-	padding: 15px;
-	background: var(--background-color-high, #f9f9f9);
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-md);
+	padding: var(--qmd-sp-4);
+	background: var(--qmd-card-2);
 }
 
-.sms-messages-list {
+.cbi-map .sms-messages-list {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 }
 
-.sms-message-wrapper {
+.cbi-map .sms-message-wrapper {
 	display: flex;
 	width: 100%;
 }
 
-.sms-message-wrapper-left {
-	justify-content: flex-start;
-}
+.cbi-map .sms-message-wrapper-left { justify-content: flex-start; }
+.cbi-map .sms-message-wrapper-right { justify-content: flex-end; }
 
-.sms-message-wrapper-right {
-	justify-content: flex-end;
-}
-
-.sms-message-bubble {
-	max-width: 70%;
-	padding: 10px 15px;
-	border-radius: 12px;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+.cbi-map .sms-message-bubble {
+	max-width: min(70%, 480px);
+	padding: 10px 14px;
+	border-radius: var(--qmd-r-lg);
+	box-shadow: var(--qmd-shadow-sm);
 	word-wrap: break-word;
+	overflow-wrap: anywhere;
+	animation: qmd-pop-in 0.18s ease both;
 }
 
-.sms-message-received {
-	background: var(--background-color-high, #ffffff);
-	border: 1px solid var(--border-color-low, #e0e0e0);
-	border-top-left-radius: 2px;
+@keyframes qmd-pop-in {
+	from { opacity: 0; transform: translateY(4px); }
+	to   { opacity: 1; transform: none; }
 }
 
-.sms-message-sent {
-	background: var(--primary-color-medium, #0066cc);
-	color: white;
-	border-top-right-radius: 2px;
+.cbi-map .sms-message-received {
+	background: var(--qmd-card);
+	border: 1px solid var(--qmd-border);
+	border-top-left-radius: 6px;
+	color: var(--qmd-text-1);
 }
 
-.sms-message-content {
+.cbi-map .sms-message-sent {
+	background: linear-gradient(135deg, var(--qmd-primary), color-mix(in srgb, var(--qmd-primary) 78%, var(--qmd-pink)));
+	color: #FFFFFF;
+	border-top-right-radius: 6px;
+}
+
+.cbi-map .sms-message-content {
 	margin-bottom: 5px;
-	line-height: 1.4;
+	line-height: 1.45;
 	white-space: pre-wrap;
 }
 
-.sms-message-meta {
+.cbi-map .sms-message-meta {
 	font-size: 11px;
-	color: var(--text-color-secondary, #666666);
+	color: var(--qmd-text-3);
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
+	gap: 6px;
 }
 
-.sms-message-sent .sms-message-meta {
-	color: rgba(255, 255, 255, 0.8);
+.cbi-map .sms-message-sent .sms-message-meta {
+	color: rgba(255, 255, 255, 0.82);
 }
 
-.sms-message-time {
-	font-style: italic;
+.cbi-map .sms-message-time {
+	font-style: normal;
+	font-variant-numeric: tabular-nums;
 }
 
-.sms-message-info {
+.cbi-map .sms-message-info {
 	font-size: 10px;
-	padding: 1px 4px;
-	background: var(--background-color-medium, #f0f0f0);
-	border-radius: 3px;
+	padding: 1px 6px;
+	background: var(--qmd-bg-2);
+	border-radius: var(--qmd-r-pill);
 }
 
-.sms-message-sent .sms-message-info {
-	background: rgba(255, 255, 255, 0.2);
+.cbi-map .sms-message-sent .sms-message-info {
+	background: rgba(255, 255, 255, 0.22);
 }
 
-.sms-message-warning {
-	font-size: 10px;
-	font-weight: bold;
+.cbi-map .sms-message-warning {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--qmd-warn);
 }
 
-/* Character counter colors */
-#sms-char-counter {
-	font-weight: bold;
+.cbi-map .sms-message-failed {
+	border-color: color-mix(in srgb, var(--qmd-err) 45%, transparent);
 }
 
-/* Collapsible Section Styles */
-.cbi-section.collapsible > legend,
-.cbi-section.collapsible > .panel-title {
-	cursor: pointer;
-	user-select: none;
+.cbi-map span.sms-message-failed {
+	margin-left: 10px;
+	color: var(--qmd-err);
+	font-weight: 600;
+}
+
+.cbi-map .sms-unread-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 6px;
+	border-radius: var(--qmd-r-pill);
+	background: var(--qmd-pink);
+	color: #FFFFFF;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.cbi-map .sms-sim-messages {
+	min-width: 0;
+}
+
+/* ============================================================
+ * 11. Modals
+ * ============================================================ */
+body > #modal_overlay .modal,
+.modal {
+	background: var(--qmd-card) !important;
+	color: var(--qmd-text-1) !important;
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-lg) !important;
+	box-shadow: var(--qmd-shadow-lg) !important;
+	font-family: inherit;
+}
+
+body > #modal_overlay .modal h4,
+.modal h4 {
+	color: var(--qmd-text-1);
+	font-weight: 600;
+}
+
+body > #modal_overlay .modal .btn,
+.modal .btn {
+	border-radius: var(--qmd-r-md);
+}
+
+.cbi-map .right {
+	display: flex;
+	gap: var(--qmd-sp-2);
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+
+/* ============================================================
+ * 12. Loading / spinning
+ * ============================================================ */
+.cbi-map .spinning {
 	position: relative;
-	padding-right: 30px;
+	padding-left: 26px;
+	color: var(--qmd-text-2);
+	min-height: 24px;
+	display: inline-flex;
+	align-items: center;
 }
 
-.cbi-section.collapsible > legend::after,
-.cbi-section.collapsible > .panel-title::after {
-	content: '▼';
+.cbi-map .spinning::before {
+	content: "";
 	position: absolute;
-	right: 10px;
+	left: 0;
 	top: 50%;
-	transform: translateY(-50%);
-	font-size: 0.8em;
-	transition: transform 0.2s ease;
+	width: 16px;
+	height: 16px;
+	margin-top: -8px;
+	border-radius: 50%;
+	border: 2.5px solid var(--qmd-primary-soft);
+	border-top-color: var(--qmd-primary);
+	animation: qmd-spin 0.8s linear infinite;
 }
 
-.cbi-section.collapsible.collapsed > legend::after,
-.cbi-section.collapsible.collapsed > .panel-title::after {
-	transform: translateY(-50%) rotate(-90deg);
+@keyframes qmd-spin {
+	to { transform: rotate(360deg); }
 }
 
-.cbi-section.collapsible.collapsed > table,
-.cbi-section.collapsible.collapsed > div:not(.panel-title) {
-	display: none;
+/* ============================================================
+ * 12b. Utility classes (replace hardcoded inline styles)
+ * ============================================================ */
+.cbi-map .qmodem-help-text {
+	font-size: 12px;
+	color: var(--qmd-text-3);
+	margin-top: 4px;
+	line-height: 1.5;
 }
 
-/* Draggable Section Styles */
-.cbi-section.draggable {
-	cursor: move;
-	transition: box-shadow 0.2s ease;
+.cbi-map .qmodem-note-warn {
+	color: var(--qmd-warn);
+	font-size: 12.5px;
+	margin-top: 5px;
 }
 
-.cbi-section.draggable.dragging {
-	opacity: 0.5;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.cbi-map .qmodem-note-warn strong {
+	font-weight: 600;
 }
 
-.cbi-section.draggable.drag-over {
-	border-top: 3px solid var(--primary-color-medium, #0066cc);
+.cbi-map .qmodem-dot {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	flex: none;
+	vertical-align: -1px;
 }
 
-.cbi-section.draggable > legend,
-.cbi-section.draggable > .panel-title {
-	padding-left: 30px;
-	position: relative;
+.cbi-map .qmodem-dot-ok   { background: var(--qmd-ok); }
+.cbi-map .qmodem-dot-warn { background: var(--qmd-warn); }
+.cbi-map .qmodem-dot-err  { background: var(--qmd-err); }
+.cbi-map .qmodem-dot-info { background: var(--qmd-info); }
+
+/* Inline warning card (monitor: user scripts security notice) */
+.cbi-map .qmodem-inline-warning {
+	background: var(--qmd-warn-soft);
+	border: 1px solid color-mix(in srgb, var(--qmd-warn) 30%, transparent);
+	border-radius: var(--qmd-r-md);
+	padding: var(--qmd-sp-3) var(--qmd-sp-4);
+	margin-bottom: var(--qmd-sp-3);
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--qmd-warn);
 }
 
-.cbi-section.draggable > legend::before,
-.cbi-section.draggable > .panel-title::before {
-	content: '≡';
-	position: absolute;
-	left: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 1.2em;
-	color: var(--text-color-secondary, #888888);
+.cbi-map .qmodem-inline-warning strong {
+	font-weight: 600;
 }
 
-/* Copyright Display Styles */
-.copyright-section {
-	background: var(--background-color-medium, #f9f9f9);
-	border: 1px solid var(--border-color-low, #e0e0e0);
-	border-radius: 4px;
-	padding: 10px 15px;
-	margin: 10px 0;
-	font-size: 0.9em;
-	color: var(--text-color-secondary, #666666);
-	text-align: center;
+/* User script list rows (monitor) */
+.cbi-map .script-item {
+	display: flex;
+	align-items: center;
+	gap: var(--qmd-sp-3);
+	padding: var(--qmd-sp-2) 0;
+	border-bottom: 1px solid var(--qmd-divider);
+	min-height: 40px;
+	flex-wrap: wrap;
+}
+
+.cbi-map .script-item:last-child {
+	border-bottom: none;
+}
+
+.cbi-map .script-item-path {
+	flex: 1;
+	min-width: 0;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12.5px;
+	color: var(--qmd-text-2);
+	font-variant-numeric: tabular-nums;
+	word-break: break-all;
+}
+
+/* ============================================================
+ * 13. Scrollbars & selection
+ * ============================================================ */
+.cbi-map ::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+.cbi-map ::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.cbi-map ::-webkit-scrollbar-thumb {
+	background: color-mix(in srgb, var(--qmd-primary) 34%, var(--qmd-border));
+	border-radius: var(--qmd-r-pill);
+	border: 2px solid transparent;
+	background-clip: content-box;
+}
+
+.cbi-map ::-webkit-scrollbar-thumb:hover {
+	background: var(--qmd-primary);
+	border: 2px solid transparent;
+	background-clip: content-box;
+}
+
+.cbi-map ::selection {
+	background: color-mix(in srgb, var(--qmd-primary) 30%, transparent);
+}
+
+/* ============================================================
+ * 14. Responsive - tablet (<=1024px)
+ * ============================================================ */
+@media (max-width: 1024px) {
+	#modem_info_container,
+	.qmodem-cards {
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+	}
+}
+
+/* ============================================================
+ * 15. Responsive - phone (<=768px)
+ * ============================================================ */
+@media (max-width: 768px) {
+	.cbi-map {
+		font-size: 13.5px;
+	}
+
+	#modem_info_container,
+	.qmodem-cards {
+		grid-template-columns: 1fr;
+		gap: var(--qmd-sp-3);
+	}
+
+	.qmodem-hero {
+		padding: var(--qmd-sp-4);
+		border-radius: var(--qmd-r-card);
+	}
+
+	.qmodem-hero-title { font-size: 20px; }
+	.qmodem-mascot { width: 64px; height: 50px; right: 10px; }
+
+	.cbi-map fieldset.cbi-section,
+	.cbi-map .cbi-section {
+		padding: var(--qmd-sp-3) var(--qmd-sp-4);
+	}
+
+	/* Stacked label-over-control layout */
+	.cbi-map .cbi-value {
+		grid-template-columns: 1fr;
+		gap: 4px;
+	}
+
+	.cbi-map .cbi-value-title {
+		padding-top: 0;
+	}
+
+	.cbi-map input[type="text"],
+	.cbi-map input[type="password"],
+	.cbi-map input[type="number"],
+	.cbi-map select,
+	.cbi-map textarea,
+	.cbi-map .cbi-input-text,
+	.cbi-map .cbi-input-select {
+		max-width: none;
+		min-height: 42px;
+		font-size: 16px; /* avoid iOS zoom */
+	}
+
+	.cbi-map .cbi-button,
+	.cbi-map .btn {
+		min-height: 42px;
+		padding: 8px 16px;
+	}
+
+	.cbi-map .cbi-page-actions .cbi-button,
+	.cbi-map .cbi-page-actions .btn {
+		flex: 1 1 auto;
+	}
+
+	.cbi-map .table .th,
+	.cbi-map .table .td {
+		padding: 8px 10px;
+	}
+}
+
+/* ============================================================
+ * 16. Reduced motion
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+	.cbi-map *,
+	.cbi-map *::before,
+	.cbi-map *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
 }

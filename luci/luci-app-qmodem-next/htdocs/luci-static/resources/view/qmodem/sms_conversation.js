@@ -130,9 +130,8 @@ return view.extend({
 			timezoneSentCheckbox.checked = true;
 		}
 		
-		var timezoneHelpText = E('div', {
-			'style': 'font-size: 12px; color: #666; margin-top: 5px;'
-		}, _('Enable if SMS timestamps appear 8 hours ahead (e.g., UTC+8 local time parsed as UTC+0)'));
+		var timezoneHelpText = E('div', { 'class': 'qmodem-help-text' },
+			_('Enable if SMS timestamps appear 8 hours ahead (e.g., UTC+8 local time parsed as UTC+0)'));
 		
 		timezoneSentCell.appendChild(timezoneSentCheckbox);
 		timezoneSentCell.appendChild(E('span', { 'style': 'margin-left: 5px;' }, 
@@ -258,10 +257,7 @@ return view.extend({
 		fieldset.appendChild(encodingDiv);
 
 		// Character counter
-		var counterDiv = E('div', { 
-			'class': 'cbi-value',
-			'style': 'font-size: 12px; color: #666;'
-		});
+		var counterDiv = E('div', { 'class': 'cbi-value qmodem-help-text' });
 		var counter = E('span', { 'id': 'sms-char-counter' }, '0/160');
 		counterDiv.appendChild(E('label', { 'class': 'cbi-value-title' }, _('Length')));
 		counterDiv.appendChild(E('div', { 'class': 'cbi-value-field' }, counter));
@@ -512,9 +508,8 @@ return view.extend({
 
 			// Show failed indicator for sent messages
 			if (isSent && msg.is_success === false) {
-				var failedSpan = E('span', { 
+				var failedSpan = E('span', {
 					'class': 'sms-message-failed',
-					'style': 'margin-left: 10px; color: #e74c3c;',
 					'title': _('Failed to send')
 				}, '✗ ' + _('Failed'));
 				metaDiv.appendChild(failedSpan);

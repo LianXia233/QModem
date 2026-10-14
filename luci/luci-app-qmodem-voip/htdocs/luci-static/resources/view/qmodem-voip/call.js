@@ -18,6 +18,7 @@ const STATE_STYLES = {
 	outgoing_setup: 'warning', incoming_ringing: 'warning', early_media: 'warning', active: 'success', terminating: 'warning', recovering: 'warning', fault: 'error'
 };
 
+document.head.appendChild(E('link', { rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/soft-anime.css') }));
 document.head.appendChild(E('link', { rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/qmodem-voip.css') }));
 
 return view.extend({
