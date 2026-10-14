@@ -320,6 +320,22 @@ jobs:
           ./scripts/feeds update qmodem
           ./scripts/feeds install -a -p qmodem
           rm -rf feeds/base/package/kernel/gpio-button-hotplug
+          # SDK 缓存命中时「初始化 SDK 环境」被跳过，缓存里的 .config 还是上一次
+          # 构建的选包结果（如旧的 luci-app-qmodem），新包不会被选中、也就不产出
+          # ipk/apk（报 missing required release package）。因此每次构建都按
+          # openwrt_package.config 重新生成 .config（不 make clean，保留 build_dir 缓存）。
+          echo "CONFIG_ALL_NONSHARED=n" > .config
+          echo "CONFIG_ALL_KMODS=n" >> .config
+          echo "CONFIG_ALL=n" >> .config
+          echo "CONFIG_AUTOREMOVE=n" >> .config
+          echo "CONFIG_LUCI_LANG_zh_Hans=y" >> .config
+          cat ../qmodem/.github/workflows/openwrt_package.config >> .config
+          make defconfig
+          sed -i '/^CONFIG_PACKAGE_gpio-button-hotplug=/d' .config
+          echo 'CONFIG_PACKAGE_gpio-button-hotplug=n' >> .config
+          sed -i '/^CONFIG_PACKAGE_libopenssl=/d;/^CONFIG_PACKAGE_openssl-util=/d' .config
+          echo 'CONFIG_PACKAGE_libopenssl=n' >> .config
+          echo 'CONFIG_PACKAGE_openssl-util=n' >> .config
           # 组件合并后只剩两个源包：qmodem（一体化后端，含全部 C 组件）
           # 与 luci-app-qmodem-next（统一前端，2026-10-14 起 luci/ 回归上游）。原先的 arch-only 列表
           # （tom_modem / ubus_at_daemon）已随合并消失。
