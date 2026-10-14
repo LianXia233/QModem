@@ -12,6 +12,14 @@
 ## [Unreleased]
 
 ### 新增（Added）
+- **短信会话 Pastel Glass 皮肤（theme.js）**：新增 `.qm-app .sms-*`
+  规则覆盖旧会话 CSS —— 接收气泡为 `--qm-surface` 柔影卡片，发送气泡
+  使用 `--qm-accent-gradient` 渐变，会话区升级为毛玻璃面板
+  （backdrop-filter + `--qm-glass-shadow`），未读徽章落在 `--qm-danger`
+  上；明暗两模式均由共享令牌驱动。同时新增 ≤560px 手机端微调：
+  气泡放宽至 `max-width:88%`，会话区高度收敛为 420px，气泡内删除
+  按钮加大为 36px 触控目标，通用 `.btn` / `.cbi-button` 控件提升至
+  42px。
 - **Rust 目标优先 Cortex-A53**：`build-rust.sh` 对 `aarch64*` 目标显式加
   `-C target-cpu=cortex-a53`。实测（`rustc --print cfg`）默认 `generic` 只有
   `crt-static`/`neon`，指定后追加 `aes`/`crc`/`sha2`/`pmuv3`；主力设备 MT7981
@@ -66,6 +74,14 @@
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`。
 
 ### 变更（Changed）
+- **次级视图 Pastel 色彩收敛（Soft Anime 视觉重构）**：
+  `sms_conversation` / `sim_switch` / `monitor` / `ttl` / `modem_config` /
+  `network_config` 中残留的全部硬编码颜色统一为 `--qm-*` 设计令牌 ——
+  连接状态圆点（连接 `--qm-ok`、断开 `--qm-danger`、未知 `--qm-warn`、
+  加载 `--qm-text-muted`），RAT 制式徽章改为 soft 底色胶囊（NR
+  `--qm-ok` / 其他 `--qm-info`），monitor 安全警告与 TTL 重要事项块
+  升级为 `--qm-warn-soft` Pastel 警示卡，短信字符计数器与元数据标记
+  全部令牌化。至此所有 LuCI 视图不再包含任何裸十六进制/颜色名。
 - **LuCI 界面排版与视觉升级**：统一页面宽度——`status` / `network` /
   `system` / `advanced` / `connection` / `device` 六个视图原先各自写死
   `max-width:1160px`（`device` 是 `960px`），现统一读 theme.js 的

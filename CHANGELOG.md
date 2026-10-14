@@ -12,6 +12,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 ## [Unreleased]
 
 ### Added
+- **Pastel Glass SMS conversation skin (theme.js)**: new `.qm-app .sms-*`
+  rules override the legacy conversation CSS — received bubbles render as
+  `--qm-surface` cards with soft shadows, sent bubbles use the
+  `--qm-accent-gradient`, the message area becomes a glass panel
+  (backdrop-filter + `--qm-glass-shadow`), and unread badges sit on
+  `--qm-danger`. Light/dark both follow the shared tokens. Also ≤560px
+  mobile tweaks: bubbles widen to `max-width:88%`, the message area is
+  capped at 420px, in-bubble delete buttons become 36px touch targets and
+  generic `.btn` / `.cbi-button` controls are raised to 42px.
 - **Rust target optimized for Cortex-A53**: `build-rust.sh` now passes
   `-C target-cpu=cortex-a53` for `aarch64*` targets. Measured with
   `rustc --print cfg`, the default `generic` CPU exposes only
@@ -77,6 +86,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   `uci set qmodem.main.at_tool='0' && uci commit qmodem`.
 
 ### Changed
+- **Secondary-view pastel token sweep (Soft Anime visual refactor)**:
+  all remaining hardcoded colors in `sms_conversation` / `sim_switch` /
+  `monitor` / `ttl` / `modem_config` / `network_config` are now `--qm-*`
+  design tokens — connection status dots (connected `--qm-ok`,
+  disconnected `--qm-danger`, unknown `--qm-warn`, loading
+  `--qm-text-muted`), RAT badges restyled as soft pills (NR `--qm-ok` /
+  others `--qm-info`), the monitor security warning and the TTL
+  important-notes block upgraded to `--qm-warn-soft` pastel cards, and
+  the SMS char counter / meta chips tokenized. Every LuCI view now
+  ships zero bare hex or named colors.
 - **LuCI layout + visual upgrade**: unified page width across 6 views
   (`status` / `network` / `system` / `advanced` / `connection` / `device`
   each hard-coded `max-width:1160px`, `device` used `960px`) — they now all
