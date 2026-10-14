@@ -329,9 +329,9 @@ msgstr ""
 #: view/qmodem/modem_config.js:856
 #: view/qmodem/modem_config.js:860
 #: view/qmodem/modem_config.js:863
-#: view/qmodem/modem_config.js:1328
-#: view/qmodem/modem_config.js:1333
-#: view/qmodem/modem_config.js:1336
+#: view/qmodem/modem_config.js:1330
+#: view/qmodem/modem_config.js:1335
+#: view/qmodem/modem_config.js:1338
 msgid "Apply"
 msgstr ""
 
@@ -346,7 +346,7 @@ msgstr ""
 #: view/qmodem/modem_config.js:236
 #: view/qmodem/modem_config.js:375
 #: view/qmodem/modem_config.js:845
-#: view/qmodem/modem_config.js:1318
+#: view/qmodem/modem_config.js:1320
 msgid "Applying..."
 msgstr ""
 
@@ -375,11 +375,11 @@ msgstr ""
 msgid "Are you sure you want to delete this script?"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1474
+#: view/qmodem/modem_config.js:1476
 msgid "Are you sure you want to perform a hard reboot? This will power cycle the modem and may cause a longer disconnection."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1437
+#: view/qmodem/modem_config.js:1439
 msgid "Are you sure you want to perform a soft reboot? The modem will restart and may lose connection temporarily."
 msgstr ""
 
@@ -508,7 +508,7 @@ msgid "Block Auto Probe/Remove"
 msgstr ""
 
 #: view/qmodem/modem_config.js:769
-#: view/qmodem/modem_config.js:1081
+#: view/qmodem/modem_config.js:1083
 msgid "Boot Hook"
 msgstr ""
 
@@ -608,11 +608,11 @@ msgstr ""
 msgid "Cell Information"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1086
+#: view/qmodem/modem_config.js:1088
 msgid "Cell is unlocked (no lock active)"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1042
+#: view/qmodem/modem_config.js:1044
 msgid "Cell parameters copied to settings"
 msgstr ""
 
@@ -722,7 +722,7 @@ msgstr ""
 msgid "Compression Mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1023
+#: view/qmodem/modem_config.js:1025
 msgid "Configuration inputs not found"
 msgstr ""
 
@@ -819,7 +819,7 @@ msgstr ""
 msgid "Conversations"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1044
+#: view/qmodem/modem_config.js:1046
 msgid "Copy"
 msgstr ""
 
@@ -928,7 +928,7 @@ msgstr ""
 msgid "Default bridge port for passthrough. Device-level bridge_port overrides this slot default."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1082
+#: view/qmodem/modem_config.js:1084
 msgid "Delay"
 msgstr ""
 
@@ -1167,7 +1167,7 @@ msgstr ""
 msgid "Enable or disable TTL/Hop Limit modification for outgoing packets."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1081
+#: view/qmodem/modem_config.js:1083
 #: view/qmodem/monitor.js:154
 #: view/qmodem/monitor.js:603
 #: view/qmodem/network_config.js:77
@@ -1264,7 +1264,7 @@ msgstr ""
 msgid "Error loading features: %s"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1351
+#: view/qmodem/modem_config.js:1353
 msgid "Error loading lock band configuration:"
 msgstr ""
 
@@ -1288,11 +1288,11 @@ msgstr ""
 msgid "Error loading preference"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1526
+#: view/qmodem/modem_config.js:1528
 msgid "Error loading reboot capabilities: %s"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1063
+#: view/qmodem/modem_config.js:1065
 msgid "Error loading status"
 msgstr ""
 
@@ -1323,9 +1323,9 @@ msgstr ""
 #: view/qmodem/modem_config.js:566
 #: view/qmodem/modem_config.js:814
 #: view/qmodem/modem_config.js:858
-#: view/qmodem/modem_config.js:1331
-#: view/qmodem/modem_config.js:1457
-#: view/qmodem/modem_config.js:1494
+#: view/qmodem/modem_config.js:1333
+#: view/qmodem/modem_config.js:1459
+#: view/qmodem/modem_config.js:1496
 msgid "Error: %s"
 msgstr ""
 
@@ -1348,7 +1348,7 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1326
+#: view/qmodem/modem_config.js:1328
 msgid "Failed to apply lock band configuration"
 msgstr ""
 
@@ -1411,11 +1411,11 @@ msgstr ""
 msgid "Failed to get SMS storage: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:1489
+#: view/qmodem/modem_config.js:1491
 msgid "Failed to initiate hard reboot"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1452
+#: view/qmodem/modem_config.js:1454
 msgid "Failed to initiate soft reboot"
 msgstr ""
 
@@ -1443,7 +1443,7 @@ msgstr ""
 msgid "Failed to load network preferences"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1415
+#: view/qmodem/modem_config.js:1417
 msgid "Failed to load reboot capabilities"
 msgstr ""
 
@@ -1730,15 +1730,15 @@ msgstr ""
 msgid "Hangup request timed out"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1486
-#: view/qmodem/modem_config.js:1491
-#: view/qmodem/modem_config.js:1496
-#: view/qmodem/modem_config.js:1499
-#: view/qmodem/modem_config.js:1516
+#: view/qmodem/modem_config.js:1488
+#: view/qmodem/modem_config.js:1493
+#: view/qmodem/modem_config.js:1498
+#: view/qmodem/modem_config.js:1501
+#: view/qmodem/modem_config.js:1518
 msgid "Hard Reboot"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1483
+#: view/qmodem/modem_config.js:1485
 msgid "Hard reboot initiated successfully. The modem is restarting..."
 msgstr ""
 
@@ -1983,7 +1983,7 @@ msgstr ""
 msgid "Invalid file type. Only .sh, .py, and .lua files are allowed."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1139
+#: view/qmodem/modem_config.js:1141
 msgid "Invalid lockband data structure"
 msgstr ""
 
@@ -2045,7 +2045,7 @@ msgstr ""
 msgid "Loading available networks..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1113
+#: view/qmodem/modem_config.js:1115
 msgid "Loading band configuration..."
 msgstr ""
 
@@ -2053,7 +2053,7 @@ msgstr ""
 msgid "Loading messages..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1400
+#: view/qmodem/modem_config.js:1402
 msgid "Loading reboot capabilities..."
 msgstr ""
 
@@ -2098,7 +2098,7 @@ msgstr ""
 msgid "Lock Band"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1104
+#: view/qmodem/modem_config.js:1106
 msgid "Lock Band Configuration"
 msgstr ""
 
@@ -2110,7 +2110,7 @@ msgstr ""
 msgid "Lock Cell Status"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1322
+#: view/qmodem/modem_config.js:1324
 msgid "Lock band configuration applied for %s"
 msgstr ""
 
@@ -2118,11 +2118,11 @@ msgstr ""
 msgid "Lock cell configuration applied successfully"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1108
+#: view/qmodem/modem_config.js:1110
 msgid "Lock modem to specific frequency bands. Select bands for each network type (UMTS/LTE/NR)."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1214
+#: view/qmodem/modem_config.js:1216
 msgid "Locked Bands"
 msgstr ""
 
@@ -2584,7 +2584,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1153
+#: view/qmodem/modem_config.js:1155
 msgid "No bands available for this modem"
 msgstr ""
 
@@ -2648,7 +2648,7 @@ msgstr ""
 msgid "No network types available"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1424
+#: view/qmodem/modem_config.js:1426
 msgid "No reboot methods available for this modem"
 msgstr ""
 
@@ -2656,7 +2656,7 @@ msgstr ""
 msgid "No response."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1129
+#: view/qmodem/modem_config.js:1131
 msgid "No result returned from getLockBand"
 msgstr ""
 
@@ -2670,7 +2670,7 @@ msgid "No scripts uploaded yet"
 msgstr ""
 
 #: view/qmodem/modem_config.js:670
-#: view/qmodem/modem_config.js:1060
+#: view/qmodem/modem_config.js:1062
 msgid "No status information available"
 msgstr ""
 
@@ -2717,7 +2717,7 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1361
+#: view/qmodem/modem_config.js:1363
 msgid "None (All bands unlocked)"
 msgstr ""
 
@@ -2938,7 +2938,7 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1354
+#: view/qmodem/modem_config.js:1356
 msgid "Please check browser console for more details"
 msgstr ""
 
@@ -2991,7 +2991,7 @@ msgstr ""
 msgid "Power GPIO"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1517
+#: view/qmodem/modem_config.js:1519
 msgid "Power cycles the modem completely. Takes longer but ensures a full restart."
 msgstr ""
 
@@ -3190,11 +3190,11 @@ msgid "Reapply lock cell command after modem initialization"
 msgstr ""
 
 #: view/qmodem/modem_config.js:96
-#: view/qmodem/modem_config.js:1386
+#: view/qmodem/modem_config.js:1388
 msgid "Reboot Modem"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1395
+#: view/qmodem/modem_config.js:1397
 msgid "Reboot Options"
 msgstr ""
 
@@ -3202,12 +3202,12 @@ msgstr ""
 msgid "Reboot request timed out"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1390
+#: view/qmodem/modem_config.js:1392
 msgid "Reboot the modem device. Soft reboot restarts the modem firmware, hard reboot power cycles the modem."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1442
-#: view/qmodem/modem_config.js:1479
+#: view/qmodem/modem_config.js:1444
+#: view/qmodem/modem_config.js:1481
 msgid "Rebooting..."
 msgstr ""
 
@@ -3348,7 +3348,7 @@ msgstr ""
 msgid "Restart"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1510
+#: view/qmodem/modem_config.js:1512
 msgid "Restarts the modem firmware without power cycling. Faster but may not resolve all issues."
 msgstr ""
 
@@ -3775,11 +3775,11 @@ msgstr ""
 msgid "Security Warning"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1304
+#: view/qmodem/modem_config.js:1306
 msgid "Select All / None"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1226
+#: view/qmodem/modem_config.js:1228
 msgid "Select Bands"
 msgstr ""
 
@@ -3982,16 +3982,16 @@ msgstr ""
 msgid "Smart Communications (PH)"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1449
-#: view/qmodem/modem_config.js:1454
-#: view/qmodem/modem_config.js:1459
-#: view/qmodem/modem_config.js:1462
-#: view/qmodem/modem_config.js:1509
+#: view/qmodem/modem_config.js:1451
+#: view/qmodem/modem_config.js:1456
+#: view/qmodem/modem_config.js:1461
+#: view/qmodem/modem_config.js:1464
+#: view/qmodem/modem_config.js:1511
 #: view/qmodem/service.js:346
 msgid "Soft Reboot"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1446
+#: view/qmodem/modem_config.js:1448
 msgid "Soft reboot initiated successfully. The modem is restarting..."
 msgstr ""
 
