@@ -11,6 +11,17 @@
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-14
+
+### 修复（Fixed）
+- **CI 手动触发现在可以上传 Release 资产**：`main.yml` 的
+  `job_release_artifacts` 要求 `push_type == 'tag'`，而
+  `workflow_dispatch` 手动触发一律被判为 `branch`，导致「发布产物」
+  job 永远被跳过——手动编译即使全部成功也不会把 ipk/apk 上传到任何
+  Release。现在 `workflow_dispatch` 支持可选的 `tag` 输入：填写后
+  本次运行按发布处理，构建产物将上传到该已存在的 Release（适用于
+  修复后补发资产）；留空则保持只编译不发布的行为。
+
 ### 移除（Removed）
 - **WAN 劫持 uci-defaults（`99-rmnet-init`）**：包内自带的
   `/etc/uci-defaults/99-rmnet-init` 会在每次安装/升级时无条件把

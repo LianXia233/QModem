@@ -23,5 +23,5 @@ QMODEM_AUTORELEASE = $(if $(DUMP),0,$(call qmodem_commitcount,1))
 
 # apk-tools accepts prerelease suffixes in _rcN form. PKG_RELEASE must remain
 # numeric because OpenWrt appends it as -rN to the package version.
-QMODEM_VERSION:=1.1.0
+QMODEM_VERSION:=1.1.1
 QMODEM_RELEASE:=$(QMODEM_AUTORELEASE)

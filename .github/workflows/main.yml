@@ -13,6 +13,10 @@ on:
         description: 本次手动编译的说明（仅记录，便于在运行列表中区分）
         required: false
         default: manual
+      tag:
+        description: 可选：手动补发 Release 时填写已存在的 tag（如 v1.1.1），构建产物将上传到该 Release；留空则只编译不发布
+        required: false
+        default: ''
   push:
     tags:
       - 'v*'
@@ -46,11 +50,20 @@ jobs:
     steps:
       - name: 判定推送类型
         id: determine_push
+        env:
+          # 修复：手动触发原先一律判为 branch，导致「发布产物」job 永远被
+          # push_type == 'tag' 条件跳过——手动编译无法把产物上传到 Release。
+          # 现在手动触发可显式传入 tag，即按发布处理（用于补发/重传 Release 资产）。
+          MANUAL_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || '' }}
         run: |
-            # 本次运行只有两种来源：tag 推送（发布）或手动触发 / PR
+            # 本次运行三种来源：tag 推送（发布）、手动触发（可选传 tag 发布）、PR/分支
             if [[ "${{ github.ref }}" == refs/tags/* ]]; then
               echo "This is a tag push."
               echo "tag_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+              echo "push_type=tag" >> $GITHUB_OUTPUT
+            elif [[ -n "${MANUAL_TAG}" ]]; then
+              echo "Manual dispatch with tag '${MANUAL_TAG}', publishing to that release."
+              echo "tag_name=${MANUAL_TAG}" >> $GITHUB_OUTPUT
               echo "push_type=tag" >> $GITHUB_OUTPUT
             else
               echo "This is a branch push."

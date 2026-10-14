@@ -11,6 +11,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-10-14
+
+### Fixed
+- **CI manual dispatch can now upload Release assets**: `main.yml`'s
+  `job_release_artifacts` requires `push_type == 'tag'`, but a
+  `workflow_dispatch` run was always classified as `branch`, so the
+  "发布产物" (publish artifacts) job was permanently skipped — manual
+  builds compiled successfully yet never uploaded ipk/apk to any
+  Release. `workflow_dispatch` now accepts an optional `tag` input:
+  when provided, the run is treated as a release build and its
+  installable packages are uploaded to that existing Release (useful
+  for republishing assets after a fix); leaving it empty keeps the
+  build-only behaviour.
+
 ### Removed
 - **WAN hijack uci-defaults (`99-rmnet-init`)**: the package shipped
   `/etc/uci-defaults/99-rmnet-init`, which on every install/upgrade
