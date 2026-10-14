@@ -42,6 +42,20 @@ USB / PCIe 蜂窝模组
 
 核心包为 `qmodem` —— 一体化后端，已把原先分散的 11 个包（`libqmodem-sms`、`tom_modem`、`sms_tool_q`、`ubus-at-daemon`、`modem_scan`、`qmodem-smsd`、`qmodem-settings`、`qmodem_monitor`、`sms-forwarder-next`、`quectel-CM-5G-M`、`qmodem-seal`）收编进包内。统一前端为纯 JavaScript 的 `luci-app-qmodem`，取代旧 Lua 版 `luci-app-qmodem` 与 `luci-app-qmodem-next`。安装 `luci-app-qmodem` 会自动拉入 `qmodem`。平台专用的 `luci-app-qmodem-hc` / `luci-app-qmodem-mwan` 与实验性语音栈仍为独立包。详见[整合范围说明](docs/refactor/integration-scope.zh-cn.md)。
 
+## 已废弃组件（Deprecated）
+
+自 2026-10 起，以下 **旧版 Lua 界面包已废弃**，仅作过渡保留，计划在未来版本移除：
+
+| 包名 | 说明 | 替代方案 |
+|---|---|---|
+| `luci-app-qmodem`（Lua 版） | 旧版 LuCI 界面 | `luci-app-qmodem-next`（Soft Anime 现代界面） |
+| `luci-app-qmodem-hc` | HC-G80 SIM 切换 | `luci-app-qmodem-next` + `luci-app-qmodem-monitor` |
+| `luci-app-qmodem-sms` | 旧版短信转发 | `luci-app-qmodem-next` 内置 SMS 全家桶 |
+| `luci-app-qmodem-ttl` | TTL 配置 | 后续并入现代界面 |
+| `luci-app-qmodem-mwan` | 多 WAN 配置 | 后续并入现代界面 |
+
+废弃包安装后所有页面顶部会显示弃用警告横幅；它们与 `luci-app-qmodem-next` 互斥（Menuconfig 中标记 `DEPRECATED`）。新部署请直接使用 `luci-app-qmodem-next`。
+
 ## 快速开始
 
 在 OpenWrt 源码树的 `feeds.conf.default` 中添加：

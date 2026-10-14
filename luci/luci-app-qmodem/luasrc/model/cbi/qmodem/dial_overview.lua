@@ -2,6 +2,7 @@ local d = require "luci.dispatcher"
 local sys  = require "luci.sys"
 
 m = Map("qmodem")
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead.")
 m.title = translate("Dial Overview")
 
 --全局配置

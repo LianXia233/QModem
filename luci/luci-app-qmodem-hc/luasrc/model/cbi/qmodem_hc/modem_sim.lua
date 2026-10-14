@@ -1,4 +1,5 @@
 m = Map("qmodem_hc_sim", translate("SIM Settings"))
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead.")
 uci = require "luci.model.uci".cursor()
 s = m:section(NamedSection,"main","main", translate("SIM Settings"))
 s.anonymous = true

@@ -9,7 +9,8 @@ m = Map("sms_daemon", translate("SMS Forward Advanced Configuration"))
 m.redirect = dispatcher.build_url("admin", "modem", "qmodem", "sms_forward")
 
 -- 添加说明信息
-m.description = translate("Advanced SMS Forward configuration with type-specific options.")
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead. ") ..
+		translate("Advanced SMS Forward configuration with type-specific options.")
 
 -- SMS转发实例配置
 s2 = m:section(NamedSection, arg[1], "sms_forward_instance",translate("SMS Forward Instances"))

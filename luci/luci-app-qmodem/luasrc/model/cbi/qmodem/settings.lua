@@ -1,6 +1,7 @@
 local sys  = require "luci.sys"
 local d = require "luci.dispatcher"
 m = Map("qmodem")
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead.")
 m.title = translate("QModem Setting")
 
 this_page = d.build_url("admin", "modem", "qmodem", "settings")

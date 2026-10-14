@@ -6,7 +6,8 @@ m = Map("sms_daemon", translate("SMS Forward Configuration"))
 m.redirect = dispatcher.build_url("admin", "modem", "qmodem", "sms_forward")
 
 -- 添加说明信息
-m.description = translate("SMS Forward Daemon allows automatic forwarding of SMS messages to various APIs.")
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead. ") ..
+		translate("SMS Forward Daemon allows automatic forwarding of SMS messages to various APIs.")
 
 
 -- 检查sms_forwarder守护进程是否存在

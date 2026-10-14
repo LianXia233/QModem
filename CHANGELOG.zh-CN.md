@@ -11,6 +11,12 @@
 
 ## [Unreleased]
 
+### Deprecated
+- **旧版 Lua 界面包标记废弃**（`luci-app-qmodem` Lua 版、`luci-app-qmodem-hc`、
+  `luci-app-qmodem-sms`、`luci-app-qmodem-ttl`、`luci-app-qmodem-mwan`）：
+  Menuconfig 标题追加 `DEPRECATED`，全部页面顶部显示弃用警告横幅，
+  与 `luci-app-qmodem-next` 互斥。过渡期内仍可安装使用，未来版本移除。
+
 ## [1.1.1] - 2026-10-14
 
 ### 修复（Fixed）

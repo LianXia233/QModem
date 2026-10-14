@@ -7,7 +7,8 @@ include $(TOPDIR)/rules.mk
 include ../../version.mk
 
 PKG_NAME:=luci-app-qmodem-ttl
-LUCI_TITLE:=Luci qwrt modem ttl support
+# Deprecated since 2026-10: superseded by luci-app-qmodem-next (Soft Anime UI); scheduled for removal in a future release.
+LUCI_TITLE:=Luci qwrt modem ttl support (DEPRECATED)
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_LICENSE:=GPLv3

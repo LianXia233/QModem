@@ -11,6 +11,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+### Deprecated
+- **Legacy Lua UI packages marked deprecated** (`luci-app-qmodem` Lua variant,
+  `luci-app-qmodem-hc`, `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`,
+  `luci-app-qmodem-mwan`): titles now carry `DEPRECATED` in menuconfig, every
+  page shows a deprecation warning banner, and the packages conflict with
+  `luci-app-qmodem-next`. They keep working for the transition period and will
+  be removed in a future release.
+
 ## [1.1.1] - 2026-10-14
 
 ### Fixed

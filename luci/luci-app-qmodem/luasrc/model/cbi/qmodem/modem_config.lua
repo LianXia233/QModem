@@ -22,6 +22,7 @@ end
 
 -- Map and Section setup
 m = Map("qmodem", translate("Modem Configuration"))
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead.")
 m.redirect = luci.dispatcher.build_url("admin", "modem", "qmodem", "settings")
 
 s = m:section(NamedSection, arg[1], "modem-device", "")

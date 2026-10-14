@@ -41,6 +41,23 @@ USB / PCIe cellular modem
 
 The core package is `qmodem` — an all-in-one backend that embeds what used to be eleven separate packages (`libqmodem-sms`, `tom_modem`, `sms_tool_q`, `ubus-at-daemon`, `modem_scan`, `qmodem-smsd`, `qmodem-settings`, `qmodem_monitor`, `sms-forwarder-next`, `quectel-CM-5G-M`, `qmodem-seal`). The unified pure-JavaScript frontend is `luci-app-qmodem`, which supersedes both the legacy Lua `luci-app-qmodem` UI and `luci-app-qmodem-next`. Installing `luci-app-qmodem` pulls `qmodem` in automatically. Platform-specific extras (`luci-app-qmodem-hc`, `luci-app-qmodem-mwan`) and the experimental voice stack stay separate. See [integration scope](docs/refactor/integration-scope.zh-cn.md).
 
+## Deprecated packages
+
+Since 2026-10 the following **legacy Lua UI packages are deprecated**; they are kept
+for transition only and will be removed in a future release:
+
+| Package | Purpose | Replacement |
+|---|---|---|
+| `luci-app-qmodem` (Lua) | Legacy LuCI UI | `luci-app-qmodem-next` (Soft Anime modern UI) |
+| `luci-app-qmodem-hc` | HC-G80 SIM switch | `luci-app-qmodem-next` + `luci-app-qmodem-monitor` |
+| `luci-app-qmodem-sms` | Legacy SMS forwarding | Built-in SMS suite in `luci-app-qmodem-next` |
+| `luci-app-qmodem-ttl` | TTL configuration | To be merged into the modern UI |
+| `luci-app-qmodem-mwan` | Multi-WAN configuration | To be merged into the modern UI |
+
+Deprecated packages show a deprecation banner on every page and are marked
+`DEPRECATED` in menuconfig; they conflict with `luci-app-qmodem-next`. For new
+deployments use `luci-app-qmodem-next` directly.
+
 ## Quick start
 
 Add the feed to `feeds.conf.default` in an OpenWrt source tree:

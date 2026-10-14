@@ -7,7 +7,8 @@ include $(TOPDIR)/rules.mk
 include ../../version.mk
 
 PKG_NAME:=luci-app-qmodem-hc
-LUCI_TITLE:=Luci qwrt modem sim switch
+# Deprecated since 2026-10: superseded by luci-app-qmodem-next (Soft Anime UI); scheduled for removal in a future release.
+LUCI_TITLE:=Luci qwrt modem sim switch (DEPRECATED)
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_LICENSE:=GPLv3

@@ -7,7 +7,8 @@ local script_path="/usr/share/qmodem/"
 
 m = Map("qmodem_mwan")
 m.title = translate("Mwan Config")
-m.description = translate("Check and modify the mwan configuration")
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead. ") ..
+		translate("Check and modify the mwan configuration")
 s = m:section(NamedSection, "global", "global")
 s.anonymous = true
 s.addremove = false

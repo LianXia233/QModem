@@ -1,5 +1,6 @@
 local uci = luci.model.uci.cursor()
 m = Map("qmodem_ttl", translate("TTL Config"))
+m.description = translate("WARNING: This legacy interface is deprecated and will be removed in a future release. Please use the new 'QModem (LuCI Modern UI)' pages instead.")
 s = m:section(NamedSection, "main", "main", translate("Global Config"))
 
 enable = s:option(Flag, "enable", translate("Enable"))
