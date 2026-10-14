@@ -320,16 +320,6 @@ jobs:
           ./scripts/feeds update qmodem
           ./scripts/feeds install -a -p qmodem
           rm -rf feeds/base/package/kernel/gpio-button-hotplug
-          # --- TEMP debug: luci-app-qmodem-next selection diagnostics ---
-          echo "=== debug: .config package selection ==="
-          grep -E "^CONFIG_PACKAGE_(qmodem|luci-app-qmodem-next|luci-i18n-qmodem-next-zh-cn|luci-base)(=| )" .config \
-            || echo "!! none of the expected PACKAGE symbols are set"
-          echo "=== debug: kconfig symbol presence ==="
-          grep -n "PACKAGE_luci-app-qmodem-next" tmp/.config-package.in 2>/dev/null | head -4 \
-            || echo "!! PACKAGE_luci-app-qmodem-next not in generated kconfig"
-          echo "=== debug: defconfig promotion test ==="
-          grep -E "^CONFIG_PACKAGE_luci-app-qmodem" .config || echo "(no luci-app-qmodem* selected)"
-          # --- end TEMP debug ---
           # 组件合并后只剩两个源包：qmodem（一体化后端，含全部 C 组件）
           # 与 luci-app-qmodem-next（统一前端，2026-10-14 起 luci/ 回归上游）。原先的 arch-only 列表
           # （tom_modem / ubus_at_daemon）已随合并消失。
