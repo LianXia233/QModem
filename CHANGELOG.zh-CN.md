@@ -11,6 +11,11 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-14
+
+> tag `v1.0.1` 从未发布过 Release——编译被 ubuntu-26.04 runner 的
+> uutils coreutils 前置检查失败阻断，因此 1.0.0 之后的全部变更都包含在本版本中。
+
 ### 新增（Added）
 - **短信会话 Pastel Glass 皮肤（theme.js）**：新增 `.qm-app .sms-*`
   规则覆盖旧会话 CSS —— 接收气泡为 `--qm-surface` 柔影卡片，发送气泡

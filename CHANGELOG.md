@@ -11,6 +11,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-14
+
+> Tag `v1.0.1` never shipped a Release — the build was blocked by the
+> ubuntu-26.04 runner's uutils coreutils prereq failure, so everything
+> since 1.0.0 is included here.
+
 ### Added
 - **Pastel Glass SMS conversation skin (theme.js)**: new `.qm-app .sms-*`
   rules override the legacy conversation CSS — received bubbles render as

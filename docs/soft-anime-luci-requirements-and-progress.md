@@ -93,5 +93,5 @@
    * [x] 已完成 SMS 会话窄屏优化：≤560px 断点气泡 `max-width:88%`、会话区 `max-height:420px`、气泡内删除按钮触控加大至 36px、通用 `.btn/.cbi-button` 触控提升至 42px。
    * [ ] 针对 360px、390px 视口进一步调优其它视图弹性换行，确保窄屏下各视图无横向滚动条，主要按键满足 40px+ 触控标准（建议用 `tests/browser` Playwright 套件做全视图目视回归）。
 3. **整体视觉与代码回归**：
-   * [ ] 执行 `parallel_validation`（Code Review + CodeQL 安全检查）。
+   * [x] 执行 `parallel_validation`（Code Review + CodeQL 安全检查）——run 38488381334 已全部通过。
    * [ ] 输出最终成果总结。
