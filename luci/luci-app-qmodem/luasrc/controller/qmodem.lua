@@ -13,6 +13,12 @@ function index()
     if not nixio.fs.access("/etc/config/qmodem") then
         return
     end
+	-- 新版界面（luci-app-qmodem-next）已安装时，本旧版界面让出 admin/modem 与
+	-- admin/modem/qmodem 两个节点：两套界面注册同一路径，Lua 侧注册晚于 menu.d
+	-- JSON，会覆盖新版节点，导致打开的是旧页面（新版样式/页面全部不生效）。
+	if nixio.fs.access("/usr/share/luci/menu.d/luci-app-qmodem-next.json") then
+		return
+	end
 	entry({"admin", "modem"}, firstchild(), _("Modem"), 25).dependent=false
 	entry({"admin", "modem", "qmodem"}, alias("admin", "modem", "qmodem", "modem_info"), luci.i18n.translate("QModem"), 100).dependent = true
 	--模块信息
