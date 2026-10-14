@@ -113,7 +113,7 @@ return view.extend({
 			
 			// Placeholder for partially failed sources (panel stays usable)
 			if (results[0].status === 'rejected' || results[1].status === 'rejected') {
-				statusInfo.push(E('div', { 'style': 'margin-top: 5px; color: #999;' },
+				statusInfo.push(E('div', { 'style': 'margin-top: 5px; color: var(--qm-text-muted);' },
 					_('Some SIM switch data failed to load; will retry on next refresh')));
 			}
 
@@ -136,14 +136,14 @@ return view.extend({
 			dom.content(buttonsField, btns);
 			
 			if (!supported) {
-				buttonsField.appendChild(E('div', { 'style': 'margin-top: 10px; color: #999;' }, 
+				buttonsField.appendChild(E('div', { 'style': 'margin-top: 10px; color: var(--qm-text-muted);' },
 					_('This modem does not support SIM switching.')));
 			}
 			
 			// Display ExtraInfo if available
 			var extraInfo = supportResult && supportResult.ExtraInfo;
 			if (extraInfo) {
-				statusInfo.push(E('div', { 'style': 'margin-top: 5px; color: #f0ad4e;' }, [
+				statusInfo.push(E('div', { 'style': 'margin-top: 5px; color: var(--qm-warn);' }, [
 					E('strong', {}, _('Note') + ': '),
 					E('span', {}, _(extraInfo))
 				]));

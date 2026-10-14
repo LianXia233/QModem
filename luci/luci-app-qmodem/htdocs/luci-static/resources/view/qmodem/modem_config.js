@@ -990,8 +990,10 @@ return view.extend({
 		var ratCell = E('td', { 'class': 'td cbi-section-table-cell' });
 		var ratBadge = E('span', { 
 			'class': 'label',
-			'style': 'padding: 2px 8px; border-radius: 3px; font-weight: bold; ' + 
-				(ratType === 'NR' ? 'background-color: #4CAF50; color: white;' : 'background-color: #2196F3; color: white;')
+			'style': 'padding: 2px 10px; border-radius: var(--qm-radius-badge); font-weight: bold; ' +
+				(ratType === 'NR'
+					? 'background-color: var(--qm-ok-soft); color: var(--qm-ok); border: 1px solid var(--qm-ok-border);'
+					: 'background-color: var(--qm-info-soft); color: var(--qm-info); border: 1px solid var(--qm-info-border);')
 		}, ratType);
 		ratCell.appendChild(ratBadge);
 		row.appendChild(ratCell);
@@ -1377,7 +1379,7 @@ return view.extend({
 		});
 
 		displayElement.textContent = bandNames.join(', ');
-		displayElement.style.color = '#0066cc';
+		displayElement.style.color = 'var(--qm-accent)';
 	},
 
 	createRebootModemTab: function(modem) {

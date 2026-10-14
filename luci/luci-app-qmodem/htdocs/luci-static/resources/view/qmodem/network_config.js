@@ -209,7 +209,7 @@ return view.extend({
 	o.editable = true;
 	o.width = '60px';
 	o.cfgvalue = L.bind(function(section_id) {
-		var color = '#999'; // Gray (default/loading)
+		var color = 'var(--qm-text-muted)'; // muted (default/loading)
 		var title = _('Loading...');
 		
 		// Use preloaded data if available
@@ -218,13 +218,13 @@ return view.extend({
 			if (result && result.connection_status !== undefined) {
 				var status = result.connection_status.toString().toLowerCase();
 				if (status === 'yes' || status === 'connected' || status === '1' || status === 'true' || status === true) {
-					color = '#00FF00'; // Green (connected)
+					color = 'var(--qm-ok)'; // ok (connected)
 					title = _('Connected');
 				} else if (status === 'no' || status === 'disconnected' || status === '0' || status === 'false' || status === false) {
-					color = '#FF0000'; // Red (disconnected)
+					color = 'var(--qm-danger)'; // danger (disconnected)
 					title = _('Disconnected');
 				} else {
-					color = '#FFA500'; // Yellow (unknown)
+					color = 'var(--qm-warn)'; // warn (unknown)
 					title = _('Unknown');
 				}
 			}
@@ -667,20 +667,20 @@ return view.extend({
 			}
 			this.connectionStatusData[section_id] = result;
 			
-			var color = '#FFA500'; // Yellow (default for error/unknown)
-			var title = _('Unknown');
+		var color = 'var(--qm-warn)'; // warn (default for error/unknown)
+		var title = _('Unknown');
 
-			if (result && result.connection_status !== undefined) {
-				var status = result.connection_status;
-				status = status.toString().toLowerCase();
-				if (status === 'yes' || status === 'connected' || status === '1' || status === 'true' || status === true) {
-					color = '#00FF00'; // Green (connected)
-					title = _('Connected');
-				} else if (status === 'no' || status === 'disconnected' || status === '0' || status === 'false' || status === false) {
-					color = '#FF0000'; // Red (disconnected)
-					title = _('Disconnected');
-				}
+		if (result && result.connection_status !== undefined) {
+			var status = result.connection_status;
+			status = status.toString().toLowerCase();
+			if (status === 'yes' || status === 'connected' || status === '1' || status === 'true' || status === true) {
+				color = 'var(--qm-ok)'; // ok (connected)
+				title = _('Connected');
+			} else if (status === 'no' || status === 'disconnected' || status === '0' || status === 'false' || status === false) {
+				color = 'var(--qm-danger)'; // danger (disconnected)
+				title = _('Disconnected');
 			}
+		}
 
 			// Update the dot color
 			while (container.firstChild) {
@@ -698,10 +698,10 @@ return view.extend({
 				container.removeChild(container.firstChild);
 			}
 			container.appendChild(
-				E('span', {
-					'style': 'display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #FFA500;',
-					'title': _('Error: ') + err.message
-				})
+			E('span', {
+				'style': 'display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: var(--qm-warn);',
+				'title': _('Error: ') + err.message
+			})
 			);
 		});
 	},

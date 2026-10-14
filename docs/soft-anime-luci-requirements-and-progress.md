@@ -63,11 +63,11 @@
 | **模组系统** | `view/qmodem/system.js` | **已完成** | SoC与双SIM卡槽 SVG 物理拓扑图全面适配 Token（芯片高亮/连接态）、统一卡片头图标、主题切换支持 |
 | **高级设置** | `view/qmodem/advanced.js` | **已完成** | 硬件总线拓扑图（PCIe/USB/I2C/GPIO）全面适配 Token、频段锁网网格与 AT 终端样式升级、主题切换支持 |
 | **短信管理** | `view/qmodem/sms.js` | **已完成** | 移除字符计数与警告样式中所有裸露十六进制颜色，统一采用 `--qm-danger`、`--qm-warn`、`--qm-text-muted` |
-| **短信对话** | `view/qmodem/sms_conversation.js` | **进行中** | 气泡对话流样式统一为 Pastel Glass，移除残留硬编码颜色 |
-| **SIM 切换** | `view/qmodem/sim_switch.js` | **进行中** | 状态文本与操作按钮色值 Token 化 |
-| **链路监控** | `view/qmodem/monitor.js` | **进行中** | 脚本列表与告警框色值 Token 化 |
-| **TTL 伪装** | `view/qmodem/ttl.js` | **进行中** | 告警说明文字色值 Token 化 |
-| **模组与网络配置** | `modem_config.js` / `network_config.js` | **进行中** | 状态圆点与网络制式徽章样式 Token 化 |
+| **短信对话** | `view/qmodem/sms_conversation.js` | **已完成** | 气泡对话流样式统一为 Pastel Glass（theme.js 新增 `.qm-app .sms-*` 皮肤：接收气泡 `--qm-surface` 卡片、发送气泡 `--qm-accent-gradient` 渐变、会话区毛玻璃 backdrop-filter）、字符计数器与元数据标记全部 Token 化（`--qm-danger`/`--qm-warn`/`--qm-text-muted`） |
+| **SIM 切换** | `view/qmodem/sim_switch.js` | **已完成** | 状态文本与操作按钮色值 Token 化（降级提示 `--qm-text-muted`、ExtraInfo 注意事项 `--qm-warn`） |
+| **链路监控** | `view/qmodem/monitor.js` | **已完成** | 脚本列表与告警框色值 Token 化（安全警告升级为 `--qm-warn-soft`/`--qm-warn-border` Pastel 告警卡、列表分隔线 `--qm-border-soft`） |
+| **TTL 伪装** | `view/qmodem/ttl.js` | **已完成** | 告警说明块升级为 `--qm-warn-soft` Pastel 警示卡，标题 `--qm-warn`、正文 `--qm-text-soft` |
+| **模组与网络配置** | `modem_config.js` / `network_config.js` | **已完成** | 状态圆点 Token 化（连接 `--qm-ok`、断开 `--qm-danger`、未知 `--qm-warn`、加载 `--qm-text-muted`）、RAT 制式徽章升级为 soft 底色胶囊（NR→`--qm-ok`、其他→`--qm-info`）、锁频列表强调色 `--qm-accent` |
 
 ---
 
@@ -88,9 +88,10 @@
 ## 四、 下一步工作计划
 
 1. **次级视图细节色彩收敛**：
-   * 完成 `sms_conversation.js`、`sim_switch.js`、`monitor.js`、`ttl.js`、`modem_config.js`、`network_config.js` 中剩余硬编码颜色的清理与 Token 化。
+   * [x] 已完成 `sms_conversation.js`、`sim_switch.js`、`monitor.js`、`ttl.js`、`modem_config.js`、`network_config.js` 中剩余硬编码颜色的清理与 Token 化（含 theme.js 新增 SMS 会话 Pastel Glass 皮肤层）。
 2. **移动端深度微调**：
-   * 针对 360px、390px 视口进一步调优弹性换行，确保窄屏下各视图无横向滚动条，按键满足 40px+ 触控标准。
+   * [x] 已完成 SMS 会话窄屏优化：≤560px 断点气泡 `max-width:88%`、会话区 `max-height:420px`、气泡内删除按钮触控加大至 36px、通用 `.btn/.cbi-button` 触控提升至 42px。
+   * [ ] 针对 360px、390px 视口进一步调优其它视图弹性换行，确保窄屏下各视图无横向滚动条，主要按键满足 40px+ 触控标准（建议用 `tests/browser` Playwright 套件做全视图目视回归）。
 3. **整体视觉与代码回归**：
-   * 执行 `parallel_validation`（Code Review + CodeQL 安全检查）。
-   * 输出最终成果总结。
+   * [ ] 执行 `parallel_validation`（Code Review + CodeQL 安全检查）。
+   * [ ] 输出最终成果总结。

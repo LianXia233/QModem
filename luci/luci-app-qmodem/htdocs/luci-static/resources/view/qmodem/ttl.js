@@ -44,9 +44,9 @@ return view.extend({
 		o = s.option(form.DummyValue, '_warning');
 		o.rawhtml = true;
 		o.cfgvalue = function() {
-			return E('div', { 'class': 'cbi-value-description' }, [
-				E('p', { 'style': 'color: #c00; font-weight: bold;' }, _('Warning:')),
-				E('ul', {}, [
+			return E('div', { 'class': 'cbi-value-description', 'style': 'background: var(--qm-warn-soft); border: 1px solid var(--qm-warn-border); border-radius: var(--qm-radius-xs); padding: 10px 14px;' }, [
+				E('p', { 'style': 'color: var(--qm-warn); font-weight: bold;' }, _('Warning:')),
+				E('ul', { 'style': 'color: var(--qm-text-soft);' }, [
 					E('li', {}, _('TTL rewriting is implemented with the fw4/nftables backend (/etc/nftables.d/99-reset-ttl-from-br-lan.nft).')),
 					E('li', {}, _('Enabling TTL modification will disable hardware flow offloading for proper packet modification.')),
 					E('li', {}, _('NSS ECM, SFE, and other acceleration modules will be disabled when TTL modification is active.')),

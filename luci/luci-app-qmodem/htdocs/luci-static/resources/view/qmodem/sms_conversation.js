@@ -168,11 +168,11 @@ return view.extend({
 			                      (parts > 1 ? ' (' + parts + ' parts)' : '');
 			
 			if (text.length > maxLength * 5) {
-				counter.style.color = 'red';
+				counter.style.color = 'var(--qm-danger)';
 			} else if (parts > 1) {
-				counter.style.color = 'orange';
+				counter.style.color = 'var(--qm-warn)';
 			} else {
-				counter.style.color = '#666';
+				counter.style.color = 'var(--qm-text-muted)';
 			}
 		});
 
@@ -349,7 +349,7 @@ return view.extend({
 			if (msg.incomplete) {
 				var incompleteSpan = E('span', { 
 					'class': 'sms-message-warning',
-					'style': 'margin-left: 10px; color: orange;'
+					'style': 'margin-left: 10px; color: var(--qm-warn);'
 				}, _('Incomplete (part ') + msg.part + '/' + msg.total + ')');
 				metaDiv.appendChild(incompleteSpan);
 			}
@@ -358,7 +358,7 @@ return view.extend({
 			if (isSent && msg.is_success === false) {
 				var failedSpan = E('span', { 
 					'class': 'sms-message-failed',
-					'style': 'margin-left: 10px; color: #e74c3c;',
+					'style': 'margin-left: 10px; color: var(--qm-danger);',
 					'title': _('Failed to send')
 				}, '✗ ' + _('Failed'));
 				metaDiv.appendChild(failedSpan);

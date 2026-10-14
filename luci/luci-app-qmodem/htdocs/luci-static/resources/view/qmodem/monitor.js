@@ -280,7 +280,7 @@ return view.extend({
 		o = s.option(form.DummyValue, '_security_warning', _('Security Warning'));
 		o.rawhtml = true;
 		o.cfgvalue = function() {
-			return E('div', { 'class': 'cbi-value-description', 'style': 'color: #c00; padding: 10px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; margin-bottom: 10px;' }, [
+			return E('div', { 'class': 'cbi-value-description', 'style': 'color: var(--qm-warn); padding: 10px 12px; background: var(--qm-warn-soft); border: 1px solid var(--qm-warn-border); border-radius: var(--qm-radius-xs); margin-bottom: 10px;' }, [
 				E('strong', {}, '⚠️ ' + _('Security Warning') + ': '),
 				E('span', {}, _('User scripts run with root privileges. Only upload scripts from trusted sources. Malicious scripts can damage your system or compromise security. Review script contents before uploading.'))
 			]);
@@ -373,7 +373,7 @@ return view.extend({
 			}
 			
 			var listItems = scripts.map(function(script) {
-				return E('div', { 'class': 'script-item', 'style': 'display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #eee;' }, [
+				return E('div', { 'class': 'script-item', 'style': 'display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--qm-border-soft);' }, [
 					E('span', { 'style': 'flex: 1; font-family: monospace;' }, USER_SCRIPTS_PATH + '/' + script.name),
 					E('button', {
 						'class': 'cbi-button cbi-button-negative',
@@ -557,7 +557,7 @@ return view.extend({
 		}
 		
 		scripts.forEach(function(script) {
-			var item = E('div', { 'class': 'script-item', 'style': 'display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #eee;' }, [
+			var item = E('div', { 'class': 'script-item', 'style': 'display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--qm-border-soft);' }, [
 				E('span', { 'style': 'flex: 1; font-family: monospace;' }, USER_SCRIPTS_PATH + '/' + script.name),
 				E('button', {
 					'class': 'cbi-button cbi-button-negative',
