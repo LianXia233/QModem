@@ -1,5 +1,13 @@
 # Soft Anime LuCI 界面设计要求与实施进度文档
 
+> **⚠️ 状态更新（2026-10-14）：本方案已停止实施。**
+> 应仓库维护者决策，`luci/` 目录已整体回归上游 FUjr/QModem（fork 点
+> c49654ef = 上游最新 main）：删除本地定制的 `luci-app-qmodem`（含本文档
+> 描述的全部 Soft Anime 主题体系与视图改造），改用上游 `luci-app-qmodem-next`
+> 现代 JS 前端。本文档保留作为历史设计规范存档，下方"实施状态"反映的是
+> 回归上游**之前**的最终进度，供将来需要重启定制化时参考；当前实际代码
+> 以 `luci/luci-app-qmodem-next`（上游原版）为准。
+
 本文档记录 OpenWrt / ImmortalWrt `luci-app-qmodem` 实施 **Soft Anime × Pastel Glass × Modern Dashboard** 视觉重构的完整需求规范、实施现状与后续工作跟踪。
 
 ---
@@ -93,6 +101,10 @@
 ---
 
 ## 四、 下一步工作计划
+
+> **2026-10-14 起本计划终止执行**：`luci/` 已回归上游（`luci-app-qmodem-next`），
+> 下列条目仅作历史记录保留。当前前端以 `luci/luci-app-qmodem-next`（上游
+> 原版）为准；后续如需重新定制，请基于 next 包另立新文档。
 
 1. **次级视图细节色彩收敛**：
    * [x] 已完成 `sms_conversation.js`、`sim_switch.js`、`monitor.js`、`ttl.js`、`modem_config.js`、`network_config.js` 中剩余硬编码颜色的清理与 Token 化（含 theme.js 新增 SMS 会话 Pastel Glass 皮肤层）。

@@ -6,7 +6,7 @@ PROG="/usr/share/qmodem/modem_sim.sh"
 start_service() {
     local sim_auto_switch=$(uci -q get qmodem_hc_sim.main.sim_auto_switch)
     logger -t modem_sim start_service $sim_auto_switch
-    if [ "$sim_auto_switch" = 1 ];then
+    if [ "$sim_auto_switch" == 1 ];then
         start_instace
     else
         stop_service

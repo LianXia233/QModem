@@ -1,5 +1,3 @@
-/* retire-audit (agent-retire-voip): 实验性语音视图，next 无对应物，独立保留（非退役）。
- * 本包无 .htm，此处为 htm 注释的等价声明式标注；详见 docs/refactor/journal-retire-voip.md。 */
 'use strict';
 'require view';
 'require poll';

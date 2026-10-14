@@ -11,21 +11,21 @@
 
 ## [Unreleased]
 
-### 新增（Added）
-- **18 个 LuCI 视图统一页头（`theme.pageHead`）**：theme.js 新增统一页头组件
-  （渐变标题 + 副题 + 主题切换按钮，支持可选徽章/按钮），此前未接入的 12 个
-  视图（`sms`、`sms_sim`、`sms_forward`、`sms_conversation`、`sim_switch`、
-  `monitor`、`ttl`、`service`、`stats`、`terminal`、`modem_config`、
-  `network_config`）全部接入；每个视图的内容包入统一 `qm-shell` 容器
-  （`--qm-maxw` 宽度），无模组/空数据态改用带二次元吉祥物的
-  `theme.emptyState`，替换旧的 `alert-message warning` 块。至此消除界面割裂：
-  不再出现六个主视图是 Soft Anime 卡片流、子页签还是原生 LuCI 表单的混杂。
-- **原生 cbi 表单 Pastel 卡片皮肤（theme.js）**：`fieldset.cbi-section`
-  渲染为 `--qm-glass` 毛玻璃卡片（backdrop-filter、`--qm-radius-lg`、
-  `--qm-shadow`），legend / `.cbi-map-descr` / `.cbi-page-actions` 同步令牌化，
-  form.Map 类视图（ttl、sms_forward、service、monitor、network_config）与
-  自定义卡片视图视觉拉齐；已改造的六个主视图零 cbi-section 引用，新皮肤仅
-  作用于本次统一的视图。≤560px 手机断点同步收敛页头与卡片内边距。
+### 变更（Changed）
+- **LuCI 前端回归上游 `luci-app-qmodem-next`**：`luci/` 目录整体对齐上游
+  FUjr/QModem@c49654ef（即本仓库 fork 点，也是上游最新 main）。删除本地的
+  `luci/luci-app-qmodem` 包——包括 Soft Anime Pastel Glass 主题体系、
+  `theme.pageHead` 统一化改造及后续全部定制——由上游 `luci-app-qmodem-next`
+  现代 JS 前端替代（上游以独立包交付，依赖 `qmodem`、`qmodem-smsd`、
+  `sms-forwarder-next`；我们的单包 `qmodem` 已通过 `PKG_PROVIDES` 提供这些
+  依赖名）。`luci/` 目录现与上游逐字节一致（新增
+  `luci-app-qmodem-monitor` / `-sms` / `-ttl` / `-ttlfw4` / `-next`，
+  恢复上游 `luci-app-qmodem`）。构建/CI 引用已同步适配，且仅涉及
+  luci 相关包名：`qmodem_package_generic` 改编 `luci-app-qmodem-next`、
+  `main.yml` 必需包为 `luci-app-qmodem-next` + `luci-i18n-qmodem-next-zh-cn`、
+  `openwrt_package.config` 选中 next 包、`extract-i18n.yml` 与 i18n 脚本
+  默认路径指向 `luci/luci-app-qmodem-next`、`check_all.sh` 运行 next 包的
+  `test_sms_service.js`。其余组件未做任何修改。
 
 ## [1.1.0] - 2026-10-14
 

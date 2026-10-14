@@ -11,30 +11,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
-## [Unreleased]
-
-### Added
-- **Unified page header for all 18 LuCI views (`theme.pageHead`)**: a new
-  theme.js helper renders the shared page header (gradient title,
-  description, theme toggle button, optional badge/actions) and every
-  previously untouched view now uses it — `sms`, `sms_sim`, `sms_forward`,
-  `sms_conversation`, `sim_switch`, `monitor`, `ttl`, `service`, `stats`,
-  `terminal`, `modem_config`, `network_config`. Each view also wraps its
-  content in the unified `qm-shell` container (`--qm-maxw` width) and
-  renders no-modem / empty states through `theme.emptyState` with the
-  anime mascot, replacing the legacy `alert-message warning` blocks.
-  This closes the visual split where the six redesigned main views were
-  Soft Anime cards while their tab children still looked like stock LuCI
-  forms.
-- **Pastel card skin for stock cbi forms (theme.js)**: `fieldset.cbi-section`
-  now renders as a `--qm-glass` glassmorphism card (backdrop-filter,
-  `--qm-radius-lg`, `--qm-shadow`) with tokenized legend /
-  `.cbi-map-descr` / `.cbi-page-actions` styling, so form.Map-based views
-  (ttl, sms_forward, service, monitor, network_config) visually match the
-  custom card views. The six already-redesigned main views reference no
-  cbi-section markup, so the new skin affects only the views being
-  unified. ≤560px breakpoints collapse the header and card padding for
-  phones.
+### Changed
+- **LuCI frontend reverted to upstream `luci-app-qmodem-next`**: the entire
+  `luci/` directory has been realigned to upstream FUjr/QModem@c49654ef
+  (the fork point itself, upstream's latest main). The local
+  `luci/luci-app-qmodem` package — including the Soft Anime Pastel Glass
+  theme system, the `theme.pageHead` unification pass and all downstream
+  customizations — is removed and replaced by the upstream
+  `luci-app-qmodem-next` modern JS UI (which upstream ships as a separate
+  package depending on `qmodem`, `qmodem-smsd` and `sms-forwarder-next`;
+  our single `qmodem` package already `PKG_PROVIDES` those). The `luci/`
+  tree now matches upstream byte-for-byte (adds
+  `luci-app-qmodem-monitor` / `-sms` / `-ttl` / `-ttlfw4` / `-next`,
+  restores upstream `luci-app-qmodem`). Build/CI references were adapted
+  accordingly and only touch luci-related package names:
+  `qmodem_package_generic` now compiles `luci-app-qmodem-next`,
+  `main.yml` required packages are `luci-app-qmodem-next` +
+  `luci-i18n-qmodem-next-zh-cn`, `openwrt_package.config` selects the
+  next packages, `extract-i18n.yml` and the i18n scripts' default paths
+  point at `luci/luci-app-qmodem-next`, and `check_all.sh` runs the
+  next package's `test_sms_service.js`. No other components were
+  modified.
 
 ## [1.1.0] - 2026-10-14
 

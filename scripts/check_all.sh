@@ -107,9 +107,9 @@ stage_node() {
     return 0
 }
 
-# ---------- stage: js-test (luci-app-qmodem 单测) ----------
+# ---------- stage: js-test (luci-app-qmodem-next 单测) ----------
 stage_js_test() {
-    local t="luci/luci-app-qmodem/tests/test_sms_service.js"
+    local t="luci/luci-app-qmodem-next/tests/test_sms_service.js"
     [ -f "$t" ] || { record SKIP js-test "测试文件不存在"; return 0; }
     have node || { record SKIP js-test "node 未安装"; return 0; }
     if [ "$CHANGED" -eq 1 ] && ! changed_files | grep -q '^luci/'; then

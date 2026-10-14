@@ -1,5 +1,4 @@
 
--- legacy: superseded by luci-app-qmodem (no mwan page there); scheduled for removal in Phase 4
 
 local d = require "luci.dispatcher"
 local uci = luci.model.uci.cursor()

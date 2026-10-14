@@ -349,7 +349,7 @@ def main():
     
     parser.add_argument(
         '--js-path',
-        default='luci/luci-app-qmodem/htdocs/luci-static/resources',
+        default='luci/luci-app-qmodem-next/htdocs/luci-static/resources',
         help='Path to JavaScript files directory'
     )
     
@@ -361,13 +361,13 @@ def main():
     
     parser.add_argument(
         '--example-po',
-        default='luci/luci-app-qmodem/po/zh_Hans/luci-app-qmodem.po',
+        default='luci/luci-app-qmodem-next/po/zh_Hans/luci-app-qmodem-next.po',
         help='Path to example PO file for translation reference'
     )
     
     parser.add_argument(
         '--output',
-        default='luci/luci-app-qmodem/po/zh_Hans/luci-app-qmodem.po',
+        default='luci/luci-app-qmodem-next/po/zh_Hans/luci-app-qmodem-next.po',
         help='Output PO file path'
     )
     

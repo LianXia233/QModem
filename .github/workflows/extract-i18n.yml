@@ -7,11 +7,11 @@ on:
       - master
     paths:
       - 'application/qmodem/files/usr/share/qmodem/**'
-      - 'luci/luci-app-qmodem/htdocs/luci-static/resources/**'
+      - 'luci/luci-app-qmodem-next/htdocs/luci-static/resources/**'
   pull_request:
     paths:
       - 'application/qmodem/files/usr/share/qmodem/**'
-      - 'luci/luci-app-qmodem/htdocs/luci-static/resources/**'
+      - 'luci/luci-app-qmodem-next/htdocs/luci-static/resources/**'
 
 permissions:
   contents: write
@@ -33,20 +33,20 @@ jobs:
         run: |
           python3 scripts/extract_i18n_strings.py \
             --sh-path application/qmodem/files/usr/share/qmodem \
-            --js-path luci/luci-app-qmodem/htdocs/luci-static/resources \
+            --js-path luci/luci-app-qmodem-next/htdocs/luci-static/resources \
             --format po \
-            --output luci/luci-app-qmodem/po/template/luci-app-qmodem.po
+            --output luci/luci-app-qmodem-next/po/template/luci-app-qmodem-next.po
             
       - name: Check for changes
         id: git-check
         run: |
-          git diff --exit-code luci/luci-app-qmodem/po/template/luci-app-qmodem.po || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --exit-code luci/luci-app-qmodem-next/po/template/luci-app-qmodem-next.po || echo "changed=true" >> $GITHUB_OUTPUT
           
       - name: Commit and push if changed
         if: steps.git-check.outputs.changed == 'true' && github.event_name == 'push'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add luci/luci-app-qmodem/po/template
+          git add luci/luci-app-qmodem-next/po/template
           git commit -m "chore: update i18n template strings [skip ci]"
           git push

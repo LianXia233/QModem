@@ -7,13 +7,12 @@ include $(TOPDIR)/rules.mk
 include ../../version.mk
 
 PKG_NAME:=luci-app-qmodem-mwan
-LUCI_TITLE:=Luci qwrt modem mwan support (legacy, maintenance mode)
+LUCI_TITLE:=Luci qwrt modem mwan support
 LUCI_PKGARCH:=all
 PKG_VERSION:=$(QMODEM_VERSION)
 PKG_LICENSE:=GPLv3
-PKG_LICENSE_FILES:=LICENSE
+PKG_LINCESE_FILES:=LICENSE
 PKG_MAINTAINER:=Tom <fjrcn@outlook.com>
-# legacy: 硬依赖 +luci-app-qmodem 仅为旧栈 UI 入口；Step 2 后切换为 +qmodem
 LUCI_DEPENDS:=+luci-app-qmodem +luci-app-mwan3
 		
 

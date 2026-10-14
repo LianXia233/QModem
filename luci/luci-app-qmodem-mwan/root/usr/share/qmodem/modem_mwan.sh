@@ -1,14 +1,6 @@
 #! /bin/sh
 . /lib/functions.sh
 
-# uci batch identifiers must be plain names: reject anything else (Phase 0 follow-up)
-valid_name(){
-    case "$1" in
-        ''|*[!A-Za-z0-9_]*) return 1 ;;
-        *) return 0 ;;
-    esac
-}
-
 
 
 
@@ -38,7 +30,7 @@ delete mwan3.$interface.track_ip
 EOF
     if [ -n "$track_ip" ]; then
         for ip in $track_ip; do
-            uci add_list mwan3.$interface.track_ip="$ip"
+            uci add_list mwan3.$interface.track_ip=$ip
         done
     fi
 }
@@ -54,9 +46,9 @@ add_mwan3_member()
     member_name=$4
     uci batch <<EOF
 set mwan3.$member_name=member
-set mwan3.$member_name.interface="$interface"
-set mwan3.$member_name.metric="$metric"
-set mwan3.$member_name.weight="$weight"
+set mwan3.$member_name.interface=$interface
+set mwan3.$member_name.metric=$metric
+set mwan3.$member_name.weight=$weight
 set mwan3.$member_name.add_by=modem
 EOF
 
@@ -120,7 +112,7 @@ gen_rule()
     uci batch <<EOF
 set mwan3.$rule_name=rule
 set mwan3.$rule_name.family="$family"
-set mwan3.$rule_name.sticky="$sticky_mode"
+set mwan3.$rule_name.sticky=$sticky_mode
 set mwan3.$rule_name.proto='all'
 set mwan3.$rule_name.use_policy=$use_policy
 set mwan3.$rule_name.add_by=modem
@@ -136,10 +128,6 @@ handle_config()
     config_get priority $1 member_priority
     config_get weight $1 member_weight
     config_get track_ip $1 member_track_ip
-    if ! valid_name "$interface"; then
-        logger -t modem_mwan "skip invalid interface name in section $1"
-        return
-    fi
     echo $1
     append_if $interface "$track_ip"
     add_mwan3_member $interface $priority $weight m$interface

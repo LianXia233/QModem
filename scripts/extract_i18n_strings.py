@@ -187,7 +187,7 @@ def generate_po_template(items: List[Dict[str, any]], output_file: str = None):
         output_file: Output file path (None for stdout)
     """
     lines = []
-    lines.append('# Translation template for luci-app-qmodem')
+    lines.append('# Translation template for luci-app-qmodem-next')
     lines.append('# Generated automatically by extract_i18n_strings.py')
     lines.append('')
     lines.append('msgid ""')
@@ -341,7 +341,7 @@ Examples:
   %(prog)s --js-path /path/to/resources
   
   # Extract from both JS and shell script directories
-  %(prog)s --js-path luci/luci-app-qmodem/htdocs/luci-static/resources --sh-path application/qmodem/files/usr/share/qmodem
+  %(prog)s --js-path luci/luci-app-qmodem-next/htdocs/luci-static/resources --sh-path application/qmodem/files/usr/share/qmodem
         """
     )
     
@@ -352,7 +352,7 @@ Examples:
     
     parser.add_argument(
         '--js-path',
-        default='luci/luci-app-qmodem/htdocs/luci-static/resources',
+        default='luci/luci-app-qmodem-next/htdocs/luci-static/resources',
         help='Directory to scan for JavaScript files (default: %(default)s)'
     )
     
