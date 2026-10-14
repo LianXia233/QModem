@@ -6,6 +6,7 @@
 'require dom';
 'require uci';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 ;
 
 
@@ -148,15 +149,19 @@ return view.extend({
 	render: function() {
 		var self = this;
 		var modems = this.getModemList();
+		var head = theme.pageHead(_('Traffic Statistics'),
+			_('Live RX/TX rates and cumulative traffic counters per modem, refreshed every %s seconds.').format(POLL_INTERVAL));
 
 		if (modems.length === 0) {
-			return E('div', { 'class': 'alert-message warning' },
-				_('No modems configured or all modems are disabled.'));
+			return E('div', { 'class': 'qm-shell' }, [
+				head,
+				theme.emptyState(_('No modems configured or all modems are disabled.'),
+					_('Add a modem device in the overview page first.'), 'sleep')
+			]);
 		}
 
-		var container = E('div', { 'class': 'cbi-map' });
-		var caption = E('h2', { 'class': 'cbi-map-caption' }, _('Traffic Statistics'));
-		container.appendChild(caption);
+		var container = E('div', { 'class': 'qm-shell' });
+		container.appendChild(head);
 
 		var cards = [];
 

@@ -5,7 +5,7 @@
 'require ui';
 'require dom';
 'require qmodem.controls as controls';
-;
+'require qmodem.theme as theme';
 ;
 
 
@@ -16,17 +16,23 @@ return view.extend({
 
 	render: function(modems) {
 		var self = this;
-		var container = E('div', { 'class': 'cbi-map' });
+		var head = theme.pageHead(_('SMS Messages'),
+			_('View and manage SMS messages. Messages are grouped by sender/recipient.'));
 
 		// Filter enabled modems (defensive: backend may return no list)
 		modems = modems || [];
 		modems = modems.filter(function(m) { return m.enabled; });
 
 		if (modems.length === 0) {
-			container.appendChild(E('div', { 'class': 'alert-message warning' }, 
-				_('No modems configured or all modems are disabled.')));
-			return container;
+			return E('div', { 'class': 'qm-shell' }, [
+				head,
+				theme.emptyState(_('No modems configured or all modems are disabled.'),
+					_('Add a modem device in the overview page first.'), 'sleep')
+			]);
 		}
+
+		var container = E('div', { 'class': 'qm-shell' });
+		container.appendChild(head);
 
 		// Modem selector (shared component; extra rows are appended to the
 		// same table body, keeping the original DOM structure)
@@ -162,15 +168,6 @@ return view.extend({
 	storageSection.appendChild(storageTable);
 	container.appendChild(storageSection);
 	
-		// Title
-		var title = E('h2', { 'name': 'content' }, _('SMS Messages'));
-		container.appendChild(title);
-
-		// Description
-		var desc = E('div', { 'class': 'cbi-map-descr' }, 
-			_('View and manage SMS messages. Messages are grouped by sender/recipient.'));
-		container.appendChild(desc);
-
 		// Main content area
 		var contentArea = E('div', { 'id': 'sms-list-content' });
 		container.appendChild(contentArea);

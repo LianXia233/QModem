@@ -11,6 +11,31 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+## [Unreleased]
+
+### Added
+- **Unified page header for all 18 LuCI views (`theme.pageHead`)**: a new
+  theme.js helper renders the shared page header (gradient title,
+  description, theme toggle button, optional badge/actions) and every
+  previously untouched view now uses it — `sms`, `sms_sim`, `sms_forward`,
+  `sms_conversation`, `sim_switch`, `monitor`, `ttl`, `service`, `stats`,
+  `terminal`, `modem_config`, `network_config`. Each view also wraps its
+  content in the unified `qm-shell` container (`--qm-maxw` width) and
+  renders no-modem / empty states through `theme.emptyState` with the
+  anime mascot, replacing the legacy `alert-message warning` blocks.
+  This closes the visual split where the six redesigned main views were
+  Soft Anime cards while their tab children still looked like stock LuCI
+  forms.
+- **Pastel card skin for stock cbi forms (theme.js)**: `fieldset.cbi-section`
+  now renders as a `--qm-glass` glassmorphism card (backdrop-filter,
+  `--qm-radius-lg`, `--qm-shadow`) with tokenized legend /
+  `.cbi-map-descr` / `.cbi-page-actions` styling, so form.Map-based views
+  (ttl, sms_forward, service, monitor, network_config) visually match the
+  custom card views. The six already-redesigned main views reference no
+  cbi-section markup, so the new skin affects only the views being
+  unified. ≤560px breakpoints collapse the header and card padding for
+  phones.
+
 ## [1.1.0] - 2026-10-14
 
 > Tag `v1.0.1` never shipped a Release — the build was blocked by the

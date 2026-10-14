@@ -7,6 +7,7 @@
 'require ui';
 'require poll';
 'require fs';
+'require qmodem.theme as theme';
 
 var callInitAction = rpc.declare({
 	object: 'luci',
@@ -127,8 +128,8 @@ return view.extend({
 		var m, s, o;
 		var self = this;
 
-		m = new form.Map('qmodem', _('QModem Monitor Configuration'),
-			_('Configure monitoring methods and actions for modem connectivity.'));
+		m = new form.Map('qmodem');
+		/* 标题与描述交给统一页头（theme.pageHead） */
 
 		// Global Monitor Configuration
 		s = m.section(form.NamedSection, 'main', 'main', _('Global Monitor Settings'));
@@ -540,7 +541,13 @@ return view.extend({
 			});
 		}
 
-		return m.render();
+		return m.render().then(function(formNode) {
+			return E('div', { 'class': 'qm-shell' }, [
+				theme.pageHead(_('Network Monitor'),
+					_('Configure monitoring methods and actions for modem connectivity.')),
+				formNode
+			]);
+		});
 	},
 
 	updateScriptList: function() {

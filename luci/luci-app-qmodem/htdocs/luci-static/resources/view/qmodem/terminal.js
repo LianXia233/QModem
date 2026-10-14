@@ -3,6 +3,7 @@
 'require qmodem.compat';
 'require ui';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 
 /*
  * AT 命令终端（AT Terminal）
@@ -211,10 +212,8 @@ return view.extend({
 			window.location.reload();
 		});
 
-		var hero = E('section', { 'class': 'mt-terminal-hero mt-ui-hero' }, [ E('div', {}, [
-			E('h2', {}, _('AT command console')),
-			E('p', {}, _('Diagnostic console for advanced users. Commands are sent directly to the module and are not automatically validated.'))
-		]) ]);
+		var hero = theme.pageHead(_('AT command console'),
+			_('Diagnostic console for advanced users. Commands are sent directly to the module and are not automatically validated.'));
 
 		if (!this.section) {
 			return E('div', { 'class':'mt-terminal mt-ui-page' }, [
@@ -222,7 +221,8 @@ return view.extend({
 				controls.styleNode(),
 				modemBar,
 				hero,
-				E('div', { 'class': 'alert-message warning' }, _('未检测到模组（请确认 QModem 已识别该设备）。')),
+				theme.emptyState(_('未检测到模组'),
+					_('请确认 QModem 已识别该设备。'), 'sleep'),
 				(res.errors || []).length ? E('div', { 'class': 'alert-message warning' }, res.errors.join('；')) : null
 			]);
 		}

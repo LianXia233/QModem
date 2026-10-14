@@ -5,6 +5,7 @@
 'require uci';
 'require ui';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 
 return view.extend({
 	load: function() {
@@ -18,8 +19,8 @@ return view.extend({
 		var modems = data[1];
 		var m, s, o;
 
-		m = new form.Map('sms_forwarder', _('SMS Forwarder Configuration'),
-			_('Configure SMS forwarding to various notification services'));
+		m = new form.Map('sms_forwarder');
+		/* 标题与描述交给统一页头（theme.pageHead） */
 
 		// Global settings
 		s = m.section(form.NamedSection, 'sms_forward', 'sms_forward', _('Global Settings'));
@@ -77,7 +78,13 @@ return view.extend({
 			this.showConfigModal(section_id, modems);
 		}, this);
 
-		return m.render();
+		return m.render().then(function(formNode) {
+			return E('div', { 'class': 'qm-shell' }, [
+				theme.pageHead(_('SMS Forwarder Configuration'),
+					_('Configure SMS forwarding to various notification services')),
+				formNode
+			]);
+		});
 	},
 
 	showConfigModal: function(section_id, modems) {

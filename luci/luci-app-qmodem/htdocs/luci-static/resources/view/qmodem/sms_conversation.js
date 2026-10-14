@@ -5,6 +5,7 @@
 'require ui';
 'require dom';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 ;
 ;
 
@@ -28,10 +29,10 @@ return view.extend({
 		var contact = loadResult[1];
 
 		if (!contact) {
-			return E('div', { 'class': 'cbi-map' }, [
-				E('h2', {}, _('SMS Conversation')),
-				E('div', { 'class': 'alert-message error' }, 
-					_('Invalid contact'))
+			return E('div', { 'class': 'qm-shell' }, [
+				theme.pageHead(_('SMS Conversation')),
+				theme.emptyState(_('Invalid contact'),
+					_('Open a conversation from the messages list instead.'), 'alert')
 			]);
 		}
 
@@ -40,11 +41,16 @@ return view.extend({
 		modems = modems.filter(function(m) { return m.enabled; });
 
 		if (modems.length === 0) {
-			return E('div', { 'class': 'alert-message warning' }, 
-				_('No modems configured or all modems are disabled.'));
+			return E('div', { 'class': 'qm-shell' }, [
+				theme.pageHead(_('SMS Conversation')),
+				theme.emptyState(_('No modems configured or all modems are disabled.'),
+					_('Add a modem device in the overview page first.'), 'sleep')
+			]);
 		}
 
-		var container = E('div', { 'class': 'cbi-map' });
+		var container = E('div', { 'class': 'qm-shell' });
+		container.appendChild(theme.pageHead(_('SMS Conversation'),
+			_('Conversation with ') + controls.sms.formatPhoneNumber(contact)));
 
 		// Modem selector (shared component)
 		var selector = controls.ModemSelector(modems, { id: 'sms_modem_selector' });
@@ -59,9 +65,7 @@ return view.extend({
 					ev.preventDefault();
 					window.location.href = L.url('admin/modem/qmodem/sms');
 				}
-			}, '← ' + _('Back')),
-			E('h2', {},
-				_('Conversation with ') + controls.sms.formatPhoneNumber(contact))
+			}, '← ' + _('Back'))
 		]);
 		container.appendChild(headerDiv);
 

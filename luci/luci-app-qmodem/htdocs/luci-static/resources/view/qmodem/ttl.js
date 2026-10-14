@@ -6,6 +6,7 @@
 'require view';
 'require qmodem.compat';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 'require form';
 'require uci';
 
@@ -17,8 +18,8 @@ return view.extend({
 	render: function() {
 		var m, s, o;
 
-		m = new form.Map('qmodem_ttl', _('TTL Configuration'),
-			_('Configure TTL/Hop Limit settings to modify outgoing packet TTL values. This can help bypass carrier restrictions on tethering.'));
+		m = new form.Map('qmodem_ttl');
+		/* 标题与描述交给统一页头（theme.pageHead），与其它视图视觉一致 */
 
 		// Global TTL Configuration
 		s = m.section(form.NamedSection, 'main', 'main', _('Global TTL Settings'));
@@ -56,6 +57,12 @@ return view.extend({
 			]);
 		};
 
-		return m.render();
+		return m.render().then(function(formNode) {
+			return E('div', { 'class': 'qm-shell' }, [
+				theme.pageHead(_('TTL Configuration'),
+					_('Configure TTL/Hop Limit settings to modify outgoing packet TTL values. This can help bypass carrier restrictions on tethering.')),
+				formNode
+			]);
+		});
 	}
 });

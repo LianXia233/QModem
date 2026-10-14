@@ -233,7 +233,29 @@ var CSS_COMPONENTS = [
 	'.qm-hide-sm{display:initial}.qm-only-sm{display:none}',
 	/* 终端/日志等深色块：跟随主题，不做硬编码黑底 */
 	'.qm-terminal{background:var(--qm-surface-3);color:var(--qm-text);border:1px solid var(--qm-border);',
-	'border-radius:var(--qm-radius-sm);padding:12px 14px;font-family:var(--qm-font-mono);font-size:12px;overflow:auto}'
+	'border-radius:var(--qm-radius-sm);padding:12px 14px;font-family:var(--qm-font-mono);font-size:12px;overflow:auto}',
+
+	/* 统一页头（qmodem 全部视图共用：渐变标题 + 副题 + 主题切换按钮） */
+	'.qm-page-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;',
+	'margin-bottom:4px;padding:2px 2px 0}',
+	'.qm-page-head-text{min-width:0;flex:1 1 260px}',
+	'.qm-page-title{font-size:21px;font-weight:800;letter-spacing:-.01em;line-height:1.25;',
+	'background:var(--qm-hero-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}',
+	'.qm-page-sub{margin-top:4px;font-size:12.5px;color:var(--qm-text-muted);line-height:1.5}',
+	'.qm-page-head-right{display:flex;align-items:center;gap:10px;flex:0 0 auto;flex-wrap:wrap}',
+
+	/* LuCI 原生 cbi 表单容器 Pastel 卡片化：form.Map 类视图与自定义卡片视图视觉统一。
+	 * （已改造的 6 个主视图零 cbi-map/cbi-section 引用，本段仅作用于待统一视图） */
+	'.qm-app .cbi-map{width:100%}',
+	'.qm-app .cbi-map-descr{margin:6px 2px 14px;font-size:12.5px;color:var(--qm-text-soft);line-height:1.55}',
+	'.qm-app fieldset.cbi-section{background:var(--qm-glass);backdrop-filter:blur(14px) saturate(160%);',
+	'-webkit-backdrop-filter:blur(14px) saturate(160%);border:1px solid var(--qm-glass-border);',
+	'border-radius:var(--qm-radius-lg);box-shadow:var(--qm-shadow);padding:18px 20px;margin:0 0 14px 0}',
+	'.qm-app fieldset.cbi-section > legend{font-size:14px;font-weight:750;color:var(--qm-text);',
+	'padding:0 8px;float:none;width:auto}',
+	'.qm-app .cbi-section-descr{margin:2px 2px 12px;font-size:11.5px;color:var(--qm-text-muted);line-height:1.5}',
+	'.qm-app .cbi-page-actions{padding-top:14px;margin:2px 0 0}',
+	'.qm-app .alert-message{border-radius:var(--qm-radius-sm)}',
 ].join('');
 
 /* ------------------------------------------------------------------ */
@@ -601,6 +623,10 @@ var CSS_RESPONSIVE = [
 	'@media (max-width:560px){',
 	'.qm-app{--qm-gap:10px;--qm-radius:12px;--qm-maxw:100%}',
 	'.qm-dashboard-grid{grid-template-columns:1fr;gap:12px}',
+	'.qm-page-head{align-items:flex-start}',
+	'.qm-page-head-text{flex-basis:100%}',
+	'.qm-page-title{font-size:19px}',
+	'.qm-app fieldset.cbi-section{padding:14px 15px;border-radius:12px}',
 	'.qm-col-3,.qm-col-4,.qm-col-6,.qm-col-8,.qm-col-12{grid-column:span 1}',
 	'.qm-hero-mascot-wrap{display:none}',
 	'.qm-app .qm-grid,.qm-app .qm-grid-2,.qm-app .qm-grid-3,' + sel(GRID_CLASSES) + '{grid-template-columns:1fr}',
@@ -913,6 +939,22 @@ function themeToggleBtn() {
 	return btn;
 }
 
+/* 统一页头：全部视图共用（渐变标题 + 副题 + 主题切换按钮 + 可选徽章/按钮）。
+ * opts.badge：置于标题右侧的徽章节点；opts.actions：按钮数组。 */
+function pageHead(title, sub, opts) {
+	opts = opts || {};
+	apply();
+	var right = [ opts.badge || null ].concat(opts.actions || []).filter(Boolean);
+	right.push(themeToggleBtn());
+	return el('div', 'qm-page-head', [
+		el('div', 'qm-page-head-text', [
+			el('h2', 'qm-page-title', title),
+			sub ? el('div', 'qm-page-sub', sub) : null
+		].filter(Boolean)),
+		el('div', 'qm-page-head-right', right)
+	]);
+}
+
 function progress(pct, tone) {
 	var bar = el('div', 'qm-progress', el('i'));
 	bar.firstChild.style.width = Math.max(0, Math.min(100, Number(pct) || 0)) + '%';
@@ -938,6 +980,7 @@ var API = {
 	toggleTheme: toggleTheme,
 	mascotSvg: mascotSvg,
 	themeToggleBtn: themeToggleBtn,
+	pageHead: pageHead,
 	emptyState: emptyState,
 	card: card,
 	kv: kv,

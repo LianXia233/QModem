@@ -6,6 +6,7 @@
 'require dom';
 ;
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 ;
 
 
@@ -16,30 +17,27 @@ return view.extend({
 
 	render: function(modems) {
 		var self = this;
-		var container = E('div', { 'class': 'cbi-map' });
+		var head = theme.pageHead(_('SIM Card SMS Management'),
+			_('View and delete SMS messages stored on SIM card. These are raw messages before being processed into conversations.'));
 
 		// Filter enabled modems
 		modems = modems.filter(function(m) { return m.enabled; });
 
 		if (modems.length === 0) {
-			container.appendChild(E('div', { 'class': 'alert-message warning' }, 
-				_('No modems configured or all modems are disabled.')));
-			return container;
+			return E('div', { 'class': 'qm-shell' }, [
+				head,
+				theme.emptyState(_('No modems configured or all modems are disabled.'),
+					_('Add a modem device in the overview page first.'), 'sleep')
+			]);
 		}
+
+		var container = E('div', { 'class': 'qm-shell' });
+		container.appendChild(head);
 
 		// Modem selector (shared component)
 		var selector = controls.ModemSelector(modems, { id: 'sms_sim_modem_selector' });
 		var select = selector.select;
 		container.appendChild(selector.section);
-
-		// Title
-		var title = E('h2', { 'name': 'content' }, _('SIM Card SMS Management'));
-		container.appendChild(title);
-
-		// Description
-		var desc = E('div', { 'class': 'cbi-map-descr' }, 
-			_('View and delete SMS messages stored on SIM card. These are raw messages before being processed into conversations.'));
-		container.appendChild(desc);
 
 		// Main content area
 		var contentArea = E('div', { 'id': 'sms-sim-content' });

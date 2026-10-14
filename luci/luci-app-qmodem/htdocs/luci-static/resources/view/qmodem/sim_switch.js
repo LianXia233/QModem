@@ -4,6 +4,7 @@
 'require ui';
 'require dom';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 ;
 
 return view.extend({
@@ -12,18 +13,19 @@ return view.extend({
 	},
 
 	render: function(modems) {
+		var head = theme.pageHead(_('SIM Switch'),
+			_('Switch between SIM card slots. Note: Some modems may require a reboot after switching SIM slots.'));
+
 		if (!modems || modems.length === 0) {
-			return E('div', { 'class': 'alert-message warning' }, 
-				_('No modem configured.'));
+			return E('div', { 'class': 'qm-shell' }, [
+				head,
+				theme.emptyState(_('No modem configured'),
+					_('Add a modem device in the overview page first.'), 'sleep')
+			]);
 		}
 
-		var container = E('div', { 'class': 'cbi-map' });
-		var title = E('h2', { 'class': 'cbi-map-caption' }, _('SIM Switch'));
-		container.appendChild(title);
-
-		var desc = E('div', { 'class': 'cbi-map-descr' }, 
-			_('Switch between SIM card slots. Note: Some modems may require a reboot after switching SIM slots.'));
-		container.appendChild(desc);
+		var container = E('div', { 'class': 'qm-shell' });
+		container.appendChild(head);
 
 	// Create modem selector section (shared component)
 	var selector = controls.ModemSelector(modems, {

@@ -62,12 +62,19 @@
 | **硬件与设备** | `view/qmodem/device.js` | **已完成** | 设备信息卡片流、SVG 拓扑图色彩变量化、主题切换支持、空状态 |
 | **模组系统** | `view/qmodem/system.js` | **已完成** | SoC与双SIM卡槽 SVG 物理拓扑图全面适配 Token（芯片高亮/连接态）、统一卡片头图标、主题切换支持 |
 | **高级设置** | `view/qmodem/advanced.js` | **已完成** | 硬件总线拓扑图（PCIe/USB/I2C/GPIO）全面适配 Token、频段锁网网格与 AT 终端样式升级、主题切换支持 |
-| **短信管理** | `view/qmodem/sms.js` | **已完成** | 移除字符计数与警告样式中所有裸露十六进制颜色，统一采用 `--qm-danger`、`--qm-warn`、`--qm-text-muted` |
-| **短信对话** | `view/qmodem/sms_conversation.js` | **已完成** | 气泡对话流样式统一为 Pastel Glass（theme.js 新增 `.qm-app .sms-*` 皮肤：接收气泡 `--qm-surface` 卡片、发送气泡 `--qm-accent-gradient` 渐变、会话区毛玻璃 backdrop-filter）、字符计数器与元数据标记全部 Token 化（`--qm-danger`/`--qm-warn`/`--qm-text-muted`） |
-| **SIM 切换** | `view/qmodem/sim_switch.js` | **已完成** | 状态文本与操作按钮色值 Token 化（降级提示 `--qm-text-muted`、ExtraInfo 注意事项 `--qm-warn`） |
-| **链路监控** | `view/qmodem/monitor.js` | **已完成** | 脚本列表与告警框色值 Token 化（安全警告升级为 `--qm-warn-soft`/`--qm-warn-border` Pastel 告警卡、列表分隔线 `--qm-border-soft`） |
-| **TTL 伪装** | `view/qmodem/ttl.js` | **已完成** | 告警说明块升级为 `--qm-warn-soft` Pastel 警示卡，标题 `--qm-warn`、正文 `--qm-text-soft` |
-| **模组与网络配置** | `modem_config.js` / `network_config.js` | **已完成** | 状态圆点 Token 化（连接 `--qm-ok`、断开 `--qm-danger`、未知 `--qm-warn`、加载 `--qm-text-muted`）、RAT 制式徽章升级为 soft 底色胶囊（NR→`--qm-ok`、其他→`--qm-info`）、锁频列表强调色 `--qm-accent` |
+| **短信管理** | `view/qmodem/sms.js` | **已完成** | 移除字符计数与警告样式中所有裸露十六进制颜色，统一采用 `--qm-danger`、`--qm-warn`、`--qm-text-muted`；接入统一页头（`theme.pageHead` + 主题切换按钮）与 `qm-shell` 容器、无设备态吉祥物空状态 |
+| **短信对话** | `view/qmodem/sms_conversation.js` | **已完成** | 气泡对话流样式统一为 Pastel Glass（theme.js 新增 `.qm-app .sms-*` 皮肤：接收气泡 `--qm-surface` 卡片、发送气泡 `--qm-accent-gradient` 渐变、会话区毛玻璃 backdrop-filter）、字符计数器与元数据标记全部 Token 化（`--qm-danger`/`--qm-warn`/`--qm-text-muted`）；统一页头（含联系人副题）与 `qm-shell` 容器 |
+| **SIM 切换** | `view/qmodem/sim_switch.js` | **已完成** | 状态文本与操作按钮色值 Token 化（降级提示 `--qm-text-muted`、ExtraInfo 注意事项 `--qm-warn`）；统一页头 + `qm-shell` 容器 + 空状态 |
+| **链路监控** | `view/qmodem/monitor.js` | **已完成** | 脚本列表与告警框色值 Token 化（安全警告升级为 `--qm-warn-soft`/`--qm-warn-border` Pastel 告警卡、列表分隔线 `--qm-border-soft`）；统一页头 + `qm-shell` 容器 + cbi 表单自动卡片化 |
+| **TTL 伪装** | `view/qmodem/ttl.js` | **已完成** | 告警说明块升级为 `--qm-warn-soft` Pastel 警示卡，标题 `--qm-warn`、正文 `--qm-text-soft`；统一页头 + `qm-shell` 容器 |
+| **模组与网络配置** | `modem_config.js` / `network_config.js` | **已完成** | 状态圆点 Token 化（连接 `--qm-ok`、断开 `--qm-danger`、未知 `--qm-warn`、加载 `--qm-text-muted`）、RAT 制式徽章升级为 soft 底色胶囊（NR→`--qm-ok`、其他→`--qm-info`）、锁频列表强调色 `--qm-accent`；统一页头 + `qm-shell` 容器 + 空状态 |
+| **SIM 卡短信** | `view/qmodem/sms_sim.js` | **已完成** | 接入统一页头 + `qm-shell` 容器 + 空状态，替代旧 `cbi-map` 标题与 alert 空态 |
+| **短信转发** | `view/qmodem/sms_forward.js` | **已完成** | 接入统一页头 + `qm-shell` 容器，form.Map 交给 cbi 全局卡片皮肤 |
+| **服务与扫描** | `view/qmodem/service.js` | **已完成** | 接入统一页头 + `qm-shell` 容器，form.Map 交给 cbi 全局卡片皮肤 |
+| **流量统计** | `view/qmodem/stats.js` | **已完成** | 接入统一页头（含轮询周期副题）+ `qm-shell` 容器 + 空状态，模组卡片由 cbi-section 自动卡片化 |
+| **AT 终端** | `view/qmodem/terminal.js` | **已完成** | hero 替换为统一页头（含主题切换），无模组态升级为吉祥物空状态，保留 `mt-terminal` 容器与 AT 终端卡片结构 |
+
+**统一基础设施（2026-10-14 全量收敛）**：theme.js 新增 `pageHead(title, sub, opts)` 统一页头组件（渐变标题 + 副题 + 主题切换按钮，opts 支持徽章/按钮）与配套 `qm-page-head` 系列 CSS；新增 `fieldset.cbi-section` Pastel 毛玻璃卡片皮肤（含 legend/cbi-map-descr/cbi-page-actions 令牌化）——form.Map 类视图与自定义卡片视图视觉统一；≤560px 断点补齐页头与 cbi 卡片收敛规则。至此 18/18 视图全部接入 Soft Anime 体系：统一容器宽度（`--qm-maxw`）、统一页头、统一主题切换、统一空状态。
 
 ---
 
@@ -89,6 +96,8 @@
 
 1. **次级视图细节色彩收敛**：
    * [x] 已完成 `sms_conversation.js`、`sim_switch.js`、`monitor.js`、`ttl.js`、`modem_config.js`、`network_config.js` 中剩余硬编码颜色的清理与 Token 化（含 theme.js 新增 SMS 会话 Pastel Glass 皮肤层）。
+2. **全量视觉统一（界面割裂收敛）**：
+   * [x] 2026-10-14 完成：12 个未接入视图（sms/sms_sim/sms_forward/sms_conversation/sim_switch/monitor/ttl/service/stats/terminal/modem_config/network_config）全部接入统一页头 `theme.pageHead`、`qm-shell` 容器、主题切换按钮与吉祥物空状态；theme.js 新增 cbi 表单 Pastel 卡片化皮肤，form.Map 类视图与自定义卡片视图视觉拉齐。18/18 视图完成 Soft Anime 接入。
 2. **移动端深度微调**：
    * [x] 已完成 SMS 会话窄屏优化：≤560px 断点气泡 `max-width:88%`、会话区 `max-height:420px`、气泡内删除按钮触控加大至 36px、通用 `.btn/.cbi-button` 触控提升至 42px。
    * [ ] 针对 360px、390px 视口进一步调优其它视图弹性换行，确保窄屏下各视图无横向滚动条，主要按键满足 40px+ 触控标准（建议用 `tests/browser` Playwright 套件做全视图目视回归）。

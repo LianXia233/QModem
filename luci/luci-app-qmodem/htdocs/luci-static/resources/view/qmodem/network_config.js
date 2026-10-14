@@ -6,6 +6,7 @@
 'require rpc';
 'require ui';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 'require dom';
 'require poll';
 
@@ -49,7 +50,8 @@ return view.extend({
 	render: function() {
 		var m, s, o;
 
-		m = new form.Map('qmodem', _('QModem Configuration'));
+		m = new form.Map('qmodem');
+		/* 标题交给统一页头（theme.pageHead） */
 
 		// Global Dial Configuration
 		s = m.section(form.NamedSection, 'main', 'main', _('Global Configuration'));
@@ -549,7 +551,11 @@ return view.extend({
 			this.startStatusIndicatorPolling();
 			// Start polling for RC status
 			this.startRcStatusPolling();
-			return rendered;
+			return E('div', { 'class': 'qm-shell' }, [
+				theme.pageHead(_('Dial and Network'),
+					_('Per-modem dialing, connection status and QModem network service control.')),
+				rendered
+			]);
 		}, this));
 	},
 

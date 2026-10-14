@@ -11,6 +11,22 @@
 
 ## [Unreleased]
 
+### 新增（Added）
+- **18 个 LuCI 视图统一页头（`theme.pageHead`）**：theme.js 新增统一页头组件
+  （渐变标题 + 副题 + 主题切换按钮，支持可选徽章/按钮），此前未接入的 12 个
+  视图（`sms`、`sms_sim`、`sms_forward`、`sms_conversation`、`sim_switch`、
+  `monitor`、`ttl`、`service`、`stats`、`terminal`、`modem_config`、
+  `network_config`）全部接入；每个视图的内容包入统一 `qm-shell` 容器
+  （`--qm-maxw` 宽度），无模组/空数据态改用带二次元吉祥物的
+  `theme.emptyState`，替换旧的 `alert-message warning` 块。至此消除界面割裂：
+  不再出现六个主视图是 Soft Anime 卡片流、子页签还是原生 LuCI 表单的混杂。
+- **原生 cbi 表单 Pastel 卡片皮肤（theme.js）**：`fieldset.cbi-section`
+  渲染为 `--qm-glass` 毛玻璃卡片（backdrop-filter、`--qm-radius-lg`、
+  `--qm-shadow`），legend / `.cbi-map-descr` / `.cbi-page-actions` 同步令牌化，
+  form.Map 类视图（ttl、sms_forward、service、monitor、network_config）与
+  自定义卡片视图视觉拉齐；已改造的六个主视图零 cbi-section 引用，新皮肤仅
+  作用于本次统一的视图。≤560px 手机断点同步收敛页头与卡片内边距。
+
 ## [1.1.0] - 2026-10-14
 
 > tag `v1.0.1` 从未发布过 Release——编译被 ubuntu-26.04 runner 的

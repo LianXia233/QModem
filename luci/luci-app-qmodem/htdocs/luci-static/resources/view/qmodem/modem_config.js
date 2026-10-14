@@ -4,6 +4,7 @@
 'require ui';
 'require dom';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 ;
 
 // Load CSS (deduplicated) - required for .cbi-tabmenu/.band-container styles
@@ -14,14 +15,19 @@ return view.extend({
 	},
 
 	render: function(modems) {
+		var head = theme.pageHead(_('Modem Features'),
+			_('Per-modem feature toggles: network mode, band locking, neighbors and reboot.'));
+
 		if (!modems || modems.length === 0) {
-			return E('div', { 'class': 'alert-message warning' }, 
-				_('No modem configured.'));
+			return E('div', { 'class': 'qm-shell' }, [
+				head,
+				theme.emptyState(_('No modem configured'),
+					_('Add a modem device in the overview page first.'), 'sleep')
+			]);
 		}
 
-		var container = E('div', { 'class': 'cbi-map' });
-		var title = E('h2', { 'class': 'cbi-map-caption' }, _('Advanced Configuration'));
-		container.appendChild(title);
+		var container = E('div', { 'class': 'qm-shell' });
+		container.appendChild(head);
 
 	// Create modem selector section (shared component)
 	var selector = controls.ModemSelector(modems, {

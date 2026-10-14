@@ -2,6 +2,7 @@
 'require view';
 'require qmodem.compat';
 'require qmodem.controls as controls';
+'require qmodem.theme as theme';
 'require form';
 'require uci';
 'require rpc';
@@ -91,7 +92,8 @@ return view.extend({
 	render: function(data) {
 		var m, s, o;
 
-		m = new form.Map('qmodem', _('QModem Settings'));
+		m = new form.Map('qmodem');
+		/* 页面标题交给统一页头（theme.pageHead） */
 
 		// ===========================================
 		// Modem Probe Settings
@@ -548,6 +550,12 @@ return view.extend({
 	o.placeholder = _('e.g.') + ' 1';
 	o.modalonly = true;
 
-		return m.render();
+		return m.render().then(function(formNode) {
+			return E('div', { 'class': 'qm-shell' }, [
+				theme.pageHead(_('Service and Scan'),
+					_('QModem service behaviour, device scanning and runtime diagnostics.')),
+				formNode
+			]);
+		});
 	}
 });
