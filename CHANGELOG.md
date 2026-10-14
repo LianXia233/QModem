@@ -230,6 +230,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
   rpcd plugins moved into `qmodem` at unchanged install paths.
 
 ### Fixed
+- **CI: OpenWrt SDK prereq passes again on ubuntu-26.04 runners**: Ubuntu
+  26.04 replaced GNU coreutils with the Rust-based uutils coreutils, whose
+  `install --version` output no longer contains "GNU". That trips the
+  OpenWrt SDK prerequisite check (include/prereq-build.mk probes
+  `install --version | grep GNU` and then `ginstall --version | grep GNU`),
+  so since the runner migrated to ubuntu-26.04 every build job failed at
+  the "初始化 SDK 环境" step with `Build dependency: Please install GNU
+  'install'`. main.yml now installs a `ginstall` wrapper (the second
+  candidate OpenWrt probes) into `/usr/local/bin`: `--version` prints a
+  GNU-style banner to satisfy the check, all other invocations forward to
+  the system install (uutils supports the -d/-m/-D/-p/-t/-T options
+  OpenWrt uses). The step self-tests first and skips the shim when the
+  system install already reports GNU.
 - **AT console unusable under the exclusive `qmodem-atd` mode**: device-level
   integration surfaced six stacked defects, all fixed —
   1. the `qmodem-atd` init script tested section type with

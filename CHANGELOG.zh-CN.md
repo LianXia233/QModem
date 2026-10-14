@@ -192,6 +192,17 @@
   `qmodem`，落盘路径不变。
 
 ### 修复（Fixed）
+- **CI：ubuntu-26.04 runner 上 OpenWrt SDK 前置检查恢复通过**：Ubuntu
+  26.04 将 GNU coreutils 替换为 Rust 重写的 uutils coreutils，
+  `install --version` 输出不再包含 "GNU"，导致 OpenWrt SDK 的前置检查
+  （include/prereq-build.mk 先探测 `install --version | grep GNU`，
+  再探测 `ginstall --version | grep GNU`）失败——runner 迁移到
+  ubuntu-26.04 后，所有构建 job 在「初始化 SDK 环境」步骤报
+  `Build dependency: Please install GNU 'install'`。main.yml 现在会向
+  `/usr/local/bin` 安装一个 `ginstall` wrapper（OpenWrt 探测的第二候选）：
+  `--version` 输出 GNU 字样通过检查，其余调用原样转发给系统 install
+  （uutils 支持 OpenWrt 用到的 -d/-m/-D/-p/-t/-T 选项）；步骤会先自检，
+  系统 install 本身能通过 GNU 检查时跳过安装 shim。
 - **AT 控制台在 AT 独占（qmodem-atd）模式下不可用**：实机联调定位到 6 个叠加
   缺陷，全部修复——
   1. `qmodem-atd` init 用 `config_get "$section" type` 判断节类型，而 UCI 里

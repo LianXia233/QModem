@@ -132,7 +132,30 @@ jobs:
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
 
-      
+      - name: GNU install shim（ubuntu-26.04 uutils coreutils 兼容）
+        # Ubuntu 26.04 把 GNU coreutils 换成了 Rust 重写的 uutils coreutils，
+        # `install --version` 输出不再含 "GNU"，OpenWrt SDK 的 prereq 检查
+        # （include/prereq-build.mk: `install --version | grep GNU`，候选依次
+        # 为 install / ginstall）因此失败，所有构建 job 死在「初始化 SDK 环境」。
+        # 这里放一个 ginstall wrapper（OpenWrt 探测的第二候选）：--version 输出
+        # GNU 字样通过检查，其余参数原样转发给系统 install（uutils 行为兼容
+        # OpenWrt 用到的 -d/-m/-D/-p/-t/-T 选项）。系统 install 本身能过检查时
+        # 跳过安装。
+        run: |
+          if install --version 2>/dev/null | grep -q GNU; then
+            echo "system install already reports GNU, shim not needed"
+            exit 0
+          fi
+          echo "system install --version output:" >&2
+          install --version >&2 || true
+          printf '%s\n' \
+            '#!/bin/sh' \
+            'if [ "$1" = "--version" ]; then echo "install (GNU coreutils) 9.4"; exit 0; fi' \
+            'exec /usr/bin/install "$@"' \
+            | sudo tee /usr/local/bin/ginstall >/dev/null
+          sudo chmod +x /usr/local/bin/ginstall
+          ginstall --version
+
       - name: 检出代码
         uses: actions/checkout@v7
         with:
