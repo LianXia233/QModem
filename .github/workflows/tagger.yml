@@ -108,3 +108,16 @@ jobs:
         echo "✅ Successfully created and pushed tag: $tag_name"
         echo "tag_name=$tag_name" >> $GITHUB_OUTPUT
         echo "tag_created=true" >> $GITHUB_OUTPUT
+
+    # 关键：用 workflow_call 直接触发编译 + 发布，而不是依赖 tag push 事件。
+    # 原因：本工作流用内置 GITHUB_TOKEN 推送 tag，GitHub 会主动抑制该 token
+    # 产生的 push 事件（防止 workflow 递归触发），因此 main.yml 的
+    # `push: tags: ['v*']` 监听器永远不会被自动打的 tag 唤醒——v1.1.0 发版
+    # 当时成功只是因为 tag 是人工推送的。workflow_call 不走 push 事件，
+    # 是自动发版链路唯一可靠的触发方式。
+    - name: 触发编译与发布
+      id: trigger_build
+      if: steps.create_tag.outputs.tag_created == 'true'
+      uses: ./.github/workflows/main.yml
+      with:
+        tag: ${{ steps.create_tag.outputs.tag_name }}

@@ -6,6 +6,33 @@
   `docs/refactor/journal-ci-release.md`（本文件）。**仅允许修改/新建 `.github/**` + 本 journal**，未触碰其他文件。
 
 ## 变更
+
+### -1. 修复自动发版链路断链（2026-10-14，v1.1.1）
+
+**问题一（手动触发不上传 Release）**：`main.yml` 的 `job_release_artifacts` 要求
+`push_type == 'tag'`，而 `workflow_dispatch` 在 `job_prepare` 一律被判为 `branch`，
+导致手动编译即使全部成功，「发布产物」job 也永远被 skipped（实测 run 38504467881
+三个构建变体全部 success、发布产物 skipped）。
+
+**修复**：`workflow_dispatch` 增加可选 `tag` 输入；填写后 `determine_push` 将本次
+运行判为 `tag` 发布，构建产物上传到该已存在 Release（用于修复后补发资产）；
+留空保持只编译不发布。
+
+**问题二（tagger 自动打的标签不触发编译——更深层的断链）**：v1.1.1 发版时发现
+tagger.yml 自动推送的 tag（github-actions[bot] + GITHUB_TOKEN）**不会触发任何
+push 事件工作流**——GitHub 出于防递归触发的安全设计，主动抑制内置 GITHUB_TOKEN
+产生的 push 事件。即 `main.yml` 的 `push: tags: ['v*']` 对自动标签永远失效。
+v1.1.0 当时成功纯属人工推送 tag 的巧合。
+
+**修复**：
+- `main.yml` 增加 `workflow_call` 触发器（input `tag` 必填）；
+- `tagger.yml` 打完标签后 `uses: ./.github/workflows/main.yml` 直接调用编译+发布，
+  绕开 push 事件抑制问题；
+- `determine_push` 统一用 `inputs.tag`（dispatch 与 call 共用）判定发布。
+
+**手动补发通道**：`gh workflow run main.yml -f tag=vX.Y.Z`（需要 PAT/经典 token，
+内置 GITHUB_TOKEN 无法创建 workflow dispatch，HTTP 403）。
+
 ### 0. 触发策略：按需编译，不再"每次推送就编译"（2026-10-14）
 
 **问题**：`main.yml` 原先监听 `push: branches: ['*']`，任何分支/任何文件改动都会

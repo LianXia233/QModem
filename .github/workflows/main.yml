@@ -27,6 +27,16 @@ on:
       - "docs/**"
       - "README*.md"
       - ".github/**"
+  # tagger.yml 打完标签后通过 workflow_call 直接调用本工作流。
+  # 关键原因：tagger.yml 用内置 GITHUB_TOKEN 推送 tag，而 GitHub 会抑制
+  # 该 token 产生的 push 事件——tag push 永远不会触发 push:tags 监听器。
+  # workflow_call 不依赖 push 事件，因此是自动发版链路的可靠触发方式。
+  workflow_call:
+    inputs:
+      tag:
+        description: 要发布的 tag（如 v1.1.1），构建产物将上传到该 Release
+        required: true
+        type: string
 
 env:
   TZ: Asia/Shanghai
@@ -53,17 +63,18 @@ jobs:
         env:
           # 修复：手动触发原先一律判为 branch，导致「发布产物」job 永远被
           # push_type == 'tag' 条件跳过——手动编译无法把产物上传到 Release。
-          # 现在手动触发可显式传入 tag，即按发布处理（用于补发/重传 Release 资产）。
-          MANUAL_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || '' }}
+          # 现在 workflow_dispatch / workflow_call（tagger 自动发版）都可显式
+          # 传入 tag，即按发布处理，二者共用同一判定逻辑。
+          RELEASE_TAG: ${{ inputs.tag || '' }}
         run: |
-            # 本次运行三种来源：tag 推送（发布）、手动触发（可选传 tag 发布）、PR/分支
+            # 本次运行三种来源：tag 推送（发布）、显式传 tag（手动/自动发版）、分支/PR
             if [[ "${{ github.ref }}" == refs/tags/* ]]; then
               echo "This is a tag push."
               echo "tag_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
               echo "push_type=tag" >> $GITHUB_OUTPUT
-            elif [[ -n "${MANUAL_TAG}" ]]; then
-              echo "Manual dispatch with tag '${MANUAL_TAG}', publishing to that release."
-              echo "tag_name=${MANUAL_TAG}" >> $GITHUB_OUTPUT
+            elif [[ -n "${RELEASE_TAG}" ]]; then
+              echo "Release requested with tag '${RELEASE_TAG}', publishing to that release."
+              echo "tag_name=${RELEASE_TAG}" >> $GITHUB_OUTPUT
               echo "push_type=tag" >> $GITHUB_OUTPUT
             else
               echo "This is a branch push."
