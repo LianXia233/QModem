@@ -27,7 +27,7 @@ msgstr ""
 msgid "$key"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:336
+#: view/qmodem/sms_sim.js:334
 msgid "%d messages deleted, %d failed"
 msgstr ""
 
@@ -59,26 +59,26 @@ msgstr ""
 msgid "(Poor)"
 msgstr ""
 
-#: view/qmodem/network_config.js:510
-#: view/qmodem/network_config.js:519
-#: view/qmodem/network_config.js:528
-#: view/qmodem/network_config.js:535
+#: view/qmodem/network_config.js:512
+#: view/qmodem/network_config.js:521
+#: view/qmodem/network_config.js:530
+#: view/qmodem/network_config.js:537
 msgid "(beta)"
 msgstr ""
 
-#: view/qmodem/network_config.js:511
-#: view/qmodem/network_config.js:520
-#: view/qmodem/network_config.js:529
-#: view/qmodem/network_config.js:536
+#: view/qmodem/network_config.js:513
+#: view/qmodem/network_config.js:522
+#: view/qmodem/network_config.js:531
+#: view/qmodem/network_config.js:538
 msgid "(still in beta)"
 msgstr ""
 
-#: view/qmodem/monitor.js:359
+#: view/qmodem/monitor.js:360
 msgid ". Allowed types: .sh, .py, .lua"
 msgstr ""
 
-#: view/qmodem/sms.js:399
-#: view/qmodem/sms_conversation.js:139
+#: view/qmodem/sms.js:396
+#: view/qmodem/sms_conversation.js:143
 msgid "16-bit (Unicode)"
 msgstr ""
 
@@ -100,7 +100,7 @@ msgstr ""
 msgid "4G 长期演进（LTE）"
 msgstr ""
 
-#: view/qmodem/service.js:505
+#: view/qmodem/service.js:507
 msgid "5G Ethernet Interface"
 msgstr ""
 
@@ -120,12 +120,12 @@ msgstr ""
 msgid "5G 新空口（NR）"
 msgstr ""
 
-#: view/qmodem/sms.js:398
-#: view/qmodem/sms_conversation.js:138
+#: view/qmodem/sms.js:395
+#: view/qmodem/sms_conversation.js:142
 msgid "7-bit (ASCII)"
 msgstr ""
 
-#: view/qmodem/monitor.js:478
+#: view/qmodem/monitor.js:479
 msgid "8.8.8.8 or www.example.com"
 msgstr ""
 
@@ -133,21 +133,21 @@ msgstr ""
 msgid "A module restart or airplane-mode cycle is required before this change takes effect."
 msgstr ""
 
-#: view/qmodem/network_config.js:400
-#: view/qmodem/network_config.js:477
+#: view/qmodem/network_config.js:402
+#: view/qmodem/network_config.js:479
 msgid "A1 (AT)"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:63
+#: view/qmodem/sms_forward.js:64
 msgid "API Type"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:354
+#: view/qmodem/sms_forward.js:361
 msgid "API configuration saved. Remember to save & apply changes."
 msgstr ""
 
-#: view/qmodem/network_config.js:382
-#: view/qmodem/network_config.js:458
+#: view/qmodem/network_config.js:384
+#: view/qmodem/network_config.js:460
 msgid "APN"
 msgstr ""
 
@@ -159,12 +159,12 @@ msgstr ""
 msgid "APN、拨号、IP 详情与会话计数"
 msgstr ""
 
-#: view/qmodem/modem_config.js:721
+#: view/qmodem/modem_config.js:727
 msgid "ARFCN"
 msgstr ""
 
-#: view/qmodem/monitor.js:93
-#: view/qmodem/monitor.js:523
+#: view/qmodem/monitor.js:94
+#: view/qmodem/monitor.js:524
 msgid "AT Commands"
 msgstr ""
 
@@ -182,11 +182,11 @@ msgstr ""
 #: vendor/simcom.sh:258
 #: vendor/telit.sh:157
 #: vendor/thales.sh:46
-#: view/qmodem/service.js:361
+#: view/qmodem/service.js:363
 msgid "AT Port"
 msgstr ""
 
-#: view/qmodem/service.js:135
+#: view/qmodem/service.js:137
 msgid "AT Probe Workers"
 msgstr ""
 
@@ -198,15 +198,15 @@ msgstr ""
 msgid "AT command timed out"
 msgstr ""
 
-#: view/qmodem/network_config.js:529
+#: view/qmodem/network_config.js:531
 msgid "AT commands to execute after modem initialization."
 msgstr ""
 
-#: view/qmodem/network_config.js:536
+#: view/qmodem/network_config.js:538
 msgid "AT commands to execute before dialing."
 msgstr ""
 
-#: view/qmodem/monitor.js:526
+#: view/qmodem/monitor.js:527
 msgid "AT commands to send when action is triggered"
 msgstr ""
 
@@ -233,7 +233,7 @@ msgstr ""
 msgid "AT 透传控制台"
 msgstr ""
 
-#: view/qmodem/modem_config.js:727
+#: view/qmodem/modem_config.js:733
 msgid "Absolute Radio Frequency Channel Number"
 msgstr ""
 
@@ -261,42 +261,47 @@ msgstr ""
 msgid "Access Maximum Bit Rate for Uplink"
 msgstr ""
 
-#: view/qmodem/modem_config.js:932
-#: view/qmodem/modem_config.js:957
+#: view/qmodem/modem_config.js:938
+#: view/qmodem/modem_config.js:963
 msgid "Action"
 msgstr ""
 
-#: view/qmodem/monitor.js:439
-#: view/qmodem/monitor.js:514
-#: view/qmodem/sms_sim.js:136
+#: view/qmodem/monitor.js:440
+#: view/qmodem/monitor.js:515
+#: view/qmodem/sms_sim.js:134
 msgid "Actions"
 msgstr ""
 
-#: view/qmodem/monitor.js:519
+#: view/qmodem/monitor.js:520
 msgid "Actions to perform when monitor threshold is reached"
 msgstr ""
 
-#: view/qmodem/service.js:312
+#: view/qmodem/service.js:314
 msgid "Add"
 msgstr ""
 
-#: view/qmodem/service.js:274
+#: view/qmodem/service.js:276
 msgid "Add Modem Device"
 msgstr ""
 
-#: view/qmodem/service.js:154
+#: view/qmodem/service.js:156
 msgid "Add Retry Delay"
 msgstr ""
 
-#: view/qmodem/service.js:159
+#: view/qmodem/service.js:161
 msgid "Add Retry Max"
 msgstr ""
 
-#: view/qmodem/modem_config.js:23
-msgid "Advanced Configuration"
+#: view/qmodem/modem_config.js:25
+#: view/qmodem/sim_switch.js:23
+#: view/qmodem/sms.js:30
+#: view/qmodem/sms_conversation.js:47
+#: view/qmodem/sms_sim.js:30
+#: view/qmodem/stats.js:159
+msgid "Add a modem device in the overview page first."
 msgstr ""
 
-#: view/qmodem/service.js:475
+#: view/qmodem/service.js:477
 msgid "After setting this option, the first module loaded into this slot will automatically be assigned this default alias."
 msgstr ""
 
@@ -304,125 +309,125 @@ msgstr ""
 msgid "Airplane mode failed: %s"
 msgstr ""
 
-#: view/qmodem/service.js:354
+#: view/qmodem/service.js:356
 msgid "Alias"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:334
+#: view/qmodem/sms_sim.js:332
 msgid "All %d messages deleted successfully"
 msgstr ""
 
-#: view/qmodem/service.js:101
+#: view/qmodem/service.js:103
 msgid "Alternative AT Tools"
 msgstr ""
 
 #: qmodem/controls.js:1522
-#: view/qmodem/modem_config.js:246
-#: view/qmodem/modem_config.js:251
-#: view/qmodem/modem_config.js:254
-#: view/qmodem/modem_config.js:385
-#: view/qmodem/modem_config.js:390
-#: view/qmodem/modem_config.js:393
-#: view/qmodem/modem_config.js:563
-#: view/qmodem/modem_config.js:568
-#: view/qmodem/modem_config.js:571
-#: view/qmodem/modem_config.js:856
-#: view/qmodem/modem_config.js:860
-#: view/qmodem/modem_config.js:863
-#: view/qmodem/modem_config.js:1330
-#: view/qmodem/modem_config.js:1335
-#: view/qmodem/modem_config.js:1338
+#: view/qmodem/modem_config.js:252
+#: view/qmodem/modem_config.js:257
+#: view/qmodem/modem_config.js:260
+#: view/qmodem/modem_config.js:391
+#: view/qmodem/modem_config.js:396
+#: view/qmodem/modem_config.js:399
+#: view/qmodem/modem_config.js:569
+#: view/qmodem/modem_config.js:574
+#: view/qmodem/modem_config.js:577
+#: view/qmodem/modem_config.js:862
+#: view/qmodem/modem_config.js:866
+#: view/qmodem/modem_config.js:869
+#: view/qmodem/modem_config.js:1336
+#: view/qmodem/modem_config.js:1341
+#: view/qmodem/modem_config.js:1344
 msgid "Apply"
 msgstr ""
 
-#: view/qmodem/sms.js:155
+#: view/qmodem/sms.js:161
 msgid "Apply Storage Settings"
 msgstr ""
 
-#: view/qmodem/sms.js:587
+#: view/qmodem/sms.js:584
 msgid "Applying settings..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:236
-#: view/qmodem/modem_config.js:375
-#: view/qmodem/modem_config.js:845
-#: view/qmodem/modem_config.js:1320
+#: view/qmodem/modem_config.js:242
+#: view/qmodem/modem_config.js:381
+#: view/qmodem/modem_config.js:851
+#: view/qmodem/modem_config.js:1326
 msgid "Applying..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:548
+#: view/qmodem/modem_config.js:554
 msgid "Are you sure you want to change the IMEI to %s? This requires modem reboot."
 msgstr ""
 
-#: view/qmodem/network_config.js:992
+#: view/qmodem/network_config.js:998
 msgid "Are you sure you want to clear the dial log?"
 msgstr ""
 
-#: view/qmodem/stats.js:129
+#: view/qmodem/stats.js:130
 msgid "Are you sure you want to clear the traffic statistics of modem %s?"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:295
+#: view/qmodem/sms_sim.js:293
 msgid "Are you sure you want to delete ALL %d messages from SIM card? This action cannot be undone."
 msgstr ""
 
-#: view/qmodem/sms_sim.js:244
+#: view/qmodem/sms_sim.js:242
 msgid "Are you sure you want to delete this message from SIM card?"
 msgstr ""
 
-#: view/qmodem/monitor.js:386
-#: view/qmodem/monitor.js:570
+#: view/qmodem/monitor.js:387
+#: view/qmodem/monitor.js:577
 msgid "Are you sure you want to delete this script?"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1476
+#: view/qmodem/modem_config.js:1482
 msgid "Are you sure you want to perform a hard reboot? This will power cycle the modem and may cause a longer disconnection."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1439
+#: view/qmodem/modem_config.js:1445
 msgid "Are you sure you want to perform a soft reboot? The modem will restart and may lose connection temporarily."
 msgstr ""
 
-#: view/qmodem/service.js:319
+#: view/qmodem/service.js:321
 msgid "Are you sure you want to remove this modem device? this cannot be roll back with uci machanism."
 msgstr ""
 
-#: view/qmodem/service.js:525
+#: view/qmodem/service.js:527
 msgid "Associated USB"
 msgstr ""
 
-#: view/qmodem/service.js:168
+#: view/qmodem/service.js:170
 msgid "Attempt to use pre-configured PCIe settings from the CPE vendor."
 msgstr ""
 
-#: view/qmodem/service.js:164
+#: view/qmodem/service.js:166
 msgid "Attempt to use pre-configured USB settings from the CPE vendor."
 msgstr ""
 
-#: view/qmodem/network_config.js:426
+#: view/qmodem/network_config.js:428
 msgid "Authentication Type"
 msgstr ""
 
-#: view/qmodem/network_config.js:383
-#: view/qmodem/network_config.js:386
-#: view/qmodem/network_config.js:460
-#: view/qmodem/network_config.js:463
+#: view/qmodem/network_config.js:385
+#: view/qmodem/network_config.js:388
+#: view/qmodem/network_config.js:462
+#: view/qmodem/network_config.js:465
 msgid "Auto Choose"
 msgstr ""
 
-#: view/qmodem/sms.js:68
+#: view/qmodem/sms.js:74
 msgid "Auto Delete from SIM"
 msgstr ""
 
-#: view/qmodem/sms.js:78
+#: view/qmodem/sms.js:84
 msgid "Automatically delete SMS from SIM card after reading"
 msgstr ""
 
-#: view/qmodem/service.js:277
+#: view/qmodem/service.js:279
 msgid "Available Devices"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:62
+#: view/qmodem/sms_conversation.js:68
 msgid "Back"
 msgstr ""
 
@@ -459,7 +464,7 @@ msgstr ""
 #: vendor/thales.sh:394
 #: vendor/thales.sh:421
 #: vendor/thales.sh:452
-#: view/qmodem/modem_config.js:738
+#: view/qmodem/modem_config.js:744
 msgid "Band"
 msgstr ""
 
@@ -467,7 +472,7 @@ msgstr ""
 msgid "Band (CA)"
 msgstr ""
 
-#: view/qmodem/modem_config.js:840
+#: view/qmodem/modem_config.js:846
 msgid "Band is required for NR"
 msgstr ""
 
@@ -498,40 +503,40 @@ msgstr ""
 msgid "Base Station Identity Code"
 msgstr ""
 
-#: view/qmodem/network_config.js:417
-#: view/qmodem/network_config.js:494
+#: view/qmodem/network_config.js:419
+#: view/qmodem/network_config.js:496
 msgid "Beeline (RU)"
 msgstr ""
 
-#: view/qmodem/service.js:111
+#: view/qmodem/service.js:113
 msgid "Block Auto Probe/Remove"
 msgstr ""
 
-#: view/qmodem/modem_config.js:769
-#: view/qmodem/modem_config.js:1083
+#: view/qmodem/modem_config.js:775
+#: view/qmodem/modem_config.js:1089
 msgid "Boot Hook"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:104
+#: view/qmodem/sms_forward.js:111
 msgid "Bot Token"
 msgstr ""
 
-#: view/qmodem/network_config.js:329
+#: view/qmodem/network_config.js:331
 msgid "Bridge Mode"
 msgstr ""
 
-#: view/qmodem/network_config.js:335
-#: view/qmodem/service.js:515
+#: view/qmodem/network_config.js:337
+#: view/qmodem/service.js:517
 msgid "Bridge Port"
 msgstr ""
 
 #: qmodem/controls.js:1508
-#: view/qmodem/network_config.js:997
-#: view/qmodem/service.js:284
-#: view/qmodem/sms.js:422
-#: view/qmodem/sms_forward.js:304
-#: view/qmodem/sms_sim.js:251
-#: view/qmodem/sms_sim.js:302
+#: view/qmodem/network_config.js:1003
+#: view/qmodem/service.js:286
+#: view/qmodem/sms.js:419
+#: view/qmodem/sms_forward.js:311
+#: view/qmodem/sms_sim.js:249
+#: view/qmodem/sms_sim.js:300
 msgid "Cancel"
 msgstr ""
 
@@ -540,16 +545,16 @@ msgstr ""
 msgid "Carrier"
 msgstr ""
 
-#: view/qmodem/network_config.js:358
+#: view/qmodem/network_config.js:360
 msgid "Caution: Enabling this option will make it the IPV6 RA Master, and only one interface can be configured as such."
 msgstr ""
 
-#: view/qmodem/network_config.js:330
+#: view/qmodem/network_config.js:332
 msgid "Caution: Only avalible for quectel sdx 5G Modem."
 msgstr ""
 
-#: view/qmodem/network_config.js:409
-#: view/qmodem/network_config.js:486
+#: view/qmodem/network_config.js:411
+#: view/qmodem/network_config.js:488
 msgid "Celcom (MY)"
 msgstr ""
 
@@ -603,28 +608,28 @@ msgstr ""
 #: vendor/simcom.sh:1141
 #: vendor/telit.sh:738
 #: vendor/thales.sh:375
-#: view/qmodem/modem_config.js:931
-#: view/qmodem/modem_config.js:956
+#: view/qmodem/modem_config.js:937
+#: view/qmodem/modem_config.js:962
 msgid "Cell Information"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1088
+#: view/qmodem/modem_config.js:1094
 msgid "Cell is unlocked (no lock active)"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1044
+#: view/qmodem/modem_config.js:1050
 msgid "Cell parameters copied to settings"
 msgstr ""
 
-#: view/qmodem/modem_config.js:804
+#: view/qmodem/modem_config.js:810
 msgid "Cell unlocked successfully"
 msgstr ""
 
-#: view/qmodem/modem_config.js:581
+#: view/qmodem/modem_config.js:587
 msgid "Changing IMEI may be illegal in some countries. Use at your own risk."
 msgstr ""
 
-#: view/qmodem/sms_forward.js:198
+#: view/qmodem/sms_forward.js:205
 msgid "Channel (optional)"
 msgstr ""
 
@@ -652,45 +657,45 @@ msgstr ""
 msgid "Channel Quality Indicator for Uplink"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:116
+#: view/qmodem/sms_forward.js:123
 msgid "Chat ID"
 msgstr ""
 
-#: view/qmodem/monitor.js:500
+#: view/qmodem/monitor.js:501
 msgid "Check Interval (seconds)"
 msgstr ""
 
-#: view/qmodem/network_config.js:390
-#: view/qmodem/network_config.js:467
+#: view/qmodem/network_config.js:392
+#: view/qmodem/network_config.js:469
 msgid "China Broadcast (CN)"
-msgstr ""
-
-#: view/qmodem/network_config.js:387
-#: view/qmodem/network_config.js:464
-msgid "China Mobile (CN)"
 msgstr ""
 
 #: view/qmodem/network_config.js:389
 #: view/qmodem/network_config.js:466
+msgid "China Mobile (CN)"
+msgstr ""
+
+#: view/qmodem/network_config.js:391
+#: view/qmodem/network_config.js:468
 msgid "China Telecom (CN)"
 msgstr ""
 
-#: view/qmodem/network_config.js:388
-#: view/qmodem/network_config.js:465
+#: view/qmodem/network_config.js:390
+#: view/qmodem/network_config.js:467
 msgid "China Unicom (CN)"
 msgstr ""
 
-#: view/qmodem/network_config.js:919
-#: view/qmodem/sms_conversation.js:198
+#: view/qmodem/network_config.js:925
+#: view/qmodem/sms_conversation.js:202
 #: view/qmodem/terminal.js:284
 msgid "Clear"
 msgstr ""
 
-#: view/qmodem/network_config.js:991
+#: view/qmodem/network_config.js:997
 msgid "Clear Dial Log"
 msgstr ""
 
-#: view/qmodem/stats.js:174
+#: view/qmodem/stats.js:179
 msgid "Clear Statistics"
 msgstr ""
 
@@ -702,16 +707,16 @@ msgstr ""
 msgid "Clearing log timed out"
 msgstr ""
 
-#: view/qmodem/modem_config.js:654
+#: view/qmodem/modem_config.js:660
 msgid "Click \"Scan Neighbor Cells\" to search for nearby cell towers"
 msgstr ""
 
-#: view/qmodem/network_config.js:924
+#: view/qmodem/network_config.js:930
 msgid "Close"
 msgstr ""
 
-#: view/qmodem/terminal.js:131
-#: view/qmodem/terminal.js:175
+#: view/qmodem/terminal.js:132
+#: view/qmodem/terminal.js:176
 msgid "Command is empty."
 msgstr ""
 
@@ -722,71 +727,71 @@ msgstr ""
 msgid "Compression Mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1025
+#: view/qmodem/modem_config.js:1031
 msgid "Configuration inputs not found"
 msgstr ""
 
-#: view/qmodem/sms.js:208
+#: view/qmodem/sms.js:205
 msgid "Configuration saved"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:73
+#: view/qmodem/sms_forward.js:74
 msgid "Configure"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:74
+#: view/qmodem/sms_forward.js:75
 msgid "Configure API"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:298
+#: view/qmodem/sms_forward.js:305
 msgid "Configure API Settings"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:40
+#: view/qmodem/sms_forward.js:41
 msgid "Configure SMS forwarding instances for different modems and services"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:22
+#: view/qmodem/sms_forward.js:84
 msgid "Configure SMS forwarding to various notification services"
 msgstr ""
 
-#: view/qmodem/ttl.js:21
+#: view/qmodem/ttl.js:63
 msgid "Configure TTL/Hop Limit settings to modify outgoing packet TTL values. This can help bypass carrier restrictions on tethering."
 msgstr ""
 
-#: view/qmodem/modem_config.js:682
+#: view/qmodem/modem_config.js:688
 msgid "Configure cell lock parameters. You can manually enter values or use the \"Copy\" button from scanned cells."
 msgstr ""
 
-#: view/qmodem/monitor.js:131
+#: view/qmodem/monitor.js:547
 msgid "Configure monitoring methods and actions for modem connectivity."
 msgstr ""
 
-#: view/qmodem/modem_config.js:331
+#: view/qmodem/modem_config.js:337
 msgid "Configure network preference (5G/4G/3G priority). Changes may require modem restart."
 msgstr ""
 
-#: view/qmodem/service.js:441
+#: view/qmodem/service.js:443
 msgid "Configure physical slots for modem installation"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:99
+#: view/qmodem/sms_forward.js:106
 msgid "Configure the API settings for "
 msgstr ""
 
-#: view/qmodem/modem_config.js:189
+#: view/qmodem/modem_config.js:195
 msgid "Configure the modem dial mode (QMI/MBIM/ECM/NCM, etc.). Changes require modem reboot to take effect."
 msgstr ""
 
-#: view/qmodem/network_config.js:1019
+#: view/qmodem/network_config.js:1025
 msgid "Confirm"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:243
+#: view/qmodem/sms_sim.js:241
 msgid "Confirm Delete"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:294
+#: view/qmodem/sms_sim.js:292
 msgid "Confirm Delete All"
 msgstr ""
 
@@ -794,64 +799,64 @@ msgstr ""
 msgid "Connect Status"
 msgstr ""
 
-#: view/qmodem/network_config.js:222
-#: view/qmodem/network_config.js:678
+#: view/qmodem/network_config.js:224
+#: view/qmodem/network_config.js:684
 msgid "Connected"
 msgstr ""
 
-#: view/qmodem/sms.js:283
+#: view/qmodem/sms.js:280
 msgid "Contact"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:134
+#: view/qmodem/sms_sim.js:132
 msgid "Content"
 msgstr ""
 
-#: view/qmodem/network_config.js:82
+#: view/qmodem/network_config.js:84
 msgid "Control"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:64
+#: view/qmodem/sms_conversation.js:53
 msgid "Conversation with "
 msgstr ""
 
-#: view/qmodem/sms.js:275
+#: view/qmodem/sms.js:272
 msgid "Conversations"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1046
+#: view/qmodem/modem_config.js:1052
 msgid "Copy"
 msgstr ""
 
-#: view/qmodem/sms.js:286
+#: view/qmodem/sms.js:283
 msgid "Count"
 msgstr ""
 
-#: view/qmodem/modem_config.js:475
+#: view/qmodem/modem_config.js:481
 msgid "Current IMEI"
 msgstr ""
 
-#: view/qmodem/modem_config.js:194
+#: view/qmodem/modem_config.js:200
 msgid "Current Mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:336
+#: view/qmodem/modem_config.js:342
 msgid "Current Preference"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:110
+#: view/qmodem/sim_switch.js:112
 msgid "Current SIM Slot"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:261
+#: view/qmodem/sms_forward.js:268
 msgid "Custom PushDeer API endpoint, leave empty to use default"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:69
+#: view/qmodem/sms_forward.js:70
 msgid "Custom Script"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:163
+#: view/qmodem/sms_forward.js:170
 msgid "Custom format using placeholders: {SENDER}, {CONTENT}, {TIME}"
 msgstr ""
 
@@ -890,12 +895,12 @@ msgstr ""
 msgid "DL/UL MOD"
 msgstr ""
 
-#: view/qmodem/network_config.js:312
+#: view/qmodem/network_config.js:314
 msgid "DNS"
 msgstr ""
 
-#: view/qmodem/monitor.js:50
-#: view/qmodem/monitor.js:471
+#: view/qmodem/monitor.js:51
+#: view/qmodem/monitor.js:472
 msgid "DNS Server"
 msgstr ""
 
@@ -903,61 +908,61 @@ msgstr ""
 msgid "DNS 读取"
 msgstr ""
 
-#: view/qmodem/sms.js:46
+#: view/qmodem/sms.js:52
 msgid "Database with URC"
 msgstr ""
 
-#: view/qmodem/sms.js:45
+#: view/qmodem/sms.js:51
 msgid "Database with polling"
 msgstr ""
 
-#: view/qmodem/service.js:124
-#: view/qmodem/sms_forward.js:35
+#: view/qmodem/service.js:126
+#: view/qmodem/sms_forward.js:36
 msgid "Debug"
 msgstr ""
 
-#: view/qmodem/service.js:474
+#: view/qmodem/service.js:476
 msgid "Default Alias"
 msgstr ""
 
-#: view/qmodem/service.js:479
+#: view/qmodem/service.js:481
 msgid "Default Metric"
 msgstr ""
 
-#: view/qmodem/service.js:516
+#: view/qmodem/service.js:518
 msgid "Default bridge port for passthrough. Device-level bridge_port overrides this slot default."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1084
+#: view/qmodem/modem_config.js:1090
 msgid "Delay"
 msgstr ""
 
-#: view/qmodem/service.js:105
+#: view/qmodem/service.js:107
 msgid "Delay Start"
 msgstr ""
 
-#: view/qmodem/network_config.js:520
+#: view/qmodem/network_config.js:522
 msgid "Delay of executing AT command after modem initialization, in seconds."
 msgstr ""
 
-#: view/qmodem/network_config.js:511
+#: view/qmodem/network_config.js:513
 msgid "Delay of executing AT command before dialing, in seconds."
 msgstr ""
 
-#: view/qmodem/monitor.js:400
-#: view/qmodem/monitor.js:584
-#: view/qmodem/sms_conversation.js:378
-#: view/qmodem/sms_sim.js:165
-#: view/qmodem/sms_sim.js:281
+#: view/qmodem/monitor.js:401
+#: view/qmodem/monitor.js:591
+#: view/qmodem/sms_conversation.js:382
+#: view/qmodem/sms_sim.js:163
+#: view/qmodem/sms_sim.js:279
 msgid "Delete"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:224
-#: view/qmodem/sms_sim.js:348
+#: view/qmodem/sms_sim.js:222
+#: view/qmodem/sms_sim.js:346
 msgid "Delete All"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:373
+#: view/qmodem/sms_conversation.js:377
 msgid "Delete this message?"
 msgstr ""
 
@@ -965,29 +970,29 @@ msgstr ""
 msgid "Deleting SMS timed out"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:309
+#: view/qmodem/sms_sim.js:307
 msgid "Deleting all messages... This may take a while."
 msgstr ""
 
-#: view/qmodem/sms_sim.js:257
+#: view/qmodem/sms_sim.js:255
 msgid "Deleting message..."
 msgstr ""
 
-#: view/qmodem/sms_sim.js:257
-#: view/qmodem/sms_sim.js:308
+#: view/qmodem/sms_sim.js:255
+#: view/qmodem/sms_sim.js:306
 msgid "Deleting..."
 msgstr ""
 
-#: view/qmodem/service.js:358
+#: view/qmodem/service.js:360
 msgid "Device Path"
 msgstr ""
 
-#: view/qmodem/network_config.js:336
+#: view/qmodem/network_config.js:338
 msgid "Device-level bridge port for passthrough. If set, it overrides the slot default bridge port."
 msgstr ""
 
-#: view/qmodem/network_config.js:410
-#: view/qmodem/network_config.js:487
+#: view/qmodem/network_config.js:412
+#: view/qmodem/network_config.js:489
 msgid "DiGi (MY)"
 msgstr ""
 
@@ -995,37 +1000,41 @@ msgstr ""
 msgid "Diagnostic console for advanced users. Commands are sent directly to the module and are not automatically validated."
 msgstr ""
 
-#: view/qmodem/network_config.js:623
+#: view/qmodem/network_config.js:629
 msgid "Dial"
 msgstr ""
 
-#: view/qmodem/network_config.js:197
-#: view/qmodem/network_config.js:203
+#: view/qmodem/network_config.js:199
+#: view/qmodem/network_config.js:205
 msgid "Dial Configuration"
 msgstr ""
 
-#: view/qmodem/network_config.js:286
+#: view/qmodem/network_config.js:288
 msgid "Dial Control"
 msgstr ""
 
-#: view/qmodem/network_config.js:267
-#: view/qmodem/network_config.js:880
+#: view/qmodem/network_config.js:269
+#: view/qmodem/network_config.js:886
 msgid "Dial Log"
 msgstr ""
 
-#: view/qmodem/modem_config.js:76
+#: view/qmodem/modem_config.js:82
 msgid "Dial Mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:185
+#: view/qmodem/modem_config.js:191
 msgid "Dial Mode Configuration"
 msgstr ""
 
-#: view/qmodem/network_config.js:611
+#: view/qmodem/network_config.js:555
+msgid "Dial and Network"
+msgstr ""
+
+#: view/qmodem/network_config.js:617
 msgid "Dial command sent successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:293
+#: view/qmodem/network_config.js:295
 msgid "Dial disabled for this modem"
 msgstr ""
 
@@ -1033,23 +1042,23 @@ msgstr ""
 msgid "Dial request timed out"
 msgstr ""
 
-#: view/qmodem/sms.js:44
+#: view/qmodem/sms.js:50
 msgid "Direct modem access"
 msgstr ""
 
-#: view/qmodem/monitor.js:268
-#: view/qmodem/monitor.js:710
-#: view/qmodem/network_config.js:189
-#: view/qmodem/network_config.js:859
+#: view/qmodem/monitor.js:269
+#: view/qmodem/monitor.js:717
+#: view/qmodem/network_config.js:191
+#: view/qmodem/network_config.js:865
 msgid "Disable"
 msgstr ""
 
-#: view/qmodem/service.js:409
+#: view/qmodem/service.js:411
 msgid "Disabled Features"
 msgstr ""
 
-#: view/qmodem/network_config.js:225
-#: view/qmodem/network_config.js:681
+#: view/qmodem/network_config.js:227
+#: view/qmodem/network_config.js:687
 msgid "Disconnected"
 msgstr ""
 
@@ -1057,25 +1066,25 @@ msgstr ""
 msgid "Discontinuous Reception"
 msgstr ""
 
-#: view/qmodem/network_config.js:407
-#: view/qmodem/network_config.js:484
+#: view/qmodem/network_config.js:409
+#: view/qmodem/network_config.js:486
 msgid "Dito Telecomunity (PH)"
 msgstr ""
 
-#: view/qmodem/network_config.js:351
+#: view/qmodem/network_config.js:353
 msgid "Do Not NAT(Only for Quectel Modem)"
 msgstr ""
 
-#: view/qmodem/network_config.js:345
+#: view/qmodem/network_config.js:347
 msgid "Do Not modify resolv.conf"
 msgstr ""
 
-#: view/qmodem/network_config.js:912
+#: view/qmodem/network_config.js:918
 msgid "Download"
 msgstr ""
 
-#: view/qmodem/network_config.js:401
-#: view/qmodem/network_config.js:478
+#: view/qmodem/network_config.js:403
+#: view/qmodem/network_config.js:480
 msgid "Drei (AT)"
 msgstr ""
 
@@ -1098,8 +1107,8 @@ msgstr ""
 msgid "Duplex Mode"
 msgstr ""
 
-#: view/qmodem/network_config.js:398
-#: view/qmodem/network_config.js:475
+#: view/qmodem/network_config.js:400
+#: view/qmodem/network_config.js:477
 msgid "E-Plus (DE)"
 msgstr ""
 
@@ -1130,58 +1139,58 @@ msgstr ""
 msgid "Ec/No"
 msgstr ""
 
-#: view/qmodem/monitor.js:249
-#: view/qmodem/monitor.js:425
-#: view/qmodem/monitor.js:692
-#: view/qmodem/network_config.js:170
-#: view/qmodem/network_config.js:840
-#: view/qmodem/sms_forward.js:46
+#: view/qmodem/monitor.js:250
+#: view/qmodem/monitor.js:426
+#: view/qmodem/monitor.js:699
+#: view/qmodem/network_config.js:172
+#: view/qmodem/network_config.js:846
+#: view/qmodem/sms_forward.js:47
 msgid "Enable"
 msgstr ""
 
-#: view/qmodem/network_config.js:244
+#: view/qmodem/network_config.js:246
 msgid "Enable Dial"
 msgstr ""
 
-#: view/qmodem/network_config.js:57
+#: view/qmodem/network_config.js:59
 msgid "Enable Dial (Global)"
 msgstr ""
 
-#: view/qmodem/service.js:115
+#: view/qmodem/service.js:117
 msgid "Enable PCIe Scan"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:27
+#: view/qmodem/sms_forward.js:28
 msgid "Enable SMS Forwarder"
 msgstr ""
 
-#: view/qmodem/ttl.js:28
+#: view/qmodem/ttl.js:29
 msgid "Enable TTL Modification"
 msgstr ""
 
-#: view/qmodem/service.js:119
+#: view/qmodem/service.js:121
 msgid "Enable USB Scan"
 msgstr ""
 
-#: view/qmodem/ttl.js:31
+#: view/qmodem/ttl.js:32
 msgid "Enable or disable TTL/Hop Limit modification for outgoing packets."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1083
-#: view/qmodem/monitor.js:154
-#: view/qmodem/monitor.js:603
-#: view/qmodem/network_config.js:77
-#: view/qmodem/network_config.js:750
-#: view/qmodem/service.js:334
+#: view/qmodem/modem_config.js:1089
+#: view/qmodem/monitor.js:155
+#: view/qmodem/monitor.js:610
+#: view/qmodem/network_config.js:79
+#: view/qmodem/network_config.js:756
+#: view/qmodem/service.js:336
 msgid "Enabled"
 msgstr ""
 
-#: view/qmodem/ttl.js:51
+#: view/qmodem/ttl.js:52
 msgid "Enabling TTL modification will disable hardware flow offloading for proper packet modification."
 msgstr ""
 
-#: view/qmodem/sms.js:392
-#: view/qmodem/sms_conversation.js:132
+#: view/qmodem/sms.js:389
+#: view/qmodem/sms_conversation.js:136
 msgid "Encoding"
 msgstr ""
 
@@ -1193,143 +1202,143 @@ msgstr ""
 msgid "Enter AT command, for example AT^HCSQ?"
 msgstr ""
 
-#: view/qmodem/network_config.js:530
-#: view/qmodem/network_config.js:537
+#: view/qmodem/network_config.js:532
+#: view/qmodem/network_config.js:539
 msgid "Enter AT commands"
 msgstr ""
 
-#: view/qmodem/monitor.js:479
+#: view/qmodem/monitor.js:480
 msgid "Enter an IP address or domain name. Note: Using a domain name may cause false disconnection detection if DNS resolution fails."
 msgstr ""
 
-#: view/qmodem/network_config.js:512
-#: view/qmodem/network_config.js:521
+#: view/qmodem/network_config.js:514
+#: view/qmodem/network_config.js:523
 msgid "Enter delay in seconds"
 msgstr ""
 
-#: view/qmodem/modem_config.js:518
+#: view/qmodem/modem_config.js:524
 msgid "Enter exactly 15 digits"
 msgstr ""
 
-#: view/qmodem/sms.js:376
+#: view/qmodem/sms.js:373
 msgid "Enter phone number"
 msgstr ""
 
-#: view/qmodem/sms.js:387
-#: view/qmodem/sms_conversation.js:123
+#: view/qmodem/sms.js:384
+#: view/qmodem/sms_conversation.js:127
 msgid "Enter your message here..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:318
-#: view/qmodem/modem_config.js:457
-#: view/qmodem/modem_config.js:611
-#: view/qmodem/service.js:128
-#: view/qmodem/sms_forward.js:32
+#: view/qmodem/modem_config.js:324
+#: view/qmodem/modem_config.js:463
+#: view/qmodem/modem_config.js:617
+#: view/qmodem/service.js:130
+#: view/qmodem/sms_forward.js:33
 msgid "Error"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:278
+#: view/qmodem/sms_sim.js:276
 msgid "Error deleting SMS: "
 msgstr ""
 
-#: view/qmodem/sms_sim.js:345
+#: view/qmodem/sms_sim.js:343
 msgid "Error deleting messages: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:597
+#: view/qmodem/modem_config.js:603
 msgid "Error loading IMEI"
 msgstr ""
 
-#: view/qmodem/modem_config.js:612
+#: view/qmodem/modem_config.js:618
 msgid "Error loading IMEI: %s"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:82
+#: view/qmodem/sms_sim.js:80
 msgid "Error loading SIM SMS: "
 msgstr ""
 
-#: view/qmodem/sim_switch.js:155
+#: view/qmodem/sim_switch.js:157
 msgid "Error loading SIM switch information: %s"
 msgstr ""
 
-#: view/qmodem/sms.js:571
+#: view/qmodem/sms.js:568
 msgid "Error loading SMS storage: "
 msgstr ""
 
-#: view/qmodem/sms.js:234
+#: view/qmodem/sms.js:231
 msgid "Error loading SMS: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:55
+#: view/qmodem/modem_config.js:61
 msgid "Error loading features: %s"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1353
+#: view/qmodem/modem_config.js:1359
 msgid "Error loading lock band configuration:"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:277
+#: view/qmodem/sms_conversation.js:281
 msgid "Error loading messages: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:268
+#: view/qmodem/modem_config.js:274
 msgid "Error loading mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:320
+#: view/qmodem/modem_config.js:326
 msgid "Error loading mode: %s"
 msgstr ""
 
-#: view/qmodem/modem_config.js:459
+#: view/qmodem/modem_config.js:465
 msgid "Error loading network preference: %s"
 msgstr ""
 
-#: view/qmodem/modem_config.js:407
+#: view/qmodem/modem_config.js:413
 msgid "Error loading preference"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1528
+#: view/qmodem/modem_config.js:1534
 msgid "Error loading reboot capabilities: %s"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1065
+#: view/qmodem/modem_config.js:1071
 msgid "Error loading status"
 msgstr ""
 
-#: view/qmodem/modem_config.js:978
+#: view/qmodem/modem_config.js:984
 msgid "Error scanning neighbor cells: %s"
 msgstr ""
 
-#: view/qmodem/sms.js:606
+#: view/qmodem/sms.js:603
 msgid "Error setting SMS storage: "
 msgstr ""
 
-#: view/qmodem/sim_switch.js:208
+#: view/qmodem/sim_switch.js:210
 msgid "Error switching SIM slot: %s"
 msgstr ""
 
-#: view/qmodem/network_config.js:584
-#: view/qmodem/network_config.js:598
-#: view/qmodem/network_config.js:620
-#: view/qmodem/network_config.js:703
-#: view/qmodem/network_config.js:873
-#: view/qmodem/network_config.js:958
-#: view/qmodem/network_config.js:1015
+#: view/qmodem/network_config.js:590
+#: view/qmodem/network_config.js:604
+#: view/qmodem/network_config.js:626
+#: view/qmodem/network_config.js:709
+#: view/qmodem/network_config.js:879
+#: view/qmodem/network_config.js:964
+#: view/qmodem/network_config.js:1021
 msgid "Error: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:249
-#: view/qmodem/modem_config.js:388
-#: view/qmodem/modem_config.js:566
-#: view/qmodem/modem_config.js:814
-#: view/qmodem/modem_config.js:858
-#: view/qmodem/modem_config.js:1333
-#: view/qmodem/modem_config.js:1459
-#: view/qmodem/modem_config.js:1496
+#: view/qmodem/modem_config.js:255
+#: view/qmodem/modem_config.js:394
+#: view/qmodem/modem_config.js:572
+#: view/qmodem/modem_config.js:820
+#: view/qmodem/modem_config.js:864
+#: view/qmodem/modem_config.js:1339
+#: view/qmodem/modem_config.js:1465
+#: view/qmodem/modem_config.js:1502
 msgid "Error: %s"
 msgstr ""
 
-#: view/qmodem/network_config.js:377
+#: view/qmodem/network_config.js:379
 msgid "Ethernet"
 msgstr ""
 
@@ -1340,27 +1349,27 @@ msgstr ""
 msgid "Excellent"
 msgstr ""
 
-#: view/qmodem/network_config.js:363
+#: view/qmodem/network_config.js:365
 msgid "Extend Prefix"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:363
+#: view/qmodem/sms_conversation.js:367
 msgid "Failed"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1328
+#: view/qmodem/modem_config.js:1334
 msgid "Failed to apply lock band configuration"
 msgstr ""
 
-#: view/qmodem/modem_config.js:853
+#: view/qmodem/modem_config.js:859
 msgid "Failed to apply lock cell configuration"
 msgstr ""
 
-#: view/qmodem/network_config.js:1011
+#: view/qmodem/network_config.js:1017
 msgid "Failed to clear log"
 msgstr ""
 
-#: view/qmodem/stats.js:143
+#: view/qmodem/stats.js:144
 msgid "Failed to clear statistics: "
 msgstr ""
 
@@ -1368,181 +1377,181 @@ msgstr ""
 msgid "Failed to create task"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:418
-#: view/qmodem/sms_conversation.js:429
-#: view/qmodem/sms_sim.js:263
+#: view/qmodem/sms_conversation.js:422
+#: view/qmodem/sms_conversation.js:433
+#: view/qmodem/sms_sim.js:261
 msgid "Failed to delete SMS: "
 msgstr ""
 
-#: view/qmodem/sms_sim.js:274
+#: view/qmodem/sms_sim.js:272
 msgid "Failed to delete message"
 msgstr ""
 
-#: view/qmodem/monitor.js:397
-#: view/qmodem/monitor.js:581
+#: view/qmodem/monitor.js:398
+#: view/qmodem/monitor.js:588
 msgid "Failed to delete script: "
 msgstr ""
 
-#: view/qmodem/network_config.js:185
-#: view/qmodem/network_config.js:855
+#: view/qmodem/network_config.js:187
+#: view/qmodem/network_config.js:861
 msgid "Failed to disable QModem Network: "
 msgstr ""
 
-#: view/qmodem/monitor.js:264
-#: view/qmodem/monitor.js:706
+#: view/qmodem/monitor.js:265
+#: view/qmodem/monitor.js:713
 msgid "Failed to disable monitor: "
 msgstr ""
 
-#: view/qmodem/network_config.js:986
+#: view/qmodem/network_config.js:992
 msgid "Failed to download log: "
 msgstr ""
 
-#: view/qmodem/network_config.js:166
-#: view/qmodem/network_config.js:836
+#: view/qmodem/network_config.js:168
+#: view/qmodem/network_config.js:842
 msgid "Failed to enable QModem Network: "
 msgstr ""
 
-#: view/qmodem/monitor.js:245
-#: view/qmodem/monitor.js:688
+#: view/qmodem/monitor.js:246
+#: view/qmodem/monitor.js:695
 msgid "Failed to enable monitor: "
 msgstr ""
 
-#: view/qmodem/sms.js:526
+#: view/qmodem/sms.js:523
 msgid "Failed to get SMS storage: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:1491
+#: view/qmodem/modem_config.js:1497
 msgid "Failed to initiate hard reboot"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1454
+#: view/qmodem/modem_config.js:1460
 msgid "Failed to initiate soft reboot"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:93
+#: view/qmodem/sms_sim.js:91
 msgid "Failed to load SIM SMS: "
 msgstr ""
 
-#: view/qmodem/sms.js:245
+#: view/qmodem/sms.js:242
 msgid "Failed to load SMS: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:269
+#: view/qmodem/modem_config.js:275
 msgid "Failed to load available modes"
 msgstr ""
 
-#: view/qmodem/network_config.js:950
+#: view/qmodem/network_config.js:956
 msgid "Failed to load log"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:288
+#: view/qmodem/sms_conversation.js:292
 msgid "Failed to load messages: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:408
+#: view/qmodem/modem_config.js:414
 msgid "Failed to load network preferences"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1417
+#: view/qmodem/modem_config.js:1423
 msgid "Failed to load reboot capabilities"
 msgstr ""
 
-#: view/qmodem/monitor.js:146
-#: view/qmodem/network_config.js:69
-#: view/qmodem/network_config.js:867
+#: view/qmodem/monitor.js:147
+#: view/qmodem/network_config.js:71
+#: view/qmodem/network_config.js:873
 msgid "Failed to load status"
 msgstr ""
 
-#: view/qmodem/network_config.js:142
-#: view/qmodem/network_config.js:812
+#: view/qmodem/network_config.js:144
+#: view/qmodem/network_config.js:818
 msgid "Failed to restart QModem Network: "
 msgstr ""
 
-#: view/qmodem/monitor.js:221
-#: view/qmodem/monitor.js:665
+#: view/qmodem/monitor.js:222
+#: view/qmodem/monitor.js:672
 msgid "Failed to restart monitor: "
 msgstr ""
 
-#: view/qmodem/sms.js:210
+#: view/qmodem/sms.js:207
 msgid "Failed to save configuration: "
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:362
+#: view/qmodem/sms_conversation.js:366
 msgid "Failed to send"
 msgstr ""
 
-#: view/qmodem/sms.js:455
-#: view/qmodem/sms.js:468
-#: view/qmodem/sms_conversation.js:228
-#: view/qmodem/sms_conversation.js:244
+#: view/qmodem/sms.js:452
+#: view/qmodem/sms.js:465
+#: view/qmodem/sms_conversation.js:232
+#: view/qmodem/sms_conversation.js:248
 msgid "Failed to send SMS: "
 msgstr ""
 
-#: view/qmodem/network_config.js:617
+#: view/qmodem/network_config.js:623
 msgid "Failed to send dial command"
 msgstr ""
 
-#: view/qmodem/network_config.js:581
+#: view/qmodem/network_config.js:587
 msgid "Failed to send hang command"
 msgstr ""
 
-#: view/qmodem/network_config.js:595
+#: view/qmodem/network_config.js:601
 msgid "Failed to send redial command"
 msgstr ""
 
-#: view/qmodem/modem_config.js:561
+#: view/qmodem/modem_config.js:567
 msgid "Failed to set IMEI"
 msgstr ""
 
-#: view/qmodem/sms.js:602
+#: view/qmodem/sms.js:599
 msgid "Failed to set SMS storage"
 msgstr ""
 
-#: view/qmodem/sms.js:593
+#: view/qmodem/sms.js:590
 msgid "Failed to set SMS storage: "
 msgstr ""
 
-#: view/qmodem/modem_config.js:244
+#: view/qmodem/modem_config.js:250
 msgid "Failed to set mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:383
+#: view/qmodem/modem_config.js:389
 msgid "Failed to set network preference"
 msgstr ""
 
-#: view/qmodem/network_config.js:105
-#: view/qmodem/network_config.js:775
+#: view/qmodem/network_config.js:107
+#: view/qmodem/network_config.js:781
 msgid "Failed to start QModem Network: "
 msgstr ""
 
-#: view/qmodem/monitor.js:183
-#: view/qmodem/monitor.js:629
+#: view/qmodem/monitor.js:184
+#: view/qmodem/monitor.js:636
 msgid "Failed to start monitor: "
 msgstr ""
 
-#: view/qmodem/network_config.js:124
-#: view/qmodem/network_config.js:794
+#: view/qmodem/network_config.js:126
+#: view/qmodem/network_config.js:800
 msgid "Failed to stop QModem Network: "
 msgstr ""
 
-#: view/qmodem/monitor.js:202
-#: view/qmodem/monitor.js:647
+#: view/qmodem/monitor.js:203
+#: view/qmodem/monitor.js:654
 msgid "Failed to stop monitor: "
 msgstr ""
 
-#: view/qmodem/sim_switch.js:201
+#: view/qmodem/sim_switch.js:203
 msgid "Failed to switch SIM slot. Please check modem status."
 msgstr ""
 
-#: view/qmodem/modem_config.js:809
+#: view/qmodem/modem_config.js:815
 msgid "Failed to unlock cell"
 msgstr ""
 
-#: view/qmodem/monitor.js:348
+#: view/qmodem/monitor.js:349
 msgid "Failed to upload script: "
 msgstr ""
 
-#: view/qmodem/monitor.js:506
+#: view/qmodem/monitor.js:507
 msgid "Failure Threshold"
 msgstr ""
 
@@ -1553,31 +1562,31 @@ msgstr ""
 msgid "Fair"
 msgstr ""
 
-#: view/qmodem/service.js:139
+#: view/qmodem/service.js:141
 msgid "Fast AT Timeout"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:68
+#: view/qmodem/sms_forward.js:69
 msgid "Feishu Bot"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:277
+#: view/qmodem/sms_forward.js:284
 msgid "Feishu webhook URL from your bot configuration"
 msgstr ""
 
-#: view/qmodem/service.js:506
+#: view/qmodem/service.js:508
 msgid "For 5G modules using the Ethernet PHY connection, please specify the network interface name (e.g., eth0, eth1)"
 msgstr ""
 
-#: view/qmodem/service.js:526
+#: view/qmodem/service.js:528
 msgid "For M.2 slots with both PCIe and USB support, specify the associated USB port (for ttyUSB access)"
 msgstr ""
 
-#: view/qmodem/network_config.js:323
+#: view/qmodem/network_config.js:325
 msgid "Force Set APN"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:39
+#: view/qmodem/sms_forward.js:40
 msgid "Forward Instances"
 msgstr ""
 
@@ -1594,15 +1603,15 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
-#: view/qmodem/service.js:233
+#: view/qmodem/service.js:235
 msgid "Full scan completed successfully"
 msgstr ""
 
-#: view/qmodem/service.js:243
+#: view/qmodem/service.js:245
 msgid "Full scan error: "
 msgstr ""
 
-#: view/qmodem/service.js:235
+#: view/qmodem/service.js:237
 msgid "Full scan failed"
 msgstr ""
 
@@ -1657,45 +1666,45 @@ msgstr ""
 msgid "GBR · 缓冲流视频"
 msgstr ""
 
-#: view/qmodem/service.js:541
+#: view/qmodem/service.js:543
 msgid "GPIO Value(Modem Power Down)"
 msgstr ""
 
-#: view/qmodem/service.js:546
+#: view/qmodem/service.js:548
 msgid "GPIO Value(Modem Power Up)"
 msgstr ""
 
-#: view/qmodem/service.js:537
+#: view/qmodem/service.js:539
 msgid "GPIO pin for power control"
 msgstr ""
 
-#: view/qmodem/monitor.js:470
+#: view/qmodem/monitor.js:471
 msgid "Gateway"
 msgstr ""
 
-#: view/qmodem/network_config.js:55
+#: view/qmodem/network_config.js:57
 msgid "Global Configuration"
 msgstr ""
 
-#: view/qmodem/monitor.js:134
+#: view/qmodem/monitor.js:135
 msgid "Global Monitor Settings"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:25
+#: view/qmodem/sms_forward.js:26
 msgid "Global Settings"
 msgstr ""
 
-#: view/qmodem/ttl.js:24
+#: view/qmodem/ttl.js:25
 msgid "Global TTL Settings"
 msgstr ""
 
-#: view/qmodem/network_config.js:405
-#: view/qmodem/network_config.js:482
+#: view/qmodem/network_config.js:407
+#: view/qmodem/network_config.js:484
 msgid "Globe Postpaid (PH)"
 msgstr ""
 
-#: view/qmodem/network_config.js:404
-#: view/qmodem/network_config.js:481
+#: view/qmodem/network_config.js:406
+#: view/qmodem/network_config.js:483
 msgid "Globe Prepaid (PH)"
 msgstr ""
 
@@ -1706,23 +1715,23 @@ msgstr ""
 msgid "Good"
 msgstr ""
 
-#: view/qmodem/monitor.js:68
+#: view/qmodem/monitor.js:69
 msgid "HTTP Request"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:177
+#: view/qmodem/sms_forward.js:184
 msgid "HTTP headers, one per line"
 msgstr ""
 
-#: view/qmodem/monitor.js:69
+#: view/qmodem/monitor.js:70
 msgid "HTTP request to check connectivity"
 msgstr ""
 
-#: view/qmodem/network_config.js:587
+#: view/qmodem/network_config.js:593
 msgid "Hang"
 msgstr ""
 
-#: view/qmodem/network_config.js:575
+#: view/qmodem/network_config.js:581
 msgid "Hang command sent successfully"
 msgstr ""
 
@@ -1730,27 +1739,27 @@ msgstr ""
 msgid "Hangup request timed out"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1488
-#: view/qmodem/modem_config.js:1493
-#: view/qmodem/modem_config.js:1498
-#: view/qmodem/modem_config.js:1501
-#: view/qmodem/modem_config.js:1518
+#: view/qmodem/modem_config.js:1494
+#: view/qmodem/modem_config.js:1499
+#: view/qmodem/modem_config.js:1504
+#: view/qmodem/modem_config.js:1507
+#: view/qmodem/modem_config.js:1524
 msgid "Hard Reboot"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1485
+#: view/qmodem/modem_config.js:1491
 msgid "Hard reboot initiated successfully. The modem is restarting..."
 msgstr ""
 
-#: view/qmodem/sms_forward.js:168
+#: view/qmodem/sms_forward.js:175
 msgid "Headers (optional)"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:212
+#: view/qmodem/sms_forward.js:219
 msgid "Hide IP"
 msgstr ""
 
-#: view/qmodem/service.js:149
+#: view/qmodem/service.js:151
 msgid "Hotplug Add Delay"
 msgstr ""
 
@@ -1758,19 +1767,19 @@ msgstr ""
 msgid "IMEI"
 msgstr ""
 
-#: view/qmodem/modem_config.js:466
+#: view/qmodem/modem_config.js:472
 msgid "IMEI Configuration"
 msgstr ""
 
-#: view/qmodem/modem_config.js:538
+#: view/qmodem/modem_config.js:544
 msgid "IMEI must be exactly 15 digits"
 msgstr ""
 
-#: view/qmodem/modem_config.js:543
+#: view/qmodem/modem_config.js:549
 msgid "IMEI must contain only numbers"
 msgstr ""
 
-#: view/qmodem/modem_config.js:557
+#: view/qmodem/modem_config.js:563
 msgid "IMEI set successfully. Please reboot the modem for changes to take effect."
 msgstr ""
 
@@ -1786,13 +1795,13 @@ msgstr ""
 msgid "IMEI 读取"
 msgstr ""
 
-#: view/qmodem/monitor.js:48
-#: view/qmodem/monitor.js:469
+#: view/qmodem/monitor.js:49
+#: view/qmodem/monitor.js:470
 msgid "IP Address / Domain"
 msgstr ""
 
-#: view/qmodem/monitor.js:60
-#: view/qmodem/monitor.js:483
+#: view/qmodem/monitor.js:61
+#: view/qmodem/monitor.js:484
 msgid "IP Version"
 msgstr ""
 
@@ -1810,7 +1819,7 @@ msgstr ""
 msgid "IP 透传 / 后置路由 / DMZ"
 msgstr ""
 
-#: view/qmodem/network_config.js:374
+#: view/qmodem/network_config.js:376
 msgid "IPv4"
 msgstr ""
 
@@ -1822,11 +1831,11 @@ msgstr ""
 msgid "IPv4 地址"
 msgstr ""
 
-#: view/qmodem/network_config.js:376
+#: view/qmodem/network_config.js:378
 msgid "IPv4/IPv6"
 msgstr ""
 
-#: view/qmodem/network_config.js:375
+#: view/qmodem/network_config.js:377
 msgid "IPv6"
 msgstr ""
 
@@ -1842,48 +1851,48 @@ msgstr ""
 msgid "ISP"
 msgstr ""
 
-#: view/qmodem/network_config.js:324
+#: view/qmodem/network_config.js:326
 msgid "If enabled, the APN will be set even if it matches the current configuration.(only works with tom modified version of quectel-cm)"
 msgstr ""
 
-#: view/qmodem/service.js:112
+#: view/qmodem/service.js:114
 msgid "If enabled, the modem auto scan will be blocked."
 msgstr ""
 
-#: view/qmodem/service.js:102
+#: view/qmodem/service.js:104
 msgid "If enabled, using alternative AT Tools"
 msgstr ""
 
-#: view/qmodem/network_config.js:352
+#: view/qmodem/network_config.js:354
 msgid "If enabled, will turn off NAT function on quectel modem."
 msgstr ""
 
-#: view/qmodem/network_config.js:459
+#: view/qmodem/network_config.js:461
 msgid "If slot 2 config is not set,will use slot 1 config."
 msgstr ""
 
-#: view/qmodem/network_config.js:313
+#: view/qmodem/network_config.js:315
 msgid "If the DNS server is not set, it will use the DNS server leased by the operator."
 msgstr ""
 
-#: view/qmodem/network_config.js:453
+#: view/qmodem/network_config.js:455
 msgid "If the PIN code is not set, leave it blank."
 msgstr ""
 
-#: view/qmodem/ttl.js:41
+#: view/qmodem/ttl.js:42
 msgid "Important Notes"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:353
+#: view/qmodem/sms_conversation.js:357
 msgid "Incomplete (part "
 msgstr ""
 
-#: view/qmodem/sms_sim.js:131
+#: view/qmodem/sms_sim.js:129
 msgid "Index"
 msgstr ""
 
-#: view/qmodem/service.js:125
-#: view/qmodem/sms_forward.js:34
+#: view/qmodem/service.js:127
+#: view/qmodem/sms_forward.js:35
 msgid "Info"
 msgstr ""
 
@@ -1979,23 +1988,23 @@ msgstr ""
 msgid "Invalid contact"
 msgstr ""
 
-#: view/qmodem/monitor.js:320
+#: view/qmodem/monitor.js:321
 msgid "Invalid file type. Only .sh, .py, and .lua files are allowed."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1141
+#: view/qmodem/modem_config.js:1147
 msgid "Invalid lockband data structure"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:239
+#: view/qmodem/sms_sim.js:237
 msgid "Invalid message index"
 msgstr ""
 
-#: view/qmodem/service.js:486
+#: view/qmodem/service.js:488
 msgid "LED indicator for SIM card status"
 msgstr ""
 
-#: view/qmodem/service.js:496
+#: view/qmodem/service.js:498
 msgid "LED indicator for network connection status"
 msgstr ""
 
@@ -2004,11 +2013,11 @@ msgid "LED 设置已接受。"
 msgstr ""
 
 #: vendor/huawei.sh:386
-#: view/qmodem/service.js:422
+#: view/qmodem/service.js:424
 msgid "LTE Band"
 msgstr ""
 
-#: view/qmodem/modem_config.js:924
+#: view/qmodem/modem_config.js:930
 msgid "LTE Cells"
 msgstr ""
 
@@ -2028,58 +2037,62 @@ msgstr ""
 msgid "LTE UL"
 msgstr ""
 
-#: view/qmodem/sms.js:284
+#: view/qmodem/sms.js:281
 msgid "Last Message"
 msgstr ""
 
-#: view/qmodem/sms.js:406
-#: view/qmodem/sms_conversation.js:151
+#: view/qmodem/sms.js:403
+#: view/qmodem/sms_conversation.js:155
 msgid "Length"
 msgstr ""
 
-#: view/qmodem/modem_config.js:208
+#: view/qmodem/stats.js:153
+msgid "Live RX/TX rates and cumulative traffic counters per modem, refreshed every %s seconds."
+msgstr ""
+
+#: view/qmodem/modem_config.js:214
 msgid "Loading available modes..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:350
+#: view/qmodem/modem_config.js:356
 msgid "Loading available networks..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1115
+#: view/qmodem/modem_config.js:1121
 msgid "Loading band configuration..."
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:76
+#: view/qmodem/sms_conversation.js:80
 msgid "Loading messages..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1402
+#: view/qmodem/modem_config.js:1408
 msgid "Loading reboot capabilities..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:47
-#: view/qmodem/modem_config.js:196
-#: view/qmodem/modem_config.js:338
-#: view/qmodem/modem_config.js:480
-#: view/qmodem/network_config.js:213
-#: view/qmodem/network_config.js:301
-#: view/qmodem/network_config.js:884
-#: view/qmodem/sim_switch.js:69
-#: view/qmodem/sms.js:103
-#: view/qmodem/sms.js:120
-#: view/qmodem/sms.js:137
-#: view/qmodem/sms.js:179
-#: view/qmodem/sms.js:199
-#: view/qmodem/sms.js:324
-#: view/qmodem/sms.js:352
-#: view/qmodem/sms_conversation.js:91
-#: view/qmodem/sms_conversation.js:425
-#: view/qmodem/sms_sim.js:49
-#: view/qmodem/sms_sim.js:58
-#: view/qmodem/sms_sim.js:212
-#: view/qmodem/sms_sim.js:270
-#: view/qmodem/sms_sim.js:340
-#: view/qmodem/stats.js:167
+#: view/qmodem/modem_config.js:53
+#: view/qmodem/modem_config.js:202
+#: view/qmodem/modem_config.js:344
+#: view/qmodem/modem_config.js:486
+#: view/qmodem/network_config.js:215
+#: view/qmodem/network_config.js:303
+#: view/qmodem/network_config.js:890
+#: view/qmodem/sim_switch.js:71
+#: view/qmodem/sms.js:109
+#: view/qmodem/sms.js:126
+#: view/qmodem/sms.js:143
+#: view/qmodem/sms.js:176
+#: view/qmodem/sms.js:196
+#: view/qmodem/sms.js:321
+#: view/qmodem/sms.js:349
+#: view/qmodem/sms_conversation.js:95
+#: view/qmodem/sms_conversation.js:429
+#: view/qmodem/sms_sim.js:47
+#: view/qmodem/sms_sim.js:56
+#: view/qmodem/sms_sim.js:210
+#: view/qmodem/sms_sim.js:268
+#: view/qmodem/sms_sim.js:338
+#: view/qmodem/stats.js:172
 msgid "Loading..."
 msgstr ""
 
@@ -2094,35 +2107,35 @@ msgstr ""
 msgid "Location Area Code"
 msgstr ""
 
-#: view/qmodem/modem_config.js:92
+#: view/qmodem/modem_config.js:98
 msgid "Lock Band"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1106
+#: view/qmodem/modem_config.js:1112
 msgid "Lock Band Configuration"
 msgstr ""
 
-#: view/qmodem/modem_config.js:676
+#: view/qmodem/modem_config.js:682
 msgid "Lock Cell Settings"
 msgstr ""
 
-#: view/qmodem/modem_config.js:663
+#: view/qmodem/modem_config.js:669
 msgid "Lock Cell Status"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1324
+#: view/qmodem/modem_config.js:1330
 msgid "Lock band configuration applied for %s"
 msgstr ""
 
-#: view/qmodem/modem_config.js:849
+#: view/qmodem/modem_config.js:855
 msgid "Lock cell configuration applied successfully"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1110
+#: view/qmodem/modem_config.js:1116
 msgid "Lock modem to specific frequency bands. Select bands for each network type (UMTS/LTE/NR)."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1216
+#: view/qmodem/modem_config.js:1222
 msgid "Locked Bands"
 msgstr ""
 
@@ -2130,25 +2143,25 @@ msgstr ""
 msgid "Locking band timed out"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:31
+#: view/qmodem/sms_forward.js:32
 msgid "Log Level"
 msgstr ""
 
-#: view/qmodem/network_config.js:1004
+#: view/qmodem/network_config.js:1010
 msgid "Log cleared successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:981
+#: view/qmodem/network_config.js:987
 msgid "Log downloaded successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:418
-#: view/qmodem/network_config.js:495
+#: view/qmodem/network_config.js:420
+#: view/qmodem/network_config.js:497
 msgid "MTS (RU)"
 msgstr ""
 
-#: view/qmodem/network_config.js:402
-#: view/qmodem/network_config.js:479
+#: view/qmodem/network_config.js:404
+#: view/qmodem/network_config.js:481
 msgid "Magenta (AT)"
 msgstr ""
 
@@ -2166,56 +2179,56 @@ msgstr ""
 #: vendor/simcom.sh:256
 #: vendor/telit.sh:155
 #: vendor/thales.sh:43
-#: view/qmodem/service.js:387
+#: view/qmodem/service.js:389
 msgid "Manufacturer"
 msgstr ""
 
-#: view/qmodem/network_config.js:412
-#: view/qmodem/network_config.js:489
+#: view/qmodem/network_config.js:414
+#: view/qmodem/network_config.js:491
 msgid "Maxis UT (MY)"
 msgstr ""
 
-#: view/qmodem/network_config.js:411
-#: view/qmodem/network_config.js:488
+#: view/qmodem/network_config.js:413
+#: view/qmodem/network_config.js:490
 msgid "Maxis | Hotlink (MY)"
 msgstr ""
 
-#: view/qmodem/network_config.js:419
-#: view/qmodem/network_config.js:496
+#: view/qmodem/network_config.js:421
+#: view/qmodem/network_config.js:498
 msgid "Megafon (RU)"
 msgstr ""
 
-#: view/qmodem/sms.js:381
-#: view/qmodem/sms_conversation.js:117
+#: view/qmodem/sms.js:378
+#: view/qmodem/sms_conversation.js:121
 msgid "Message"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:154
+#: view/qmodem/sms_forward.js:161
 msgid "Message Format (optional)"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:207
+#: view/qmodem/sms_forward.js:214
 msgid "Message channel, use | to separate multiple channels"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:422
+#: view/qmodem/sms_conversation.js:426
 msgid "Message deleted"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:268
+#: view/qmodem/sms_sim.js:266
 msgid "Message deleted successfully"
 msgstr ""
 
-#: view/qmodem/sms.js:460
-#: view/qmodem/sms_conversation.js:233
+#: view/qmodem/sms.js:457
+#: view/qmodem/sms_conversation.js:237
 msgid "Message sent successfully"
 msgstr ""
 
-#: view/qmodem/monitor.js:430
+#: view/qmodem/monitor.js:431
 msgid "Method"
 msgstr ""
 
-#: view/qmodem/network_config.js:503
+#: view/qmodem/network_config.js:505
 msgid "Metric"
 msgstr ""
 
@@ -2251,10 +2264,10 @@ msgstr ""
 msgid "Mobile Country Code"
 msgstr ""
 
-#: view/qmodem/sms.js:101
-#: view/qmodem/sms.js:118
-#: view/qmodem/sms.js:135
-#: view/qmodem/sms.js:549
+#: view/qmodem/sms.js:107
+#: view/qmodem/sms.js:124
+#: view/qmodem/sms.js:141
+#: view/qmodem/sms.js:546
 msgid "Mobile Equipment (ME)"
 msgstr ""
 
@@ -2295,7 +2308,7 @@ msgstr ""
 msgid "Mobile Network Code"
 msgstr ""
 
-#: view/qmodem/modem_config.js:240
+#: view/qmodem/modem_config.js:246
 msgid "Mode set successfully. Please reboot the modem."
 msgstr ""
 
@@ -2303,41 +2316,45 @@ msgstr ""
 msgid "Model"
 msgstr ""
 
-#: view/qmodem/service.js:144
+#: view/qmodem/service.js:146
 msgid "Model AT Timeout"
 msgstr ""
 
-#: view/qmodem/service.js:352
+#: view/qmodem/service.js:354
 msgid "Model Name"
 msgstr ""
 
 #: qmodem/controls.js:1281
-#: view/qmodem/monitor.js:418
+#: view/qmodem/monitor.js:419
 msgid "Modem"
 msgstr ""
 
-#: view/qmodem/network_config.js:255
-#: view/qmodem/network_config.js:308
+#: view/qmodem/network_config.js:257
+#: view/qmodem/network_config.js:310
 msgid "Modem Alias"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:50
+#: view/qmodem/sms_forward.js:51
 msgid "Modem Config"
 msgstr ""
 
-#: view/qmodem/service.js:255
+#: view/qmodem/service.js:257
 msgid "Modem Device"
 msgstr ""
 
-#: view/qmodem/service.js:250
+#: view/qmodem/service.js:252
 msgid "Modem Devices"
 msgstr ""
 
-#: view/qmodem/network_config.js:249
+#: view/qmodem/modem_config.js:18
+msgid "Modem Features"
+msgstr ""
+
+#: view/qmodem/network_config.js:251
 msgid "Modem Model"
 msgstr ""
 
-#: view/qmodem/monitor.js:408
+#: view/qmodem/monitor.js:409
 msgid "Modem Monitor Configuration"
 msgstr ""
 
@@ -2349,23 +2366,23 @@ msgstr ""
 msgid "Modem Offline"
 msgstr ""
 
-#: view/qmodem/service.js:99
+#: view/qmodem/service.js:101
 msgid "Modem Probe Settings"
 msgstr ""
 
-#: view/qmodem/service.js:448
+#: view/qmodem/service.js:450
 msgid "Modem Slot"
 msgstr ""
 
-#: view/qmodem/service.js:440
+#: view/qmodem/service.js:442
 msgid "Modem Slot Configuration"
 msgstr ""
 
-#: view/qmodem/service.js:329
+#: view/qmodem/service.js:331
 msgid "Modem device removal failed: "
 msgstr ""
 
-#: view/qmodem/service.js:324
+#: view/qmodem/service.js:326
 msgid "Modem device removed successfully"
 msgstr ""
 
@@ -2377,61 +2394,61 @@ msgstr ""
 msgid "Monday"
 msgstr ""
 
-#: view/qmodem/monitor.js:414
+#: view/qmodem/monitor.js:415
 msgid "Monitor Configuration"
 msgstr ""
 
-#: view/qmodem/monitor.js:451
+#: view/qmodem/monitor.js:452
 msgid "Monitor Method"
 msgstr ""
 
-#: view/qmodem/monitor.js:139
+#: view/qmodem/monitor.js:140
 msgid "Monitor Service"
 msgstr ""
 
-#: view/qmodem/monitor.js:260
-#: view/qmodem/monitor.js:702
+#: view/qmodem/monitor.js:261
+#: view/qmodem/monitor.js:709
 msgid "Monitor service disabled successfully"
 msgstr ""
 
-#: view/qmodem/monitor.js:241
-#: view/qmodem/monitor.js:684
+#: view/qmodem/monitor.js:242
+#: view/qmodem/monitor.js:691
 msgid "Monitor service enabled successfully"
 msgstr ""
 
-#: view/qmodem/monitor.js:217
-#: view/qmodem/monitor.js:661
+#: view/qmodem/monitor.js:218
+#: view/qmodem/monitor.js:668
 msgid "Monitor service restarted successfully"
 msgstr ""
 
-#: view/qmodem/monitor.js:179
-#: view/qmodem/monitor.js:625
+#: view/qmodem/monitor.js:180
+#: view/qmodem/monitor.js:632
 msgid "Monitor service started successfully"
 msgstr ""
 
-#: view/qmodem/monitor.js:198
-#: view/qmodem/monitor.js:643
+#: view/qmodem/monitor.js:199
+#: view/qmodem/monitor.js:650
 msgid "Monitor service stopped successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:428
+#: view/qmodem/network_config.js:430
 msgid "MsChapV2"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:344
+#: view/qmodem/sms_conversation.js:348
 msgid "Multi-part"
 msgstr ""
 
 #: qmodem/qmodem.js:531
-#: view/qmodem/sim_switch.js:166
+#: view/qmodem/sim_switch.js:168
 msgid "N/A"
 msgstr ""
 
-#: view/qmodem/network_config.js:427
+#: view/qmodem/network_config.js:429
 msgid "NONE"
 msgstr ""
 
-#: view/qmodem/modem_config.js:949
+#: view/qmodem/modem_config.js:955
 msgid "NR (5G) Cells"
 msgstr ""
 
@@ -2440,7 +2457,7 @@ msgid "NR Absolute Radio Frequency Channel Number"
 msgstr ""
 
 #: vendor/huawei.sh:398
-#: view/qmodem/modem_config.js:744
+#: view/qmodem/modem_config.js:750
 msgid "NR Band"
 msgstr ""
 
@@ -2448,11 +2465,11 @@ msgstr ""
 msgid "NR Lock"
 msgstr ""
 
-#: view/qmodem/service.js:427
+#: view/qmodem/service.js:429
 msgid "NSA Band"
 msgstr ""
 
-#: view/qmodem/ttl.js:52
+#: view/qmodem/ttl.js:53
 msgid "NSS ECM, SFE, and other acceleration modules will be disabled when TTL modification is active."
 msgstr ""
 
@@ -2471,19 +2488,19 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: view/qmodem/terminal.js:176
+#: view/qmodem/terminal.js:177
 msgid "Name this command"
 msgstr ""
 
-#: view/qmodem/modem_config.js:88
+#: view/qmodem/modem_config.js:94
 msgid "Neighbor Cell"
 msgstr ""
 
-#: view/qmodem/modem_config.js:619
+#: view/qmodem/modem_config.js:625
 msgid "Neighbor Cell / Lock Cell"
 msgstr ""
 
-#: view/qmodem/modem_config.js:633
+#: view/qmodem/modem_config.js:639
 msgid "Neighbor Cell List"
 msgstr ""
 
@@ -2506,7 +2523,7 @@ msgstr ""
 msgid "Network Information"
 msgstr ""
 
-#: view/qmodem/service.js:495
+#: view/qmodem/service.js:497
 msgid "Network LED"
 msgstr ""
 
@@ -2538,11 +2555,15 @@ msgstr ""
 msgid "Network Mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:80
+#: view/qmodem/monitor.js:546
+msgid "Network Monitor"
+msgstr ""
+
+#: view/qmodem/modem_config.js:86
 msgid "Network Preference"
 msgstr ""
 
-#: view/qmodem/modem_config.js:327
+#: view/qmodem/modem_config.js:333
 msgid "Network Preference Configuration"
 msgstr ""
 
@@ -2560,117 +2581,117 @@ msgstr ""
 msgid "Network Type"
 msgstr ""
 
-#: view/qmodem/modem_config.js:379
+#: view/qmodem/modem_config.js:385
 msgid "Network preference set successfully"
 msgstr ""
 
-#: view/qmodem/sms.js:346
-#: view/qmodem/sms.js:414
+#: view/qmodem/sms.js:343
+#: view/qmodem/sms.js:411
 msgid "New Conversation"
 msgstr ""
 
-#: view/qmodem/modem_config.js:487
+#: view/qmodem/modem_config.js:493
 msgid "New IMEI"
 msgstr ""
 
-#: view/qmodem/monitor.js:154
 #: view/qmodem/monitor.js:155
-#: view/qmodem/monitor.js:603
-#: view/qmodem/monitor.js:604
-#: view/qmodem/network_config.js:77
-#: view/qmodem/network_config.js:78
-#: view/qmodem/network_config.js:750
-#: view/qmodem/network_config.js:751
+#: view/qmodem/monitor.js:156
+#: view/qmodem/monitor.js:610
+#: view/qmodem/monitor.js:611
+#: view/qmodem/network_config.js:79
+#: view/qmodem/network_config.js:80
+#: view/qmodem/network_config.js:756
+#: view/qmodem/network_config.js:757
 msgid "No"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1155
+#: view/qmodem/modem_config.js:1161
 msgid "No bands available for this modem"
 msgstr ""
 
-#: view/qmodem/service.js:295
+#: view/qmodem/service.js:297
 msgid "No data available for the selected device. Please rescan and try again."
 msgstr ""
 
-#: view/qmodem/service.js:266
+#: view/qmodem/service.js:268
 msgid "No devices available. Please scan for devices first."
 msgstr ""
 
-#: view/qmodem/modem_config.js:112
+#: view/qmodem/modem_config.js:118
 msgid "No features available for this modem."
 msgstr ""
 
-#: view/qmodem/network_config.js:941
+#: view/qmodem/network_config.js:947
 msgid "No log available"
 msgstr ""
 
-#: view/qmodem/network_config.js:983
+#: view/qmodem/network_config.js:989
 msgid "No log content to download"
 msgstr ""
 
-#: view/qmodem/sms.js:270
+#: view/qmodem/sms.js:267
 msgid "No messages found"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:118
+#: view/qmodem/sms_sim.js:116
 msgid "No messages found on SIM card"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:310
+#: view/qmodem/sms_conversation.js:314
 msgid "No messages in this conversation"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:290
+#: view/qmodem/sms_sim.js:288
 msgid "No messages to delete"
 msgstr ""
 
-#: view/qmodem/modem_config.js:19
-#: view/qmodem/sim_switch.js:17
-msgid "No modem configured."
+#: view/qmodem/modem_config.js:24
+#: view/qmodem/sim_switch.js:22
+msgid "No modem configured"
 msgstr ""
 
-#: view/qmodem/sms.js:27
-#: view/qmodem/sms_conversation.js:44
-#: view/qmodem/sms_sim.js:26
-#: view/qmodem/stats.js:154
+#: view/qmodem/sms.js:29
+#: view/qmodem/sms_conversation.js:46
+#: view/qmodem/sms_sim.js:29
+#: view/qmodem/stats.js:158
 msgid "No modems configured or all modems are disabled."
 msgstr ""
 
-#: view/qmodem/modem_config.js:290
+#: view/qmodem/modem_config.js:296
 msgid "No modes available"
 msgstr ""
 
-#: view/qmodem/modem_config.js:913
+#: view/qmodem/modem_config.js:919
 msgid "No neighbor cells found. Make sure the modem has network signal."
 msgstr ""
 
-#: view/qmodem/modem_config.js:429
+#: view/qmodem/modem_config.js:435
 msgid "No network types available"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1426
+#: view/qmodem/modem_config.js:1432
 msgid "No reboot methods available for this modem"
 msgstr ""
 
-#: view/qmodem/terminal.js:146
+#: view/qmodem/terminal.js:147
 msgid "No response."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1131
+#: view/qmodem/modem_config.js:1137
 msgid "No result returned from getLockBand"
 msgstr ""
 
-#: view/qmodem/modem_config.js:894
+#: view/qmodem/modem_config.js:900
 msgid "No result returned from neighbor cell scan"
 msgstr ""
 
-#: view/qmodem/monitor.js:371
-#: view/qmodem/monitor.js:555
+#: view/qmodem/monitor.js:372
+#: view/qmodem/monitor.js:562
 msgid "No scripts uploaded yet"
 msgstr ""
 
-#: view/qmodem/modem_config.js:670
-#: view/qmodem/modem_config.js:1062
+#: view/qmodem/modem_config.js:676
+#: view/qmodem/modem_config.js:1068
 msgid "No status information available"
 msgstr ""
 
@@ -2713,55 +2734,59 @@ msgstr ""
 msgid "Non-GBR · 默认数据"
 msgstr ""
 
-#: view/qmodem/modem_config.js:425
+#: view/qmodem/modem_config.js:431
 msgid "None"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1363
+#: view/qmodem/modem_config.js:1369
 msgid "None (All bands unlocked)"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:107
+#: view/qmodem/sim_switch.js:109
 msgid "Not Supported"
 msgstr ""
 
-#: view/qmodem/modem_config.js:602
+#: view/qmodem/modem_config.js:608
 msgid "Not available"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:147
+#: view/qmodem/sim_switch.js:149
 msgid "Note"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:191
+#: view/qmodem/sim_switch.js:193
 msgid "Note: Some modems may require a reboot for the change to take effect."
 msgstr ""
 
-#: view/qmodem/service.js:126
+#: view/qmodem/service.js:128
 msgid "Notice"
 msgstr ""
 
-#: view/qmodem/monitor.js:511
+#: view/qmodem/monitor.js:512
 msgid "Number of consecutive failures before triggering actions"
 msgstr ""
 
-#: view/qmodem/network_config.js:364
+#: view/qmodem/network_config.js:366
 msgid "Once checking, the prefix will be apply to lan zone"
 msgstr ""
 
-#: view/qmodem/service.js:116
+#: view/qmodem/service.js:118
 msgid "Once enabled, the PCIe ports will be scanned on every boot."
 msgstr ""
 
-#: view/qmodem/service.js:120
+#: view/qmodem/service.js:122
 msgid "Once enabled, the USB ports will be scanned on every boot."
 msgstr ""
 
-#: view/qmodem/sms_forward.js:222
+#: view/qmodem/sms_conversation.js:35
+msgid "Open a conversation from the messages list instead."
+msgstr ""
+
+#: view/qmodem/sms_forward.js:229
 msgid "OpenID (optional)"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:231
+#: view/qmodem/sms_forward.js:238
 msgid "OpenID for message forwarding, use comma to separate multiple IDs"
 msgstr ""
 
@@ -2769,43 +2794,43 @@ msgstr ""
 msgid "Operator"
 msgstr ""
 
-#: view/qmodem/sms.js:129
+#: view/qmodem/sms.js:135
 msgid "Other Storage"
 msgstr ""
 
-#: view/qmodem/service.js:374
+#: view/qmodem/service.js:376
 msgid "Override AT Port"
 msgstr ""
 
-#: view/qmodem/network_config.js:443
+#: view/qmodem/network_config.js:445
 msgid "PAP/CHAP Password"
 msgstr ""
 
-#: view/qmodem/network_config.js:435
+#: view/qmodem/network_config.js:437
 msgid "PAP/CHAP Username"
 msgstr ""
 
-#: view/qmodem/modem_config.js:707
+#: view/qmodem/modem_config.js:713
 msgid "PCI"
 msgstr ""
 
-#: view/qmodem/modem_config.js:835
+#: view/qmodem/modem_config.js:841
 msgid "PCI and ARFCN are required"
 msgstr ""
 
-#: view/qmodem/service.js:453
+#: view/qmodem/service.js:455
 msgid "PCIe"
 msgstr ""
 
-#: view/qmodem/service.js:183
+#: view/qmodem/service.js:185
 msgid "PCIe scan completed successfully"
 msgstr ""
 
-#: view/qmodem/service.js:193
+#: view/qmodem/service.js:195
 msgid "PCIe scan error: "
 msgstr ""
 
-#: view/qmodem/service.js:185
+#: view/qmodem/service.js:187
 msgid "PCIe scan failed"
 msgstr ""
 
@@ -2825,11 +2850,11 @@ msgstr ""
 msgid "PCIe 控制器命令已被接受。"
 msgstr ""
 
-#: view/qmodem/network_config.js:369
+#: view/qmodem/network_config.js:371
 msgid "PDP Context Index"
 msgstr ""
 
-#: view/qmodem/network_config.js:373
+#: view/qmodem/network_config.js:375
 msgid "PDP Type"
 msgstr ""
 
@@ -2849,7 +2874,7 @@ msgstr ""
 msgid "PHY 档位命令已被接受。"
 msgstr ""
 
-#: view/qmodem/network_config.js:452
+#: view/qmodem/network_config.js:454
 msgid "PIN Code"
 msgstr ""
 
@@ -2870,16 +2895,24 @@ msgstr ""
 msgid "PUK 码"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:155
+#: view/qmodem/sms_sim.js:153
 msgid "Part"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:293
+#: view/qmodem/sms_forward.js:300
 msgid "Path to custom forwarding script. Script receives SMS_SENDER, SMS_TIME, SMS_CONTENT environment variables"
 msgstr ""
 
+#: view/qmodem/network_config.js:556
+msgid "Per-modem dialing, connection status and QModem network service control."
+msgstr ""
+
+#: view/qmodem/modem_config.js:19
+msgid "Per-modem feature toggles: network mode, band locking, neighbors and reboot."
+msgstr ""
+
 #: vendor/thales.sh:358
-#: view/qmodem/sms.js:370
+#: view/qmodem/sms.js:367
 msgid "Phone Number"
 msgstr ""
 
@@ -2906,7 +2939,7 @@ msgstr ""
 #: vendor/telit.sh:743
 #: vendor/thales.sh:419
 #: vendor/thales.sh:450
-#: view/qmodem/modem_config.js:713
+#: view/qmodem/modem_config.js:719
 msgid "Physical Cell ID"
 msgstr ""
 
@@ -2921,54 +2954,54 @@ msgstr ""
 msgid "Physical Channel"
 msgstr ""
 
-#: view/qmodem/service.js:458
+#: view/qmodem/service.js:460
 msgid "Physical slot identifier (e.g., 1-1.4 for USB, 0000:01:00.0 for PCIe)"
 msgstr ""
 
-#: view/qmodem/monitor.js:45
-#: view/qmodem/monitor.js:467
+#: view/qmodem/monitor.js:46
+#: view/qmodem/monitor.js:468
 msgid "Ping Type"
 msgstr ""
 
-#: view/qmodem/monitor.js:42
+#: view/qmodem/monitor.js:43
 msgid "Ping target to check connectivity"
 msgstr ""
 
-#: view/qmodem/service.js:394
+#: view/qmodem/service.js:396
 msgid "Platform"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1356
+#: view/qmodem/modem_config.js:1362
 msgid "Please check browser console for more details"
 msgstr ""
 
-#: view/qmodem/sms.js:442
-#: view/qmodem/sms_conversation.js:215
+#: view/qmodem/sms.js:439
+#: view/qmodem/sms_conversation.js:219
 msgid "Please enter a message"
 msgstr ""
 
-#: view/qmodem/sms.js:437
+#: view/qmodem/sms.js:434
 msgid "Please enter a phone number"
 msgstr ""
 
-#: view/qmodem/monitor.js:308
+#: view/qmodem/monitor.js:309
 msgid "Please select a file to upload"
 msgstr ""
 
-#: view/qmodem/modem_config.js:231
+#: view/qmodem/modem_config.js:237
 msgid "Please select a mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:370
+#: view/qmodem/modem_config.js:376
 msgid "Please select at least one network type"
 msgstr ""
 
-#: view/qmodem/sms.js:583
+#: view/qmodem/sms.js:580
 msgid "Please wait for storage info to load"
 msgstr ""
 
-#: view/qmodem/sms.js:54
-#: view/qmodem/sms_forward.js:58
+#: view/qmodem/sms.js:60
+#: view/qmodem/sms_forward.js:59
 msgid "Poll Interval (seconds)"
 msgstr ""
 
@@ -2979,27 +3012,27 @@ msgstr ""
 msgid "Poor"
 msgstr ""
 
-#: view/qmodem/network_config.js:528
+#: view/qmodem/network_config.js:530
 msgid "Post Init AT Commands"
 msgstr ""
 
-#: view/qmodem/network_config.js:519
+#: view/qmodem/network_config.js:521
 msgid "Post Init Delay"
 msgstr ""
 
-#: view/qmodem/service.js:536
+#: view/qmodem/service.js:538
 msgid "Power GPIO"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1519
+#: view/qmodem/modem_config.js:1525
 msgid "Power cycles the modem completely. Takes longer but ensures a full restart."
 msgstr ""
 
-#: view/qmodem/network_config.js:535
+#: view/qmodem/network_config.js:537
 msgid "Pre Dial AT Commands"
 msgstr ""
 
-#: view/qmodem/network_config.js:510
+#: view/qmodem/network_config.js:512
 msgid "Pre Dial Delay"
 msgstr ""
 
@@ -3012,61 +3045,53 @@ msgstr ""
 msgid "Primary Scrambling Code"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:238
+#: view/qmodem/sms_forward.js:245
 msgid "Push Key"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:67
+#: view/qmodem/sms_forward.js:68
 msgid "PushDeer"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:247
+#: view/qmodem/sms_forward.js:254
 msgid "PushDeer Push Key from http://pushdeer.com"
 msgstr ""
 
-#: view/qmodem/network_config.js:52
-msgid "QModem Configuration"
-msgstr ""
-
-#: view/qmodem/monitor.js:130
-msgid "QModem Monitor Configuration"
-msgstr ""
-
-#: view/qmodem/network_config.js:62
+#: view/qmodem/network_config.js:64
 msgid "QModem Network"
 msgstr ""
 
-#: view/qmodem/network_config.js:181
-#: view/qmodem/network_config.js:851
+#: view/qmodem/network_config.js:183
+#: view/qmodem/network_config.js:857
 msgid "QModem Network disabled successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:162
-#: view/qmodem/network_config.js:832
+#: view/qmodem/network_config.js:164
+#: view/qmodem/network_config.js:838
 msgid "QModem Network enabled successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:138
-#: view/qmodem/network_config.js:808
+#: view/qmodem/network_config.js:140
+#: view/qmodem/network_config.js:814
 msgid "QModem Network restarted successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:101
-#: view/qmodem/network_config.js:771
+#: view/qmodem/network_config.js:103
+#: view/qmodem/network_config.js:777
 msgid "QModem Network started successfully"
 msgstr ""
 
-#: view/qmodem/network_config.js:120
-#: view/qmodem/network_config.js:790
+#: view/qmodem/network_config.js:122
+#: view/qmodem/network_config.js:796
 msgid "QModem Network stopped successfully"
-msgstr ""
-
-#: view/qmodem/service.js:94
-msgid "QModem Settings"
 msgstr ""
 
 #: view/qmodem/connection.js:356
 msgid "QModem dial_status 实时状态上报"
+msgstr ""
+
+#: view/qmodem/service.js:556
+msgid "QModem service behaviour, device scanning and runtime diagnostics."
 msgstr ""
 
 #: view/qmodem/advanced.js:842
@@ -3133,13 +3158,13 @@ msgstr ""
 msgid "QoS 等级"
 msgstr ""
 
-#: view/qmodem/network_config.js:357
+#: view/qmodem/network_config.js:359
 msgid "RA Master"
 msgstr ""
 
-#: view/qmodem/modem_config.js:687
-#: view/qmodem/modem_config.js:930
-#: view/qmodem/modem_config.js:955
+#: view/qmodem/modem_config.js:693
+#: view/qmodem/modem_config.js:936
+#: view/qmodem/modem_config.js:961
 msgid "RAT"
 msgstr ""
 
@@ -3160,7 +3185,7 @@ msgstr ""
 msgid "RX Power (dBm)"
 msgstr ""
 
-#: view/qmodem/stats.js:103
+#: view/qmodem/stats.js:104
 msgid "RX Rate"
 msgstr ""
 
@@ -3173,11 +3198,11 @@ msgstr ""
 msgid "Radio Signal Strength Noise Ratio"
 msgstr ""
 
-#: view/qmodem/network_config.js:601
+#: view/qmodem/network_config.js:607
 msgid "ReDial"
 msgstr ""
 
-#: view/qmodem/sms.js:95
+#: view/qmodem/sms.js:101
 msgid "Reading Storage"
 msgstr ""
 
@@ -3185,16 +3210,16 @@ msgstr ""
 msgid "Ready."
 msgstr ""
 
-#: view/qmodem/modem_config.js:777
+#: view/qmodem/modem_config.js:783
 msgid "Reapply lock cell command after modem initialization"
 msgstr ""
 
-#: view/qmodem/modem_config.js:96
-#: view/qmodem/modem_config.js:1388
+#: view/qmodem/modem_config.js:102
+#: view/qmodem/modem_config.js:1394
 msgid "Reboot Modem"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1397
+#: view/qmodem/modem_config.js:1403
 msgid "Reboot Options"
 msgstr ""
 
@@ -3202,12 +3227,12 @@ msgstr ""
 msgid "Reboot request timed out"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1392
+#: view/qmodem/modem_config.js:1398
 msgid "Reboot the modem device. Soft reboot restarts the modem firmware, hard reboot power cycles the modem."
 msgstr ""
 
-#: view/qmodem/modem_config.js:1444
-#: view/qmodem/modem_config.js:1481
+#: view/qmodem/modem_config.js:1450
+#: view/qmodem/modem_config.js:1487
 msgid "Rebooting..."
 msgstr ""
 
@@ -3263,7 +3288,7 @@ msgstr ""
 msgid "Received Signal Strength Indicator"
 msgstr ""
 
-#: view/qmodem/network_config.js:593
+#: view/qmodem/network_config.js:599
 msgid "Redial command sent successfully"
 msgstr ""
 
@@ -3328,31 +3353,31 @@ msgstr ""
 msgid "Reference Signal Received Quality"
 msgstr ""
 
-#: view/qmodem/sms.js:356
-#: view/qmodem/sms_sim.js:216
+#: view/qmodem/sms.js:353
+#: view/qmodem/sms_sim.js:214
 msgid "Refresh"
 msgstr ""
 
-#: view/qmodem/terminal.js:191
+#: view/qmodem/terminal.js:192
 msgid "Remove saved command"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:144
+#: view/qmodem/sms_forward.js:151
 msgid "Request Method"
 msgstr ""
 
-#: view/qmodem/monitor.js:225
-#: view/qmodem/monitor.js:669
-#: view/qmodem/network_config.js:146
-#: view/qmodem/network_config.js:816
+#: view/qmodem/monitor.js:226
+#: view/qmodem/monitor.js:676
+#: view/qmodem/network_config.js:148
+#: view/qmodem/network_config.js:822
 msgid "Restart"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1512
+#: view/qmodem/modem_config.js:1518
 msgid "Restarts the modem firmware without power cycling. Faster but may not resolve all issues."
 msgstr ""
 
-#: view/qmodem/sim_switch.js:82
+#: view/qmodem/sim_switch.js:84
 msgid "Result"
 msgstr ""
 
@@ -3373,8 +3398,8 @@ msgstr ""
 msgid "Revision"
 msgstr ""
 
-#: view/qmodem/network_config.js:423
-#: view/qmodem/network_config.js:500
+#: view/qmodem/network_config.js:425
+#: view/qmodem/network_config.js:502
 msgid "Rostelecom (RU)"
 msgstr ""
 
@@ -3384,18 +3409,18 @@ msgstr ""
 msgid "Routing Area Code"
 msgstr ""
 
-#: view/qmodem/monitor.js:100
+#: view/qmodem/monitor.js:101
 msgid "Run Scripts"
 msgstr ""
 
-#: view/qmodem/monitor.js:101
+#: view/qmodem/monitor.js:102
 msgid "Run custom scripts"
 msgstr ""
 
-#: view/qmodem/monitor.js:155
-#: view/qmodem/monitor.js:604
-#: view/qmodem/network_config.js:78
-#: view/qmodem/network_config.js:751
+#: view/qmodem/monitor.js:156
+#: view/qmodem/monitor.js:611
+#: view/qmodem/network_config.js:80
+#: view/qmodem/network_config.js:757
 msgid "Running"
 msgstr ""
 
@@ -3403,7 +3428,7 @@ msgstr ""
 msgid "RxLev"
 msgstr ""
 
-#: view/qmodem/service.js:432
+#: view/qmodem/service.js:434
 msgid "SA Band"
 msgstr ""
 
@@ -3416,18 +3441,18 @@ msgstr ""
 #: vendor/quectel.sh:1719
 #: vendor/simcom.sh:1162
 #: vendor/simcom.sh:1197
-#: view/qmodem/modem_config.js:755
+#: view/qmodem/modem_config.js:761
 msgid "SCS"
 msgstr ""
 
-#: view/qmodem/sms.js:102
-#: view/qmodem/sms.js:119
-#: view/qmodem/sms.js:136
-#: view/qmodem/sms.js:550
+#: view/qmodem/sms.js:108
+#: view/qmodem/sms.js:125
+#: view/qmodem/sms.js:142
+#: view/qmodem/sms.js:547
 msgid "SIM Card (SM)"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:36
+#: view/qmodem/sms_sim.js:20
 msgid "SIM Card SMS Management"
 msgstr ""
 
@@ -3452,7 +3477,7 @@ msgstr ""
 msgid "SIM Information"
 msgstr ""
 
-#: view/qmodem/service.js:485
+#: view/qmodem/service.js:487
 msgid "SIM LED"
 msgstr ""
 
@@ -3536,15 +3561,15 @@ msgstr ""
 msgid "SIM Status"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:21
+#: view/qmodem/sim_switch.js:16
 msgid "SIM Switch"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:67
+#: view/qmodem/sim_switch.js:69
 msgid "SIM Switch Status"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:188
+#: view/qmodem/sim_switch.js:190
 msgid "SIM slot switched to Slot %s successfully."
 msgstr ""
 
@@ -3621,31 +3646,33 @@ msgstr ""
 msgid "SIM 状态"
 msgstr ""
 
-#: view/qmodem/service.js:368
+#: view/qmodem/service.js:370
 msgid "SMS AT Port"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:32
+#: view/qmodem/sms_conversation.js:33
+#: view/qmodem/sms_conversation.js:45
+#: view/qmodem/sms_conversation.js:52
 msgid "SMS Conversation"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:21
+#: view/qmodem/sms_forward.js:83
 msgid "SMS Forwarder Configuration"
 msgstr ""
 
-#: view/qmodem/sms.js:166
+#: view/qmodem/sms.js:19
 msgid "SMS Messages"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:123
+#: view/qmodem/sms_sim.js:121
 msgid "SMS Messages on SIM Card"
 msgstr ""
 
-#: view/qmodem/sms.js:41
+#: view/qmodem/sms.js:47
 msgid "SMS Mode"
 msgstr ""
 
-#: view/qmodem/sms.js:87
+#: view/qmodem/sms.js:93
 msgid "SMS Storage"
 msgstr ""
 
@@ -3657,7 +3684,7 @@ msgstr ""
 msgid "SMS configuration failed"
 msgstr ""
 
-#: view/qmodem/sms.js:598
+#: view/qmodem/sms.js:595
 msgid "SMS storage settings applied successfully"
 msgstr ""
 
@@ -3669,7 +3696,7 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:310
+#: view/qmodem/sms_forward.js:317
 msgid "Save"
 msgstr ""
 
@@ -3681,149 +3708,149 @@ msgstr ""
 msgid "Saving schedule timed out"
 msgstr ""
 
-#: view/qmodem/network_config.js:424
-#: view/qmodem/network_config.js:501
+#: view/qmodem/network_config.js:426
+#: view/qmodem/network_config.js:503
 msgid "Sber Mobile (RU)"
 msgstr ""
 
-#: view/qmodem/service.js:222
+#: view/qmodem/service.js:224
 msgid "Scan ALL Manually"
 msgstr ""
 
-#: view/qmodem/service.js:123
+#: view/qmodem/service.js:125
 msgid "Scan Log Level"
 msgstr ""
 
-#: view/qmodem/modem_config.js:647
-#: view/qmodem/modem_config.js:896
-#: view/qmodem/modem_config.js:915
-#: view/qmodem/modem_config.js:973
-#: view/qmodem/modem_config.js:980
+#: view/qmodem/modem_config.js:653
+#: view/qmodem/modem_config.js:902
+#: view/qmodem/modem_config.js:921
+#: view/qmodem/modem_config.js:979
+#: view/qmodem/modem_config.js:986
 msgid "Scan Neighbor Cells"
 msgstr ""
 
-#: view/qmodem/service.js:172
+#: view/qmodem/service.js:174
 msgid "Scan PCIe Manually"
 msgstr ""
 
-#: view/qmodem/service.js:197
+#: view/qmodem/service.js:199
 msgid "Scan USB Manually"
 msgstr ""
 
-#: view/qmodem/service.js:131
+#: view/qmodem/service.js:133
 msgid "Scan Workers"
 msgstr ""
 
-#: view/qmodem/modem_config.js:623
+#: view/qmodem/modem_config.js:629
 msgid "Scan neighboring cell towers and lock modem to specific cell. You can scan for nearby cells and then lock to a specific cell by copying its parameters."
 msgstr ""
 
-#: view/qmodem/service.js:175
-#: view/qmodem/service.js:200
-#: view/qmodem/service.js:225
+#: view/qmodem/service.js:177
+#: view/qmodem/service.js:202
+#: view/qmodem/service.js:227
 msgid "Scanning"
 msgstr ""
 
-#: view/qmodem/service.js:176
+#: view/qmodem/service.js:178
 msgid "Scanning PCIe ports, please wait..."
 msgstr ""
 
-#: view/qmodem/service.js:201
+#: view/qmodem/service.js:203
 msgid "Scanning USB ports, please wait..."
 msgstr ""
 
-#: view/qmodem/service.js:226
+#: view/qmodem/service.js:228
 msgid "Scanning all ports, please wait..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:643
+#: view/qmodem/modem_config.js:649
 msgid "Scanning neighbor cells..."
 msgstr ""
 
-#: view/qmodem/modem_config.js:642
+#: view/qmodem/modem_config.js:648
 msgid "Scanning..."
 msgstr ""
 
-#: view/qmodem/sms_forward.js:284
+#: view/qmodem/sms_forward.js:291
 msgid "Script Path"
 msgstr ""
 
-#: view/qmodem/monitor.js:104
-#: view/qmodem/monitor.js:530
+#: view/qmodem/monitor.js:105
+#: view/qmodem/monitor.js:531
 msgid "Script Paths"
 msgstr ""
 
-#: view/qmodem/monitor.js:391
-#: view/qmodem/monitor.js:575
+#: view/qmodem/monitor.js:392
+#: view/qmodem/monitor.js:582
 msgid "Script deleted successfully: "
 msgstr ""
 
-#: view/qmodem/monitor.js:340
+#: view/qmodem/monitor.js:341
 msgid "Script uploaded successfully: "
 msgstr ""
 
-#: view/qmodem/monitor.js:533
+#: view/qmodem/monitor.js:534
 msgid "Scripts to execute when action is triggered. You can upload scripts in the User Scripts Management section above."
 msgstr ""
 
-#: view/qmodem/monitor.js:359
+#: view/qmodem/monitor.js:360
 msgid "Scripts will be uploaded to "
 msgstr ""
 
-#: view/qmodem/monitor.js:280
-#: view/qmodem/monitor.js:284
+#: view/qmodem/monitor.js:281
+#: view/qmodem/monitor.js:285
 msgid "Security Warning"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1306
+#: view/qmodem/modem_config.js:1312
 msgid "Select All / None"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1228
+#: view/qmodem/modem_config.js:1234
 msgid "Select Bands"
 msgstr ""
 
-#: view/qmodem/modem_config.js:203
+#: view/qmodem/modem_config.js:209
 msgid "Select Mode"
 msgstr ""
 
-#: view/qmodem/modem_config.js:345
+#: view/qmodem/modem_config.js:351
 msgid "Select Networks"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:75
+#: view/qmodem/sim_switch.js:77
 msgid "Select SIM Slot"
 msgstr ""
 
-#: view/qmodem/service.js:275
+#: view/qmodem/service.js:277
 msgid "Select a device to configure:"
 msgstr ""
 
-#: view/qmodem/service.js:410
+#: view/qmodem/service.js:412
 msgid "Select features to disable for this modem."
 msgstr ""
 
-#: view/qmodem/sms.js:471
-#: view/qmodem/sms_conversation.js:189
-#: view/qmodem/sms_conversation.js:225
-#: view/qmodem/sms_conversation.js:243
+#: view/qmodem/sms.js:468
+#: view/qmodem/sms_conversation.js:193
+#: view/qmodem/sms_conversation.js:229
+#: view/qmodem/sms_conversation.js:247
 #: view/qmodem/terminal.js:278
 msgid "Send"
 msgstr ""
 
-#: view/qmodem/monitor.js:89
+#: view/qmodem/monitor.js:90
 msgid "Send AT Commands"
 msgstr ""
 
-#: view/qmodem/monitor.js:90
+#: view/qmodem/monitor.js:91
 msgid "Send AT commands to modem"
 msgstr ""
 
-#: view/qmodem/sms_conversation.js:112
+#: view/qmodem/sms_conversation.js:116
 msgid "Send Message"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:132
+#: view/qmodem/sms_sim.js:130
 msgid "Sender"
 msgstr ""
 
@@ -3831,29 +3858,33 @@ msgstr ""
 msgid "Sending SMS timed out"
 msgstr ""
 
-#: view/qmodem/sms.js:449
+#: view/qmodem/sms.js:446
 msgid "Sending message..."
 msgstr ""
 
-#: view/qmodem/sms.js:449
-#: view/qmodem/sms_conversation.js:221
+#: view/qmodem/sms.js:446
+#: view/qmodem/sms_conversation.js:225
 msgid "Sending..."
 msgstr ""
 
-#: view/qmodem/sms_forward.js:252
+#: view/qmodem/sms_forward.js:259
 msgid "Server (optional)"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:66
+#: view/qmodem/sms_forward.js:67
 msgid "ServerChan"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:193
+#: view/qmodem/sms_forward.js:200
 msgid "ServerChan API token from https://sctapi.ftqq.com"
 msgstr ""
 
-#: view/qmodem/monitor.js:160
+#: view/qmodem/monitor.js:161
 msgid "Service Control"
+msgstr ""
+
+#: view/qmodem/service.js:555
+msgid "Service and Scan"
 msgstr ""
 
 #: vendor/fibocom.sh:1730
@@ -3873,11 +3904,11 @@ msgstr ""
 msgid "Serving Cell Receive Level"
 msgstr ""
 
-#: view/qmodem/modem_config.js:84
+#: view/qmodem/modem_config.js:90
 msgid "Set IMEI"
 msgstr ""
 
-#: view/qmodem/ttl.js:38
+#: view/qmodem/ttl.js:39
 msgid "Set the TTL (Time To Live) value for IPv4 packets and Hop Limit for IPv6 packets. Common values: 64 (Linux default), 128 (Windows default)."
 msgstr ""
 
@@ -3885,7 +3916,7 @@ msgstr ""
 msgid "Setting IMEI timed out"
 msgstr ""
 
-#: view/qmodem/sms.js:587
+#: view/qmodem/sms.js:584
 msgid "Setting SMS Storage"
 msgstr ""
 
@@ -3901,7 +3932,7 @@ msgstr ""
 msgid "Setting network preference timed out"
 msgstr ""
 
-#: view/qmodem/modem_config.js:553
+#: view/qmodem/modem_config.js:559
 msgid "Setting..."
 msgstr ""
 
@@ -3909,7 +3940,7 @@ msgstr ""
 msgid "Settings applied."
 msgstr ""
 
-#: view/qmodem/ttl.js:54
+#: view/qmodem/ttl.js:55
 msgid "Settings will take effect after saving and applying changes."
 msgstr ""
 
@@ -3948,12 +3979,12 @@ msgstr ""
 msgid "Signal to Interference plus Noise Ratio Bandwidth"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:157
+#: view/qmodem/sms_sim.js:155
 msgid "Single"
 msgstr ""
 
-#: view/qmodem/network_config.js:391
-#: view/qmodem/network_config.js:468
+#: view/qmodem/network_config.js:393
+#: view/qmodem/network_config.js:470
 msgid "Skytone (CN)"
 msgstr ""
 
@@ -3964,38 +3995,38 @@ msgstr ""
 msgid "Slot"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:126
-#: view/qmodem/sim_switch.js:167
+#: view/qmodem/sim_switch.js:128
+#: view/qmodem/sim_switch.js:169
 msgid "Slot %s"
 msgstr ""
 
-#: view/qmodem/service.js:457
+#: view/qmodem/service.js:459
 msgid "Slot ID"
 msgstr ""
 
-#: view/qmodem/service.js:451
+#: view/qmodem/service.js:453
 msgid "Slot Type"
 msgstr ""
 
-#: view/qmodem/network_config.js:406
-#: view/qmodem/network_config.js:483
+#: view/qmodem/network_config.js:408
+#: view/qmodem/network_config.js:485
 msgid "Smart Communications (PH)"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1451
-#: view/qmodem/modem_config.js:1456
-#: view/qmodem/modem_config.js:1461
-#: view/qmodem/modem_config.js:1464
-#: view/qmodem/modem_config.js:1511
-#: view/qmodem/service.js:346
+#: view/qmodem/modem_config.js:1457
+#: view/qmodem/modem_config.js:1462
+#: view/qmodem/modem_config.js:1467
+#: view/qmodem/modem_config.js:1470
+#: view/qmodem/modem_config.js:1517
+#: view/qmodem/service.js:348
 msgid "Soft Reboot"
 msgstr ""
 
-#: view/qmodem/modem_config.js:1448
+#: view/qmodem/modem_config.js:1454
 msgid "Soft reboot initiated successfully. The modem is restarting..."
 msgstr ""
 
-#: view/qmodem/sim_switch.js:117
+#: view/qmodem/sim_switch.js:119
 msgid "Some SIM switch data failed to load; will retry on next refresh"
 msgstr ""
 
@@ -4012,30 +4043,30 @@ msgstr ""
 msgid "Spreading Factor"
 msgstr ""
 
-#: view/qmodem/monitor.js:187
-#: view/qmodem/monitor.js:633
-#: view/qmodem/network_config.js:109
-#: view/qmodem/network_config.js:779
+#: view/qmodem/monitor.js:188
+#: view/qmodem/monitor.js:640
+#: view/qmodem/network_config.js:111
+#: view/qmodem/network_config.js:785
 msgid "Start"
 msgstr ""
 
-#: view/qmodem/stats.js:140
+#: view/qmodem/stats.js:141
 msgid "Statistics cleared"
 msgstr ""
 
-#: view/qmodem/network_config.js:207
-#: view/qmodem/network_config.js:260
+#: view/qmodem/network_config.js:209
+#: view/qmodem/network_config.js:262
 msgid "Status"
 msgstr ""
 
-#: view/qmodem/monitor.js:206
-#: view/qmodem/monitor.js:651
-#: view/qmodem/network_config.js:128
-#: view/qmodem/network_config.js:798
+#: view/qmodem/monitor.js:207
+#: view/qmodem/monitor.js:658
+#: view/qmodem/network_config.js:130
+#: view/qmodem/network_config.js:804
 msgid "Stop"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:190
+#: view/qmodem/sms_sim.js:188
 msgid "Summary"
 msgstr ""
 
@@ -4043,40 +4074,40 @@ msgstr ""
 msgid "Sunday"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:105
+#: view/qmodem/sim_switch.js:107
 msgid "Support"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:107
+#: view/qmodem/sim_switch.js:109
 msgid "Supported"
 msgstr ""
 
-#: view/qmodem/service.js:401
+#: view/qmodem/service.js:403
 msgid "Supported Modes"
 msgstr ""
 
-#: view/qmodem/service.js:402
+#: view/qmodem/service.js:404
 msgid "Supported driver modes (e.g., RNDIS/NCM/QMI/MBIM/ETH/PPP)"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:139
+#: view/qmodem/sms_forward.js:146
 msgid "Supports placeholders: {SENDER}, {CONTENT}, {TIME}"
 msgstr ""
 
-#: view/qmodem/network_config.js:393
-#: view/qmodem/network_config.js:470
+#: view/qmodem/network_config.js:395
+#: view/qmodem/network_config.js:472
 msgid "Swisscom (CH)"
 msgstr ""
 
-#: view/qmodem/monitor.js:84
+#: view/qmodem/monitor.js:85
 msgid "Switch SIM Slot"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:25
+#: view/qmodem/sim_switch.js:17
 msgid "Switch between SIM card slots. Note: Some modems may require a reboot after switching SIM slots."
 msgstr ""
 
-#: view/qmodem/monitor.js:85
+#: view/qmodem/monitor.js:86
 msgid "Switch to another SIM slot"
 msgstr ""
 
@@ -4084,24 +4115,24 @@ msgstr ""
 msgid "Switching SIM slot timed out"
 msgstr ""
 
-#: view/qmodem/sim_switch.js:177
+#: view/qmodem/sim_switch.js:179
 msgid "Switching SIM slot..."
 msgstr ""
 
-#: view/qmodem/network_config.js:422
-#: view/qmodem/network_config.js:499
+#: view/qmodem/network_config.js:424
+#: view/qmodem/network_config.js:501
 msgid "T-mobile (RU)"
 msgstr ""
 
-#: view/qmodem/ttl.js:20
+#: view/qmodem/ttl.js:62
 msgid "TTL Configuration"
 msgstr ""
 
-#: view/qmodem/ttl.js:34
+#: view/qmodem/ttl.js:35
 msgid "TTL Value"
 msgstr ""
 
-#: view/qmodem/ttl.js:50
+#: view/qmodem/ttl.js:51
 msgid "TTL rewriting is implemented with the fw4/nftables backend (/etc/nftables.d/99-reset-ttl-from-br-lan.nft)."
 msgstr ""
 
@@ -4130,12 +4161,12 @@ msgstr ""
 msgid "TX Power (dBm)"
 msgstr ""
 
-#: view/qmodem/stats.js:107
+#: view/qmodem/stats.js:108
 msgid "TX Rate"
 msgstr ""
 
-#: view/qmodem/monitor.js:55
-#: view/qmodem/monitor.js:476
+#: view/qmodem/monitor.js:56
+#: view/qmodem/monitor.js:477
 msgid "Target IP / Domain"
 msgstr ""
 
@@ -4155,17 +4186,17 @@ msgstr ""
 msgid "Task timed out"
 msgstr ""
 
-#: view/qmodem/network_config.js:420
-#: view/qmodem/network_config.js:497
+#: view/qmodem/network_config.js:422
+#: view/qmodem/network_config.js:499
 msgid "Tele2 (RU)"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:64
+#: view/qmodem/sms_forward.js:65
 msgid "Telegram Bot"
 msgstr ""
 
-#: view/qmodem/network_config.js:397
-#: view/qmodem/network_config.js:474
+#: view/qmodem/network_config.js:399
+#: view/qmodem/network_config.js:476
 msgid "Telekom (DE)"
 msgstr ""
 
@@ -4182,19 +4213,19 @@ msgstr ""
 msgid "Temperature"
 msgstr ""
 
-#: view/qmodem/service.js:480
+#: view/qmodem/service.js:482
 msgid "The first module loaded into this slot will automatically be assigned this default metric."
 msgstr ""
 
-#: view/qmodem/network_config.js:504
+#: view/qmodem/network_config.js:506
 msgid "The metric value is used to determine the priority of the route. The smaller the value, the higher the priority. Cannot duplicate."
 msgstr ""
 
-#: view/qmodem/ttl.js:53
+#: view/qmodem/ttl.js:54
 msgid "This may affect network performance on some devices."
 msgstr ""
 
-#: view/qmodem/sim_switch.js:140
+#: view/qmodem/sim_switch.js:142
 msgid "This modem does not support SIM switching."
 msgstr ""
 
@@ -4202,24 +4233,24 @@ msgstr ""
 msgid "Thursday"
 msgstr ""
 
-#: view/qmodem/sms.js:285
-#: view/qmodem/sms_sim.js:133
+#: view/qmodem/sms.js:282
+#: view/qmodem/sms_sim.js:131
 msgid "Time"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:184
+#: view/qmodem/sms_forward.js:191
 msgid "Token"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:195
+#: view/qmodem/sms_sim.js:193
 msgid "Total Messages"
 msgstr ""
 
-#: view/qmodem/stats.js:111
+#: view/qmodem/stats.js:112
 msgid "Total RX"
 msgstr ""
 
-#: view/qmodem/stats.js:115
+#: view/qmodem/stats.js:116
 msgid "Total TX"
 msgstr ""
 
@@ -4252,7 +4283,7 @@ msgstr ""
 msgid "Tracking area code of cell served by neighbor Enb"
 msgstr ""
 
-#: view/qmodem/stats.js:158
+#: view/qmodem/stats.js:152
 msgid "Traffic Statistics"
 msgstr ""
 
@@ -4260,11 +4291,11 @@ msgstr ""
 msgid "Transmit Rate"
 msgstr ""
 
-#: view/qmodem/service.js:167
+#: view/qmodem/service.js:169
 msgid "Try Preset PCIe Port"
 msgstr ""
 
-#: view/qmodem/service.js:163
+#: view/qmodem/service.js:165
 msgid "Try Preset USB Port"
 msgstr ""
 
@@ -4276,8 +4307,8 @@ msgstr ""
 msgid "Tx Power"
 msgstr ""
 
-#: view/qmodem/service.js:339
-#: view/qmodem/sms_sim.js:135
+#: view/qmodem/service.js:341
+#: view/qmodem/sms_sim.js:133
 msgid "Type"
 msgstr ""
 
@@ -4312,29 +4343,29 @@ msgstr ""
 msgid "UL CA"
 msgstr ""
 
-#: view/qmodem/network_config.js:414
-#: view/qmodem/network_config.js:491
+#: view/qmodem/network_config.js:416
+#: view/qmodem/network_config.js:493
 msgid "UMobile (MY)"
 msgstr ""
 
-#: view/qmodem/monitor.js:72
-#: view/qmodem/monitor.js:493
+#: view/qmodem/monitor.js:73
+#: view/qmodem/monitor.js:494
 msgid "URL"
 msgstr ""
 
-#: view/qmodem/service.js:452
+#: view/qmodem/service.js:454
 msgid "USB"
 msgstr ""
 
-#: view/qmodem/service.js:208
+#: view/qmodem/service.js:210
 msgid "USB scan completed successfully"
 msgstr ""
 
-#: view/qmodem/service.js:218
+#: view/qmodem/service.js:220
 msgid "USB scan error: "
 msgstr ""
 
-#: view/qmodem/service.js:210
+#: view/qmodem/service.js:212
 msgid "USB scan failed"
 msgstr ""
 
@@ -4361,38 +4392,38 @@ msgstr ""
 msgid "UTRA Absolute Radio Frequency Channel Number"
 msgstr ""
 
-#: view/qmodem/network_config.js:415
-#: view/qmodem/network_config.js:492
+#: view/qmodem/network_config.js:417
+#: view/qmodem/network_config.js:494
 msgid "Unifi (MY)"
 msgstr ""
 
-#: view/qmodem/service.js:106
-#: view/qmodem/service.js:140
-#: view/qmodem/service.js:145
-#: view/qmodem/service.js:150
-#: view/qmodem/service.js:155
+#: view/qmodem/service.js:108
+#: view/qmodem/service.js:142
+#: view/qmodem/service.js:147
+#: view/qmodem/service.js:152
+#: view/qmodem/service.js:157
 msgid "Units: seconds"
 msgstr ""
 
-#: view/qmodem/modem_config.js:286
-#: view/qmodem/network_config.js:228
-#: view/qmodem/network_config.js:263
-#: view/qmodem/network_config.js:671
-#: view/qmodem/stats.js:27
+#: view/qmodem/modem_config.js:292
+#: view/qmodem/network_config.js:230
+#: view/qmodem/network_config.js:265
+#: view/qmodem/network_config.js:677
+#: view/qmodem/stats.js:28
 msgid "Unknown"
 msgstr ""
 
-#: view/qmodem/modem_config.js:812
-#: view/qmodem/modem_config.js:816
-#: view/qmodem/modem_config.js:819
+#: view/qmodem/modem_config.js:818
+#: view/qmodem/modem_config.js:822
+#: view/qmodem/modem_config.js:825
 msgid "Unlock Cell"
 msgstr ""
 
-#: view/qmodem/modem_config.js:793
+#: view/qmodem/modem_config.js:799
 msgid "Unlocking..."
 msgstr ""
 
-#: view/qmodem/stats.js:119
+#: view/qmodem/stats.js:120
 msgid "Updated"
 msgstr ""
 
@@ -4400,23 +4431,23 @@ msgstr ""
 msgid "Uplink Absolute Radio Frequency Channel Number"
 msgstr ""
 
-#: view/qmodem/monitor.js:353
+#: view/qmodem/monitor.js:354
 msgid "Upload"
 msgstr ""
 
-#: view/qmodem/monitor.js:290
+#: view/qmodem/monitor.js:291
 msgid "Upload Script"
 msgstr ""
 
-#: view/qmodem/monitor.js:364
+#: view/qmodem/monitor.js:365
 msgid "Uploaded Scripts"
 msgstr ""
 
-#: view/qmodem/network_config.js:317
+#: view/qmodem/network_config.js:319
 msgid "Use Ubus"
 msgstr ""
 
-#: view/qmodem/service.js:380
+#: view/qmodem/service.js:382
 msgid "Use Ubus AT Daemon"
 msgstr ""
 
@@ -4424,37 +4455,37 @@ msgstr ""
 msgid "Use query commands whenever possible. Configuration and reset commands may interrupt mobile connectivity."
 msgstr ""
 
-#: view/qmodem/monitor.js:276
+#: view/qmodem/monitor.js:277
 msgid "User Scripts Management"
 msgstr ""
 
-#: view/qmodem/monitor.js:285
+#: view/qmodem/monitor.js:286
 msgid "User scripts run with root privileges. Only upload scripts from trusted sources. Malicious scripts can damage your system or compromise security. Review script contents before uploading."
 msgstr ""
 
-#: view/qmodem/stats.js:77
-#: view/qmodem/stats.js:134
+#: view/qmodem/stats.js:78
+#: view/qmodem/stats.js:135
 msgid "Vendor does not support traffic statistics"
 msgstr ""
 
-#: view/qmodem/network_config.js:282
+#: view/qmodem/network_config.js:284
 msgid "View Log"
 msgstr ""
 
-#: view/qmodem/sms_sim.js:41
+#: view/qmodem/sms_sim.js:21
 msgid "View and delete SMS messages stored on SIM card. These are raw messages before being processed into conversations."
 msgstr ""
 
-#: view/qmodem/sms.js:171
+#: view/qmodem/sms.js:20
 msgid "View and manage SMS messages. Messages are grouped by sender/recipient."
 msgstr ""
 
-#: view/qmodem/modem_config.js:470
+#: view/qmodem/modem_config.js:476
 msgid "View and modify the modem IMEI number. IMEI must be 15 digits. Changes require modem reboot to take effect."
 msgstr ""
 
-#: view/qmodem/network_config.js:396
-#: view/qmodem/network_config.js:473
+#: view/qmodem/network_config.js:398
+#: view/qmodem/network_config.js:475
 msgid "Vodafone (DE)"
 msgstr ""
 
@@ -4469,7 +4500,7 @@ msgstr ""
 msgid "Voltage"
 msgstr ""
 
-#: view/qmodem/service.js:417
+#: view/qmodem/service.js:419
 msgid "WCDMA Band"
 msgstr ""
 
@@ -4477,25 +4508,25 @@ msgstr ""
 msgid "WCDMA Information"
 msgstr ""
 
-#: view/qmodem/service.js:127
-#: view/qmodem/sms_forward.js:33
+#: view/qmodem/service.js:129
+#: view/qmodem/sms_forward.js:34
 msgid "Warning"
 msgstr ""
 
-#: view/qmodem/ttl.js:48
+#: view/qmodem/ttl.js:49
 msgid "Warning:"
 msgstr ""
 
-#: view/qmodem/modem_config.js:580
+#: view/qmodem/modem_config.js:586
 msgid "Warning: "
 msgstr ""
 
-#: view/qmodem/sms_forward.js:65
+#: view/qmodem/sms_forward.js:66
 msgid "Webhook"
 msgstr ""
 
-#: view/qmodem/sms_forward.js:130
-#: view/qmodem/sms_forward.js:268
+#: view/qmodem/sms_forward.js:137
+#: view/qmodem/sms_forward.js:275
 msgid "Webhook URL"
 msgstr ""
 
@@ -4503,23 +4534,23 @@ msgstr ""
 msgid "Wednesday"
 msgstr ""
 
-#: view/qmodem/sms.js:112
+#: view/qmodem/sms.js:118
 msgid "Writing Storage"
 msgstr ""
 
-#: view/qmodem/network_config.js:413
-#: view/qmodem/network_config.js:490
+#: view/qmodem/network_config.js:415
+#: view/qmodem/network_config.js:492
 msgid "YES (MY)"
 msgstr ""
 
-#: view/qmodem/monitor.js:154
 #: view/qmodem/monitor.js:155
-#: view/qmodem/monitor.js:603
-#: view/qmodem/monitor.js:604
-#: view/qmodem/network_config.js:77
-#: view/qmodem/network_config.js:78
-#: view/qmodem/network_config.js:750
-#: view/qmodem/network_config.js:751
+#: view/qmodem/monitor.js:156
+#: view/qmodem/monitor.js:610
+#: view/qmodem/monitor.js:611
+#: view/qmodem/network_config.js:79
+#: view/qmodem/network_config.js:80
+#: view/qmodem/network_config.js:756
+#: view/qmodem/network_config.js:757
 msgid "Yes"
 msgstr ""
 
@@ -4527,8 +4558,8 @@ msgstr ""
 msgid "Yesterday"
 msgstr ""
 
-#: view/qmodem/network_config.js:421
-#: view/qmodem/network_config.js:498
+#: view/qmodem/network_config.js:423
+#: view/qmodem/network_config.js:500
 msgid "Yota (RU)"
 msgstr ""
 
@@ -4549,24 +4580,24 @@ msgstr ""
 msgid "dB（分贝）"
 msgstr ""
 
-#: view/qmodem/service.js:353
 #: view/qmodem/service.js:355
-#: view/qmodem/service.js:359
-#: view/qmodem/service.js:362
-#: view/qmodem/service.js:369
-#: view/qmodem/service.js:375
-#: view/qmodem/service.js:418
-#: view/qmodem/service.js:423
-#: view/qmodem/service.js:428
-#: view/qmodem/service.js:433
-#: view/qmodem/service.js:476
-#: view/qmodem/service.js:482
-#: view/qmodem/service.js:543
-#: view/qmodem/service.js:548
+#: view/qmodem/service.js:357
+#: view/qmodem/service.js:361
+#: view/qmodem/service.js:364
+#: view/qmodem/service.js:371
+#: view/qmodem/service.js:377
+#: view/qmodem/service.js:420
+#: view/qmodem/service.js:425
+#: view/qmodem/service.js:430
+#: view/qmodem/service.js:435
+#: view/qmodem/service.js:478
+#: view/qmodem/service.js:484
+#: view/qmodem/service.js:545
+#: view/qmodem/service.js:550
 msgid "e.g."
 msgstr ""
 
-#: view/qmodem/service.js:347
+#: view/qmodem/service.js:349
 msgid "enable modem soft reboot"
 msgstr ""
 
@@ -4578,7 +4609,7 @@ msgstr ""
 msgid "min"
 msgstr ""
 
-#: view/qmodem/network_config.js:346
+#: view/qmodem/network_config.js:348
 msgid "quectel-CM will append the DNS server to the resolv.conf file by default.if you do not want to modify the resolv.conf file, please check this option."
 msgstr ""
 
@@ -5457,11 +5488,11 @@ msgstr ""
 #: view/qmodem/device.js:153
 #: view/qmodem/network.js:825
 #: view/qmodem/system.js:343
+#: view/qmodem/terminal.js:224
 msgid "未检测到模组"
 msgstr ""
 
-#: view/qmodem/terminal.js:136
-#: view/qmodem/terminal.js:225
+#: view/qmodem/terminal.js:137
 msgid "未检测到模组（请确认 QModem 已识别该设备）。"
 msgstr ""
 
@@ -6189,6 +6220,10 @@ msgstr ""
 #: view/qmodem/device.js:153
 #: view/qmodem/network.js:825
 msgid "请确认 QModem 已接入并识别该设备，然后刷新页面重试。"
+msgstr ""
+
+#: view/qmodem/terminal.js:225
+msgid "请确认 QModem 已识别该设备。"
 msgstr ""
 
 #: view/qmodem/connection.js:367
