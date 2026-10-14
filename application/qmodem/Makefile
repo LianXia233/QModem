@@ -351,7 +351,6 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./files/lib/netifd/rmnet.script ./files/lib/netifd/rmnet6.script \
 		$(1)/lib/netifd/
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/etc/uci-defaults/99-rmnet-init $(1)/etc/uci-defaults/
 	$(INSTALL_BIN) ./files/etc/uci-defaults/99-qmodem-atd-default $(1)/etc/uci-defaults/
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/etc/config/qmodem_sms $(1)/etc/config/

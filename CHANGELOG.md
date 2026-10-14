@@ -11,6 +11,31 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+### Removed
+- **WAN hijack uci-defaults (`99-rmnet-init`)**: the package shipped
+  `/etc/uci-defaults/99-rmnet-init`, which on every install/upgrade
+  unconditionally rewrote `network.wan` to `proto 'rmnet'` +
+  `ifname 'wwan0'` (and `wan6` to `rmnet6`), silently clobbering any
+  user WAN configuration. On devices where the WAN port should be a
+  standard DHCP uplink this breaks WAN entirely: the rmnet proto waits
+  for a cellular data-call state file and a `wwan0` interface that do
+  not exist, netifd falls back to `proto 'none'`, no DHCP client is
+  ever started and the port gets no address (diagnosed on a
+  WAN-first ImmortalWrt device: manual `proto 'dhcp'` repair was undone
+  by the next qmodem upgrade re-running this script). The same script
+  also forced an odhcpd relay setup (`dhcp.lan/wan/wan6` ra/dhcpv6/ndp
+  relay + `dhcp.wan6.master=1`) that presumes the cellular-on-wan
+  design and leaves LAN IPv6 dead when wan6 carries no real uplink.
+  The script and its Makefile install line are removed; qmodem now
+  leaves `network` / `dhcp` untouched at install time (its own modem
+  interfaces are created by `modem_dial.sh` as separate
+  `modem_*` sections and never touched wan). The inert netifd proto
+  handlers `rmnet.sh` / `rmnet6.sh` stay for existing configs that
+  still reference them. Device-side cleanup for already-infected
+  installs: `uci set network.wan.proto='dhcp'`, drop the bogus
+  `ifname 'wwan0'` / `defaultroute '0'` remnants on wan/wan6, and
+  delete the relay overrides in `/etc/config/dhcp`.
+
 ### Changed
 - **LuCI frontend reverted to upstream `luci-app-qmodem-next`**: the entire
   `luci/` directory has been realigned to upstream FUjr/QModem@c49654ef

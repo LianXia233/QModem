@@ -11,6 +11,25 @@
 
 ## [Unreleased]
 
+### 移除（Removed）
+- **WAN 劫持 uci-defaults（`99-rmnet-init`）**：包内自带的
+  `/etc/uci-defaults/99-rmnet-init` 会在每次安装/升级时无条件把
+  `network.wan` 改写为 `proto 'rmnet'` + `ifname 'wwan0'`（`wan6` 同样改写为
+  `rmnet6`），静默覆盖用户的 WAN 配置。对 WAN 口应为标准 DHCP 上行的设备，
+  这会直接弄断 WAN：rmnet 协议等待不存在的蜂窝拨号状态文件与 `wwan0`
+  接口，netifd 回退 `proto 'none'`，不启动任何 DHCP 客户端、拿不到地址
+  （在 WAN 优先的 ImmortalWrt 设备上实测诊断：手工改回 `proto 'dhcp'`
+  修复后，下一次 qmodem 升级重跑该脚本再次打断）。该脚本还强制写入一套
+  odhcpd 中继配置（`dhcp.lan/wan/wan6` 的 ra/dhcpv6/ndp relay +
+  `dhcp.wan6.master=1`），该设计假定蜂窝走 wan 口，当 wan6 无实际上行时
+  LAN 的 IPv6 处于死中继状态。现已删除该脚本及其 Makefile 安装行；
+  qmodem 安装时不再触碰 `network` / `dhcp`（模组接口由 `modem_dial.sh`
+  以独立的 `modem_*` 节创建，从不涉及 wan）。惰性的 netifd 协议处理器
+  `rmnet.sh` / `rmnet6.sh` 保留，供仍引用它们的存量配置使用。
+  已受影响设备的清理方法：`uci set network.wan.proto='dhcp'`，删除
+  wan/wan6 上残留的 `ifname 'wwan0'` / `defaultroute '0'`，并删除
+  `/etc/config/dhcp` 中的中继覆盖项。
+
 ### 变更（Changed）
 - **LuCI 前端回归上游 `luci-app-qmodem-next`**：`luci/` 目录整体对齐上游
   FUjr/QModem@c49654ef（即本仓库 fork 点，也是上游最新 main）。删除本地的
