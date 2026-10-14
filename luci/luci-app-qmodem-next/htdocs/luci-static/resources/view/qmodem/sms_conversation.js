@@ -9,7 +9,7 @@
 document.head.appendChild(E('link', {
 	'rel': 'stylesheet',
 	'type': 'text/css',
-	'href': L.resource('qmodem/qmodem-next.css')
+	'href': L.resource('qmodem/qmodem-next.css') + '?v=' + new Date().toISOString().slice(0, 10)
 }));
 
 return view.extend({

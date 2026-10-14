@@ -6,10 +6,10 @@
 'require qmodem-voip.rpc as rpc';
 
 document.head.appendChild(E('link', {
-	rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/soft-anime.css')
+	rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/soft-anime.css') + '?v=' + new Date().toISOString().slice(0, 10)
 }));
 document.head.appendChild(E('link', {
-	rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/qmodem-voip.css')
+	rel: 'stylesheet', type: 'text/css', href: L.resource('qmodem-voip/qmodem-voip.css') + '?v=' + new Date().toISOString().slice(0, 10)
 }));
 
 function statusLabel(value, positive) {
