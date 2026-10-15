@@ -3,9 +3,10 @@
 [简体中文](install-suite.zh-cn.md) | English
 
 > Status: **two-package layout**. After the component consolidation the whole stack is just
-> `qmodem` (backend, built for the target architecture) and `luci-app-qmodem` (frontend,
+> `qmodem` (backend, built for the target architecture) and `luci-app-qmodem-next` (frontend,
 > `all`). The former `qmodem-suite` meta-package and the standalone packages it pulled in
-> are retired; see the
+> are retired, and the legacy Lua `luci-app-qmodem` UI has been deleted from the repository
+> (never built, never released); see the
 > [integration scope](../refactor/integration-scope.zh-cn.md) for the reasons and the
 > replacement mapping.
 
@@ -14,10 +15,10 @@
 | Package | Arch | Role | Required |
 | --- | --- | --- | --- |
 | `qmodem` | target | All-in-one backend: modem discovery and dialing scripts, ubus data services, SMS daemon, traffic statistics, network monitor, SMS forwarding, all CLI tools | yes |
-| `luci-app-qmodem` | `all` | The single frontend (pure JavaScript); all data is read through the `qmodem` ubus object | recommended |
-| `luci-i18n-qmodem-zh-cn` | `all` | Simplified Chinese translations | optional |
+| `luci-app-qmodem-next` | `all` | The single frontend (pure JavaScript); all data is read through the `qmodem` ubus object | recommended |
+| `luci-i18n-qmodem-next-zh-cn` | `all` | Simplified Chinese translations | optional |
 
-`luci-app-qmodem` declares `DEPENDS:=+qmodem`, so **installing the frontend is enough** —
+`luci-app-qmodem-next` declares `DEPENDS:=+qmodem`, so **installing the frontend is enough** —
 the backend is pulled in automatically.
 
 > `qmodem` now embeds what used to be eleven separate packages: `libqmodem-sms`,
@@ -34,14 +35,14 @@ the backend is pulled in automatically.
 ```sh
 # opkg (OpenWrt 23.05 and older)
 opkg update
-opkg install luci-app-qmodem luci-i18n-qmodem-zh-cn
+opkg install luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
 
 # apk (OpenWrt 24.10 / ImmortalWrt 25.12 and newer)
 apk update
-apk add luci-app-qmodem luci-i18n-qmodem-zh-cn
+apk add luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
 ```
 
-`opkg install qmodem luci-app-qmodem` is equivalent if you want to pin the backend
+`opkg install qmodem luci-app-qmodem-next` is equivalent if you want to pin the backend
 explicitly.
 
 > Compatibility baseline: OpenWrt / ImmortalWrt **25.12 and newer** (24.10 and older are no
@@ -66,11 +67,11 @@ arch suffix — pick the one matching your device:
 # OpenWrt (aarch64 shown; apk filenames drop the ipk `_cortex-a53` granularity)
 cd /tmp
 opkg install qmodem_*_aarch64_cortex-a53.ipk
-opkg install luci-app-qmodem_*_all.ipk
-opkg install luci-i18n-qmodem-zh-cn_*_all.ipk
+opkg install luci-app-qmodem-next_*_all.ipk
+opkg install luci-i18n-qmodem-next-zh-cn_*_all.ipk
 
 # ImmortalWrt (apk)
-apk add --allow-untrusted qmodem-*_aarch64.apk luci-app-qmodem-*.apk
+apk add --allow-untrusted qmodem-*_aarch64.apk luci-app-qmodem-next-*.apk
 ```
 
 > Assets built natively for ImmortalWrt carry an `-immortalwrt` suffix. Do not mix them
@@ -80,7 +81,7 @@ apk add --allow-untrusted qmodem-*_aarch64.apk luci-app-qmodem-*.apk
 
 TTL management (fw4/nft backend) is part of the unified packages: the service
 `/etc/init.d/qmodem_ttl` and the default config `/etc/config/qmodem_ttl` ship with
-`qmodem`, and the UI is the **TTL** page in `luci-app-qmodem`.
+`qmodem`, and the UI is the **TTL** page in `luci-app-qmodem-next`.
 
 - **Disabled by default**: TTL rewriting disables hardware flow offloading, so neither the
   `qmodem` uci-defaults hook nor its `postinst` enables `qmodem_ttl`. Turn it on explicitly
@@ -148,14 +149,14 @@ The full method table is in the [rpcd interface](../qmodem-rpcd-interface.zh-cn.
 
 ### 3.3 LuCI menu
 
-With `luci-app-qmodem` installed, a dedicated menu appears at **Modem → QModem → Overview**
+With `luci-app-qmodem-next` installed, a dedicated menu appears at **Modem → QModem → Overview**
 (route `admin/modem/qmodem/overview`). There are 18 pages: Overview, Statistics, Mobile
 Data, Radio and Cells, Dial and Network, Messages, SIM Messages, SMS Forwarding, Module and
 SIM, SIM Switch, AT Console, Network Monitor, Advanced, Modem Features, TTL, Device
 Parameters, Service and Scan, plus the SMS conversation page (not in the menu — reached
 from Messages).
 
-If the menu is missing, check that the browser account has the `luci-app-qmodem` ACL, then
+If the menu is missing, check that the browser account has the `luci-app-qmodem-next` ACL, then
 log in again; if necessary `rm -rf /tmp/luci-*cache` and hard-refresh the browser.
 
 ## 4. Minimal configuration
@@ -241,18 +242,21 @@ cross-compile the binary and ship it with the firmware:
 
 Older releases installed `qmodem` alongside a set of standalone packages (`qmodem-smsd`,
 `qmodem_monitor`, `tom_modem`, `ubus-at-daemon`, `sms-forwarder-next`, ...) and used
-`luci-app-qmodem-next` or the legacy Lua `luci-app-qmodem` as the frontend. Migration:
+`luci-app-qmodem-next` or the retired legacy Lua `luci-app-qmodem` as the frontend.
+Migration:
 
 ```sh
 # 1) remove the absorbed standalone packages first so they cannot fight over
 #    identically named files
 opkg remove qmodem-suite qmodem-smsd qmodem_monitor qmodem-settings tom_modem \
 	ubus-at-daemon sms-forwarder-next qmodem-seal 2>/dev/null
-opkg remove luci-app-qmodem-next luci-app-qmodem-monitor luci-app-qmodem-ttlfw4 \
-	luci-app-qmodem-ttl luci-app-qmodem-sms 2>/dev/null
+# the retired legacy Lua frontend (if still present on the device) must go too,
+# otherwise it fights over the menu and the LuCI cache
+opkg remove luci-app-qmodem luci-app-qmodem-sms luci-app-qmodem-ttl \
+	luci-app-qmodem-mwan luci-app-qmodem-hc 2>/dev/null
 
 # 2) install the new layout
-opkg install luci-app-qmodem luci-i18n-qmodem-zh-cn
+opkg install luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
 ```
 
 `/etc/config/qmodem`, `/etc/config/qmodem_sms`, `/etc/config/sms_forwarder`,

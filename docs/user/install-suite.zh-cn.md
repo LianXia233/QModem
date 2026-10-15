@@ -3,19 +3,19 @@
 [简体中文](install-suite.zh-cn.md) | [English](install-suite.en.md)
 
 > 状态：**两包形态**。自组件整合后，整套只剩两个包——`qmodem`（后端，按目标架构编译）
-> 与 `luci-app-qmodem`（前端，架构 `all`）。原 `qmodem-suite` 元包与其拉起的一批
-> 独立包均已退役，相关原因与替代关系见
-> [整合范围说明](../refactor/integration-scope.zh-cn.md)。
+> 与 `luci-app-qmodem-next`（前端，架构 `all`）。原 `qmodem-suite` 元包与其拉起的一批
+> 独立包均已退役，旧 Lua 版 `luci-app-qmodem` 已从仓库删除（不编译、不产出），相关原因
+> 与替代关系见[整合范围说明](../refactor/integration-scope.zh-cn.md)。
 
 ## 1. 包清单
 
 | 包 | 架构 | 职责 | 是否必需 |
 | --- | --- | --- | --- |
 | `qmodem` | 目标架构 | 一体化后端：模组识别与拨号脚本、ubus 数据服务、短信守护、统计采集、网络监控、SMS 转发、全部命令行工具 | 是 |
-| `luci-app-qmodem` | `all` | 唯一前端（纯 JavaScript），全部数据经 `qmodem` ubus 对象读取 | 推荐 |
-| `luci-i18n-qmodem-zh-cn` | `all` | 简体中文翻译 | 可选 |
+| `luci-app-qmodem-next` | `all` | 唯一前端（纯 JavaScript），全部数据经 `qmodem` ubus 对象读取 | 推荐 |
+| `luci-i18n-qmodem-next-zh-cn` | `all` | 简体中文翻译 | 可选 |
 
-`luci-app-qmodem` 已 `DEPENDS:=+qmodem`，所以**只装前端即可**，后端会被自动拉入。
+`luci-app-qmodem-next` 已 `DEPENDS:=+qmodem`，所以**只装前端即可**，后端会被自动拉入。
 
 > 后端 `qmodem` 内部已包含原先分散的 11 个包：`libqmodem-sms`、`tom_modem`、
 > `sms_tool_q`、`ubus-at-daemon`、`modem_scan`、`qmodem-smsd`、`qmodem-settings`、
@@ -30,14 +30,14 @@
 ```sh
 # opkg（OpenWrt 23.05 及更早）
 opkg update
-opkg install luci-app-qmodem luci-i18n-qmodem-zh-cn
+opkg install luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
 
 # apk（OpenWrt 24.10 / ImmortalWrt 25.12 及更新）
 apk update
-apk add luci-app-qmodem luci-i18n-qmodem-zh-cn
+apk add luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
 ```
 
-想显式确认后端版本也可写成 `opkg install qmodem luci-app-qmodem`，效果一致。
+想显式确认后端版本也可写成 `opkg install qmodem luci-app-qmodem-next`，效果一致。
 
 > 兼容基线：OpenWrt / ImmortalWrt **25.12 及更新**（不再支持 24.10 及更早）。
 > 25.12+ 基线由 CI 编译矩阵与文档强制，包元数据中没有版本约束表达式
@@ -60,11 +60,11 @@ apk add luci-app-qmodem luci-i18n-qmodem-zh-cn
 # OpenWrt（以 aarch64 为例；apk 文件名去掉了 ipk 的 `_cortex-a53` 细粒度）
 cd /tmp
 opkg install qmodem_*_aarch64_cortex-a53.ipk
-opkg install luci-app-qmodem_*_all.ipk
-opkg install luci-i18n-qmodem-zh-cn_*_all.ipk
+opkg install luci-app-qmodem-next_*_all.ipk
+opkg install luci-i18n-qmodem-next-zh-cn_*_all.ipk
 
 # ImmortalWrt（apk）
-apk add --allow-untrusted qmodem-*_aarch64.apk luci-app-qmodem-*.apk
+apk add --allow-untrusted qmodem-*_aarch64.apk luci-app-qmodem-next-*.apk
 ```
 
 > ImmortalWrt 原生构建的资产带 `-immortalwrt` 后缀，请勿与 OpenWrt 的资产混装
@@ -73,7 +73,7 @@ apk add --allow-untrusted qmodem-*_aarch64.apk luci-app-qmodem-*.apk
 ### 2.3 TTL 组件说明
 
 TTL 管理（fw4/nft 后端）已并入统一包：服务 `/etc/init.d/qmodem_ttl` 与默认配置
-`/etc/config/qmodem_ttl` 由 `qmodem` 携带，界面在 `luci-app-qmodem` 的 **TTL** 页。
+`/etc/config/qmodem_ttl` 由 `qmodem` 携带，界面在 `luci-app-qmodem-next` 的 **TTL** 页。
 
 - **默认关闭**：TTL 改写会关闭硬件流量分载，因此 `qmodem` 的 uci-defaults 与
   `postinst` 都刻意**不**启用 `qmodem_ttl`，需要时在 LuCI 中显式打开。
@@ -140,14 +140,14 @@ ubus call qmodem network_info '{"config_section":"modem1"}'
 
 ### 3.3 LuCI 菜单路径
 
-安装 `luci-app-qmodem` 后，Web 界面出现独立菜单：**Modem → QModem → Overview**
+安装 `luci-app-qmodem-next` 后，Web 界面出现独立菜单：**Modem → QModem → Overview**
 （路由 `admin/modem/qmodem/overview`）。共 18 个页面：
 
 概览 / 统计 / 移动数据 / 无线与小区 / 拨号与网络 / 消息 / SIM 短信 / SMS 转发 /
 模组与 SIM / SIM 切换 / AT 控制台 / 网络监控 / 高级 / 模组特性 / TTL / 设备参数 /
 服务与扫描 / 短信会话（会话页无菜单项，由消息页进入）。
 
-看不到菜单时，先确认浏览器账号已获得 `luci-app-qmodem` 的 ACL，然后重新登录；
+看不到菜单时，先确认浏览器账号已获得 `luci-app-qmodem-next` 的 ACL，然后重新登录；
 必要时 `rm -rf /tmp/luci-*cache` 并强制刷新浏览器缓存。
 
 ## 4. 最小可用配置
@@ -229,18 +229,19 @@ QModem 的 AT 命令走哪条底层通路由 `qmodem.main.at_tool` 全局决定�
 ## 8. 从旧版本升级
 
 旧版本会把 `qmodem` 与一批独立包（`qmodem-smsd`、`qmodem_monitor`、`tom_modem`、
-`ubus-at-daemon`、`sms-forwarder-next`…）分别安装，前端则是 `luci-app-qmodem-next`
-或旧 Lua 版 `luci-app-qmodem`。升级路径：
+`ubus-at-daemon`、`sms-forwarder-next`…）分别安装，前端可能是 `luci-app-qmodem-next`
+或已退役的旧 Lua 版 `luci-app-qmodem`。升级路径：
 
 ```sh
 # 1) 先卸掉被吸收的旧独立包，避免与新包争抢同名文件
 opkg remove qmodem-suite qmodem-smsd qmodem_monitor qmodem-settings tom_modem \
 	ubus-at-daemon sms-forwarder-next qmodem-seal 2>/dev/null
-opkg remove luci-app-qmodem-next luci-app-qmodem-monitor luci-app-qmodem-ttlfw4 \
-	luci-app-qmodem-ttl luci-app-qmodem-sms 2>/dev/null
+# 已退役的旧 Lua 前端（若设备上仍残留）务必卸载，避免菜单与缓存冲突
+opkg remove luci-app-qmodem luci-app-qmodem-sms luci-app-qmodem-ttl \
+	luci-app-qmodem-mwan luci-app-qmodem-hc 2>/dev/null
 
 # 2) 安装新形态
-opkg install luci-app-qmodem luci-i18n-qmodem-zh-cn
+opkg install luci-app-qmodem-next luci-i18n-qmodem-next-zh-cn
 ```
 
 `/etc/config/qmodem`、`/etc/config/qmodem_sms`、`/etc/config/sms_forwarder`、

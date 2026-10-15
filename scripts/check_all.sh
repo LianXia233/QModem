@@ -2,7 +2,7 @@
 # check_all.sh - QModem 一站式本地质量门禁
 # 用法:
 #   bash scripts/check_all.sh                 # 全量跑所有 stage
-#   bash scripts/check_all.sh --only shell    # 只跑某个 stage (shell|node|js-test|rust|c|crlf|rust-cross|lua-smoke)
+#   bash scripts/check_all.sh --only shell    # 只跑某个 stage (shell|node|js-test|rust|c|crlf|rust-cross)
 #   bash scripts/check_all.sh --changed       # 仅检查 git diff 涉及的文件
 #   FAST=1 bash scripts/check_all.sh          # 或 --fast：额外跑 rust-cross native 构建冒烟（默认 SKIP）
 # 汇总各 stage 结果，任一 FAIL 则退出码非 0。
@@ -290,20 +290,7 @@ stage_rust_cross() {
     return 0
 }
 
-# ---------- stage: lua-smoke (旧栈 lua 语法冒烟) ----------
-# 委托 tests/lua/smoke.sh：退出码 0 = 通过或脚本内部 SKIP，1 = 有语法错误。
-stage_lua_smoke() {
-    local t="tests/lua/smoke.sh"
-    [ -f "$t" ] || { record SKIP lua-smoke "tests/lua/smoke.sh 不存在"; return 0; }
-    if sh "$t" >/tmp/check_all_lua_smoke.log 2>&1; then
-        record PASS lua-smoke "tests/lua/smoke.sh 通过"
-    else
-        record FAIL lua-smoke "tests/lua/smoke.sh 失败 (见 /tmp/check_all_lua_smoke.log)"
-    fi
-    return 0
-}
-
-STAGES=(shell node js-test rust c crlf rust-cross lua-smoke)
+STAGES=(shell node js-test rust c crlf rust-cross)
 for stage in "${STAGES[@]}"; do
     should_run "$stage" || continue
     "stage_${stage//-/_}"

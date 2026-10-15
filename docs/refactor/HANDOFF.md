@@ -21,9 +21,8 @@
   以错误的 `-p1` 根路径误用）；脚本与服务载荷在 `files/`（120 个文件）。
   Makefile 里 `Build/Compile` 的**顺序即依赖顺序**：`libqmodem-sms` 先构建并发布到
   `$(STAGING_DIR)`，之后 `tom_modem` / `qmodem_smsd` 才能 `-lqmodem-sms` 链接。
-- **`luci-app-qmodem`**（`luci/luci-app-qmodem/`）：唯一前端。`qmodem.controls` 是唯一
-  对外入口（110 项导出），`qmodem.ui` / `qmodem.theme` / `qmodem.sms` 是内部实现层，
-  视图只 `require qmodem.controls`。
+- **`luci-app-qmodem-next`**（`luci/luci-app-qmodem-next/`）：唯一前端（纯 JS）。
+  旧 Lua 版 `luci/luci-app-qmodem/` 已从仓库删除，不再编译、不再产出。
 - **改完必须跑的门禁**：`node --check` 全量前端 JS、`compat_matrix.py`（端点）、
   `verify_layers.py`（导出面 / 孤儿引用）、`final_check.py`（i18n / 样式类 / CRLF），
   以及 `application/qmodem/tests/*.sh` 中的一致性断言脚本。
@@ -47,7 +46,7 @@
 cd rust && cargo test --workspace
 
 # LuCI 前端冒烟
-node luci/luci-app-qmodem/tests/test_sms_service.js
+node luci/luci-app-qmodem-next/tests/test_sms_service.js
 
 # Shell 语法（改动的脚本）
 sh -n application/qmodem/files/usr/share/qmodem/modem_hook.sh
