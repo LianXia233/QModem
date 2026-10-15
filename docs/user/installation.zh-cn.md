@@ -8,10 +8,10 @@ QModem 是一个 OpenWrt Feed，不是与任意固件通用的单个安装包。
 
 ```text
 qmodem
-luci-app-qmodem
+luci-app-qmodem-next
 ```
 
-`qmodem` 提供后端和运行服务，`luci-app-qmodem` 提供纯 JavaScript LuCI 页面。旧版 `luci-app-qmodem` 及其短信、MWAN、TTL 插件仍在仓库中，但不应与 Next 主界面同时安装。选择前先确认所需功能是否出现在对应界面中。
+`qmodem` 提供后端和运行服务，`luci-app-qmodem-next` 提供纯 JavaScript LuCI 页面。旧版 `luci-app-qmodem` 及其短信、MWAN、TTL 插件已从仓库删除，不再参与编译与发布产出；TTL 页另见 `luci-app-qmodem-ttlfw4`。选择前先确认所需功能是否出现在对应界面中。
 
 ## 从 OpenWrt 源码树构建
 

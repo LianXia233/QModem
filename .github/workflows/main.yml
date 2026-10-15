@@ -345,7 +345,7 @@ jobs:
           ./scripts/feeds install -a -p qmodem
           rm -rf feeds/base/package/kernel/gpio-button-hotplug
           # SDK 缓存命中时「初始化 SDK 环境」被跳过，缓存里的 .config 还是上一次
-          # 构建的选包结果（如旧的 luci-app-qmodem），新包不会被选中、也就不产出
+          # 构建的选包结果（含早已退役的旧包残留项），新包不会被选中、也就不产出
           # ipk/apk（报 missing required release package）。因此每次构建都按
           # openwrt_package.config 重新生成 .config（不 make clean，保留 build_dir 缓存）。
           echo "CONFIG_ALL_NONSHARED=n" > .config

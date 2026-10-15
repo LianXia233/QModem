@@ -62,7 +62,7 @@ ubus-at-daemon / tom_modem
 USB / PCIe cellular modem
 ```
 
-The core package is `qmodem` — an all-in-one backend that embeds what used to be eleven separate packages (`libqmodem-sms`, `tom_modem`, `sms_tool_q`, `ubus-at-daemon`, `modem_scan`, `qmodem-smsd`, `qmodem-settings`, `qmodem_monitor`, `sms-forwarder-next`, `quectel-CM-5G-M`, `qmodem-seal`). The unified pure-JavaScript frontend is `luci-app-qmodem`, which supersedes both the legacy Lua `luci-app-qmodem` UI and `luci-app-qmodem-next`. Installing `luci-app-qmodem` pulls `qmodem` in automatically. Platform-specific extras (`luci-app-qmodem-hc`, `luci-app-qmodem-mwan`) and the experimental voice stack stay separate. See [integration scope](docs/refactor/integration-scope.zh-cn.md).
+The core package is `qmodem` — an all-in-one backend that embeds what used to be eleven separate packages (`libqmodem-sms`, `tom_modem`, `sms_tool_q`, `ubus-at-daemon`, `modem_scan`, `qmodem-smsd`, `qmodem-settings`, `qmodem_monitor`, `sms-forwarder-next`, `quectel-CM-5G-M`, `qmodem-seal`). The unified pure-JavaScript frontend is `luci-app-qmodem-next` (the legacy Lua `luci-app-qmodem` UI was removed in 2026-10 — it is no longer built or released). Installing `luci-app-qmodem-next` pulls `qmodem` in automatically. The TTL page ships as `luci-app-qmodem-ttlfw4`, and the experimental voice stack stays separate. See [integration scope](docs/refactor/integration-scope.zh-cn.md).
 
 ## Retired legacy packages
 
@@ -76,7 +76,7 @@ Since 2026-10 the following **legacy Lua UI packages have been retired** (their 
 | `luci-app-qmodem-ttl` | Legacy TTL configuration | `luci-app-qmodem-ttlfw4` (Soft Anime modern UI) |
 | `luci-app-qmodem-mwan` | Multi-WAN configuration | `qmodem` built-in multi-WAN rules + official `luci-app-mwan3` |
 
-All legacy Lua UI packages are retired, resolving all menu conflicts with `luci-app-qmodem-next`. For all deployments use `luci-app-qmodem-next` and `luci-app-qmodem-ttlfw4` directly.
+The legacy Lua UI packages have been deleted from the repository: they are no longer built, released, or listed in menuconfig. New deployments use `luci-app-qmodem-next` and `luci-app-qmodem-ttlfw4` directly.
 
 ## Quick start
 
@@ -94,7 +94,7 @@ Then run:
 make menuconfig
 ```
 
-Select `luci-app-qmodem` under `LuCI -> Applications`. The target firmware must also contain USB, serial, QMI, MBIM, or MHI drivers matching the modem, protocol, kernel, and hardware topology.
+Select `luci-app-qmodem-next` under `LuCI -> Applications`. The target firmware must also contain USB, serial, QMI, MBIM, or MHI drivers matching the modem, protocol, kernel, and hardware topology.
 
 The detailed English manuals are currently maintained in the existing [user guide](docs/user-guide.md) and [developer guide](docs/developer-guide.md). The new structured documentation is being introduced in Chinese first (three documents are also available in English):
 
@@ -118,12 +118,12 @@ The AT command path is selectable via `qmodem.main.at_tool`: `0` tom_modem/ubus 
 ## Install
 
 The stack is two packages: `qmodem` (backend, built for the target architecture) and
-`luci-app-qmodem` (frontend, `all`). One command is enough — the frontend depends on the
+`luci-app-qmodem-next` (frontend, `all`). One command is enough — the frontend depends on the
 backend:
 
 ```sh
-opkg update && opkg install luci-app-qmodem    # opkg
-apk add luci-app-qmodem                        # apk (ImmortalWrt 25.12+ / OpenWrt snapshot)
+opkg update && opkg install luci-app-qmodem-next    # opkg
+apk add luci-app-qmodem-next                        # apk (ImmortalWrt 25.12+ / OpenWrt snapshot)
 ```
 
 `qmodem`'s `postinst` and its `uci-defaults` hook enable the backend daemons, fix script

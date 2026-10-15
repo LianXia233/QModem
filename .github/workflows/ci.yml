@@ -61,12 +61,8 @@ jobs:
         with:
           components: clippy
 
-      # 尽力而为：lua 语法检查失败不阻塞门禁
-      - name: Install lua5.1 (best effort)
-        continue-on-error: true
-        run: sudo apt-get update && sudo apt-get install -y lua5.1
-
       # 一站式门禁：shell / node / js-test / rust(cargo test + clippy) / c / crlf
+      # （旧 Lua 栈已退役，无 lua 检查阶段）
       - name: Run check_all.sh
         run: bash scripts/check_all.sh
 

@@ -63,7 +63,7 @@ ubus-at-daemon / tom_modem
 USB / PCIe 蜂窝模组
 ```
 
-核心包为 `qmodem` —— 一体化后端，已把原先分散的 11 个包（`libqmodem-sms`、`tom_modem`、`sms_tool_q`、`ubus-at-daemon`、`modem_scan`、`qmodem-smsd`、`qmodem-settings`、`qmodem_monitor`、`sms-forwarder-next`、`quectel-CM-5G-M`、`qmodem-seal`）收编进包内。统一前端为纯 JavaScript 的 `luci-app-qmodem`，取代旧 Lua 版 `luci-app-qmodem` 与 `luci-app-qmodem-next`。安装 `luci-app-qmodem` 会自动拉入 `qmodem`。平台专用的 `luci-app-qmodem-hc` / `luci-app-qmodem-mwan` 与实验性语音栈仍为独立包。详见[整合范围说明](docs/refactor/integration-scope.zh-cn.md)。
+核心包为 `qmodem` —— 一体化后端，已把原先分散的 11 个包（`libqmodem-sms`、`tom_modem`、`sms_tool_q`、`ubus-at-daemon`、`modem_scan`、`qmodem-smsd`、`qmodem-settings`、`qmodem_monitor`、`sms-forwarder-next`、`quectel-CM-5G-M`、`qmodem-seal`）收编进包内。统一前端为纯 JavaScript 的 `luci-app-qmodem-next`（旧 Lua 版 `luci-app-qmodem` 已于 2026-10 退役删除，不再编译、不再产出）。安装 `luci-app-qmodem-next` 会自动拉入 `qmodem`。TTL 界面另有 `luci-app-qmodem-ttlfw4`，实验性语音栈仍为独立包。详见[整合范围说明](docs/refactor/integration-scope.zh-cn.md)。
 
 ## 已移除的旧版组件（Retired Packages）
 
@@ -77,7 +77,7 @@ USB / PCIe 蜂窝模组
 | `luci-app-qmodem-ttl` | 旧版 TTL 配置 | `luci-app-qmodem-ttlfw4`（Soft Anime 现代界面） |
 | `luci-app-qmodem-mwan` | 多 WAN 配置 | `qmodem` 内置多拨规则 + 官方 `luci-app-mwan3` |
 
-所有旧版 Lua 界面已完全退役，消除了与 `luci-app-qmodem-next` 的菜单冲突。新部署请直接使用 `luci-app-qmodem-next` 与 `luci-app-qmodem-ttlfw4`。
+旧版 Lua 界面包已从仓库删除，不再参与编译与发布产出，也不再出现在 menuconfig 中；新部署直接使用 `luci-app-qmodem-next` 与 `luci-app-qmodem-ttlfw4`。
 
 ## 快速开始
 
@@ -95,7 +95,7 @@ src-git qmodem https://github.com/FUjr/QModem.git;main
 make menuconfig
 ```
 
-在 `LuCI -> Applications` 中选择 `luci-app-qmodem`。目标设备仍需具备与模组、拨号协议和当前内核匹配的 USB、串口、QMI、MBIM 或 MHI 驱动。
+在 `LuCI -> Applications` 中选择 `luci-app-qmodem-next`。目标设备仍需具备与模组、拨号协议和当前内核匹配的 USB、串口、QMI、MBIM 或 MHI 驱动。
 
 完整步骤见[安装指南](docs/user/installation.zh-cn.md)和[首次配置](docs/user/first-setup.zh-cn.md)。
 
@@ -135,12 +135,12 @@ AT 命令通路可经 `qmodem.main.at_tool` 选择：`0` tom_modem/ubus at-daemo
 
 ## 安装
 
-整套只剩两个包：`qmodem`（后端，按目标架构编译）与 `luci-app-qmodem`（前端，架构 `all`）。
+整套只剩两个包：`qmodem`（后端，按目标架构编译）与 `luci-app-qmodem-next`（前端，架构 `all`）。
 前端依赖后端，因此一条命令即可：
 
 ```sh
-opkg update && opkg install luci-app-qmodem    # opkg
-apk add luci-app-qmodem                        # apk（ImmortalWrt 25.12+ / OpenWrt snapshot）
+opkg update && opkg install luci-app-qmodem-next    # opkg
+apk add luci-app-qmodem-next                        # apk（ImmortalWrt 25.12+ / OpenWrt snapshot）
 ```
 
 `qmodem` 的 `postinst` 与其 `uci-defaults` 钩子会补脚本权限、启用各后端守护进程并重启

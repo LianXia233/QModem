@@ -388,13 +388,12 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./files/etc/uci-defaults/99-qmodem-board $(1)/etc/uci-defaults/
 	$(INSTALL_DIR) $(1)/lib/functions
 	$(INSTALL_DATA) ./files/lib/functions/qmodem-defaults.sh $(1)/lib/functions/
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/admin_status/index
-	$(INSTALL_DATA) ./files/usr/lib/lua/luci/view/admin_status/index/modem_overview.htm \
-		$(1)/usr/lib/lua/luci/view/admin_status/index/
-	# 注意：/usr/share/rpcd/acl.d/luci-app-qmodem.json 由前端包
-	# luci-app-qmodem 提供（含完整 UI 权限面）。后端不再安装同名文件，
+	# 注意：/usr/share/rpcd/acl.d/luci-app-qmodem-next.json 由前端包
+	# luci-app-qmodem-next 提供（含完整 UI 权限面）。后端不安装同名文件，
 	# 否则两个包会争抢同一路径；原先此文件里的 luci-mod-status-index
 	# → modem_ctrl 授权已合并进前端包的 ACL。
+	# 旧 Lua 栈的 admin_status/index/modem_overview.htm 模板已随退役删除，
+	# 后端不再向 /usr/lib/lua/ 落任何文件。
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) ./files/usr/share/rpcd/acl.d/qmodem.json $(1)/usr/share/rpcd/acl.d/
 	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
