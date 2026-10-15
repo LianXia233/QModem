@@ -778,10 +778,13 @@ base_info()
 
     #Name（名称）
     name=$(cmd_cgmm "$at_port" | grep "+CGMM: " | awk -F'"' '{print $2}')
+    [ -z "$name" ] && name=$(cmd_cgmm "$at_port" | grep -v -E '^(OK|ERROR|\+CME|\+CMS|$)' | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | head -n 1)
     #Manufacturer（制造商）
     manufacturer=$(cmd_cgmi "$at_port" | grep "+CGMI: " | awk -F'"' '{print $2}')
+    [ -z "$manufacturer" ] && manufacturer=$(cmd_cgmi "$at_port" | grep -v -E '^(OK|ERROR|\+CME|\+CMS|$)' | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | head -n 1)
     #Revision（固件版本）
     revision=$(cmd_cgmr "$at_port" | grep "+CGMR: " | awk -F'"' '{print $2}')
+    [ -z "$revision" ] && revision=$(cmd_cgmr "$at_port" | grep -v -E '^(OK|ERROR|\+CME|\+CMS|$)' | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | head -n 1)
 
     class="Base Information"
     add_plain_info_entry "name" "$name" "Name"
@@ -820,6 +823,7 @@ sim_info()
 
     #IMEI（国际移动设备识别码）
 	imei=$(cmd_cgsn "$at_port" | grep "+CGSN: " | awk -F'"' '{print $2}')
+    [ -z "$imei" ] && imei=$(cmd_cgsn "$at_port" | grep -o -E '[0-9]{14,17}' | head -n 1)
 
     #SIM Status（SIM状态）
 	sim_status_flag=$(cmd_cpin_query "$at_port" | grep "+CPIN: ")
@@ -890,6 +894,7 @@ sim_info()
 get_imei()
 {
     imei=$(cmd_cgsn "$at_port" | grep "+CGSN: " | awk -F'"' '{print $2}'| grep -E '[0-9]+')
+    [ -z "$imei" ] && imei=$(cmd_cgsn "$at_port" | grep -o -E '[0-9]{14,17}' | head -n 1)
     json_add_string "imei" "$imei"
 }
 

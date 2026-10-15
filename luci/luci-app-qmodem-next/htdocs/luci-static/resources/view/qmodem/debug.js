@@ -4,7 +4,7 @@
 'require dom';
 'require qmodem.qmodem as qmodem';
 
-// Load shared QModem Soft Anime design system with daily cache-bust
+// Load shared QModem Soft Anime design system with cache-bust
 document.head.appendChild(E('link', {
 	'rel': 'stylesheet',
 	'type': 'text/css',
@@ -15,6 +15,12 @@ function createSvg(html) {
 	var div = document.createElement('div');
 	div.innerHTML = html.trim();
 	return div.firstChild;
+}
+
+function formatTime() {
+	var now = new Date();
+	var pad = function(n) { return (n < 10 ? '0' : '') + n; };
+	return pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
 }
 
 return view.extend({
@@ -78,7 +84,10 @@ return view.extend({
 		leftBar.appendChild(select);
 		selectorSection.appendChild(leftBar);
 
-		var rightStatus = E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Serial Ready'));
+		var rightStatus = E('span', { 'class': 'qmodem-chip qmodem-chip-success' }, [
+			E('span', { 'class': 'qmodem-dot qmd-pulse', 'style': 'margin-right: 6px;' }),
+			_('Serial Engine Online')
+		]);
 		selectorSection.appendChild(rightStatus);
 		container.appendChild(selectorSection);
 
@@ -102,7 +111,6 @@ return view.extend({
 	},
 
 	createAtInterface: function(modem) {
-		var self = this;
 		var wrap = E('div', {});
 
 		// Loading indicator
@@ -110,6 +118,10 @@ return view.extend({
 			E('div', { 'class': 'spinning' }, _('Initializing AT interface for %s...').format(modem.name))
 		]);
 		wrap.appendChild(loadingCard);
+
+		// Command History State
+		var cmdHistory = [];
+		var historyIndex = -1;
 
 		// Load AT configuration
 		qmodem.getAtCfg(modem.id).then(function(cfg) {
@@ -123,18 +135,18 @@ return view.extend({
 			if (cfg.at_cfg.ports) ports = ports.concat(cfg.at_cfg.ports);
 			if (cfg.at_cfg.other_ttys) ports = ports.concat(cfg.at_cfg.other_ttys);
 
-			// Configuration Card: Port selection + Ubus Mode
+			// Configuration Card: Port selection + Info Chips
 			var configCard = E('div', { 'class': 'cbi-section', 'style': 'margin-bottom: 16px; padding: 14px 18px;' });
 			var configRow = E('div', { 'style': 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;' });
 
 			// Port Selector
-			var portField = E('div', { 'style': 'display: flex; align-items: center; gap: 8px;' });
+			var portField = E('div', { 'style': 'display: flex; align-items: center; gap: 10px;' });
 			portField.appendChild(E('label', { 'style': 'font-weight: 600; font-size: 13px; color: var(--qmd-text-2);' }, _('AT Port') + ':'));
 			
 			var portSelect = E('select', {
 				'class': 'cbi-input-select',
 				'id': 'at_port_' + modem.id,
-				'style': 'min-width: 180px;'
+				'style': 'min-width: 190px;'
 			});
 			var currentPort = cfg.at_cfg.using_port || (ports.length > 0 ? ports[0] : '');
 			ports.forEach(function(p) {
@@ -145,62 +157,141 @@ return view.extend({
 			portField.appendChild(portSelect);
 			configRow.appendChild(portField);
 
-			// Ubus Mode Toggle
-			var ubusField = E('div', { 'style': 'display: flex; align-items: center; gap: 8px;' });
-			var ubusCheckbox = E('input', {
-				'type': 'checkbox',
-				'id': 'use_ubus_' + modem.id,
-				'checked': modem.use_ubus !== '0'
-			});
-			ubusField.appendChild(ubusCheckbox);
-			ubusField.appendChild(E('label', { 'for': 'use_ubus_' + modem.id, 'style': 'font-size: 13px; cursor: pointer;' },
-				_('Use Ubus AT Daemon (non-blocking)')));
-			configRow.appendChild(ubusField);
+			// Port Info Badges
+			var infoBadges = E('div', { 'style': 'display: flex; align-items: center; gap: 8px; flex-wrap: wrap;' }, [
+				E('span', { 'class': 'qmodem-chip qmodem-chip-muted' }, '115200 8N1'),
+				E('span', { 'class': 'qmodem-chip qmodem-chip-info', 'id': 'active_port_badge_' + modem.id }, 
+					currentPort ? currentPort : _('Default Port'))
+			]);
+			configRow.appendChild(infoBadges);
 			configCard.appendChild(configRow);
 			wrap.appendChild(configCard);
 
-			// Quick Commands Section
-			var quickCard = E('div', { 'class': 'cbi-section', 'style': 'margin-bottom: 16px; padding: 12px 18px;' });
-			quickCard.appendChild(E('div', { 'style': 'font-size: 12.5px; font-weight: 600; color: var(--qmd-text-2); margin-bottom: 8px;' },
-				_('Quick Diagnostic Presets')));
-			
-			var quickChips = E('div', { 'style': 'display: flex; flex-wrap: wrap; gap: 8px;' });
-			
-			// Built-in popular AT commands
-			var standardCmds = [
-				{ name: 'ATI (Info)', value: 'ATI' },
-				{ name: 'AT+CSQ (Signal)', value: 'AT+CSQ' },
-				{ name: 'AT+CPIN? (SIM)', value: 'AT+CPIN?' },
-				{ name: 'AT+CEREG? (EPS)', value: 'AT+CEREG?' },
-				{ name: 'AT+COPS? (Operator)', value: 'AT+COPS?' },
-				{ name: 'AT+CIMI (IMSI)', value: 'AT+CIMI' }
+			// Update Port Badge on change
+			portSelect.addEventListener('change', function() {
+				var badge = document.getElementById('active_port_badge_' + modem.id);
+				if (badge) badge.textContent = portSelect.value || _('Default Port');
+			});
+
+			// Categorized Diagnostic Presets
+			var quickCard = E('div', { 'class': 'cbi-section', 'style': 'margin-bottom: 16px; padding: 16px 20px;' });
+			quickCard.appendChild(E('div', { 'style': 'font-size: 13px; font-weight: 700; color: var(--qmd-text-1); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;' }, [
+				createSvg('<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--qmd-primary)" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'),
+				E('span', {}, _('Quick Diagnostic Presets'))
+			]));
+
+			var presetGroups = [
+				{
+					category: _('Device Info'),
+					colorClass: 'qmodem-preset-device',
+					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+					cmds: [
+						{ name: 'ATI', label: _('Overview'), desc: _('Device Overview') },
+						{ name: 'AT+CGMM', label: _('Model'), desc: _('Device Model') },
+						{ name: 'AT+CGMI', label: _('Vendor'), desc: _('Manufacturer') },
+						{ name: 'AT+CGMR', label: _('Firmware'), desc: _('Revision & Version') },
+						{ name: 'AT+CGSN', label: _('IMEI'), desc: _('IMEI Number') }
+					]
+				},
+				{
+					category: _('Signal & Network'),
+					colorClass: 'qmodem-preset-signal',
+					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V4"/></svg>',
+					cmds: [
+						{ name: 'AT+CSQ', label: _('Signal CSQ'), desc: _('Signal Quality (0-31)') },
+						{ name: 'AT+CESQ', label: _('Ext Signal'), desc: _('Extended Signal (RSRP/RSRQ)') },
+						{ name: 'AT+COPS?', label: _('Operator'), desc: _('Current Network Operator') },
+						{ name: 'AT+CEREG?', label: _('EPS Reg'), desc: _('Network Registration Status') },
+						{ name: 'AT+CGPADDR', label: _('PDP IP'), desc: _('Modem IP Address') }
+					]
+				},
+				{
+					category: _('SIM & Card Slot'),
+					colorClass: 'qmodem-preset-sim',
+					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="7" y2="8"/><line x1="7" y1="12" x2="7" y2="12"/></svg>',
+					cmds: [
+						{ name: 'AT+CPIN?', label: _('SIM Status'), desc: _('PIN / SIM Ready State') },
+						{ name: 'AT+CIMI', label: _('IMSI'), desc: _('Subscriber Identity') },
+						{ name: 'AT+CCID', label: _('ICCID'), desc: _('SIM Card ICCID') },
+						{ name: 'AT+GTDUALSIM?', label: _('Dual SIM'), desc: _('SIM Slot Status') }
+					]
+				},
+				{
+					category: _('Hardware & RF'),
+					colorClass: 'qmodem-preset-hw',
+					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+					cmds: [
+						{ name: 'AT+CBC', label: _('Voltage'), desc: _('Supply Voltage') },
+						{ name: 'AT+GTSENRDTEMP=1', label: _('Temp'), desc: _('Module Temperature') },
+						{ name: 'AT+CFUN?', label: _('RF State'), desc: _('Radio Power Function') },
+						{ name: 'AT+CFUN=1', label: _('Restart RF'), desc: _('Full Radio Reset') }
+					]
+				}
 			];
 
-			// Merge custom commands from cfg
-			if (cfg.at_cfg.cmds && Array.isArray(cfg.at_cfg.cmds)) {
+			// Append custom commands if present in configuration
+			if (cfg.at_cfg.cmds && Array.isArray(cfg.at_cfg.cmds) && cfg.at_cfg.cmds.length > 0) {
+				var customCmds = [];
 				cfg.at_cfg.cmds.forEach(function(c) {
-					if (c.name && c.value) standardCmds.push(c);
+					if (c.name && c.value) {
+						var cleanLabel = c.name.replace(/>.*$/, '').replace(/•.*$/, '').trim();
+						if (!cleanLabel) cleanLabel = c.name;
+						customCmds.push({ name: c.value, label: cleanLabel, desc: c.name });
+					}
 				});
+				if (customCmds.length > 0) {
+					presetGroups.push({
+						category: _('Custom Commands'),
+						colorClass: 'qmodem-preset-custom',
+						icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+						cmds: customCmds
+					});
+				}
 			}
 
-			standardCmds.forEach(function(cmd) {
-				var chip = E('button', {
-					'class': 'qmodem-preset-btn',
-					'type': 'button',
-					'click': function() {
-						var input = document.getElementById('at_command_' + modem.id);
-						if (input) {
-							input.value = cmd.value;
-							input.focus();
-						}
-					}
-				}, [
-					createSvg('<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'),
-					E('span', {}, cmd.name)
+			// Render preset categories
+			presetGroups.forEach(function(group) {
+				var catBox = E('div', { 'class': 'qmodem-preset-category' });
+				
+				var catTitle = E('div', { 'class': 'qmodem-preset-cat-title' }, [
+					createSvg(group.icon),
+					E('span', {}, group.category)
 				]);
-				quickChips.appendChild(chip);
+				catBox.appendChild(catTitle);
+
+				var pillRow = E('div', { 'style': 'display: flex; flex-wrap: wrap; gap: 8px;' });
+				group.cmds.forEach(function(cmd) {
+					var labelElements = [
+						E('span', { 'style': 'font-weight: 700; font-family: monospace;' }, cmd.name)
+					];
+					if (cmd.label && cmd.label !== cmd.name) {
+						labelElements.push(E('span', { 'style': 'font-size: 11px; opacity: 0.75;' }, '• ' + cmd.label));
+					}
+					var pill = E('button', {
+						'class': 'qmodem-preset-pill ' + group.colorClass,
+						'type': 'button',
+						'title': cmd.desc + ' (' + cmd.name + ')',
+						'click': function() {
+							var input = document.getElementById('at_command_' + modem.id);
+							if (input) {
+								input.value = cmd.name;
+								input.focus();
+							}
+						},
+						'dblclick': function() {
+							var input = document.getElementById('at_command_' + modem.id);
+							if (input) {
+								input.value = cmd.name;
+								executeCommand();
+							}
+						}
+					}, labelElements);
+					pillRow.appendChild(pill);
+				});
+				catBox.appendChild(pillRow);
+				quickCard.appendChild(catBox);
 			});
-			quickCard.appendChild(quickChips);
+
 			wrap.appendChild(quickCard);
 
 			// macOS / Soft Anime Cyber Terminal Frame
@@ -212,14 +303,20 @@ return view.extend({
 				E('span', { 'class': 'qmodem-terminal-dot dot-pink' }),
 				E('span', { 'class': 'qmodem-terminal-dot dot-yellow' }),
 				E('span', { 'class': 'qmodem-terminal-dot dot-mint' }),
-				E('span', { 'style': 'font-size: 12px; font-weight: 600; color: var(--qmd-text-2); margin-left: 8px;' },
-					_('Serial Console') + ' — ' + modem.name)
+				E('span', { 'style': 'font-size: 12.5px; font-weight: 600; color: var(--qmd-text-2); margin-left: 10px;' }, [
+					_('Serial Console'),
+					E('span', { 'style': 'opacity: 0.6; margin: 0 4px;' }, '—'),
+					E('span', { 'style': 'color: var(--qmd-primary); font-weight: 700;' }, modem.name)
+				])
 			]);
 
 			var termActions = E('div', { 'style': 'display: flex; gap: 8px;' });
+			
+			// Copy Output Button
 			var copyBtn = E('button', {
 				'class': 'qmodem-preset-btn',
 				'type': 'button',
+				'title': _('Copy terminal content to clipboard'),
 				'click': function() {
 					var resp = document.getElementById('at_response_' + modem.id);
 					if (resp && resp.value) {
@@ -231,19 +328,21 @@ return view.extend({
 					}
 				}
 			}, [
-				createSvg('<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'),
+				createSvg('<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'),
 				E('span', {}, _('Copy Output'))
 			]);
 
+			// Clear Output Button
 			var clearBtn = E('button', {
 				'class': 'qmodem-preset-btn',
 				'type': 'button',
+				'title': _('Clear terminal screen'),
 				'click': function() {
 					var resp = document.getElementById('at_response_' + modem.id);
 					if (resp) resp.value = '';
 				}
 			}, [
-				createSvg('<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'),
+				createSvg('<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>'),
 				E('span', {}, _('Clear'))
 			]);
 
@@ -259,7 +358,7 @@ return view.extend({
 				'class': 'qmodem-terminal-body',
 				'readonly': 'readonly',
 				'rows': 16,
-				'placeholder': _('Ready. Type an AT command below or click a diagnostic preset.')
+				'placeholder': _('Ready. Type an AT command below or select a diagnostic preset above.\nUse ↑ / ↓ arrow keys to cycle through previous command history.')
 			});
 			terminalFrame.appendChild(responseTextarea);
 
@@ -271,58 +370,91 @@ return view.extend({
 				'type': 'text',
 				'class': 'cbi-input-text',
 				'id': 'at_command_' + modem.id,
-				'style': 'flex: 1; font-family: monospace; font-size: 13.5px; height: 38px;',
-				'placeholder': 'AT+CSQ'
+				'style': 'flex: 1; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13.5px; height: 38px; border-radius: 8px;',
+				'placeholder': 'ATI, AT+CSQ, AT+CPIN?...'
 			});
 
 			var executeCommand = function() {
 				var port = portSelect.value;
 				var cmd = cmdInput.value.trim();
-				var useUbus = ubusCheckbox.checked ? '1' : '0';
 
 				if (!cmd) {
 					ui.addNotification(null, E('p', _('Please enter an AT command')), 'warning');
 					return;
 				}
 
+				// Push into history
+				if (cmdHistory[cmdHistory.length - 1] !== cmd) {
+					cmdHistory.push(cmd);
+				}
+				historyIndex = cmdHistory.length;
+
 				sendBtn.disabled = true;
-				sendBtn.classList.add('spinning');
-				responseTextarea.value += (responseTextarea.value ? '\n\n' : '') + '>>> ' + cmd + '\n... sending ...';
+				var originalBtnHtml = sendBtn.innerHTML;
+				sendBtn.innerHTML = '<span class="spinning"></span> ' + _('Executing...');
+
+				var timestamp = formatTime();
+				var sendEntry = '[' + timestamp + '] >>> ' + cmd + '\n... sending ...';
+				responseTextarea.value += (responseTextarea.value ? '\n\n' : '') + sendEntry;
 				responseTextarea.scrollTop = responseTextarea.scrollHeight;
 
-				qmodem.sendAt(modem.id, port, cmd, useUbus).then(function(result) {
+				qmodem.sendAt(modem.id, port, cmd).then(function(result) {
 					sendBtn.disabled = false;
-					sendBtn.classList.remove('spinning');
+					sendBtn.innerHTML = originalBtnHtml;
+
 					var text = '';
 					if (result && result.at_cfg) {
-						var statusStr = result.at_cfg.status === '1' ? 'OK' : 'ERROR';
-						text = '[' + statusStr + ']\n' + (result.at_cfg.res || _('No response content'));
+						var isOk = result.at_cfg.status === '1';
+						var statusTag = isOk ? '[OK]' : '[ERROR]';
+						var resContent = (result.at_cfg.res || '').trim();
+						if (!resContent) {
+							resContent = isOk ? 'OK' : (result.at_cfg.error || _('No response content'));
+						}
+						text = statusTag + '\n' + resContent;
 					} else {
-						text = _('[No response received]');
+						text = _('[No response received from modem]');
 					}
-					// Replace sending line with response
+
 					responseTextarea.value = responseTextarea.value.replace(/\n\.\.\. sending \.\.\.$/, '\n' + text);
 					responseTextarea.scrollTop = responseTextarea.scrollHeight;
 				}).catch(function(e) {
 					sendBtn.disabled = false;
-					sendBtn.classList.remove('spinning');
-					responseTextarea.value = responseTextarea.value.replace(/\n\.\.\. sending \.\.\.$/, '\n[ERROR: ' + e.message + ']');
+					sendBtn.innerHTML = originalBtnHtml;
+					responseTextarea.value = responseTextarea.value.replace(/\n\.\.\. sending \.\.\.$/, '\n[RPC ERROR: ' + e.message + ']');
 					responseTextarea.scrollTop = responseTextarea.scrollHeight;
 				});
 			};
 
+			// Send Button
 			var sendBtn = E('button', {
-				'class': 'cbi-button cbi-button-action',
+				'class': 'qmodem-btn-send',
 				'type': 'button',
-				'style': 'min-height: 38px; padding: 0 20px; font-weight: 600;',
 				'click': executeCommand
-			}, _('Send Command'));
+			}, [
+				createSvg('<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>'),
+				E('span', {}, _('Send Command'))
+			]);
 
-			// Enter key trigger
+			// Keyboard Listeners: Enter to execute, Up/Down for command history
 			cmdInput.addEventListener('keydown', function(ev) {
 				if (ev.key === 'Enter') {
 					ev.preventDefault();
 					executeCommand();
+				} else if (ev.key === 'ArrowUp') {
+					ev.preventDefault();
+					if (cmdHistory.length > 0 && historyIndex > 0) {
+						historyIndex--;
+						cmdInput.value = cmdHistory[historyIndex];
+					}
+				} else if (ev.key === 'ArrowDown') {
+					ev.preventDefault();
+					if (historyIndex < cmdHistory.length - 1) {
+						historyIndex++;
+						cmdInput.value = cmdHistory[historyIndex];
+					} else {
+						historyIndex = cmdHistory.length;
+						cmdInput.value = '';
+					}
 				}
 			});
 

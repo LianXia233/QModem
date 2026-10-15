@@ -2934,3 +2934,132 @@ msgstr "SIM 卡短信存储"
 
 msgid "Sender"
 msgstr "发送方"
+
+msgid "Serial Engine Online"
+msgstr "串口引擎就绪"
+
+msgid "Default Port"
+msgstr "默认端口"
+
+msgid "Quick Diagnostic Presets"
+msgstr "快捷诊断指令"
+
+msgid "Device Info"
+msgstr "设备信息"
+
+msgid "Overview"
+msgstr "总览"
+
+msgid "Device Overview"
+msgstr "设备基本信息总览"
+
+msgid "Model"
+msgstr "型号"
+
+msgid "Device Model"
+msgstr "模组硬件型号"
+
+msgid "Vendor"
+msgstr "厂商"
+
+msgid "Firmware"
+msgstr "固件"
+
+msgid "Revision & Version"
+msgstr "固件版本识别"
+
+msgid "IMEI Number"
+msgstr "国际移动设备识别码 (IMEI)"
+
+msgid "Signal & Network"
+msgstr "信号与网络"
+
+msgid "Signal CSQ"
+msgstr "信号 CSQ"
+
+msgid "Signal Quality (0-31)"
+msgstr "信号质量 (0-31)"
+
+msgid "Ext Signal"
+msgstr "扩展信号"
+
+msgid "Extended Signal (RSRP/RSRQ)"
+msgstr "扩展信号质量 (RSRP/RSRQ)"
+
+msgid "Current Network Operator"
+msgstr "当前驻网运营商"
+
+msgid "EPS Reg"
+msgstr "网络注册"
+
+msgid "Network Registration Status"
+msgstr "4G/5G 网络注册状态"
+
+msgid "PDP IP"
+msgstr "PDP IP"
+
+msgid "Modem IP Address"
+msgstr "模组 PDP IP 地址"
+
+msgid "SIM & Card Slot"
+msgstr "SIM 与卡槽"
+
+msgid "PIN / SIM Ready State"
+msgstr "PIN / SIM 卡就绪状态"
+
+msgid "Subscriber Identity"
+msgstr "国际移动用户识别码 (IMSI)"
+
+msgid "ICCID"
+msgstr "ICCID 卡号"
+
+msgid "SIM Card ICCID"
+msgstr "SIM 卡集成电路卡识别码"
+
+msgid "Dual SIM"
+msgstr "双卡状态"
+
+msgid "SIM Slot Status"
+msgstr "双卡与卡槽切换状态"
+
+msgid "Hardware & RF"
+msgstr "硬件与射频"
+
+msgid "Supply Voltage"
+msgstr "模组工作供电电压"
+
+msgid "Temp"
+msgstr "射频温度"
+
+msgid "Module Temperature"
+msgstr "模组射频工作温度"
+
+msgid "RF State"
+msgstr "射频状态"
+
+msgid "Radio Power Function"
+msgstr "射频功能全开关状态"
+
+msgid "Restart RF"
+msgstr "重启射频"
+
+msgid "Full Radio Reset"
+msgstr "重启射频协议栈"
+
+msgid "Custom Commands"
+msgstr "自定义指令"
+
+msgid "Clear terminal screen"
+msgstr "清空终端屏幕"
+
+msgid "Copy terminal content to clipboard"
+msgstr "复制终端内容到剪贴板"
+
+msgid "Executing..."
+msgstr "执行中..."
+
+msgid "Ready. Type an AT command below or select a diagnostic preset above.\nUse ↑ / ↓ arrow keys to cycle through previous command history."
+msgstr "终端就绪。请在下方输入 AT 指令或点击上方快捷诊断预设。\n支持使用键盘 ↑ / ↓ 方向键调取历史指令记录。"
+
+msgid "[No response received from modem]"
+msgstr "[模组未返回响应]"
