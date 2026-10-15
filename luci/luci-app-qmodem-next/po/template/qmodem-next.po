@@ -3565,3 +3565,12 @@ msgstr ""
 #: view/qmodem/network_config.js:345
 msgid "quectel-CM will append the DNS server to the resolv.conf file by default.if you do not want to modify the resolv.conf file, please check this option."
 msgstr ""
+#: view/qmodem/overview.js:484
+msgid "Modem Dashboard"
+msgstr ""
+#: view/qmodem/overview.js:486
+msgid "%d modem(s) detected"
+msgstr ""
+#: view/qmodem/overview.js:489
+msgid "Signal, SIM and network overview. Drag cards to reorder, click a title to collapse."
+msgstr ""

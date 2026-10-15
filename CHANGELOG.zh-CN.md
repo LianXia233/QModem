@@ -18,6 +18,13 @@
 - **`luci-app-qmodem-ttlfw4` 完整接入 Soft Anime 设计系统**：引入自包含 `soft-anime.css`（避免跨包 404）、Pastel Glass 警示卡片组件、按天资源缓存防呆（cache-bust）并修正 init.d 脚本中的 bashism。
 - **`luci-app-qmodem-monitor` 状态指示体验升级**：服务启用/运行状态全面接入 `.qmodem-chip` 与 `.qmodem-status-row` 状态胶囊徽章。
 
+### 修复（Fixed）
+- **补齐概览页 Hero 区缺失的中文翻译**：Soft Anime 概览页新增的三条 UI 文案
+  （`Modem Dashboard`、`%d modem(s) detected` 与 Hero 副标题）从未被提取进翻译
+  目录，导致简体中文界面下 Hero 区仍显示英文，而页面其余部分已翻译（实机安装
+  1.1.1 构建后观察到）。三条文案现已加入 `po/template/qmodem-next.po`，
+  并在 `po/zh_Hans/luci-app-qmodem-next.po` 中完成翻译。
+
 ## [1.1.1] - 2026-10-14
 
 ### 修复（Fixed）

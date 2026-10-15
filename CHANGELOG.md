@@ -11,12 +11,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
-### Removed
-- **Legacy Lua UI packages removed**: `luci-app-qmodem` (Lua), `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`, `luci-app-qmodem-hc`, `luci-app-qmodem-mwan` have been deleted from `luci/`. Essential hardware and daemon scripts (`modem_sim.sh`, `modem_mwan.sh`, `qmodem_hc_sim`, `qmodem_mwan`, `99-setup-mwan`, `01-reload-mwan3.dhcpscript`) were migrated directly into the all-in-one `qmodem` backend package. This permanently resolves the menu routing conflict between legacy Lua controllers and modern JS views.
-
 ### Added
 - **Soft Anime design system for `luci-app-qmodem-ttlfw4`**: self-contained `soft-anime.css`, Pastel Glass warning cards, daily cache-busting, and bashism cleanup.
 - **Enhanced service status chips for `luci-app-qmodem-monitor`**: unified `.qmodem-chip` and `.qmodem-status-row` pill badges for service state.
+
+### Removed
+- **Legacy Lua UI packages removed**: `luci-app-qmodem` (Lua), `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`, `luci-app-qmodem-hc`, `luci-app-qmodem-mwan` have been deleted from `luci/`. Essential hardware and daemon scripts (`modem_sim.sh`, `modem_mwan.sh`, `qmodem_hc_sim`, `qmodem_mwan`, `99-setup-mwan`, `01-reload-mwan3.dhcpscript`) were migrated directly into the all-in-one `qmodem` backend package. This permanently resolves the menu routing conflict between legacy Lua controllers and modern JS views. These five packages were previously flagged `DEPRECATED` in the `[Unreleased]` section; that entry is superseded by this one because they were removed outright rather than kept through a transition period.
+
+### Fixed
+- **Missing translations for the new overview hero strings**: the Soft Anime
+  overview introduced three new UI strings (`Modem Dashboard`,
+  `%d modem(s) detected`, and the hero subtitle) that were never extracted
+  into the translation catalog, so a Chinese (`zh_Hans`) interface rendered
+  the hero band in English while the rest of the page was translated
+  (observed on a live device after installing the 1.1.1 build). The three
+  strings are now present in `po/template/qmodem-next.po` and translated in
+  `po/zh_Hans/luci-app-qmodem-next.po`.
 
 ## [1.1.1] - 2026-10-14
 
