@@ -41,22 +41,19 @@ USB / PCIe cellular modem
 
 The core package is `qmodem` — an all-in-one backend that embeds what used to be eleven separate packages (`libqmodem-sms`, `tom_modem`, `sms_tool_q`, `ubus-at-daemon`, `modem_scan`, `qmodem-smsd`, `qmodem-settings`, `qmodem_monitor`, `sms-forwarder-next`, `quectel-CM-5G-M`, `qmodem-seal`). The unified pure-JavaScript frontend is `luci-app-qmodem`, which supersedes both the legacy Lua `luci-app-qmodem` UI and `luci-app-qmodem-next`. Installing `luci-app-qmodem` pulls `qmodem` in automatically. Platform-specific extras (`luci-app-qmodem-hc`, `luci-app-qmodem-mwan`) and the experimental voice stack stay separate. See [integration scope](docs/refactor/integration-scope.zh-cn.md).
 
-## Deprecated packages
+## Retired legacy packages
 
-Since 2026-10 the following **legacy Lua UI packages are deprecated**; they are kept
-for transition only and will be removed in a future release:
+Since 2026-10 the following **legacy Lua UI packages have been retired** (their backend daemons and scripts are now incorporated into the all-in-one `qmodem` package); the entire web UI is unified on modern JavaScript:
 
-| Package | Purpose | Replacement |
+| Retired Package | Purpose | Modern Replacement |
 |---|---|---|
 | `luci-app-qmodem` (Lua) | Legacy LuCI UI | `luci-app-qmodem-next` (Soft Anime modern UI) |
-| `luci-app-qmodem-hc` | HC-G80 SIM switch | `luci-app-qmodem-next` + `luci-app-qmodem-monitor` |
+| `luci-app-qmodem-hc` | HC-G80 SIM switch | `luci-app-qmodem-next` (SIM switch view) + `qmodem` built-in script |
 | `luci-app-qmodem-sms` | Legacy SMS forwarding | Built-in SMS suite in `luci-app-qmodem-next` |
-| `luci-app-qmodem-ttl` | TTL configuration | To be merged into the modern UI |
-| `luci-app-qmodem-mwan` | Multi-WAN configuration | To be merged into the modern UI |
+| `luci-app-qmodem-ttl` | Legacy TTL configuration | `luci-app-qmodem-ttlfw4` (Soft Anime modern UI) |
+| `luci-app-qmodem-mwan` | Multi-WAN configuration | `qmodem` built-in multi-WAN rules + official `luci-app-mwan3` |
 
-Deprecated packages show a deprecation banner on every page and are marked
-`DEPRECATED` in menuconfig; they conflict with `luci-app-qmodem-next`. For new
-deployments use `luci-app-qmodem-next` directly.
+All legacy Lua UI packages are retired, resolving all menu conflicts with `luci-app-qmodem-next`. For all deployments use `luci-app-qmodem-next` and `luci-app-qmodem-ttlfw4` directly.
 
 ## Quick start
 

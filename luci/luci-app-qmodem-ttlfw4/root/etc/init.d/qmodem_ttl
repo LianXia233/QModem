@@ -11,7 +11,7 @@ start_service()
 {
     config_load 'qmodem_ttl'
     config_get enable 'main' 'enable' '0'
-    if [ "$enable" == 0 ]; then
+    if [ "$enable" = "0" ]; then
         return
     fi
     set_if_ttl

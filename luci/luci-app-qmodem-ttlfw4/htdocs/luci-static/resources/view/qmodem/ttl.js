@@ -5,6 +5,13 @@
 'require rpc';
 'require ui';
 
+// Load QModem Soft Anime design system (self-contained within package)
+document.head.appendChild(E('link', {
+	'rel': 'stylesheet',
+	'type': 'text/css',
+	'href': L.resource('qmodem-ttlfw4/soft-anime.css') + '?v=' + new Date().toISOString().slice(0, 10)
+}));
+
 var callInitAction = rpc.declare({
 	object: 'luci',
 	method: 'setInitAction',
@@ -60,9 +67,12 @@ return view.extend({
 		var warning = s.option(form.DummyValue, '_warning');
 		warning.rawhtml = true;
 		warning.cfgvalue = function() {
-			return E('div', { 'class': 'cbi-value-description' }, [
-				E('p', { 'style': 'color: #c00; font-weight: bold;' }, _('Warning:')),
-				E('ul', {}, [
+			return E('div', { 'class': 'qmodem-inline-warning' }, [
+				E('div', { 'class': 'qmodem-warn-title' }, [
+					E('span', { 'class': 'qmodem-dot qmodem-dot-warn' }),
+					E('strong', {}, _('Important Warning:'))
+				]),
+				E('ul', { 'class': 'qmodem-warn-list' }, [
 					E('li', {}, _('Enabling TTL modification will disable hardware flow offloading for proper packet modification.')),
 					E('li', {}, _('This may affect network performance on some devices.')),
 					E('li', {}, _('NSS ECM, SFE, and other acceleration modules will be disabled when TTL modification is active.')),

@@ -11,13 +11,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
-### Deprecated
-- **Legacy Lua UI packages marked deprecated** (`luci-app-qmodem` Lua variant,
-  `luci-app-qmodem-hc`, `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`,
-  `luci-app-qmodem-mwan`): titles now carry `DEPRECATED` in menuconfig, every
-  page shows a deprecation warning banner, and the packages conflict with
-  `luci-app-qmodem-next`. They keep working for the transition period and will
-  be removed in a future release.
+### Removed
+- **Legacy Lua UI packages removed**: `luci-app-qmodem` (Lua), `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`, `luci-app-qmodem-hc`, `luci-app-qmodem-mwan` have been deleted from `luci/`. Essential hardware and daemon scripts (`modem_sim.sh`, `modem_mwan.sh`, `qmodem_hc_sim`, `qmodem_mwan`, `99-setup-mwan`, `01-reload-mwan3.dhcpscript`) were migrated directly into the all-in-one `qmodem` backend package. This permanently resolves the menu routing conflict between legacy Lua controllers and modern JS views.
+
+### Added
+- **Soft Anime design system for `luci-app-qmodem-ttlfw4`**: self-contained `soft-anime.css`, Pastel Glass warning cards, daily cache-busting, and bashism cleanup.
+- **Enhanced service status chips for `luci-app-qmodem-monitor`**: unified `.qmodem-chip` and `.qmodem-status-row` pill badges for service state.
 
 ## [1.1.1] - 2026-10-14
 

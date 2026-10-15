@@ -11,11 +11,12 @@
 
 ## [Unreleased]
 
-### Deprecated
-- **旧版 Lua 界面包标记废弃**（`luci-app-qmodem` Lua 版、`luci-app-qmodem-hc`、
-  `luci-app-qmodem-sms`、`luci-app-qmodem-ttl`、`luci-app-qmodem-mwan`）：
-  Menuconfig 标题追加 `DEPRECATED`，全部页面顶部显示弃用警告横幅，
-  与 `luci-app-qmodem-next` 互斥。过渡期内仍可安装使用，未来版本移除。
+### 移除（Removed）
+- **正式移除旧版 Lua 界面五包**：`luci-app-qmodem`（Lua 版）、`luci-app-qmodem-sms`、`luci-app-qmodem-ttl`、`luci-app-qmodem-hc`、`luci-app-qmodem-mwan` 从 `luci/` 目录彻底清理。其承载的核心硬件控制与守护脚本（`modem_sim.sh`、`modem_mwan.sh`、`qmodem_hc_sim`、`qmodem_mwan`、`99-setup-mwan`、`01-reload-mwan3.dhcpscript）已全量迁移并入 `qmodem` 一体化后端包。彻底消除了与现代 JS 视图之间的同名菜单路由覆盖冲突。
+
+### 新增（Added）
+- **`luci-app-qmodem-ttlfw4` 完整接入 Soft Anime 设计系统**：引入自包含 `soft-anime.css`（避免跨包 404）、Pastel Glass 警示卡片组件、按天资源缓存防呆（cache-bust）并修正 init.d 脚本中的 bashism。
+- **`luci-app-qmodem-monitor` 状态指示体验升级**：服务启用/运行状态全面接入 `.qmodem-chip` 与 `.qmodem-status-row` 状态胶囊徽章。
 
 ## [1.1.1] - 2026-10-14
 

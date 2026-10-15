@@ -272,6 +272,13 @@ body.qmodem-dark {
 }
 
 /* Status chips */
+.qmodem-status-row {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--qmd-sp-2);
+}
+
 .qmodem-chip {
 	display: inline-flex;
 	align-items: center;
