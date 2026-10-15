@@ -22,6 +22,29 @@ QModem 适合自制 4G/5G 路由器、工业网关和多模组设备。它不是
 
 模组出现在[支持列表](docs/support_list.md)中，表示项目中存在对应配置，不等同于所有固件、接口模式和高级功能都经过维护者实机验证。
 
+## 🌸 Soft Anime 视觉与现代交互界面（LuCI Next）
+
+QModem LuCI 全系列插件已完成全新 **Soft Anime 柔和二次元 × Pastel Glass 毛玻璃 × Modern Dashboard 现代仪表盘** 视觉重构：
+
+| 模块名称 | 页面路径 | 核心视觉与交互特性 |
+|---|---|---|
+| **总览仪表盘** | `/qmodem/overview` | 动态蜂窝波天线与吉祥物，4 大实时指标卡（信号/RAT、运营商/频段、会话/IP、卡槽），平滑骨架屏与异步水合 |
+| **网络配置** | `/qmodem/network_config` | 双天线 5G 路由器动态 SVG，超时防挂死异步轮询，网络服务脉冲呼吸指示胶囊 |
+| **AT 调试终端** | `/qmodem/debug` | 赛博终端视窗，分段式诊断标签栏（**节省 70%+ 纵向空间**），一键折叠，键盘 `↑`/`↓` 历史指令循环 |
+| **高级配置** | `/qmodem/config_advanced` | 齿轮调谐动态 SVG，按物理设备分段调优，频段/制式响应式卡片网格 |
+| **短信管理** | `/qmodem/sms` | 发光气泡对话流 SVG，消息时区/存储独立卡片，未读消息粉红提示徽章 |
+| **核心设置** | `/qmodem/settings` | 微芯片与 PCB 脉冲走线 SVG，RPC 并行安全加载防冷启动阻塞 |
+| **链路监控** | `/qmodem/monitor` | 雷达扫描波 SVG，多拨链路监控守护卡片化 |
+| **TTL 规则** | `/qmodem/ttl` | 数据包护盾 SVG，内置 1-Click 常用预设（64 Linux/Android、128 Windows、65 绕过热点） |
+| **SIM 切换** | `/qmodem/sim_switch` | 双卡芯片动态切换 SVG，Slot 1 / Slot 2 独立交互卡片与呼吸灯指示 |
+| **短信转发** | `/qmodem/sms_forward` | 纸飞机信使动态 SVG，集成 Telegram/Webhook/飞书/ServerChan/PushDeer 多通道 |
+| **SIM 短信** | `/qmodem/sms_sim` | Micro-SIM 存储 SVG，现代工具栏与卡片化消息管理 |
+
+- **🎨 统一色彩 Token**：浅色模式（薰衣草紫 `#8875E8`、樱花粉 `#EFA8CB`、薄荷蓝 `#8CCFE2`、薄荷绿 `#79CDB0`）与暗色模式无缝自适应。
+- **✨ 零外部依赖**：**100% 离线可用**，不调用任何外网 CDN 或外部网络字体，所有图标与吉祥物均为轻量内联矢量 SVG。
+- **🪟 全局毛玻璃弹窗**：系统内所有 `ui.showModal` 均升级为 `14px` 毛玻璃虚化背景、`20px` 圆角卡片与马卡龙胶囊按钮。
+- **📱 响应式适配**：兼顾桌面宽屏高密度监控与手机端（360px~430px）单手易操作布局。
+
 ## 软件组成
 
 ```text
