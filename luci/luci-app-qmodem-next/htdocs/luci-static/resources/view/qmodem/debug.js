@@ -136,8 +136,8 @@ return view.extend({
 			if (cfg.at_cfg.other_ttys) ports = ports.concat(cfg.at_cfg.other_ttys);
 
 			// Configuration Card: Port selection + Info Chips
-			var configCard = E('div', { 'class': 'cbi-section', 'style': 'margin-bottom: 16px; padding: 14px 18px;' });
-			var configRow = E('div', { 'style': 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;' });
+			var configCard = E('div', { 'class': 'cbi-section', 'style': 'margin-bottom: 12px; padding: 12px 18px;' });
+			var configRow = E('div', { 'style': 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;' });
 
 			// Port Selector
 			var portField = E('div', { 'style': 'display: flex; align-items: center; gap: 10px;' });
@@ -173,18 +173,61 @@ return view.extend({
 				if (badge) badge.textContent = portSelect.value || _('Default Port');
 			});
 
-			// Categorized Diagnostic Presets
-			var quickCard = E('div', { 'class': 'cbi-section', 'style': 'margin-bottom: 16px; padding: 16px 20px;' });
-			quickCard.appendChild(E('div', { 'style': 'font-size: 13px; font-weight: 700; color: var(--qmd-text-1); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;' }, [
-				createSvg('<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--qmd-primary)" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'),
-				E('span', {}, _('Quick Diagnostic Presets'))
-			]));
+			// Declare executeCommand so preset dblclick can trigger it safely
+			var executeCommand;
+
+			// Categorized Diagnostic Presets (Compact Tabbed Layout)
+			var quickCard = E('div', { 'class': 'cbi-section qmodem-preset-card' });
+
+			// Read collapse and active tab preferences from localStorage
+			var isCollapsed = localStorage.getItem('qmodem_debug_preset_collapsed') === '1';
+			var activeTabKey = localStorage.getItem('qmodem_debug_preset_tab') || 'device';
+
+			var toggleIcon = createSvg(isCollapsed 
+				? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>'
+				: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>');
+			var toggleLabel = E('span', {}, isCollapsed ? _('Expand') : _('Collapse'));
+
+			var toggleBtn = E('button', {
+				'class': 'qmodem-preset-toggle',
+				'type': 'button',
+				'title': _('Toggle Quick Diagnostic Presets'),
+				'click': function() {
+					var body = quickCard.querySelector('.qmodem-preset-body');
+					if (!body) return;
+					var currentlyCollapsed = body.classList.contains('collapsed');
+					if (currentlyCollapsed) {
+						body.classList.remove('collapsed');
+						localStorage.setItem('qmodem_debug_preset_collapsed', '0');
+						toggleLabel.textContent = _('Collapse');
+						toggleIcon.innerHTML = '<polyline points="18 15 12 9 6 15"/>';
+					} else {
+						body.classList.add('collapsed');
+						localStorage.setItem('qmodem_debug_preset_collapsed', '1');
+						toggleLabel.textContent = _('Expand');
+						toggleIcon.innerHTML = '<polyline points="6 9 12 15 18 9"/>';
+					}
+				}
+			}, [toggleIcon, toggleLabel]);
+
+			var headerRow = E('div', { 'class': 'qmodem-preset-header' }, [
+				E('div', { 'class': 'qmodem-preset-title' }, [
+					createSvg('<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--qmd-primary)" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'),
+					E('span', {}, _('Quick Diagnostic Presets')),
+					E('span', { 'class': 'qmodem-preset-hint' }, '(' + _('Click to input, double-click to execute') + ')')
+				]),
+				toggleBtn
+			]);
+			quickCard.appendChild(headerRow);
+
+			var presetBody = E('div', { 'class': 'qmodem-preset-body' + (isCollapsed ? ' collapsed' : '') });
 
 			var presetGroups = [
 				{
+					id: 'device',
 					category: _('Device Info'),
 					colorClass: 'qmodem-preset-device',
-					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+					icon: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
 					cmds: [
 						{ name: 'ATI', label: _('Overview'), desc: _('Device Overview') },
 						{ name: 'AT+CGMM', label: _('Model'), desc: _('Device Model') },
@@ -194,9 +237,10 @@ return view.extend({
 					]
 				},
 				{
+					id: 'signal',
 					category: _('Signal & Network'),
 					colorClass: 'qmodem-preset-signal',
-					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V4"/></svg>',
+					icon: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V4"/></svg>',
 					cmds: [
 						{ name: 'AT+CSQ', label: _('Signal CSQ'), desc: _('Signal Quality (0-31)') },
 						{ name: 'AT+CESQ', label: _('Ext Signal'), desc: _('Extended Signal (RSRP/RSRQ)') },
@@ -206,9 +250,10 @@ return view.extend({
 					]
 				},
 				{
+					id: 'sim',
 					category: _('SIM & Card Slot'),
 					colorClass: 'qmodem-preset-sim',
-					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="7" y2="8"/><line x1="7" y1="12" x2="7" y2="12"/></svg>',
+					icon: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="7" y2="8"/><line x1="7" y1="12" x2="7" y2="12"/></svg>',
 					cmds: [
 						{ name: 'AT+CPIN?', label: _('SIM Status'), desc: _('PIN / SIM Ready State') },
 						{ name: 'AT+CIMI', label: _('IMSI'), desc: _('Subscriber Identity') },
@@ -217,9 +262,10 @@ return view.extend({
 					]
 				},
 				{
+					id: 'hw',
 					category: _('Hardware & RF'),
 					colorClass: 'qmodem-preset-hw',
-					icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+					icon: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
 					cmds: [
 						{ name: 'AT+CBC', label: _('Voltage'), desc: _('Supply Voltage') },
 						{ name: 'AT+GTSENRDTEMP=1', label: _('Temp'), desc: _('Module Temperature') },
@@ -241,31 +287,80 @@ return view.extend({
 				});
 				if (customCmds.length > 0) {
 					presetGroups.push({
+						id: 'custom',
 						category: _('Custom Commands'),
 						colorClass: 'qmodem-preset-custom',
-						icon: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+						icon: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
 						cmds: customCmds
 					});
 				}
 			}
 
-			// Render preset categories
-			presetGroups.forEach(function(group) {
-				var catBox = E('div', { 'class': 'qmodem-preset-category' });
-				
-				var catTitle = E('div', { 'class': 'qmodem-preset-cat-title' }, [
-					createSvg(group.icon),
-					E('span', {}, group.category)
-				]);
-				catBox.appendChild(catTitle);
+			// Add "All" tab to the list
+			var tabList = presetGroups.concat([{
+				id: 'all',
+				category: _('All'),
+				icon: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+			}]);
 
-				var pillRow = E('div', { 'style': 'display: flex; flex-wrap: wrap; gap: 8px;' });
+			var validIds = tabList.map(function(t) { return t.id; });
+			if (validIds.indexOf(activeTabKey) === -1) {
+				activeTabKey = 'device';
+			}
+
+			// Render Tab Bar
+			var tabsBar = E('div', { 'class': 'qmodem-preset-tabs' });
+			var pillsContainer = E('div', { 'class': 'qmodem-preset-pills-container' });
+
+			var updateActiveTab = function(newId) {
+				activeTabKey = newId;
+				localStorage.setItem('qmodem_debug_preset_tab', newId);
+				tabsBar.querySelectorAll('.qmodem-preset-tab').forEach(function(btn) {
+					if (btn.getAttribute('data-tab-id') === newId) {
+						btn.classList.add('active');
+					} else {
+						btn.classList.remove('active');
+					}
+				});
+				pillsContainer.querySelectorAll('.qmodem-preset-group-row').forEach(function(row) {
+					if (newId === 'all' || row.getAttribute('data-group-id') === newId) {
+						row.style.display = 'flex';
+					} else {
+						row.style.display = 'none';
+					}
+				});
+			};
+
+			tabList.forEach(function(tab) {
+				var tabBtn = E('button', {
+					'class': 'qmodem-preset-tab' + (tab.id === activeTabKey ? ' active' : ''),
+					'type': 'button',
+					'data-tab-id': tab.id,
+					'click': function() {
+						updateActiveTab(tab.id);
+					}
+				}, [
+					createSvg(tab.icon),
+					E('span', {}, tab.category)
+				]);
+				tabsBar.appendChild(tabBtn);
+			});
+			presetBody.appendChild(tabsBar);
+
+			// Render pill rows
+			presetGroups.forEach(function(group) {
+				var groupRow = E('div', {
+					'class': 'qmodem-preset-group-row',
+					'data-group-id': group.id,
+					'style': 'display: ' + ((activeTabKey === 'all' || activeTabKey === group.id) ? 'flex' : 'none') + '; flex-wrap: wrap; gap: 6px; margin-top: 8px;'
+				});
+
 				group.cmds.forEach(function(cmd) {
 					var labelElements = [
-						E('span', { 'style': 'font-weight: 700; font-family: monospace;' }, cmd.name)
+						E('span', { 'style': 'font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;' }, cmd.name)
 					];
 					if (cmd.label && cmd.label !== cmd.name) {
-						labelElements.push(E('span', { 'style': 'font-size: 11px; opacity: 0.75;' }, '• ' + cmd.label));
+						labelElements.push(E('span', { 'style': 'font-size: 11px; opacity: 0.75; font-weight: 500;' }, '• ' + cmd.label));
 					}
 					var pill = E('button', {
 						'class': 'qmodem-preset-pill ' + group.colorClass,
@@ -282,16 +377,19 @@ return view.extend({
 							var input = document.getElementById('at_command_' + modem.id);
 							if (input) {
 								input.value = cmd.name;
-								executeCommand();
+								if (typeof executeCommand === 'function') {
+									executeCommand();
+								}
 							}
 						}
 					}, labelElements);
-					pillRow.appendChild(pill);
+					groupRow.appendChild(pill);
 				});
-				catBox.appendChild(pillRow);
-				quickCard.appendChild(catBox);
+				pillsContainer.appendChild(groupRow);
 			});
 
+			presetBody.appendChild(pillsContainer);
+			quickCard.appendChild(presetBody);
 			wrap.appendChild(quickCard);
 
 			// macOS / Soft Anime Cyber Terminal Frame
@@ -374,7 +472,7 @@ return view.extend({
 				'placeholder': 'ATI, AT+CSQ, AT+CPIN?...'
 			});
 
-			var executeCommand = function() {
+			executeCommand = function() {
 				var port = portSelect.value;
 				var cmd = cmdInput.value.trim();
 

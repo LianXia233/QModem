@@ -3063,3 +3063,18 @@ msgstr "终端就绪。请在下方输入 AT 指令或点击上方快捷诊断�
 
 msgid "[No response received from modem]"
 msgstr "[模组未返回响应]"
+
+msgid "All"
+msgstr "全部"
+
+msgid "Collapse"
+msgstr "收起"
+
+msgid "Expand"
+msgstr "展开"
+
+msgid "Click to input, double-click to execute"
+msgstr "单击填入，双击直接发送"
+
+msgid "Toggle Quick Diagnostic Presets"
+msgstr "折叠/展开快捷诊断预设"
