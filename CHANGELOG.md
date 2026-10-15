@@ -11,6 +11,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-15
+
 ### Added
 - **Compact Quick Diagnostic Presets with Segmented Tabs (Debug View)**:
   - Overhauled the diagnostic presets section from a stacked multi-category layout (~300px) to a compact **Segmented Tab Bar** (`📱 Device Info`, `📶 Signal & Network`, `💳 SIM & Card Slot`, `⚙️ Hardware & RF`, `⭐ Custom Commands`, `✨ All`), slashing vertical height by **more than 70%** (~100px).
@@ -36,6 +38,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 - **Soft Anime design system for `luci-app-qmodem-ttlfw4`**: self-contained `soft-anime.css`, Pastel Glass warning cards, daily cache-busting, and bashism cleanup.
 - **Enhanced service status chips for `luci-app-qmodem-monitor`**: unified `.qmodem-chip` and `.qmodem-status-row` pill badges for service state.
 
+### Removed
+- **Legacy Lua UI packages removed**: `luci-app-qmodem` (Lua), `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`, `luci-app-qmodem-hc`, `luci-app-qmodem-mwan` have been deleted from `luci/`. Essential hardware and daemon scripts (`modem_sim.sh`, `modem_mwan.sh`, `qmodem_hc_sim`, `qmodem_mwan`, `99-setup-mwan`, `01-reload-mwan3.dhcpscript`) were migrated directly into the all-in-one `qmodem` backend package. This permanently resolves the menu routing conflict between legacy Lua controllers and modern JS views. These five packages were previously flagged `DEPRECATED` in the `[Unreleased]` section; that entry is superseded by this one because they were removed outright rather than kept through a transition period.
 ### Fixed
 - **Overview Card Loading & Drag/Collapse Stabilization**: Resolved layout jumpiness and sluggish drag/drop behavior on `overview.js` CBI sections during concurrent data refreshes.
 - **AT Port Resolution & RPCD Null Handling**:
