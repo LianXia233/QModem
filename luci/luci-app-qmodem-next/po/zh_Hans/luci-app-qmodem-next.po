@@ -2655,3 +2655,426 @@ msgstr "检测到 %d 个模组"
 # Source: view/qmodem/overview.js:489
 msgid "Signal, SIM and network overview. Drag cards to reorder, click a title to collapse."
 msgstr "信号、SIM 卡与网络概览。拖拽卡片可调整顺序，点击标题可折叠。"
+
+msgid "Active Modem"
+msgstr "当前模组"
+
+msgid "Active SIM Slot"
+msgstr "当前激活 SIM 卡槽"
+
+msgid "Carrier Aggregation Idle"
+msgstr "载波聚合空闲"
+
+msgid "Cellular Carrier"
+msgstr "蜂窝运营商"
+
+msgid "Checking session..."
+msgstr "正在检查连接会话..."
+
+msgid "Network Session"
+msgstr "网络会话"
+
+msgid "No Active Session"
+msgstr "无活跃网络会话"
+
+msgid "No signal data"
+msgstr "无信号数据"
+
+msgid "Offline"
+msgstr "离线"
+
+msgid "Primary Band"
+msgstr "主频段"
+
+msgid "RAT & Signal"
+msgstr "网络制式与信号"
+
+msgid "Ready"
+msgstr "就绪"
+
+msgid "Real-time signal diagnostics, carrier aggregation and hardware overview. Drag cards to reorder."
+msgstr "实时信号诊断、载波聚合与硬件概览。拖拽卡片可调整顺序。"
+
+msgid "Refresh modem data"
+msgstr "刷新模组数据"
+
+msgid "SIM Card"
+msgstr "SIM 卡"
+
+msgid "Slot %s"
+msgstr "卡槽 %s"
+
+msgid "Uplink Ready"
+msgstr "上行链路就绪"
+
+msgid "Waiting for signal data"
+msgstr "等待信号数据"
+
+msgid "Bridge Port"
+msgstr "网桥端口"
+
+msgid "Checking status..."
+msgstr "正在检查状态..."
+
+msgid "Configure auto-dial daemon, network preference, APN, interface bindings and multi-WAN routes."
+msgstr "配置自动拨号守护进程、网络偏好、APN、接口绑定与多 WAN 路由。"
+
+msgid "Device-level bridge port for passthrough. If set, it overrides the slot default bridge port."
+msgstr "用于透传的设备级网桥端口。设置后将覆盖卡槽默认网桥端口。"
+
+msgid "Ethernet"
+msgstr "以太网"
+
+msgid "Global & Dial Rules"
+msgstr "全局与拨号规则"
+
+msgid "Network Configuration"
+msgstr "网络配置"
+
+msgid "AT Command Terminal"
+msgstr "AT 命令终端"
+
+msgid "Copy Output"
+msgstr "复制输出"
+
+msgid "Execute 3GPP diagnostic commands, test cellular module responses, and inspect raw serial streams."
+msgstr "执行 3GPP 诊断命令，测试蜂窝模组响应并检查原始串口数据流。"
+
+msgid "Failed to copy output"
+msgstr "复制输出失败"
+
+msgid "Initializing AT interface for %s..."
+msgstr "正在为 %s 初始化 AT 接口..."
+
+msgid "Interactive Modem Shell"
+msgstr "交互式模组终端"
+
+msgid "No response content"
+msgstr "无响应内容"
+
+msgid "Output copied to clipboard"
+msgstr "输出已复制到剪贴板"
+
+msgid "Please enter an AT command"
+msgstr "请输入 AT 命令"
+
+msgid "Quick Diagnostic Presets"
+msgstr "快速诊断预设"
+
+msgid "Ready. Type an AT command below or click a diagnostic preset."
+msgstr "就绪。在下方输入 AT 命令或点击上方诊断预设。"
+
+msgid "Send Command"
+msgstr "发送命令"
+
+msgid "Serial Console"
+msgstr "串口控制台"
+
+msgid "Serial Ready"
+msgstr "串口就绪"
+
+msgid "Use Ubus AT Daemon (non-blocking)"
+msgstr "使用 Ubus AT 守护进程（非阻塞）"
+
+msgid "[No response received]"
+msgstr "[未收到响应]"
+
+msgid "Advanced Modem Configuration"
+msgstr "模组高级配置"
+
+msgid "Click "Scan Neighbor Cells" to search for nearby cell towers"
+msgstr "点击“扫描邻区”以搜索附近基站"
+
+msgid "Configure cell lock parameters. You can manually enter values or use the "Copy" button from scanned cells."
+msgstr "配置锁小区参数。您可以手动输入数值，或使用已扫描小区中的“复制”按钮。"
+
+msgid "Fine-tune radio access technologies, band locking, IMEI provisioning and cell lock parameters."
+msgstr "微调无线接入技术、频段锁定、IMEI 写入与锁小区参数。"
+
+msgid "Hardware Tuning"
+msgstr "硬件微调"
+
+msgid "Conversations & Storage"
+msgstr "短信会话与存储"
+
+msgid "Database with URC"
+msgstr "数据库存储（URC 主动上报）"
+
+msgid "Database with polling"
+msgstr "数据库存储（轮询模式）"
+
+msgid "Direct modem access"
+msgstr "模组直连模式"
+
+msgid "Manage cellular SMS threads, compose new messages, adjust storage areas (ME/SM) and sync database."
+msgstr "管理蜂窝短信会话、撰写新消息、调整存储区域（ME/SM）并同步数据库。"
+
+msgid "SMS Mode"
+msgstr "短信模式"
+
+msgid "AT Probe Workers"
+msgstr "AT 探测工作线程数"
+
+msgid "Add Retry Delay"
+msgstr "添加重试延迟"
+
+msgid "Add Retry Max"
+msgstr "最大添加重试次数"
+
+msgid "Configure hardware scanning workers, PCIe/USB bus discovery rules, LEDs and daemon worker timeouts."
+msgstr "配置硬件扫描线程、PCIe/USB 总线发现规则、LED 指示灯与守护进程超时。"
+
+msgid "Daemon & Bus Scanning"
+msgstr "守护进程与总线扫描"
+
+msgid "Default bridge port for passthrough. Device-level bridge_port overrides this slot default."
+msgstr "透传默认网桥端口。设备级 bridge_port 会覆盖此卡槽默认值。"
+
+msgid "Fast AT Timeout"
+msgstr "快速 AT 超时时间"
+
+msgid "Hotplug Add Delay"
+msgstr "热插拔添加延迟"
+
+msgid "Model AT Timeout"
+msgstr "模组型号查询超时时间"
+
+msgid "Notice"
+msgstr "注意 (Notice)"
+
+msgid "QModem Core Settings"
+msgstr "QModem 核心设置"
+
+msgid "Scan Log Level"
+msgstr "扫描日志级别"
+
+msgid "Scan Workers"
+msgstr "总线扫描工作线程数"
+
+msgid "Active Slot"
+msgstr "当前激活卡槽"
+
+msgid "Click below to switch the active RF path to this slot."
+msgstr "点击下方以将活跃射频通路切换至此卡槽。"
+
+msgid "Current Active Slot"
+msgstr "当前活跃卡槽"
+
+msgid "Currently Active"
+msgstr "当前活跃中"
+
+msgid "Error querying SIM switch capability: %s"
+msgstr "查询 SIM 卡切换功能时出错：%s"
+
+msgid "Failed to switch SIM slot: %s"
+msgstr "切换 SIM 卡槽失败：%s"
+
+msgid "Hardware Slot Control"
+msgstr "硬件卡槽控制"
+
+msgid "Hardware Support"
+msgstr "硬件支持"
+
+msgid "Note:"
+msgstr "提示："
+
+msgid "Note: Some modems may take 10-30 seconds to re-register on cellular networks."
+msgstr "提示：部分模组在切换卡槽后可能需要 10-30 秒重新在蜂窝网络中注册。"
+
+msgid "Probing SIM slot capabilities for %s..."
+msgstr "正在探测 %s 的 SIM 卡槽切换功能..."
+
+msgid "SIM Slot %s"
+msgstr "SIM 卡槽 %s"
+
+msgid "SIM Slot Switcher"
+msgstr "SIM 卡槽切换器"
+
+msgid "Standby"
+msgstr "待机备用"
+
+msgid "Switch to Slot %s"
+msgstr "切换至卡槽 %s"
+
+msgid "Switching active RF path to Slot %s..."
+msgstr "正在将活跃射频通路切换至卡槽 %s..."
+
+msgid "This SIM card is currently serving cellular connections."
+msgstr "此 SIM 卡当前正在提供蜂窝连接。"
+
+msgid "This modem model or current firmware does not support software SIM switching."
+msgstr "该模组型号或当前固件不支持软件切换 SIM 卡槽。"
+
+msgid "Toggle active SIM physical slots on dual-SIM cellular modems. Some modules may automatically re-register."
+msgstr "在双卡蜂窝模组上切换物理激活卡槽。部分模组切换后会自动重新搜网。"
+
+msgid "Automatically relay inbound cellular SMS to Telegram Bot, Webhook, Feishu, ServerChan or PushDeer."
+msgstr "自动将接收到的蜂窝短信转发至 Telegram Bot、Webhook、飞书、Server酱或 PushDeer。"
+
+msgid "Multi-Channel Push"
+msgstr "多通道推送"
+
+msgid "Actions"
+msgstr "操作"
+
+msgid "Content"
+msgstr "短信内容"
+
+msgid "Direct SIM Access"
+msgstr "SIM 卡直连访问"
+
+msgid "Inspect raw SMS records stored directly on SIM memory, view message indices, and perform cleanup."
+msgstr "直接检查 SIM 卡内存中的原始短信记录、查看消息索引并执行清理。"
+
+msgid "No messages to delete"
+msgstr "没有可删除的消息"
+
+msgid "SIM Card SMS Storage"
+msgstr "SIM 卡短信存储"
+
+msgid "Sender"
+msgstr "发送方"
+
+msgid "Serial Engine Online"
+msgstr "串口引擎就绪"
+
+msgid "Default Port"
+msgstr "默认端口"
+
+msgid "Quick Diagnostic Presets"
+msgstr "快捷诊断指令"
+
+msgid "Device Info"
+msgstr "设备信息"
+
+msgid "Overview"
+msgstr "总览"
+
+msgid "Device Overview"
+msgstr "设备基本信息总览"
+
+msgid "Model"
+msgstr "型号"
+
+msgid "Device Model"
+msgstr "模组硬件型号"
+
+msgid "Vendor"
+msgstr "厂商"
+
+msgid "Firmware"
+msgstr "固件"
+
+msgid "Revision & Version"
+msgstr "固件版本识别"
+
+msgid "IMEI Number"
+msgstr "国际移动设备识别码 (IMEI)"
+
+msgid "Signal & Network"
+msgstr "信号与网络"
+
+msgid "Signal CSQ"
+msgstr "信号 CSQ"
+
+msgid "Signal Quality (0-31)"
+msgstr "信号质量 (0-31)"
+
+msgid "Ext Signal"
+msgstr "扩展信号"
+
+msgid "Extended Signal (RSRP/RSRQ)"
+msgstr "扩展信号质量 (RSRP/RSRQ)"
+
+msgid "Current Network Operator"
+msgstr "当前驻网运营商"
+
+msgid "EPS Reg"
+msgstr "网络注册"
+
+msgid "Network Registration Status"
+msgstr "4G/5G 网络注册状态"
+
+msgid "PDP IP"
+msgstr "PDP IP"
+
+msgid "Modem IP Address"
+msgstr "模组 PDP IP 地址"
+
+msgid "SIM & Card Slot"
+msgstr "SIM 与卡槽"
+
+msgid "PIN / SIM Ready State"
+msgstr "PIN / SIM 卡就绪状态"
+
+msgid "Subscriber Identity"
+msgstr "国际移动用户识别码 (IMSI)"
+
+msgid "ICCID"
+msgstr "ICCID 卡号"
+
+msgid "SIM Card ICCID"
+msgstr "SIM 卡集成电路卡识别码"
+
+msgid "Dual SIM"
+msgstr "双卡状态"
+
+msgid "SIM Slot Status"
+msgstr "双卡与卡槽切换状态"
+
+msgid "Hardware & RF"
+msgstr "硬件与射频"
+
+msgid "Supply Voltage"
+msgstr "模组工作供电电压"
+
+msgid "Temp"
+msgstr "射频温度"
+
+msgid "Module Temperature"
+msgstr "模组射频工作温度"
+
+msgid "RF State"
+msgstr "射频状态"
+
+msgid "Radio Power Function"
+msgstr "射频功能全开关状态"
+
+msgid "Restart RF"
+msgstr "重启射频"
+
+msgid "Full Radio Reset"
+msgstr "重启射频协议栈"
+
+msgid "Custom Commands"
+msgstr "自定义指令"
+
+msgid "Clear terminal screen"
+msgstr "清空终端屏幕"
+
+msgid "Copy terminal content to clipboard"
+msgstr "复制终端内容到剪贴板"
+
+msgid "Executing..."
+msgstr "执行中..."
+
+msgid "Ready. Type an AT command below or select a diagnostic preset above.\nUse ↑ / ↓ arrow keys to cycle through previous command history."
+msgstr "终端就绪。请在下方输入 AT 指令或点击上方快捷诊断预设。\n支持使用键盘 ↑ / ↓ 方向键调取历史指令记录。"
+
+msgid "[No response received from modem]"
+msgstr "[模组未返回响应]"
+
+msgid "All"
+msgstr "全部"
+
+msgid "Collapse"
+msgstr "收起"
+
+msgid "Expand"
+msgstr "展开"
+
+msgid "Click to input, double-click to execute"
+msgstr "单击填入，双击直接发送"
+
+msgid "Toggle Quick Diagnostic Presets"
+msgstr "折叠/展开快捷诊断预设"

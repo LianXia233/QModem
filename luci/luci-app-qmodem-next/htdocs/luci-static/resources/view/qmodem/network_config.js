@@ -29,21 +29,23 @@ return view.extend({
 			qmodem.rcStatus('qmodem_network')
 		]).then(L.bind(function(results) {
 			this.rcStatusData = results[1];
+			this.connectionStatusData = {};
 			
-			// Load connection status for all modem devices
+			// Load connection status with fast timeout (1200ms) to guarantee instant non-blocking page load
 			var sections = uci.sections('qmodem', 'modem-device');
 			var statusPromises = sections.map(function(section) {
-				return qmodem.getConnectStatus(section['.name'])
-					.then(function(status) {
-						return { section_id: section['.name'], status: status };
-					})
-					.catch(function(err) {
-						return { section_id: section['.name'], status: null };
-					});
+				var sid = section['.name'];
+				return Promise.race([
+					qmodem.getConnectStatus(sid),
+					new Promise(function(resolve) { setTimeout(function(){ resolve(null); }, 1200); })
+				]).then(function(status) {
+					return { section_id: sid, status: status };
+				}).catch(function() {
+					return { section_id: sid, status: null };
+				});
 			});
 			
 			return Promise.all(statusPromises).then(L.bind(function(statuses) {
-				this.connectionStatusData = {};
 				statuses.forEach(L.bind(function(item) {
 					this.connectionStatusData[item.section_id] = item.status;
 				}, this));
@@ -71,17 +73,23 @@ return view.extend({
 			var status = this.rcStatusData && this.rcStatusData.qmodem_network ? this.rcStatusData.qmodem_network : null;
 			
 			if (!status) {
-				return E('div', { id: 'rc-status-container' }, [
-					E('span', {}, _('Failed to load status'))
+				return E('div', { 'class': 'qmodem-status-row', 'id': 'rc-status-container' }, [
+					E('span', { 'class': 'qmodem-chip qmodem-chip-warn' }, _('Checking status...'))
 				]);
 			}
 			
 			var enabled = status.enabled === true || status.enabled === 'true';
 			var running = status.running === true || status.running === 'true';
 			
-			return E('div', { id: 'rc-status-container' }, [
-				E('span', {}, _('Enabled') + ': ' + (enabled ? _('Yes') : _('No'))),
-				E('span', { 'style': 'margin-left: 12px;' }, _('Running') + ': ' + (running ? _('Yes') : _('No')))
+			return E('div', { 'class': 'qmodem-status-row', 'id': 'rc-status-container' }, [
+				E('span', { 'class': 'qmodem-chip ' + (enabled ? 'qmodem-chip-ok' : 'qmodem-chip-muted') }, [
+					E('span', { 'class': 'qmodem-dot ' + (enabled ? 'qmodem-dot-ok' : 'qmodem-dot-err') }),
+					_('Enabled') + ': ' + (enabled ? _('Yes') : _('No'))
+				]),
+				E('span', { 'class': 'qmodem-chip ' + (running ? 'qmodem-chip-ok' : 'qmodem-chip-warn') }, [
+					E('span', { 'class': 'qmodem-dot ' + (running ? 'qmodem-dot-ok' : 'qmodem-dot-warn') }),
+					_('Running') + ': ' + (running ? _('Yes') : _('No'))
+				])
 			]);
 		}, this);
 
@@ -545,6 +553,36 @@ return view.extend({
 	o.modalonly = true;
 
 	return m.render().then(L.bind(function(rendered) {
+			var hero = E('div', { 'class': 'qmodem-hero' }, [
+				E('h1', { 'class': 'qmodem-hero-title' }, [
+					_('Network Configuration'),
+					E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Global & Dial Rules'))
+				]),
+				E('p', { 'class': 'qmodem-hero-sub' },
+					_('Configure auto-dial daemon, network preference, APN, interface bindings and multi-WAN routes.'))
+			]);
+			var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+			heroIcon.innerHTML =
+				'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+				'<rect x="10" y="26" width="56" height="26" rx="6" fill="#FFFFFF" stroke="#8875E8" stroke-width="2.5"/>' +
+				'<circle cx="20" cy="39" r="2.8" fill="#36AD87" class="qmd-anim-pulse"/>' +
+				'<circle cx="29" cy="39" r="2.8" fill="#8875E8"/>' +
+				'<circle cx="38" cy="39" r="2.8" fill="#8875E8"/>' +
+				'<line x1="48" y1="39" x2="60" y2="39" stroke="#EFA8CB" stroke-width="2.5" stroke-linecap="round"/>' +
+				'<path d="M22 26 L22 12" stroke="#8875E8" stroke-width="2.5" stroke-linecap="round"/>' +
+				'<circle cx="22" cy="12" r="3" fill="#8875E8"/>' +
+				'<path d="M16 10 A9 9 0 0 1 28 10" stroke="#8875E8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>' +
+				'<path d="M54 26 L54 12" stroke="#8875E8" stroke-width="2.5" stroke-linecap="round"/>' +
+				'<circle cx="54" cy="12" r="3" fill="#8875E8"/>' +
+				'<path d="M48 10 A9 9 0 0 1 60 10" stroke="#8875E8" stroke-width="2" stroke-linecap="round" opacity="0.6"/>' +
+				'</svg>';
+			hero.appendChild(heroIcon);
+			if (rendered.firstChild) {
+				rendered.insertBefore(hero, rendered.firstChild);
+			} else {
+				rendered.appendChild(hero);
+			}
+
 			// Update dial controls for all modems
 			this.updateAllDialControls();
 			// Update connection status indicators

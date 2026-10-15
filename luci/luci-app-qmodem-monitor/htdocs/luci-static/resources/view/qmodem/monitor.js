@@ -548,7 +548,32 @@ return view.extend({
 			});
 		}
 
-		return m.render();
+		return m.render().then(function(rendered) {
+			var hero = E('div', { 'class': 'qmodem-hero' }, [
+				E('h1', { 'class': 'qmodem-hero-title' }, [
+					_('Network Health Monitor'),
+					E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Watchdog & Recovery'))
+				]),
+				E('p', { 'class': 'qmodem-hero-sub' },
+					_('Continuous ICMP/HTTP link monitoring, automatic modem recovery actions and custom trigger scripts.'))
+			]);
+			var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+			heroIcon.innerHTML =
+				'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+				'<circle cx="38" cy="30" r="22" stroke="#8875E8" stroke-width="2" opacity="0.35"/>' +
+				'<circle cx="38" cy="30" r="14" stroke="#8875E8" stroke-width="2" opacity="0.6"/>' +
+				'<circle cx="38" cy="30" r="5" fill="#36AD87" class="qmd-anim-pulse"/>' +
+				'<line x1="38" y1="30" x2="38" y2="8" stroke="#8CCFE2" stroke-width="2.5" stroke-linecap="round" class="qmd-anim-sweep"/>' +
+				'<path d="M14 48 L24 48 L28 40 L32 54 L36 44 L40 48 L62 48" stroke="#EFA8CB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+				'</svg>';
+			hero.appendChild(heroIcon);
+			if (rendered.firstChild) {
+				rendered.insertBefore(hero, rendered.firstChild);
+			} else {
+				rendered.appendChild(hero);
+			}
+			return rendered;
+		});
 	},
 
 	updateScriptList: function() {

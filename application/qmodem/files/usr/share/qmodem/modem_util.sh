@@ -273,7 +273,18 @@ qmodem_at_dispatch()
 	case "$(uci -q get qmodem.main.at_tool 2>/dev/null)" in
 		0) tom_modem $use_ubus_flag -d "$at_port" -o a -c "$atcmd" $options ;;
 		1) sms_tool_q -d "$at_port" at "$atcmd" ;;
-		*) qmodem_atd_sendat "$at_port" "$atcmd" 3000 ;;
+		*)
+			local sock
+			sock=$(qmodem_atd_socket)
+			if [ -S "$sock" ]; then
+				qmodem_atd_sendat "$at_port" "$atcmd" 3000 && return 0
+			fi
+			if command -v sms_tool_q >/dev/null 2>&1; then
+				sms_tool_q -d "$at_port" at "$atcmd"
+			else
+				tom_modem -d "$at_port" -o a -c "$atcmd" $options
+			fi
+			;;
 	esac
 }
 
@@ -283,7 +294,18 @@ qmodem_fastat_dispatch()
 	case "$(uci -q get qmodem.main.at_tool 2>/dev/null)" in
 		0) tom_modem -d "$at_port" -o a -c "$atcmd" -t 1 ;;
 		1) sms_tool_q -t 1 -d "$at_port" at "$atcmd" ;;
-		*) qmodem_atd_sendat "$at_port" "$atcmd" 1000 ;;
+		*)
+			local sock
+			sock=$(qmodem_atd_socket)
+			if [ -S "$sock" ]; then
+				qmodem_atd_sendat "$at_port" "$atcmd" 1000 && return 0
+			fi
+			if command -v sms_tool_q >/dev/null 2>&1; then
+				sms_tool_q -t 1 -d "$at_port" at "$atcmd"
+			else
+				tom_modem -d "$at_port" -o a -c "$atcmd" -t 1
+			fi
+			;;
 	esac
 }
 

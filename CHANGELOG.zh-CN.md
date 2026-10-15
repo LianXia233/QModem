@@ -11,10 +11,19 @@
 
 ## [Unreleased]
 
-### 移除（Removed）
-- **正式移除旧版 Lua 界面五包**：`luci-app-qmodem`（Lua 版）、`luci-app-qmodem-sms`、`luci-app-qmodem-ttl`、`luci-app-qmodem-hc`、`luci-app-qmodem-mwan` 从 `luci/` 目录彻底清理。其承载的核心硬件控制与守护脚本（`modem_sim.sh`、`modem_mwan.sh`、`qmodem_hc_sim`、`qmodem_mwan`、`99-setup-mwan`、`01-reload-mwan3.dhcpscript）已全量迁移并入 `qmodem` 一体化后端包。彻底消除了与现代 JS 视图之间的同名菜单路由覆盖冲突。
-
 ### 新增（Added）
+- **全量 11 个核心页面 Soft Anime 视觉与动态 SVG 重构**：
+  - `overview`（仪表盘）：新增蜂窝波动态 SVG 天线与吉祥物、4 核心指标卡（信号强度/RAT、运营商/频段、网络会话/IP、SIM 卡槽位）、闪烁骨架屏与极速并行异步水合。
+  - `network_config`（网络配置）：新增双天线 5G 路由器动态 SVG Hero 头图，优化异步加载超时策略（避免拨号阻塞整页渲染），RC 服务状态升级为脉冲呼吸点胶囊。
+  - `debug`（AT 调试）：重构为 macOS/Anime 风格赛博终端（`.qmodem-terminal-frame`），配动态 SVG 终端、诊断预设药丸、一键复制、Enter 键发送与非阻塞异步响应。
+  - `config_advanced`（高级配置）：新增齿轮调优动态 SVG Hero 头图，模组选择工具栏卡片化，增强标签页响应式切换。
+  - `sms`（短信）：新增动态发光气泡 SVG 头图，优化会话与时区/存储配置区域。
+  - `settings`（核心设置）：新增微芯片与 PCB 动态走线 SVG，RPC 链路全面增加超时与容错回退机制，确保冷启动秒开。
+  - `monitor`（健康监控）：新增雷达扫描波动态 SVG，多拨监控与守护状态卡片化。
+  - `ttl`（TTL 规则）：新增护盾与数据包流向动态 SVG，内置 1-Click 常用预设（64 Linux/Android、128 Windows、65 绕过热点）。
+  - `sim_switch`（SIM 卡切换）：新增双卡芯片动态切换 SVG，提供 Slot 1 / Slot 2 独立交互卡片与呼吸灯指示。
+  - `sms_forward`（短信转发）：新增纸飞机推送信使动态 SVG，集成多通道（TG/Webhook/飞书/ServerChan/PushDeer）配置。
+  - `sms_sim`（SIM 卡短信）：新增 Micro-SIM 动态 SVG 头图，重构为现代工具栏与卡片化消息表单。
 - **`luci-app-qmodem-ttlfw4` 完整接入 Soft Anime 设计系统**：引入自包含 `soft-anime.css`（避免跨包 404）、Pastel Glass 警示卡片组件、按天资源缓存防呆（cache-bust）并修正 init.d 脚本中的 bashism。
 - **`luci-app-qmodem-monitor` 状态指示体验升级**：服务启用/运行状态全面接入 `.qmodem-chip` 与 `.qmodem-status-row` 状态胶囊徽章。
 
@@ -24,6 +33,9 @@
   目录，导致简体中文界面下 Hero 区仍显示英文，而页面其余部分已翻译（实机安装
   1.1.1 构建后观察到）。三条文案现已加入 `po/template/qmodem-next.po`，
   并在 `po/zh_Hans/luci-app-qmodem-next.po` 中完成翻译。
+
+### 移除（Removed）
+- **正式移除旧版 Lua 界面五包**：`luci-app-qmodem`（Lua 版）、`luci-app-qmodem-sms`、`luci-app-qmodem-ttl`、`luci-app-qmodem-hc`、`luci-app-qmodem-mwan` 从 `luci/` 目录彻底清理。其承载的核心硬件控制与守护脚本（`modem_sim.sh`、`modem_mwan.sh`、`qmodem_hc_sim`、`qmodem_mwan`、`99-setup-mwan`、`01-reload-mwan3.dhcpscript）已全量迁移并入 `qmodem` 一体化后端包。彻底消除了与现代 JS 视图之间的同名菜单路由覆盖冲突。
 
 ## [1.1.1] - 2026-10-14
 

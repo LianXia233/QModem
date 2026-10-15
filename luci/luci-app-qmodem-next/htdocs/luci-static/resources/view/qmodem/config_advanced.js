@@ -23,35 +23,45 @@ return view.extend({
 		}
 
 		var container = E('div', { 'class': 'cbi-map' });
-		var title = E('h2', { 'class': 'cbi-map-caption' }, _('Advanced Configuration'));
-		container.appendChild(title);
 
-		// Create modem selector section
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td left', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
-		
-		// Create select dropdown
+		// Soft Anime Hero
+		var hero = E('div', { 'class': 'qmodem-hero' }, [
+			E('h1', { 'class': 'qmodem-hero-title' }, [
+				_('Advanced Modem Configuration'),
+				E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Hardware Tuning'))
+			]),
+			E('p', { 'class': 'qmodem-hero-sub' },
+				_('Fine-tune radio access technologies, band locking, IMEI provisioning and cell lock parameters.'))
+		]);
+		var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+		heroIcon.innerHTML =
+			'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+			'<circle cx="38" cy="30" r="15" stroke="#8875E8" stroke-width="2.5" stroke-dasharray="5 3" class="qmd-anim-spin"/>' +
+			'<circle cx="38" cy="30" r="6" fill="#EFA8CB" class="qmd-anim-pulse"/>' +
+			'<path d="M16 30 L6 30 M70 30 L60 30 M38 8 L38 18 M38 52 L38 42" stroke="#8CCFE2" stroke-width="2.5" stroke-linecap="round"/>' +
+			'</svg>';
+		hero.appendChild(heroIcon);
+		container.appendChild(hero);
+
+		// Modern Toolbar Card
+		var selectorSection = E('div', {
+			'class': 'cbi-section',
+			'style': 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 12px 18px;'
+		});
+		var leftBar = E('div', { 'style': 'display: flex; align-items: center; gap: 10px; flex-wrap: wrap;' });
+		leftBar.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-muted', 'style': 'font-weight: 600;' }, _('Active Modem')));
 		var select = E('select', {
 			'class': 'cbi-input-select',
-			'id': 'modem_selector'
+			'id': 'modem_selector',
+			'style': 'min-width: 220px;'
 		});
-		
 		modems.forEach(function(modem) {
 			if (modem.enabled) {
 				select.appendChild(E('option', { 'value': modem.id }, modem.name));
 			}
 		});
-		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
-		selectorTable.appendChild(selectorBody);
-		selectorSection.appendChild(selectorTable);
+		leftBar.appendChild(select);
+		selectorSection.appendChild(leftBar);
 		container.appendChild(selectorSection);
 
 		// Create tab container

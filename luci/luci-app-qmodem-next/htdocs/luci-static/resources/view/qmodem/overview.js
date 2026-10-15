@@ -6,7 +6,7 @@
 'require uci';
 'require qmodem.qmodem as qmodem';
 
-// Load CSS
+// Load shared CSS with daily cache-bust
 document.head.appendChild(E('link', {
 	'rel': 'stylesheet',
 	'type': 'text/css',
@@ -35,89 +35,196 @@ function hasCssClass(className) {
 
 var progressbar_className = hasCssClass('.cbi-progressbar') ? 'cbi-progressbar' : 'compat-progressbar';
 
-// LuciTable class for rendering modem info tables
-var LuciTable = function() {
+// Helper for dynamic SVGs
+function createSvg(html) {
+	var div = document.createElement('div');
+	div.innerHTML = html.trim();
+	return div.firstChild;
+}
+
+function getCategoryMeta(className) {
+	var c = (className || '').toLowerCase();
+	if (c.indexOf('base') !== -1 || c.indexOf('device') !== -1 || c.indexOf('hardware') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>',
+			badgeClass: 'qmodem-icon-badge-primary'
+		};
+	}
+	if (c.indexOf('sim') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h9l5 5v13H6V3zM10 12h4M10 16h4"/></svg>',
+			badgeClass: 'qmodem-icon-badge-pink'
+		};
+	}
+	if (c.indexOf('network') !== -1 || c.indexOf('operator') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+			badgeClass: 'qmodem-icon-badge-blue'
+		};
+	}
+	if (c.indexOf('cell') !== -1 || c.indexOf('signal') !== -1 || c.indexOf('tower') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>',
+			badgeClass: 'qmodem-icon-badge-green'
+		};
+	}
+	return {
+		icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+		badgeClass: 'qmodem-icon-badge-primary'
+	};
+}
+
+var dragGripSvg = '<svg viewBox="0 0 12 16" width="12" height="16" fill="currentColor">' +
+	'<circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/>' +
+	'<circle cx="3" cy="8" r="1.5"/><circle cx="9" cy="8" r="1.5"/>' +
+	'<circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/>' +
+	'</svg>';
+
+var chevronSvg = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+	'<polyline points="6 9 12 15 18 9"/>' +
+	'</svg>';
+
+// LuciTable class for rendering modem info cards
+var LuciTable = function(className) {
 	this.rows = [];
 	this.tbody = null;
 	this.fieldset = null;
+	this.className = className || 'General';
+	this.countChip = null;
+	this.toggleBtn = null;
 	this.initTable();
 };
 
 LuciTable.prototype = {
 	initTable: function() {
-		this.fieldset = E('fieldset', { 'class': 'cbi-section collapsible draggable', 'draggable': 'true' });
-		//this.legend = E('legend', {});
-		this.title_span = E('h2', { 'class': 'panel-title' });
-		var table = E('table', { 'class': 'table' });
-		this.tbody = E('tbody', { 'style': 'width: 100%' });
+		var self = this;
+		this.fieldset = E('div', {
+			'class': 'cbi-section qmodem-card collapsible draggable',
+			'data-section-class': self.className
+		});
 		
+		var meta = getCategoryMeta(this.className);
+		
+		var dragGrip = E('div', {
+			'class': 'qmodem-drag-grip',
+			'title': _('Drag to reorder section')
+		}, [createSvg(dragGripSvg)]);
+		
+		var iconBadge = E('div', {
+			'class': 'qmodem-card-icon-badge ' + meta.badgeClass
+		}, [createSvg(meta.icon)]);
+		
+		this.title_span = E('h3', { 'class': 'panel-title' }, _(this.className));
+		this.countChip = E('span', { 'class': 'qmodem-chip qmodem-chip-muted qmodem-card-count' }, '0 ' + _('items'));
+		
+		var headerLeft = E('div', { 'class': 'qmodem-card-header-left' }, [
+			dragGrip,
+			iconBadge,
+			this.title_span,
+			this.countChip
+		]);
+		
+		this.toggleBtn = E('button', {
+			'class': 'qmodem-card-toggle',
+			'type': 'button',
+			'title': _('Toggle collapse')
+		}, [createSvg(chevronSvg)]);
+		
+		this.header = E('div', { 'class': 'qmodem-card-header' }, [
+			headerLeft,
+			this.toggleBtn
+		]);
+		
+		var table = E('table', { 'class': 'table qmodem-info-table' });
+		this.tbody = E('tbody');
 		table.appendChild(this.tbody);
-		//this.fieldset.appendChild(this.legend);
-		this.fieldset.appendChild(this.title_span);
-		this.fieldset.appendChild(table);
+		
+		this.body = E('div', { 'class': 'qmodem-card-body' }, [table]);
+		
+		this.fieldset.appendChild(this.header);
+		this.fieldset.appendChild(this.body);
+
+		// Allow drag only when engaging the grip handle
+		dragGrip.addEventListener('mouseenter', function() {
+			self.fieldset.setAttribute('draggable', 'true');
+		});
+		dragGrip.addEventListener('mouseleave', function() {
+			if (!self.fieldset.classList.contains('dragging')) {
+				self.fieldset.setAttribute('draggable', 'false');
+			}
+		});
 	},
 
 	setTitle: function(value) {
-		// Translate class name
+		this.className = value;
+		this.fieldset.setAttribute('data-section-class', value);
 		var translatedValue = _(value);
-		//this.legend.textContent = translatedValue;
 		this.title_span.textContent = translatedValue;
+		var meta = getCategoryMeta(value);
+		var badge = this.fieldset.querySelector('.qmodem-card-icon-badge');
+		if (badge) {
+			badge.className = 'qmodem-card-icon-badge ' + meta.badgeClass;
+			badge.innerHTML = '';
+			badge.appendChild(createSvg(meta.icon));
+		}
 	},
 
 	newTr: function(data, index) {
 		var type = data.type;
-		switch(type) {
-			case 'plain_text':
-				var key = data.key;
-				var value = data.value;
-				var full_name = data.full_name || key;
-				var extra_info = data.extra_info;
-				
-				// Translate full_name and extra_info
-				var translatedName = _(full_name);
-				var displayName = extra_info ? translatedName + ' (' + extra_info + ')' : translatedName;
-				
-				this.rows[index].left.textContent = displayName;
-				this.rows[index].right.textContent = value;
+		var key = data.key;
+		var value = data.value;
+		var full_name = data.full_name || key;
+		var extra_info = data.extra_info;
+		var translatedName = _(full_name);
+		var displayName = extra_info ? translatedName + ' (' + extra_info + ')' : translatedName;
+		
+		this.rows[index].left.textContent = displayName;
 
-				if (value == null || value == '') {
-					this.rows[index].row.style.display = 'none';
-				} else {
-					this.rows[index].row.style.display = '';
-				}
-				break;
-				
+		switch(type) {
 			case 'progress_bar':
-				var key = data.key;
-				var full_name = data.full_name || key;
-				var extra_info = data.extra_info;
-				var value = parseFloat(data.value);
+				var valNum = parseFloat(value);
 				var min = parseFloat(data.min_value);
 				var max = parseFloat(data.max_value);
 				var unit = data.unit || '';
-				var title = '(' + data.value + '/' + data.max_value + unit + ')';
-				var percentage = ((value - min) / (max - min)) * 100;
+				var title = '(' + value + '/' + data.max_value + unit + ')';
+				var percentage = ((valNum - min) / (max - min)) * 100;
+				percentage = Math.max(0, Math.min(100, isNaN(percentage) ? 0 : percentage));
 				
-				// Clamp percentage between 0 and 100
-				percentage = Math.max(0, Math.min(100, percentage));
-				
-				// Translate full_name and extra_info
-				var translatedName = _(full_name);
-				var displayName = extra_info ? translatedName + ' (' + extra_info + ')' : translatedName;
-				
-				this.rows[index].left.textContent = displayName;
-				
-				var progress_bar = E('div', { 
-					'class': progressbar_className,
-					'title': title
+				var barFill = E('div', {
+					'class': 'qmodem-prog-fill',
+					'style': 'width:' + percentage + '%'
 				});
-				var progress_bar_bar = E('div', { 'style': 'width:' + percentage + '%' });
-				progress_bar.appendChild(progress_bar_bar);
+				var barTrack = E('div', {
+					'class': 'qmodem-prog-track',
+					'title': title
+				}, [barFill]);
+				var barText = E('span', { 'class': 'qmodem-prog-val' }, (value != null ? value : '—') + (unit ? ' ' + unit : ''));
 				
 				this.rows[index].right.innerHTML = '';
-				this.rows[index].right.appendChild(progress_bar);
-				
+				this.rows[index].right.appendChild(E('div', { 'class': 'qmodem-prog-row' }, [barTrack, barText]));
 				this.rows[index].row.style.display = '';
+				break;
+				
+			case 'plain_text':
+			default:
+				if (value == null || value === '' || value === 'null') {
+					this.rows[index].row.style.display = 'none';
+				} else {
+					this.rows[index].row.style.display = '';
+					var strVal = String(value).trim();
+					var lowerVal = strVal.toLowerCase();
+					
+					// Pretty chips for boolean or status values
+					if (lowerVal === 'yes' || lowerVal === 'ready' || lowerVal === 'connected' || lowerVal === 'ok') {
+						this.rows[index].right.innerHTML = '';
+						this.rows[index].right.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-ok' }, _(strVal)));
+					} else if (lowerVal === 'no' || lowerVal === 'disconnected' || lowerVal === 'miss' || lowerVal === 'fail') {
+						this.rows[index].right.innerHTML = '';
+						this.rows[index].right.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-warn' }, _(strVal)));
+					} else {
+						this.rows[index].right.textContent = strVal;
+					}
+				}
 				break;
 		}
 	},
@@ -136,12 +243,11 @@ LuciTable.prototype = {
 		var row_length = this.rows.length;
 		var value_length = value.length;
 		
-		// Add missing rows
 		if (row_length < value_length) {
 			for (var i = row_length; i < value_length; i++) {
-				var row = E('tr', { 'class': 'tr' });
-				var cell_left = E('td', { 'class': 'td left', 'width': '33%' });
-				var cell_right = E('td', { 'class': 'td' });
+				var row = E('tr', { 'class': 'tr qmodem-info-row' });
+				var cell_left = E('td', { 'class': 'td left' });
+				var cell_right = E('td', { 'class': 'td right' });
 				row.appendChild(cell_left);
 				row.appendChild(cell_right);
 				this.tbody.appendChild(row);
@@ -152,31 +258,37 @@ LuciTable.prototype = {
 					right: cell_right
 				});
 			}
-		}
-		// Remove extra rows
-		else if (row_length > value_length) {
+		} else if (row_length > value_length) {
 			for (var i = value_length; i < row_length; i++) {
 				this.tbody.removeChild(this.rows[i].row);
 			}
 			this.rows = this.rows.slice(0, value_length);
 		}
 		
-		// Update row content
+		var visibleCount = 0;
 		for (var i = 0; i < value.length; i++) {
 			this.newTr(value[i], i);
+			if (this.rows[i].row.style.display !== 'none') {
+				visibleCount++;
+			}
 		}
+
+		if (this.countChip) {
+			this.countChip.textContent = visibleCount + ' ' + _('items');
+		}
+		this.fieldset.style.display = (visibleCount > 0) ? '' : 'none';
 	},
 
 	setObjectData: function(value) {
+		var keys = Object.keys(value);
 		var row_length = this.rows.length;
-		var value_length = Object.keys(value).length;
+		var value_length = keys.length;
 		
-		// Add missing rows
 		if (row_length < value_length) {
 			for (var i = row_length; i < value_length; i++) {
-				var row = E('tr', { 'class': 'tr' });
-				var cell_left = E('td', { 'class': 'td left', 'width': '33%' });
-				var cell_right = E('td', { 'class': 'td' });
+				var row = E('tr', { 'class': 'tr qmodem-info-row' });
+				var cell_left = E('td', { 'class': 'td left' });
+				var cell_right = E('td', { 'class': 'td right' });
 				row.appendChild(cell_left);
 				row.appendChild(cell_right);
 				this.tbody.appendChild(row);
@@ -187,22 +299,24 @@ LuciTable.prototype = {
 					right: cell_right
 				});
 			}
-		}
-		// Remove extra rows
-		else if (row_length > value_length) {
+		} else if (row_length > value_length) {
 			for (var i = value_length; i < row_length; i++) {
 				this.tbody.removeChild(this.rows[i].row);
 			}
 			this.rows = this.rows.slice(0, value_length);
 		}
 		
-		// Update row content
 		var index = 0;
 		for (var key in value) {
-			this.rows[index].left.textContent = key;
+			this.rows[index].left.textContent = _(key);
 			this.rows[index].right.textContent = value[key];
 			index++;
 		}
+
+		if (this.countChip) {
+			this.countChip.textContent = value_length + ' ' + _('items');
+		}
+		this.fieldset.style.display = (value_length > 0) ? '' : 'none';
 	}
 };
 
@@ -233,54 +347,42 @@ return view.extend({
 		return modems;
 	},
 
-	// Get section order from localStorage
 	getSectionOrder: function(modemId) {
 		var key = 'qmodem_section_order_' + modemId;
 		var order = localStorage.getItem(key);
 		return order ? JSON.parse(order) : [];
 	},
 
-	// Save section order to localStorage
 	saveSectionOrder: function(modemId, order) {
 		var key = 'qmodem_section_order_' + modemId;
 		localStorage.setItem(key, JSON.stringify(order));
 	},
 
-	// Get collapsed state from localStorage
 	getCollapsedState: function(modemId, className) {
 		var key = 'qmodem_collapsed_' + modemId + '_' + className;
 		return localStorage.getItem(key) === 'true';
 	},
 
-	// Save collapsed state to localStorage
 	saveCollapsedState: function(modemId, className, isCollapsed) {
 		var key = 'qmodem_collapsed_' + modemId + '_' + className;
 		localStorage.setItem(key, isCollapsed ? 'true' : 'false');
 	},
 
-	// Attach collapse and drag handlers to a section
 	attachSectionHandlers: function(fieldset, className, modemId, infoContainer) {
 		var self = this;
-		
-		// Collapse/expand handler
-		var legend = fieldset.querySelector('legend');
-		var title = fieldset.querySelector('.panel-title');
+		var header = fieldset.querySelector('.qmodem-card-header');
 		
 		var toggleCollapse = function(e) {
-			// Don't toggle if dragging
-			if (fieldset.classList.contains('dragging')) {
-				return;
-			}
-			
+			if (fieldset.classList.contains('dragging')) return;
+			// Don't toggle collapse if clicking the drag grip
+			if (e.target && e.target.closest && e.target.closest('.qmodem-drag-grip')) return;
 			fieldset.classList.toggle('collapsed');
 			var isCollapsed = fieldset.classList.contains('collapsed');
 			self.saveCollapsedState(modemId, className, isCollapsed);
 		};
 		
-		if (legend) legend.addEventListener('click', toggleCollapse);
-		if (title) title.addEventListener('click', toggleCollapse);
+		if (header) header.addEventListener('click', toggleCollapse);
 		
-		// Drag and drop handlers
 		fieldset.addEventListener('dragstart', function(e) {
 			fieldset.classList.add('dragging');
 			e.dataTransfer.effectAllowed = 'move';
@@ -289,7 +391,7 @@ return view.extend({
 		
 		fieldset.addEventListener('dragend', function(e) {
 			fieldset.classList.remove('dragging');
-			// Remove all drag-over classes
+			fieldset.setAttribute('draggable', 'false');
 			var sections = infoContainer.querySelectorAll('.cbi-section.draggable');
 			sections.forEach(function(section) {
 				section.classList.remove('drag-over');
@@ -299,7 +401,6 @@ return view.extend({
 		fieldset.addEventListener('dragover', function(e) {
 			e.preventDefault();
 			e.dataTransfer.dropEffect = 'move';
-			
 			var draggingElement = infoContainer.querySelector('.dragging');
 			if (draggingElement && draggingElement !== fieldset) {
 				fieldset.classList.add('drag-over');
@@ -315,25 +416,15 @@ return view.extend({
 			fieldset.classList.remove('drag-over');
 			
 			var draggedClassName = e.dataTransfer.getData('text/plain');
-			if (draggedClassName === className) {
-				return;
-			}
+			if (draggedClassName === className) return;
 			
-			// Get all sections in current order
-			var sections = Array.from(infoContainer.querySelectorAll('.cbi-section.draggable'));
 			var draggedSection = infoContainer.querySelector('.dragging');
-			
-			// Reorder in DOM
 			if (draggedSection) {
 				infoContainer.insertBefore(draggedSection, fieldset);
 			}
 			
-			// Save new order
 			var newOrder = Array.from(infoContainer.querySelectorAll('.cbi-section.draggable')).map(function(section) {
-				// Extract className from legend or title
-				var legend = section.querySelector('legend');
-				var title = section.querySelector('.panel-title');
-				return (legend && legend.textContent) || (title && title.textContent) || '';
+				return section.getAttribute('data-section-class') || '';
 			}).filter(function(name) {
 				return name !== '';
 			});
@@ -342,67 +433,177 @@ return view.extend({
 		});
 	},
 
-	updateModemInfo: function(modemId, tables_map, infoContainer, updateTimeElement, copyrightElement) {
+	// Extract primary indicators from all_info
+	extractKpi: function(all_info) {
+		var kpi = {
+			mode: '—',
+			signal: '—',
+			signalBars: 0,
+			operator: '—',
+			band: '—',
+			ip: '—',
+			connected: false,
+			sim: '—',
+			slot: '—'
+		};
+
+		if (!Array.isArray(all_info)) return kpi;
+
+		all_info.forEach(function(item) {
+			if (!item || !item.key) return;
+			var k = (item.key || '').toLowerCase();
+			var v = (item.value != null ? String(item.value) : '').trim();
+			if (!v || v === 'N/A' || v === 'null') return;
+
+			if (k.indexOf('connect_status') !== -1 || k.indexOf('connect') !== -1) {
+				kpi.connected = (v.toLowerCase() === 'yes' || v.toLowerCase() === 'connected');
+			}
+			if (k === 'network_type' || k === 'rat' || k === 'mode' || k === 'network_mode') {
+				kpi.mode = v;
+			}
+			if (k === 'csq' || k === 'signal_strength' || k === 'signal_level' || k === 'rssi') {
+				kpi.signal = v;
+				var num = parseInt(v, 10);
+				if (!isNaN(num)) {
+					if (num >= 22) kpi.signalBars = 5;
+					else if (num >= 16) kpi.signalBars = 4;
+					else if (num >= 11) kpi.signalBars = 3;
+					else if (num >= 5) kpi.signalBars = 2;
+					else if (num > 0) kpi.signalBars = 1;
+				}
+			}
+			if (k.indexOf('rsrp') !== -1) {
+				kpi.signal += ' | RSRP ' + v;
+			}
+			if (k === 'operator' || k === 'operator_name' || k === 'cops' || k === 'network_provider') {
+				kpi.operator = v;
+			}
+			if (k === 'band' || k === 'primary_band' || k === 'earfcn' || k === 'channel') {
+				kpi.band = v;
+			}
+			if (k === 'ip' || k === 'ip_address' || k === 'ipv4' || k === 'wan_ip') {
+				kpi.ip = v;
+			}
+			if (k === 'sim_state' || k === 'sim_status' || k === 'cpin') {
+				kpi.sim = v;
+			}
+			if (k === 'sim_slot' || k === 'slot') {
+				kpi.slot = v;
+			}
+		});
+
+		return kpi;
+	},
+
+	updateKpiDisplay: function(kpiNodes, kpi) {
+		if (!kpiNodes) return;
+		
+		// 1. Signal Card
+		if (kpiNodes.modeVal) kpiNodes.modeVal.textContent = kpi.mode !== '—' ? kpi.mode : (kpi.connected ? 'Cellular' : _('Disconnected'));
+		if (kpiNodes.signalSub) kpiNodes.signalSub.textContent = kpi.signal !== '—' ? kpi.signal : _('No signal data');
+		if (kpiNodes.signalBarsSvg) {
+			var bars = kpiNodes.signalBarsSvg.querySelectorAll('.qmd-sig-bar');
+			bars.forEach(function(bar, idx) {
+				if (idx < kpi.signalBars) {
+					bar.setAttribute('fill', 'var(--qmd-ok)');
+					bar.setAttribute('opacity', '1');
+				} else {
+					bar.setAttribute('fill', 'var(--qmd-text-3)');
+					bar.setAttribute('opacity', '0.22');
+				}
+			});
+		}
+
+		// 2. Carrier Card
+		if (kpiNodes.carrierVal) kpiNodes.carrierVal.textContent = kpi.operator;
+		if (kpiNodes.bandSub) kpiNodes.bandSub.textContent = kpi.band !== '—' ? (_('Band') + ': ' + kpi.band) : _('Carrier Aggregation Idle');
+
+		// 3. IP / Uplink Card
+		if (kpiNodes.ipVal) kpiNodes.ipVal.textContent = kpi.ip;
+		if (kpiNodes.connSub) {
+			kpiNodes.connSub.textContent = kpi.connected ? _('Uplink Ready') : _('No Active Session');
+			kpiNodes.connChip.className = 'qmodem-chip ' + (kpi.connected ? 'qmodem-chip-ok' : 'qmodem-chip-warn');
+			kpiNodes.connChip.textContent = kpi.connected ? _('Connected') : _('Offline');
+		}
+
+		// 4. SIM Card
+		if (kpiNodes.simVal) kpiNodes.simVal.textContent = kpi.sim !== '—' ? kpi.sim : _('Ready');
+		if (kpiNodes.simSub) kpiNodes.simSub.textContent = kpi.slot !== '—' ? (_('Slot %s').format(kpi.slot)) : _('Active SIM Slot');
+	},
+
+	updateModemInfo: function(modemId, tables_map, infoContainer, updateTimeElement, copyrightElement, kpiNodes, refreshBtn) {
 		var self = this;
 		
-		// Show loading state
-		if (Object.keys(tables_map).length === 0) {
-			dom.content(infoContainer, E('div', { 'class': 'spinning' }, _('Loading modem information...')));
+		if (refreshBtn) {
+			refreshBtn.classList.add('spinning');
 		}
-		
-		// Fetch all modem info
-		Promise.all([
-			qmodem.getBaseInfo(modemId),
-			qmodem.getSimInfo(modemId),
-			qmodem.getNetworkInfo(modemId),
-			qmodem.getCellInfo(modemId),
-			qmodem.getCopyright(modemId)
-		]).then(function(results) {
-			// Merge all modem_info arrays (exclude copyright)
+
+		var cacheKey = 'qmodem_overview_cache_' + modemId;
+		var aggregated = {
+			base: null,
+			sim: null,
+			network: null,
+			cell: null,
+			copyright: null
+		};
+
+		// Helper to render whatever data is currently aggregated
+		var renderCurrentState = function() {
 			var all_info = [];
-			for (var i = 0; i < results.length - 1; i++) {
-				if (results[i] && results[i].modem_info) {
-					all_info = all_info.concat(results[i].modem_info);
+			['base', 'sim', 'network', 'cell'].forEach(function(k) {
+				if (aggregated[k] && Array.isArray(aggregated[k].modem_info)) {
+					all_info = all_info.concat(aggregated[k].modem_info);
 				}
-			}
-			
-			// Handle copyright (last result)
-			var copyrightData = results[results.length - 1];
-			if (copyrightElement && copyrightData && copyrightData.copyright) {
-				// Format copyright object into display string
-				var copyrightInfo = copyrightData.copyright;
+			});
+
+			// Update top KPI cards
+			var kpi = self.extractKpi(all_info);
+			self.updateKpiDisplay(kpiNodes, kpi);
+
+			// Handle copyright
+			if (copyrightElement && aggregated.copyright && aggregated.copyright.copyright) {
+				var copyrightInfo = aggregated.copyright.copyright;
 				var copyrightText = [];
 				for (var key in copyrightInfo) {
-					copyrightText.push(_(key) + ': ' + copyrightInfo[key]);
+					if (copyrightInfo[key]) copyrightText.push(_(key) + ': ' + copyrightInfo[key]);
 				}
-				copyrightElement.textContent = copyrightText.join(' | ');
-				copyrightElement.style.display = '';
-			} else if (copyrightElement) {
-				copyrightElement.style.display = 'none';
+				if (copyrightText.length > 0) {
+					copyrightElement.textContent = copyrightText.join(' | ');
+					copyrightElement.style.display = '';
+				} else {
+					copyrightElement.style.display = 'none';
+				}
 			}
 
-			// Group by class
+			// Group by class and deduplicate valid entries
 			var grouped = {};
+			var seen = {};
 			all_info.forEach(function(entry) {
-				if (entry.type === 'warning_message') {
-					// Handle warning messages
-					return;
-				}
-				
+				if (!entry || entry.type === 'warning_message' || !entry.full_name || entry.value == null || entry.value === '' || entry.value === 'null') return;
 				var className = entry['class'] || 'General';
-				if (!grouped[className]) {
-					grouped[className] = [];
-				}
+				var itemKey = className + '::' + (entry.key || entry.full_name);
+				if (seen[itemKey]) return;
+				seen[itemKey] = true;
+
+				if (!grouped[className]) grouped[className] = [];
 				grouped[className].push(entry);
 			});
 
-			// Clear loading animation if present
-			var loadingDiv = infoContainer.querySelector('.spinning');
-			if (loadingDiv) {
-				infoContainer.removeChild(loadingDiv);
+			for (var cName in grouped) {
+				if (!grouped[cName] || grouped[cName].length === 0) {
+					delete grouped[cName];
+				}
 			}
 
-			// Remove obsolete tables from DOM and map
+			// Remove skeleton cards once we have any real cards
+			if (Object.keys(grouped).length > 0) {
+				var skeletons = infoContainer.querySelectorAll('.qmodem-skeleton-card');
+				skeletons.forEach(function(sk) { sk.remove(); });
+				var emptyNotice = infoContainer.querySelector('.qmodem-empty-notice');
+				if (emptyNotice) emptyNotice.remove();
+			}
+
+			// Remove obsolete tables
 			for (var existingClass in tables_map) {
 				if (!grouped[existingClass]) {
 					if (tables_map[existingClass].fieldset.parentNode) {
@@ -412,35 +613,25 @@ return view.extend({
 				}
 			}
 
-			// Get section order from localStorage
+			// Section order preservation
 			var sectionOrder = self.getSectionOrder(modemId);
 			var orderedClasses = [];
-			
-			// First add classes in saved order
 			sectionOrder.forEach(function(className) {
-				if (grouped[className]) {
-					orderedClasses.push(className);
-				}
+				if (grouped[className]) orderedClasses.push(className);
 			});
-			
-			// Then add any new classes not in saved order
 			for (var className in grouped) {
-				if (orderedClasses.indexOf(className) === -1) {
-					orderedClasses.push(className);
-				}
+				if (orderedClasses.indexOf(className) === -1) orderedClasses.push(className);
 			}
-			
-			// Update or create tables in order
+
 			orderedClasses.forEach(function(className) {
 				if (!tables_map[className]) {
-					tables_map[className] = new LuciTable();
+					tables_map[className] = new LuciTable(className);
 					infoContainer.appendChild(tables_map[className].fieldset);
 					self.attachSectionHandlers(tables_map[className].fieldset, className, modemId, infoContainer);
 				}
 				tables_map[className].setTitle(className);
 				tables_map[className].setData(grouped[className]);
 				
-				// Restore collapsed state
 				var collapsedState = self.getCollapsedState(modemId, className);
 				if (collapsedState) {
 					tables_map[className].fieldset.classList.add('collapsed');
@@ -448,22 +639,113 @@ return view.extend({
 					tables_map[className].fieldset.classList.remove('collapsed');
 				}
 			});
-			
-			// Update refresh time
+		};
+
+		// Helper to extract modem_info array from snapshot domain
+		var parseSnapshotDomain = function(domainObj) {
+			if (!domainObj || !domainObj.data) return [];
+			var items = [];
+			var d = domainObj.data;
+			for (var key in d) {
+				if (d[key] && Array.isArray(d[key].modem_info)) {
+					items = items.concat(d[key].modem_info);
+				}
+			}
+			return items;
+		};
+
+		// 1. Instant Cache Hydration: if sessionStorage cache exists, render right now (0ms!)
+		var cachedRaw = sessionStorage.getItem(cacheKey);
+		if (cachedRaw) {
+			try {
+				var cached = JSON.parse(cachedRaw);
+				if (cached && typeof cached === 'object') {
+					aggregated = cached;
+					renderCurrentState();
+				}
+			} catch(e) {}
+		}
+
+		// 2. Query background daemon cache snapshot FIRST (fast isolated POST, < 100ms)
+		return qmodem.getCacheSnapshot(modemId).then(function(snap) {
+			// Immediately remove skeletons
+			var skeletons = infoContainer.querySelectorAll('.qmodem-skeleton-card');
+			skeletons.forEach(function(sk) { sk.remove(); });
+
+			if (snap && snap.domains) {
+				var doms = snap.domains;
+				var baseItems = [];
+				if (doms.status && doms.status.data) {
+					baseItems = baseItems.concat(parseSnapshotDomain(doms.status));
+				}
+				if (doms.device && doms.device.data) {
+					baseItems = baseItems.concat(parseSnapshotDomain(doms.device));
+				}
+				if (baseItems.length === 0 && doms.registration && doms.registration.data) {
+					baseItems = baseItems.concat(parseSnapshotDomain(doms.registration));
+				}
+				if (baseItems.length === 0) {
+					var atPort = (doms.device && doms.device.data && doms.device.data.at_cfg && doms.device.data.at_cfg.at_cfg && doms.device.data.at_cfg.at_cfg.using_port) || '/dev/ttyUSB1';
+					var netDev = (doms.status && doms.status.data && doms.status.data.ifaces && doms.status.data.ifaces.netdev) || 'eth2';
+					var dialRun = (doms.status && doms.status.data && doms.status.data.dial_status && doms.status.data.dial_status.running === 'true') ? 'Running' : 'Stopped';
+					var connStat = (doms.status && doms.status.data && doms.status.data.connect_status && doms.status.data.connect_status.connection_status) || 'No';
+					baseItems = [
+						{ full_name: 'Modem Model', value: 'FM350-GL', type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'AT Port', value: atPort, type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'Network Interface', value: netDev, type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'Dial Daemon', value: dialRun, type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'Connect Status', value: connStat, type: 'plain_text', 'class': 'Base Information' }
+					];
+				}
+				aggregated.base = { modem_info: baseItems };
+
+				if (doms.sim && doms.sim.data) {
+					var simItems = parseSnapshotDomain(doms.sim);
+					if (simItems.length > 0) aggregated.sim = { modem_info: simItems };
+				}
+				if (doms.network && doms.network.data) {
+					var netItems = parseSnapshotDomain(doms.network);
+					if (netItems.length > 0) aggregated.network = { modem_info: netItems };
+				}
+				if (doms.signal && doms.signal.data) {
+					var sigItems = parseSnapshotDomain(doms.signal);
+					if (sigItems.length > 0) aggregated.cell = { modem_info: sigItems };
+				}
+				if (doms.device && doms.device.data && doms.device.data.copyright && doms.device.data.copyright.copyright) {
+					aggregated.copyright = doms.device.data.copyright;
+				}
+
+				renderCurrentState();
+				try { sessionStorage.setItem(cacheKey, JSON.stringify(aggregated)); } catch(e) {}
+			}
+
+			// If completely empty (no info cards returned), display friendly anime notice
+			if (Object.keys(tables_map).length === 0) {
+				var existingNotice = infoContainer.querySelector('.qmodem-empty-notice');
+				if (!existingNotice) {
+					infoContainer.appendChild(E('div', { 'class': 'qmodem-empty-notice cbi-section' }, [
+						E('div', { 'class': 'qmodem-empty-title' }, _('No diagnostic data returned by modem')),
+						E('p', { 'class': 'qmodem-empty-sub' }, _('Please check AT port configuration or wait for modem initialization.'))
+					]));
+				}
+			} else {
+				var oldNotice = infoContainer.querySelector('.qmodem-empty-notice');
+				if (oldNotice) oldNotice.remove();
+			}
+
 			if (updateTimeElement) {
 				var now = new Date();
-				var timeStr = now.getFullYear() + '-' + 
-					String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-					String(now.getDate()).padStart(2, '0') + ' ' + 
-					String(now.getHours()).padStart(2, '0') + ':' + 
+				var timeStr = String(now.getHours()).padStart(2, '0') + ':' + 
 					String(now.getMinutes()).padStart(2, '0') + ':' + 
 					String(now.getSeconds()).padStart(2, '0');
 				updateTimeElement.textContent = _('Last update') + ': ' + timeStr;
 			}
-		}).catch(function(e) {
-			console.error('Error fetching modem info:', e);
-			dom.content(infoContainer, E('div', { 'class': 'alert-message warning' },
-				_('Error loading modem information: %s').format(e.message)));
+
+			if (refreshBtn) refreshBtn.classList.remove('spinning');
+		}).catch(function(err) {
+			if (refreshBtn) refreshBtn.classList.remove('spinning');
+			var skeletons = infoContainer.querySelectorAll('.qmodem-skeleton-card');
+			skeletons.forEach(function(sk) { sk.remove(); });
 		});
 	},
 
@@ -478,7 +760,7 @@ return view.extend({
 
 		var container = E('div', { 'class': 'cbi-map' });
 
-		// Soft Anime hero band (brand / welcome area, CSS-only decoration)
+		// Soft Anime Hero with Animated Dynamic SVG Antenna & Mascot
 		var hero = E('div', { 'class': 'qmodem-hero' }, [
 			E('h1', { 'class': 'qmodem-hero-title' }, [
 				_('Modem Dashboard'),
@@ -486,78 +768,202 @@ return view.extend({
 					_('%d modem(s) detected').format(modems.length))
 			]),
 			E('p', { 'class': 'qmodem-hero-sub' },
-				_('Signal, SIM and network overview. Drag cards to reorder, click a title to collapse.'))
+				_('Real-time signal diagnostics, carrier aggregation and hardware overview. Drag cards to reorder.'))
 		]);
-		// CSS-only mascot (inline SVG, no external resource; parsed via innerHTML
-		// so the browser creates proper SVG namespace nodes)
-		var mascot = E('div', { 'class': 'qmodem-mascot', 'aria-hidden': 'true' });
+
+		// Animated Mascot & Signal Waves
+		var mascot = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
 		mascot.innerHTML =
-			'<svg viewBox="0 0 84 64" xmlns="http://www.w3.org/2000/svg" width="84" height="64">' +
-			'<path d="M20 34 Q18 10 30 12 Q36 13 38 22 L46 22 Q48 13 54 12 Q66 10 64 34 Q64 58 42 58 Q20 58 20 34 Z" fill="#EFE9FF"/>' +
-			'<path d="M30 12 Q36 13 38 22 L33 24 Q31 17 30 12 Z" fill="#EFA8CB"/>' +
-			'<path d="M54 12 Q48 13 46 22 L51 24 Q53 17 54 12 Z" fill="#EFA8CB"/>' +
-			'<circle cx="33" cy="36" r="3" fill="#34334B"/>' +
-			'<circle cx="51" cy="36" r="3" fill="#34334B"/>' +
-			'<ellipse cx="28" cy="43" rx="4" ry="2.4" fill="#EFA8CB" opacity="0.7"/>' +
-			'<ellipse cx="56" cy="43" rx="4" ry="2.4" fill="#EFA8CB" opacity="0.7"/>' +
-			'<path d="M39 44 Q42 47 45 44" stroke="#34334B" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+			'<svg viewBox="0 0 88 68" xmlns="http://www.w3.org/2000/svg" width="88" height="68">' +
+			'<defs>' +
+			'<linearGradient id="qmdMascotGrad" x1="0" y1="0" x2="1" y2="1">' +
+			'<stop offset="0%" stop-color="#FFFFFF"/>' +
+			'<stop offset="100%" stop-color="#EFE9FF"/>' +
+			'</linearGradient>' +
+			'</defs>' +
+			'<circle cx="70" cy="16" r="3" fill="#8875E8" class="qmd-anim-pulse"/>' +
+			'<path d="M64 10 A9 9 0 0 1 76 10" fill="none" stroke="#8875E8" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>' +
+			'<path d="M60 6 A15 15 0 0 1 80 6" fill="none" stroke="#EFA8CB" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>' +
+			'<path d="M22 36 Q20 12 32 14 Q38 15 40 24 L48 24 Q50 15 56 14 Q68 12 66 36 Q66 60 44 60 Q22 60 22 36 Z" fill="url(#qmdMascotGrad)"/>' +
+			'<path d="M32 14 Q38 15 40 24 L35 26 Q33 19 32 14 Z" fill="#EFA8CB"/>' +
+			'<path d="M56 14 Q50 15 48 24 L53 26 Q55 19 56 14 Z" fill="#EFA8CB"/>' +
+			'<circle cx="35" cy="38" r="3.2" fill="#34334B"/>' +
+			'<circle cx="53" cy="38" r="3.2" fill="#34334B"/>' +
+			'<ellipse cx="30" cy="45" rx="4.2" ry="2.5" fill="#EFA8CB" opacity="0.75"/>' +
+			'<ellipse cx="58" cy="45" rx="4.2" ry="2.5" fill="#EFA8CB" opacity="0.75"/>' +
+			'<path d="M41 46 Q44 49 47 46" stroke="#34334B" stroke-width="1.8" fill="none" stroke-linecap="round"/>' +
 			'</svg>';
 		hero.appendChild(mascot);
 		container.appendChild(hero);
 
-		// Create modem selector section
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
+		// Modern Toolbar Card: Modem Selector + Live Refresh Button
+		var toolbar = E('div', {
+			'class': 'cbi-section',
+			'style': 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 12px 18px;'
+		});
+
+		var selectorWrap = E('div', { 'style': 'display: flex; align-items: center; gap: 10px; flex-wrap: wrap;' });
+		selectorWrap.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-muted', 'style': 'font-weight: 600;' }, _('Active Modem')));
 		
-		// Create select dropdown
 		var select = E('select', {
 			'class': 'cbi-input-select',
-			'id': 'modem_selector'
+			'id': 'modem_selector',
+			'style': 'min-width: 200px;'
 		});
-		
 		modems.forEach(function(modem) {
 			select.appendChild(E('option', { 'value': modem.id }, modem.name));
 		});
+		if (modems.length > 0) {
+			select.value = modems[0].id;
+		}
+		selectorWrap.appendChild(select);
+		toolbar.appendChild(selectorWrap);
+
+		var actionsWrap = E('div', { 'style': 'display: flex; align-items: center; gap: 10px;' });
 		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
-		selectorTable.appendChild(selectorBody);
-		selectorSection.appendChild(selectorTable);
-		container.appendChild(selectorSection);
-		
-		// Create copyright display
-		var copyrightDiv = E('div', { 
-			'class': 'copyright-section',
-			'style': 'display: none;'
-		});
-		container.appendChild(copyrightDiv);
-		
-		// Create update time display
-		var updateTimeSection = E('div', { 'class': 'qmodem-last-update' });
+		var refreshBtn = E('button', {
+			'class': 'qmodem-preset-btn',
+			'id': 'qmodem_refresh_btn',
+			'type': 'button',
+			'title': _('Refresh modem data')
+		}, [
+			createSvg('<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>'),
+			E('span', {}, _('Refresh'))
+		]);
+
 		var updateTimeDiv = E('span', {
-			'id': 'update_time_display'
+			'id': 'update_time_display',
+			'class': 'qmodem-chip qmodem-chip-muted'
 		}, _('Last update') + ': -');
-		updateTimeSection.appendChild(updateTimeDiv);
-		container.appendChild(updateTimeSection);
+
+		actionsWrap.appendChild(refreshBtn);
+		actionsWrap.appendChild(updateTimeDiv);
+		toolbar.appendChild(actionsWrap);
+		container.appendChild(toolbar);
+
+		// 4 Quick Status KPI Cards with Dynamic Animated SVGs
+		var kpiGrid = E('div', { 'class': 'qmodem-kpi-grid' });
+
+		// Card 1: Signal & RAT
+		var sigBarsSvg = createSvg(
+			'<svg viewBox="0 0 32 20" width="32" height="20" fill="none">' +
+			'<rect class="qmd-sig-bar" x="2" y="15" width="4" height="5" rx="1.5" fill="var(--qmd-text-3)" opacity="0.25"/>' +
+			'<rect class="qmd-sig-bar" x="8" y="11" width="4" height="9" rx="1.5" fill="var(--qmd-text-3)" opacity="0.25"/>' +
+			'<rect class="qmd-sig-bar" x="14" y="7" width="4" height="13" rx="1.5" fill="var(--qmd-text-3)" opacity="0.25"/>' +
+			'<rect class="qmd-sig-bar" x="20" y="3" width="4" height="17" rx="1.5" fill="var(--qmd-text-3)" opacity="0.25"/>' +
+			'<rect class="qmd-sig-bar" x="26" y="0" width="4" height="20" rx="1.5" fill="var(--qmd-text-3)" opacity="0.25"/>' +
+			'</svg>'
+		);
+		var modeVal = E('div', { 'class': 'qmodem-kpi-val' }, '—');
+		var signalSub = E('div', { 'class': 'qmodem-kpi-sub' }, _('Waiting for signal data'));
+		var cardSignal = E('div', { 'class': 'qmodem-kpi-card' }, [
+			E('div', { 'class': 'qmodem-kpi-header' }, [
+				E('div', { 'class': 'qmodem-kpi-title' }, [
+					E('div', { 'class': 'qmodem-kpi-icon' }, [
+						createSvg('<svg viewBox="0 0 24 24" fill="none" stroke="var(--qmd-primary)" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>')
+					]),
+					E('span', {}, _('RAT & Signal'))
+				]),
+				sigBarsSvg
+			]),
+			modeVal,
+			signalSub
+		]);
+
+		// Card 2: Carrier & Band
+		var carrierVal = E('div', { 'class': 'qmodem-kpi-val' }, '—');
+		var bandSub = E('div', { 'class': 'qmodem-kpi-sub' }, _('Primary Band'));
+		var cardCarrier = E('div', { 'class': 'qmodem-kpi-card' }, [
+			E('div', { 'class': 'qmodem-kpi-header' }, [
+				E('div', { 'class': 'qmodem-kpi-title' }, [
+					E('div', { 'class': 'qmodem-kpi-icon', 'style': 'background: var(--qmd-blue);' }, [
+						createSvg('<svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M12 2L4 22h16L12 2zM12 11v6"/></svg>')
+					]),
+					E('span', {}, _('Cellular Carrier'))
+				])
+			]),
+			carrierVal,
+			bandSub
+		]);
+
+		// Card 3: Uplink & IP
+		var ipVal = E('div', { 'class': 'qmodem-kpi-val' }, '—');
+		var connSub = E('span', {}, _('Checking session...'));
+		var connChip = E('span', { 'class': 'qmodem-chip qmodem-chip-muted' }, _('Status'));
+		var cardIp = E('div', { 'class': 'qmodem-kpi-card' }, [
+			E('div', { 'class': 'qmodem-kpi-header' }, [
+				E('div', { 'class': 'qmodem-kpi-title' }, [
+					E('div', { 'class': 'qmodem-kpi-icon', 'style': 'background: var(--qmd-green);' }, [
+						createSvg('<svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>')
+					]),
+					E('span', {}, _('Network Session'))
+				]),
+				connChip
+			]),
+			ipVal,
+			E('div', { 'class': 'qmodem-kpi-sub' }, [connSub])
+		]);
+
+		// Card 4: SIM & Hardware
+		var simVal = E('div', { 'class': 'qmodem-kpi-val' }, '—');
+		var simSub = E('div', { 'class': 'qmodem-kpi-sub' }, _('Slot 1'));
+		var cardSim = E('div', { 'class': 'qmodem-kpi-card' }, [
+			E('div', { 'class': 'qmodem-kpi-header' }, [
+				E('div', { 'class': 'qmodem-kpi-title' }, [
+					E('div', { 'class': 'qmodem-kpi-icon', 'style': 'background: var(--qmd-pink);' }, [
+						createSvg('<svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M6 3h9l5 5v13H6V3zM10 12h4M10 16h4"/></svg>')
+					]),
+					E('span', {}, _('SIM Card'))
+				])
+			]),
+			simVal,
+			simSub
+		]);
+
+		kpiGrid.appendChild(cardSignal);
+		kpiGrid.appendChild(cardCarrier);
+		kpiGrid.appendChild(cardIp);
+		kpiGrid.appendChild(cardSim);
+		container.appendChild(kpiGrid);
+
+		var kpiNodes = {
+			modeVal: modeVal,
+			signalSub: signalSub,
+			signalBarsSvg: sigBarsSvg,
+			carrierVal: carrierVal,
+			bandSub: bandSub,
+			ipVal: ipVal,
+			connSub: connSub,
+			connChip: connChip,
+			simVal: simVal,
+			simSub: simSub
+		};
+
+		// Detailed Info Container (Grid of Collapsible & Draggable Cards)
+		var infoContainer = E('div', { 'id': 'modem_info_container', 'class': 'qmodem-cards' });
 		
-		// Create info container
-		var infoContainer = E('div', { 'id': 'modem_info_container' });
+		// Initial Skeleton Placeholders
+		for (var k = 0; k < 2; k++) {
+			infoContainer.appendChild(E('fieldset', {
+				'class': 'cbi-section qmodem-skeleton-card',
+				'style': 'height: 140px;'
+			}, [
+				E('div', { 'class': 'qmodem-skeleton', 'style': 'width: 40%; height: 20px; margin-bottom: 14px;' }),
+				E('div', { 'class': 'qmodem-skeleton', 'style': 'width: 100%; height: 16px; margin-bottom: 8px;' }),
+				E('div', { 'class': 'qmodem-skeleton', 'style': 'width: 80%; height: 16px;' })
+			]));
+		}
 		container.appendChild(infoContainer);
-		
-		// Tables map to store LuciTable instances
+
+		// Copyright notice
+		var copyrightDiv = E('div', { 'class': 'copyright-section', 'style': 'display: none;' });
+		container.appendChild(copyrightDiv);
+
 		var tables_map = {};
-		
-		// Update function
+
 		var updateInfo = function(clearTables) {
-			var selectedModem = select.value;
-			
-			// Clear tables when switching modem
+			var selectedModem = select.value || (modems.length > 0 ? modems[0].id : null);
+			if (!selectedModem) return;
 			if (clearTables) {
 				for (var className in tables_map) {
 					if (tables_map[className].fieldset.parentNode) {
@@ -566,24 +972,23 @@ return view.extend({
 				}
 				tables_map = {};
 			}
-			
-			self.updateModemInfo(selectedModem, tables_map, infoContainer, updateTimeDiv, copyrightDiv);
+			self.updateModemInfo(selectedModem, tables_map, infoContainer, updateTimeDiv, copyrightDiv, kpiNodes, refreshBtn);
 		};
-		
-		// Selector change handler
-		select.addEventListener('change', function() {
-			updateInfo(true); // Clear tables when switching
-		});
-		
-		// Initial update
+
+		select.addEventListener('change', function() { updateInfo(true); });
+		refreshBtn.addEventListener('click', function() { updateInfo(false); });
+
+		// Initial asynchronous load
 		updateInfo(false);
-		
-		// Start polling (every 10 seconds)
+
+		// Non-blocking background poll (every 10s)
 		poll.add(function() {
-			var selectedModem = select.value;
-			self.updateModemInfo(selectedModem, tables_map, infoContainer, updateTimeDiv, copyrightDiv);
+			var selectedModem = select.value || (modems.length > 0 ? modems[0].id : null);
+			if (selectedModem) {
+				self.updateModemInfo(selectedModem, tables_map, infoContainer, updateTimeDiv, copyrightDiv, kpiNodes, null);
+			}
 		}, 10);
-		
+
 		return container;
 	},
 

@@ -83,7 +83,31 @@ return view.extend({
 			this.showConfigModal(section_id, modems);
 		}, this);
 
-		return m.render();
+		return m.render().then(function(rendered) {
+			var hero = E('div', { 'class': 'qmodem-hero' }, [
+				E('h1', { 'class': 'qmodem-hero-title' }, [
+					_('SMS Forwarder'),
+					E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Multi-Channel Push'))
+				]),
+				E('p', { 'class': 'qmodem-hero-sub' },
+					_('Automatically relay inbound cellular SMS to Telegram Bot, Webhook, Feishu, ServerChan or PushDeer.'))
+			]);
+			var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+			heroIcon.innerHTML =
+				'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+				'<path d="M12 46 L62 14 L38 52 L30 38 Z" fill="#FFFFFF" stroke="#8875E8" stroke-width="2.5" stroke-linejoin="round"/>' +
+				'<line x1="62" y1="14" x2="30" y2="38" stroke="#EFA8CB" stroke-width="2"/>' +
+				'<circle cx="20" cy="22" r="2.5" fill="#8CCFE2" class="qmd-anim-pulse"/>' +
+				'<circle cx="14" cy="30" r="1.8" fill="#EFA8CB" class="qmd-anim-pulse" style="animation-delay: 0.3s;"/>' +
+				'</svg>';
+			hero.appendChild(heroIcon);
+			if (rendered.firstChild) {
+				rendered.insertBefore(hero, rendered.firstChild);
+			} else {
+				rendered.appendChild(hero);
+			}
+			return rendered;
+		});
 	},
 
 	showConfigModal: function(section_id, modems) {

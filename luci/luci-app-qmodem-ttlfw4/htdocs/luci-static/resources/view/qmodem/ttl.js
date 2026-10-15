@@ -60,6 +60,33 @@ return view.extend({
 		o.placeholder = '64';
 		o.description = _('Set the TTL (Time To Live) value for IPv4 packets and Hop Limit for IPv6 packets. Common values: 64 (Linux default), 128 (Windows default).');
 
+		// Preset buttons helper
+		var presets = s.option(form.DummyValue, '_presets', _('Common Presets'));
+		presets.rawhtml = true;
+		presets.cfgvalue = function() {
+			var wrap = E('div', { 'style': 'display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;' });
+			var options = [
+				{ label: _('64 (Linux / Android / macOS)'), val: '64' },
+				{ label: _('128 (Windows)'), val: '128' },
+				{ label: _('65 (Carrier Bypass +1)'), val: '65' }
+			];
+			options.forEach(function(opt) {
+				wrap.appendChild(E('button', {
+					'class': 'qmodem-preset-btn',
+					'type': 'button',
+					'click': function(ev) {
+						ev.preventDefault();
+						var input = document.querySelector('input[id*="ttl"]');
+						if (input) {
+							input.value = opt.val;
+							input.dispatchEvent(new Event('change', { bubbles: true }));
+						}
+					}
+				}, opt.label));
+			});
+			return wrap;
+		};
+
 		// Warning section
 		s = m.section(form.NamedSection, 'main', 'main', _('Important Notes'));
 		s.anonymous = true;
@@ -81,6 +108,29 @@ return view.extend({
 			]);
 		};
 
-		return m.render();
+		return m.render().then(function(rendered) {
+			var hero = E('div', { 'class': 'qmodem-hero' }, [
+				E('h1', { 'class': 'qmodem-hero-title' }, [
+					_('Packet TTL / Hop Limit Rules'),
+					E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Firewall4 / NFT'))
+				]),
+				E('p', { 'class': 'qmodem-hero-sub' },
+					_('Customize outgoing IPv4 Time-To-Live and IPv6 Hop Limit packets to bypass tethering and hotspot throttling.'))
+			]);
+			var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+			heroIcon.innerHTML =
+				'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+				'<path d="M38 10 L58 18 L58 36 C58 48 38 54 38 54 C38 54 18 48 18 36 L18 18 Z" fill="#FFFFFF" stroke="#8875E8" stroke-width="2.5" stroke-linejoin="round"/>' +
+				'<path d="M38 16 L52 22 L52 35 C52 44 38 48 38 48 C38 48 24 44 24 35 L24 22 Z" fill="#EEE9FF"/>' +
+				'<path d="M32 32 L36 36 L44 26" stroke="#36AD87" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="qmd-anim-pulse"/>' +
+				'</svg>';
+			hero.appendChild(heroIcon);
+			if (rendered.firstChild) {
+				rendered.insertBefore(hero, rendered.firstChild);
+			} else {
+				rendered.appendChild(hero);
+			}
+			return rendered;
+		});
 	},
 });

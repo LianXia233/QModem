@@ -1089,27 +1089,242 @@ body.qmodem-dark .cbi-map .cbi-button-action {
 }
 
 /* ============================================================
- * 11. Modals
+ * 11. Modals & Dialogs (Soft Anime / Pastel Glass)
  * ============================================================ */
+#modal_overlay,
+body > #modal_overlay {
+	display: none !important;
+	position: fixed !important;
+	inset: 0 !important;
+	z-index: 9999 !important;
+}
+
+body.modal-overlay-active > #modal_overlay,
+body.modal-overlay-active #modal_overlay {
+	display: flex !important;
+	background: rgba(17, 21, 34, 0.45) !important;
+	-webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+	backdrop-filter: blur(14px) saturate(140%) !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding: 24px 16px !important;
+	box-sizing: border-box !important;
+	transition: opacity 0.25s ease !important;
+}
+
+body.modal-overlay-active {
+	overflow: hidden !important;
+}
+
+/* Modal Window Container */
 body > #modal_overlay .modal,
 .modal {
+	position: relative !important;
 	background: var(--qmd-card) !important;
 	color: var(--qmd-text-1) !important;
-	border: 1px solid var(--qmd-border);
-	border-radius: var(--qmd-r-lg) !important;
-	box-shadow: var(--qmd-shadow-lg) !important;
-	font-family: inherit;
+	border: 1.5px solid var(--qmd-border) !important;
+	border-radius: 20px !important;
+	box-shadow: 0 24px 60px rgba(28, 20, 56, 0.22), 0 6px 20px rgba(136, 117, 232, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+	font-family: inherit !important;
+	padding: 26px 28px !important;
+	width: min(92vw, 680px) !important;
+	max-width: 100% !important;
+	margin: auto !important;
+	box-sizing: border-box !important;
+	animation: qmd-modal-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+	overflow: hidden !important;
 }
 
+/* Wide / CBI / UCI Dialog Variant */
+body > #modal_overlay .modal.cbi-modal,
+body > #modal_overlay .modal.uci-dialog,
+.modal.cbi-modal,
+.modal.uci-dialog {
+	width: min(94vw, 840px) !important;
+	max-height: 88vh !important;
+	overflow-y: auto !important;
+}
+
+/* Top Pastel Accent Bar */
+body > #modal_overlay .modal::before,
+.modal::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3.5px;
+	background: linear-gradient(90deg, var(--qmd-primary) 0%, var(--qmd-pink) 50%, var(--qmd-blue) 100%);
+	border-radius: 20px 20px 0 0;
+}
+
+/* Modal Title */
 body > #modal_overlay .modal h4,
 .modal h4 {
-	color: var(--qmd-text-1);
-	font-weight: 600;
+	color: var(--qmd-text-1) !important;
+	font-size: 17px !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.2px !important;
+	margin: 0 0 18px 0 !important;
+	padding-bottom: 12px !important;
+	border-bottom: 1px solid var(--qmd-divider) !important;
+	display: flex !important;
+	align-items: center !important;
+	gap: 8px !important;
 }
 
+/* Modal Text / Paragraphs */
+body > #modal_overlay .modal p,
+.modal p {
+	color: var(--qmd-text-2) !important;
+	font-size: 13.5px !important;
+	line-height: 1.65 !important;
+	margin: 0 0 16px 0 !important;
+}
+
+/* Modal Footer Action Buttons */
+body > #modal_overlay .modal .right,
+body > #modal_overlay .modal .button-row,
+.modal .right,
+.modal .button-row {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: flex-end !important;
+	gap: 12px !important;
+	margin-top: 22px !important;
+	padding-top: 16px !important;
+	border-top: 1px solid var(--qmd-divider) !important;
+	flex-wrap: wrap !important;
+}
+
+/* Modal Buttons Standard / Secondary */
 body > #modal_overlay .modal .btn,
-.modal .btn {
-	border-radius: var(--qmd-r-md);
+.modal .btn,
+body > #modal_overlay .modal .cbi-button,
+.modal .cbi-button {
+	height: 38px !important;
+	min-height: 38px !important;
+	padding: 0 18px !important;
+	border-radius: var(--qmd-r-pill) !important;
+	font-size: 13px !important;
+	font-weight: 600 !important;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+	cursor: pointer !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 6px !important;
+	border: 1px solid var(--qmd-border) !important;
+	background: var(--qmd-bg-2) !important;
+	color: var(--qmd-text-2) !important;
+}
+
+body > #modal_overlay .modal .btn:hover,
+.modal .btn:hover,
+body > #modal_overlay .modal .cbi-button:hover,
+.modal .cbi-button:hover {
+	background: var(--qmd-card-2) !important;
+	color: var(--qmd-text-1) !important;
+	border-color: var(--qmd-primary-soft) !important;
+	transform: translateY(-1px) !important;
+}
+
+/* Modal Action / Primary Button */
+body > #modal_overlay .modal .cbi-button-action,
+body > #modal_overlay .modal .cbi-button-positive,
+body > #modal_overlay .modal .cbi-button-save,
+body > #modal_overlay .modal .cbi-button-apply,
+.modal .cbi-button-action,
+.modal .cbi-button-positive,
+.modal .cbi-button-save,
+.modal .cbi-button-apply {
+	background: linear-gradient(135deg, var(--qmd-primary) 0%, var(--qmd-pink) 100%) !important;
+	color: #FFFFFF !important;
+	border: none !important;
+	box-shadow: 0 4px 14px color-mix(in srgb, var(--qmd-primary) 32%, transparent) !important;
+}
+
+body > #modal_overlay .modal .cbi-button-action:hover:not(:disabled),
+body > #modal_overlay .modal .cbi-button-positive:hover:not(:disabled),
+.modal .cbi-button-action:hover:not(:disabled),
+.modal .cbi-button-positive:hover:not(:disabled) {
+	transform: translateY(-1.5px) !important;
+	box-shadow: 0 6px 18px color-mix(in srgb, var(--qmd-primary) 42%, transparent) !important;
+	filter: brightness(1.05) !important;
+}
+
+/* Modal Danger / Reset / Delete Button */
+body > #modal_overlay .modal .cbi-button-negative,
+body > #modal_overlay .modal .cbi-button-reset,
+body > #modal_overlay .modal .cbi-button-remove,
+.modal .cbi-button-negative,
+.modal .cbi-button-reset,
+.modal .cbi-button-remove {
+	background: var(--qmd-err-soft) !important;
+	color: var(--qmd-err) !important;
+	border: 1px solid color-mix(in srgb, var(--qmd-err) 30%, transparent) !important;
+}
+
+body > #modal_overlay .modal .cbi-button-negative:hover:not(:disabled),
+.modal .cbi-button-negative:hover:not(:disabled) {
+	background: var(--qmd-err) !important;
+	color: #FFFFFF !important;
+	box-shadow: 0 4px 14px color-mix(in srgb, var(--qmd-err) 32%, transparent) !important;
+	transform: translateY(-1px) !important;
+}
+
+/* Modal Progress Bar */
+body > #modal_overlay .modal .cbi-progressbar,
+.modal .cbi-progressbar {
+	height: 10px !important;
+	border-radius: 999px !important;
+	background: var(--qmd-border) !important;
+	overflow: hidden !important;
+	margin: 14px 0 !important;
+	border: none !important;
+}
+
+body > #modal_overlay .modal .cbi-progressbar > div,
+.modal .cbi-progressbar > div {
+	height: 100% !important;
+	background: linear-gradient(90deg, var(--qmd-primary) 0%, var(--qmd-pink) 100%) !important;
+	border-radius: 999px !important;
+	transition: width 0.25s ease !important;
+}
+
+/* Status / Alert Modals */
+body > #modal_overlay .modal.alert-message,
+.modal.alert-message {
+	text-align: center !important;
+	padding: 32px 28px !important;
+	width: min(90vw, 480px) !important;
+}
+
+body > #modal_overlay .modal.spinning,
+.modal.spinning {
+	padding-top: 36px !important;
+}
+
+@keyframes qmd-modal-pop {
+	0% {
+		opacity: 0;
+		transform: scale(0.95) translateY(12px);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}
+
+/* Dark mode modal support */
+[data-theme="dark"] body > #modal_overlay,
+body[data-theme="dark"] #modal_overlay {
+	background: rgba(10, 13, 22, 0.65) !important;
+}
+
+[data-theme="dark"] body > #modal_overlay .modal,
+body[data-theme="dark"] .modal {
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--qmd-border) !important;
 }
 
 .cbi-map .right {
@@ -1251,6 +1466,184 @@ body > #modal_overlay .modal .btn,
 
 .cbi-map ::selection {
 	background: color-mix(in srgb, var(--qmd-primary) 30%, transparent);
+}
+
+/* ============================================================
+ * 13b. Dynamic SVGs, Micro-interactions & Special Components
+ * ============================================================ */
+@keyframes qmd-pulse-glow {
+	0%, 100% { transform: scale(1); opacity: 0.92; }
+	50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 6px var(--qmd-primary)); }
+}
+
+@keyframes qmd-signal-wave {
+	0% { opacity: 0.25; stroke-width: 1.5; }
+	50% { opacity: 1; stroke-width: 2.2; stroke: var(--qmd-primary); }
+	100% { opacity: 0.25; stroke-width: 1.5; }
+}
+
+@keyframes qmd-spin-slow {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+@keyframes qmd-radar-sweep {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+@keyframes qmd-cursor-blink {
+	0%, 49% { opacity: 1; }
+	50%, 100% { opacity: 0; }
+}
+
+@keyframes qmd-shimmer {
+	0% { background-position: -200% 0; }
+	100% { background-position: 200% 0; }
+}
+
+@keyframes qmd-float {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-4px); }
+}
+
+.qmd-anim-float {
+	animation: qmd-float 4s ease-in-out infinite;
+}
+
+.qmd-anim-pulse {
+	animation: qmd-pulse-glow 2.4s ease-in-out infinite;
+}
+
+.qmd-anim-spin {
+	animation: qmd-spin-slow 8s linear infinite;
+}
+
+.qmd-anim-sweep {
+	transform-origin: center;
+	animation: qmd-radar-sweep 3s linear infinite;
+}
+
+/* Quick KPI Grid */
+.qmodem-kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: var(--qmd-sp-4);
+	margin-bottom: var(--qmd-sp-4);
+}
+
+.qmodem-kpi-card {
+	background: var(--qmd-card);
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-card);
+	box-shadow: var(--qmd-shadow-sm);
+	padding: var(--qmd-sp-4);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	position: relative;
+	overflow: hidden;
+	transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+}
+
+.qmodem-kpi-card::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: linear-gradient(90deg, var(--qmd-primary), var(--qmd-pink));
+	opacity: 0.85;
+}
+
+.qmodem-kpi-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--qmd-shadow-md);
+	border-color: color-mix(in srgb, var(--qmd-primary) 40%, var(--qmd-border));
+}
+
+.qmodem-kpi-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: var(--qmd-sp-2);
+}
+
+.qmodem-kpi-title {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--qmd-text-2);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.qmodem-kpi-icon {
+	width: 28px;
+	height: 28px;
+	border-radius: var(--qmd-r-sm);
+	background: var(--qmd-primary-soft);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+}
+
+.qmodem-kpi-icon svg {
+	width: 18px;
+	height: 18px;
+}
+
+.qmodem-kpi-val {
+	font-size: 24px;
+	font-weight: 700;
+	color: var(--qmd-text-1);
+	font-variant-numeric: tabular-nums;
+	line-height: 1.2;
+	margin: 4px 0;
+}
+
+.qmodem-kpi-sub {
+	font-size: 12px;
+	color: var(--qmd-text-3);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+/* Skeleton Loading */
+.qmodem-skeleton {
+	background: linear-gradient(90deg, var(--qmd-bg-2) 25%, color-mix(in srgb, var(--qmd-primary) 12%, var(--qmd-bg-2)) 50%, var(--qmd-bg-2) 75%);
+	background-size: 200% 100%;
+	animation: qmd-shimmer 1.5s infinite;
+	border-radius: var(--qmd-r-sm);
+}
+
+/* Preset Buttons */
+.qmodem-preset-btn {
+	background: var(--qmd-bg-2);
+	border: 1px solid var(--qmd-border);
+	color: var(--qmd-text-1);
+	border-radius: var(--qmd-r-pill);
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.qmodem-preset-btn:hover {
+	background: var(--qmd-primary-soft);
+	color: var(--qmd-primary);
+	border-color: var(--qmd-primary);
+	transform: translateY(-1px);
 }
 
 /* ============================================================

@@ -255,7 +255,19 @@ var callSetSimSlot = rpc.declare({
 	expect: { }
 });
 
+var callCacheSnapshot = rpc.declare({
+	object: 'qmodem_cache',
+	method: 'snapshot',
+	params: ['config_section'],
+	expect: { }
+});
+
 return L.Class.extend({
+	// Get background cached snapshot (instantaneous)
+	getCacheSnapshot: function(section) {
+		return callCacheSnapshot(section);
+	},
+
 	// Get modem base information
 	getBaseInfo: function(section) {
 		return callBaseInfo(section);
@@ -339,14 +351,14 @@ return L.Class.extend({
 	// Send AT command
 	sendAt: function(section, port, command, use_ubus) {
 		var params = {
-			port: port,
 			at: command
 		};
-		
-		if (use_ubus !== undefined && use_ubus !== null) {
-			params.use_ubus = use_ubus;
+		if (port && port !== 'null' && port.trim() !== '') {
+			params.port = port.trim();
 		}
-		
+		if (use_ubus !== undefined && use_ubus !== null && use_ubus !== '0' && use_ubus !== false) {
+			params.use_ubus = '1';
+		}
 		return callSendAt(section, params);
 	},
 

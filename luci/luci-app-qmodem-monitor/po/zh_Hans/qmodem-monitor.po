@@ -331,3 +331,24 @@ msgstr "脚本删除失败："
 #: view/qmodem/monitor.js
 msgid "Scripts to execute when action is triggered. You can upload scripts in the User Scripts Management section above."
 msgstr "触发动作时要执行的脚本。您可以在上方的用户脚本管理部分上传脚本。"
+
+msgid "Continuous ICMP/HTTP link monitoring, automatic modem recovery actions and custom trigger scripts."
+msgstr "持续进行 ICMP/HTTP 链路健康监控，支持自动模组恢复动作与自定义触发脚本。"
+
+msgid "Disabled"
+msgstr "已禁用"
+
+msgid "Network Health Monitor"
+msgstr "网络健康监控"
+
+msgid "Service"
+msgstr "服务"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Stopped"
+msgstr "已停止"
+
+msgid "Watchdog & Recovery"
+msgstr "看门狗与自愈"

@@ -6,6 +6,9 @@
 				"qmodem": [
 					"*"
 				],
+				"qmodem_cache": [
+					"*"
+				],
 				"qmodem.sms": [
 					"status", "config_get", "sync_status", "list", "get", "modem_list", "storage_get"
 				],

@@ -1272,11 +1272,13 @@ EOF
                 # 兼容前端历史上传的 use_ubus 键名（两种写法都接受）
                 [ -n "$use_ubus_flag" ] || use_ubus_flag=$(_rpc_jq .use_ubus "$params")
 
-                # 未显式给端口时按该 section 的 UCI 配置解析（at_port /
+                # 确保 modem_util.sh 已加载
+                . /usr/share/qmodem/modem_util.sh
+
+                # 未显式给端口或 jq 输出了 "null" 时按该 section 的 UCI 配置解析（at_port /
                 # override_at_port）。AT 控制台/缓存任务都只传 {at}，若此处不
-                # 回退，at "" 会以空设备名调用 tom_modem/sms_tool/atd 必然失败，
-                # 表现为 status=0 且没有 res（实机已复现）。
-                if [ -z "$port" ]; then
+                # 回退，at "" 会以空设备名调用 tom_modem/sms_tool/atd 必然失败。
+                if [ -z "$port" ] || [ "$port" = "null" ]; then
                     _saved_ubus_flag="$use_ubus_flag"
                     use_ubus_flag=""
                     get_at_port_config "$config_section" 0
@@ -1284,7 +1286,7 @@ EOF
                     [ -n "$_saved_ubus_flag" ] && use_ubus_flag="$_saved_ubus_flag"
                 fi
 
-                if [ -z "$cmd" ] || [ -z "$port" ]; then
+                if [ -z "$cmd" ] || [ "$cmd" = "null" ] || [ -z "$port" ] || [ "$port" = "null" ]; then
                     json_init
                     json_add_object at_cfg
                     json_add_string status "0"
@@ -1299,18 +1301,18 @@ EOF
                 else
                     use_ubus_flag=""
                 fi
-                res=$(at "$port" "$cmd")
+                res=$(at "$port" "$cmd" 2>&1)
                 ret=$?
                 
                 json_init
                 json_add_object at_cfg
                 if [ "$ret" = "0" ]; then
                     json_add_string status "1"
-                    json_add_string cmd "at $port $cmd"
-                    json_add_string res "$res"
                 else
                     json_add_string status "0"
                 fi
+                json_add_string cmd "at $port $cmd"
+                json_add_string res "$res"
                 json_close_object
                 json_dump
                 ;;
