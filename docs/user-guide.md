@@ -33,13 +33,15 @@ make -j$(nproc)
 
 ### Software Packages
 
-The QModem suite is modular. Here are the functions of each package:
+> **Status**: Since the legacy Lua stack was retired in 2026-10, only two core packages are
+> shipped — `qmodem` (the all-in-one backend) and `luci-app-qmodem-next` (the sole frontend).
+> The legacy split Lua packages below were deleted from the repository and are neither compiled
+> nor produced; their field documentation is kept here as historical reference. The current
+> package list and install commands are in the [install guide](user/install-suite.en.md).
 
-* **`luci-app-qmodem` (Core)**: The main package providing the core web interface for modem management, status monitoring, and dialing.
-* **`luci-app-qmodem-sms`**: Adds an SMS interface to send and receive text messages.
-* **`luci-app-qmodem-mwan`**: Integrates the modem with OpenWRT's `mwan3` for multi-WAN load balancing and failover.
-* **`luci-app-qmodem-ttl`**: Provides options to modify the TTL of packets, which can be useful for bypassing carrier tethering restrictions.
-* **`luci-app-qmodem-hc`**: Support for specific devices with hardware-controlled SIM slots (e.g., HC-G80), allowing SIM switching from the UI.
+* **`qmodem` (Backend)**: All-in-one backend with modem recognition, dialing scripts, ubus data services, SMS daemon, and all CLI tools.
+* **`luci-app-qmodem-next` (Core Frontend)**: Pure JavaScript interface providing the core web UI for modem management, status monitoring, and dialing; declares `DEPENDS:=+qmodem`.
+* **`luci-app-qmodem-ttlfw4`**: TTL rules UI (fw4/nft backend), installed separately on demand.
 
 ### Installation from Release
 
@@ -48,16 +50,16 @@ When installing pre-compiled `.ipk` packages from a release, be aware of kernel 
 **Important**: Your router's kernel version must be compatible with the one used to build the packages. If you encounter errors about kernel version mismatch, you can try to force the installation, but this may lead to instability or non-functional features.
 
 ```bash
-# Example installation
-opkg install luci-app-qmodem.ipk
+# Example installation (the frontend pulls in the backend automatically)
+opkg install luci-app-qmodem-next.ipk
 
 # Example of a forced installation (use with caution)
-opkg install luci-app-qmodem.ipk --force-depends
+opkg install luci-app-qmodem-next.ipk --force-depends
 ```
 
 ## 2. Features Introduction
 
-### `luci-app-qmodem` (Core)
+### `luci-app-qmodem-next` (Core)
 
 The main plugin provides a comprehensive interface for managing your modem.
 
@@ -68,30 +70,30 @@ The main plugin provides a comprehensive interface for managing your modem.
 * **Advanced Debugging**: Offers tools for band locking, cell locking, and sending custom AT commands.
   ![Advanced Settings](../imgs/modem_debug_lock_band.png)
 
-### `luci-app-qmodem-sms`
+### SMS (built into `luci-app-qmodem-next`)
 
-Adds a complete SMS portal to the LuCI interface.
+The standalone `luci-app-qmodem-sms` package is retired; the SMS portal is now part of the core frontend's SMS page.
 
 * Send and receive SMS messages.
 * View message history.
 * Supports PDU mode for raw message sending.
   ![SMS Interface](../imgs/modem_sms.png)
 
-### `luci-app-qmodem-mwan`
+### Multi-WAN (legacy `luci-app-qmodem-mwan`, retired)
 
-This plugin configures the modem as a WAN interface for `mwan3` (Multi-WAN).
+The standalone package is retired; multi-dial rules live in the `qmodem` built-in scripts and the UI pairs with the official `luci-app-mwan3`.
 
 * Set up load balancing rules to distribute traffic across multiple internet connections.
 * Configure failover to automatically switch to a backup connection if the primary one fails.
   ![MWAN Configuration](../imgs/modem_mwan.png)
 
-### `luci-app-qmodem-ttl`
+### TTL (`luci-app-qmodem-ttlfw4`)
 
-Allows you to modify the Time-To-Live (TTL) value of IP packets. This is sometimes used to prevent carriers from detecting and throttling hotspot or tethering data usage.
+Allows you to modify the Time-To-Live (TTL) value of IP packets. This is sometimes used to prevent carriers from detecting and throttling hotspot or tethering data usage. The TTL UI ships as the standalone package `luci-app-qmodem-ttlfw4` (the original `luci-app-qmodem-ttl` is retired).
 
-### `luci-app-qmodem-hc`
+### SIM hardware switching (legacy `luci-app-qmodem-hc`, retired)
 
-Provides a UI for switching between two SIM cards on specific hardware models that use GPIOs to control the active SIM slot.
+The standalone package is retired; SIM slot switching on GPIO-controlled hardware such as HC-G80 is provided by the core frontend's SIM switch view and `qmodem` built-in scripts.
 
 ## 3. Configuration Options
 

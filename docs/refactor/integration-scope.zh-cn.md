@@ -17,28 +17,28 @@
 | 包名 | 架构 | 位置 | 职责 |
 | --- | --- | --- | --- |
 | `qmodem` | 目标架构（编译 C 代码） | `application/qmodem/` | 一体化后端：模组识别与拨号脚本、ubus 数据服务、短信守护、统计采集、网络监控、SMS 转发、全部命令行工具 |
-| `luci-app-qmodem` | `all` | `luci/luci-app-qmodem/` | 唯一前端：统一视觉层、组件层、数据层，全部数据经 `qmodem` ubus 对象读取 |
+| `luci-app-qmodem-next` | `all` | `luci/luci-app-qmodem-next/` | 唯一前端：统一视觉层、组件层、数据层，全部数据经 `qmodem` ubus 对象读取 |
 
 用户侧安装命令退化为两条：
 
 ```sh
 # opkg 环境
-opkg update && opkg install qmodem luci-app-qmodem
+opkg update && opkg install qmodem luci-app-qmodem-next
 
 # apk 环境（ImmortalWrt 25.12+ / OpenWrt snapshot）
-apk add qmodem luci-app-qmodem
+apk add qmodem luci-app-qmodem-next
 ```
 
-`luci-app-qmodem` 已 `DEPENDS:=+qmodem`，因此**只装前端一条命令即可**（后端会被自动拉入）：
+`luci-app-qmodem-next` 已 `DEPENDS:=+qmodem`，因此**只装前端一条命令即可**（后端会被自动拉入）：
 
 ```sh
-opkg install luci-app-qmodem
+opkg install luci-app-qmodem-next
 ```
 
 ### 为什么是两个包而不是一个
 
 `qmodem` 里有 8 个 C 工程，必须对目标架构交叉编译，产出 ELF 可执行文件；
-`luci-app-qmodem` 全是 JS / JSON / PO，架构无关（`LUCI_PKGARCH:=all`）。
+`luci-app-qmodem-next` 全是 JS / JSON / PO，架构无关（`LUCI_PKGARCH:=all`）。
 两者架构不同，在 OpenWrt 打包模型中无法合成单个包。
 这是物理下限，不是取舍。
 
@@ -108,14 +108,13 @@ generic 是「前端包顺带携带后端运行时」的形态。这些资产与
 
 ---
 
-## 三、被并入 `luci-app-qmodem` 的内容
+## 三、被并入统一前端 `luci-app-qmodem-next` 的内容
 
 | 旧包 | 旧路径 | 吸收方式 |
 | --- | --- | --- |
 | `luci-app-qmodem-generic` | 独立仓库 `LianXia233/luci-app-qmodem-generic` | 作为**统一基座**：`theme.js`（视觉层）、`ui.js`（组件层）、`controls.js`（数据层 + 唯一对外入口）整体迁入 |
-| `luci-app-qmodem-next` | `luci/luci-app-qmodem-next/` | 10 个业务视图改接统一入口；自有样式层与私有组件层退役 |
 | `luci-app-qmodem-monitor` | `luci/luci-app-qmodem-monitor/` | 视图 `view/qmodem/monitor.js` 并入，菜单项合并 |
-| `luci-app-qmodem-ttlfw4` | `luci/luci-app-qmodem-ttlfw4/` | 视图 `view/qmodem/ttl.js`（fw4/nft 后端）+ 服务 `init.d/qmodem_ttl` + `/etc/config/qmodem_ttl` 并入 |
+| `luci-app-qmodem-ttlfw4` | `luci/luci-app-qmodem-ttlfw4/` | TTL 视图与服务脚本（见 4.4 注：TTL 页当前仍以独立包 `luci-app-qmodem-ttlfw4` 交付） |
 | `luci-app-qmodem-ttl` | `luci/luci-app-qmodem-ttl/` | 退役（旧 iptables Lua 栈，与 fw4 变体共用同一份配置，语义冲突） |
 | `luci-app-qmodem-sms` | `luci/luci-app-qmodem-sms/` | 退役（旧 Lua 短信视图，能力被统一前端的短信模块完全覆盖） |
 | `luci-app-qmodem`（旧 Lua 栈） | `luci/luci-app-qmodem/luasrc/**` | 退役；后端脚本下沉到 `qmodem`（见 2.3），`rpcd/acl.d` 与 `menu.d` 由新前端包接管 |
@@ -170,21 +169,22 @@ generic 是「前端包顺带携带后端运行时」的形态。这些资产与
 同时 `PKG_CONFLICTS` 列同一批名字 + `sms-forwarder`，防止旧包与新包**同时**
 安装导致同名文件互相覆盖（相同 ubus 名的 rpcd 插件、同名 `init.d`、同名 `/usr/bin` 工具）。
 
-`luci-app-qmodem` 侧：
+`luci-app-qmodem-next` 侧：
 
-- `PKG_PROVIDES:=qmodem-luci-ui` —— 沿用 `luci-app-qmodem-next` 原本的虚拟名，历史依赖可解析；
-- `PKG_CONFLICTS:=luci-app-qmodem-generic luci-app-qmodem-next` —— 防止与两套被吸收的前端同时安装造成菜单与 ACL 重复注册。
+- `PKG_PROVIDES:=qmodem-luci-ui` —— 虚拟名沿用至今，历史依赖可解析；
+- 旧 Lua 版 `luci-app-qmodem` 已删除，无需再声明与其的冲突关系。
 
 ### 4.4 已退役的包
 
 | 包 | 退役理由 |
 | --- | --- |
-| `qmodem-suite` | 元包，唯一实质职责是逐个 `enable` 守护进程。该职责已下沉到 `qmodem` 自身（见 2.4），剩下只是「依赖两个包」，与直接 `apk add qmodem luci-app-qmodem` 等价 |
-| `luci-app-qmodem-next` | 内容全部并入 `luci-app-qmodem` |
-| `luci-app-qmodem-monitor` | 同上 |
-| `luci-app-qmodem-ttlfw4` | 同上 |
+| `qmodem-suite` | 元包，唯一实质职责是逐个 `enable` 守护进程。该职责已下沉到 `qmodem` 自身（见 2.4），剩下只是「依赖两个包」，与直接 `apk add qmodem luci-app-qmodem-next` 等价 |
+| `luci-app-qmodem`（旧 Lua 栈） | 目录已从仓库删除：不再编译、不再产出、不再出现在 menuconfig；其后端脚本下沉到 `qmodem`（见 2.3），设备残留需先卸载再装新前端 |
 | `luci-app-qmodem-ttl` | 旧 iptables Lua 栈，与 fw4 变体共用 `/etc/config/qmodem_ttl`，保留会造成语义冲突 |
 | `luci-app-qmodem-sms` | 旧 Lua 短信视图，能力被统一前端覆盖 |
+
+> 注：`luci-app-qmodem-next`、`luci-app-qmodem-monitor`、`luci-app-qmodem-ttlfw4`
+> 仍为当前在册交付包（monitor 与 TTL 页目前以独立包形态交付），并非退役对象。
 
 ---
 

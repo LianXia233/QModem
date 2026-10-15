@@ -11,6 +11,17 @@
 
 ## [Unreleased]
 
+### 移除（Removed）
+- **旧 Lua 版 `luci-app-qmodem` 彻底退役**：
+  - 删除后端包携带的旧模板 `admin_status/index/modem_overview.htm` 及 `qmodem` Makefile 中对应的 `/usr/lib/lua/` 安装段，后端不再向 `/usr/lib/lua/` 落任何文件。
+  - 移除旧栈冒烟测试链路：`tests/lua/smoke.sh`、`scripts/check_all.sh` 的 `lua-smoke` stage、`ci.yml` 的 Lua 安装步骤。
+  - 修复 `application/qmodem/tests/test_use_ubus_default.sh` 指向已删除旧路径的失效引用，改指 `luci/luci-app-qmodem-next/`。
+  - 旧包**不再编译、不再产出**：CI 构建列表仅含 `qmodem` + `luci-app-qmodem-next`。
+- **清理陈旧分支**：删除远端 5 个已完全包含于 `main` 的分支（3 个 `copilot/*`、`refactor/luci-soft-anime-unify`、`ui/soft-anime-luci-all`）。
+
+### 变更（Changed）
+- **文档与更新日志包名统一**：README、安装指南、用户/开发者文档与重构文档统一只把 `luci-app-qmodem-next` 作为唯一前端包，旧包名仅保留在升级/卸载说明中（设备残留需先卸载）。
+
 ## [1.2.0] - 2026-10-15
 
 ### 新增（Added）

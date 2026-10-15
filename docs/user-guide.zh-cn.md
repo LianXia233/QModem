@@ -33,13 +33,14 @@ make -j$(nproc)
 
 ### 软件包
 
-QModem 套件是模块化的。以下是每个软件包的功能：
+> **状态**：自 2026-10 旧 Lua 栈退役后，整套只交付两个核心包——`qmodem`（一体化后端）
+> 与 `luci-app-qmodem-next`（唯一前端）。下列旧版 Lua 分体包已从仓库删除，不再编译与产出；
+> 本手册保留其字段说明作为历史参考。当前包清单与安装命令见
+> [安装指南](user/install-suite.zh-cn.md)。
 
-* **`luci-app-qmodem` (核心)**: 提供模组管理、状态监控和拨号的核心 Web 界面的主软件包。
-* **`luci-app-qmodem-sms`**: 添加短信界面以发送和接收短信。
-* **`luci-app-qmodem-mwan`**: 将模组与 OpenWRT 的 `mwan3` 集成，用于多 WAN 负载均衡和故障转移。
-* **`luci-app-qmodem-ttl`**: 提供修改数据包 TTL 的选项，这对于绕过运营商的网络共享限制非常有用。
-* **`luci-app-qmodem-hc`**: 支持具有硬件控制 SIM 卡插槽的特定设备（例如 HC-G80），允许从 UI 切换 SIM 卡。
+* **`qmodem` (后端)**: 一体化后端，包含模组识别、拨号脚本、ubus 数据服务、短信守护与全部命令行工具。
+* **`luci-app-qmodem-next` (核心前端)**: 纯 JavaScript 界面，提供模组管理、状态监控和拨号的核心 Web 界面，已 `DEPENDS:=+qmodem`。
+* **`luci-app-qmodem-ttlfw4`**: TTL 规则界面（fw4/nft 后端），按需单独安装。
 
 ### 从 Release 安装
 
@@ -48,16 +49,16 @@ QModem 套件是模块化的。以下是每个软件包的功能：
 **重要提示**：您的路由器的内核版本必须与用于构建软件包的内核版本兼容。如果遇到有关内核版本不匹配的错误，您可以尝试强制安装，但这可能会导致不稳定或功能无法使用。
 
 ```bash
-# 安装示例
-opkg install luci-app-qmodem.ipk
+# 安装示例（前端会自动拉入后端）
+opkg install luci-app-qmodem-next.ipk
 
 # 强制安装示例 (请谨慎使用)
-opkg install luci-app-qmodem.ipk --force-depends
+opkg install luci-app-qmodem-next.ipk --force-depends
 ```
 
 ## 2. 功能介绍
 
-### `luci-app-qmodem` (核心)
+### `luci-app-qmodem-next` (核心)
 
 主插件为管理您的模组提供了全面的界面。
 
@@ -68,30 +69,30 @@ opkg install luci-app-qmodem.ipk --force-depends
 * **高级调试**: 提供锁频段、锁小区和发送自定义 AT 命令的工具。
   ![高级设置](../imgs/modem_debug_lock_band.png)
 
-### `luci-app-qmodem-sms`
+### 短信（`luci-app-qmodem-next` 内置）
 
-向 LuCI 界面添加一个完整的短信门户。
+原独立包 `luci-app-qmodem-sms` 已退役，短信门户并入核心前端的 SMS 页面。
 
 * 发送和接收短信。
 * 查看消息历史记录。
 * 支持 PDU 模式以进行原始消息发送。
   ![短信界面](../imgs/modem_sms.png)
 
-### `luci-app-qmodem-mwan`
+### 多 WAN（历史：`luci-app-qmodem-mwan`，已退役）
 
-此插件将模组配置为 `mwan3` (多 WAN) 的 WAN 接口。
+原独立包已退役，多拨规则下沉到 `qmodem` 内置脚本，界面配合官方 `luci-app-mwan3` 使用。
 
 * 设置负载均衡规则以在多个互联网连接之间分配流量。
 * 配置故障转移以在主连接失败时自动切换到备用连接。
   ![MWAN 配置](../imgs/modem_mwan.png)
 
-### `luci-app-qmodem-ttl`
+### TTL（`luci-app-qmodem-ttlfw4`）
 
-允许您修改 IP 包的生存时间 (TTL) 值。这有时用于防止运营商检测和限制热点或网络共享数据的使用。
+允许您修改 IP 包的生存时间 (TTL) 值。这有时用于防止运营商检测和限制热点或网络共享数据的使用。TTL 界面以独立包 `luci-app-qmodem-ttlfw4` 交付（原 `luci-app-qmodem-ttl` 已退役）。
 
-### `luci-app-qmodem-hc`
+### SIM 卡硬件切换（历史：`luci-app-qmodem-hc`，已退役）
 
-为使用 GPIO 控制活动 SIM 卡插槽的特定硬件型号提供一个用于在两个 SIM 卡之间切换的 UI。
+原独立包已退役，HC-G80 等 GPIO 控制的 SIM 卡槽切换能力由核心前端的 SIM 切换视图与 `qmodem` 内置脚本提供。
 
 ## 3. 配置选项
 

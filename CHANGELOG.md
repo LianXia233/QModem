@@ -11,6 +11,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+### Removed
+- **Full retirement of the legacy Lua `luci-app-qmodem`**:
+  - Removed the last backend-held legacy template `admin_status/index/modem_overview.htm` and its `/usr/lib/lua/` install rules from the `qmodem` Makefile; the backend no longer writes any files under `/usr/lib/lua/`.
+  - Removed the legacy Lua smoke-test chain: `tests/lua/smoke.sh`, the `lua-smoke` stage in `scripts/check_all.sh`, and the Lua install step in `ci.yml`.
+  - Fixed the broken test path in `application/qmodem/tests/test_use_ubus_default.sh` to point at `luci/luci-app-qmodem-next/`.
+  - The legacy package is neither compiled nor produced: CI build lists only contain `qmodem` + `luci-app-qmodem-next`.
+- **Stale merged remote branches cleaned up**: deleted 5 remote branches fully contained in `main` (3 `copilot/*`, `refactor/luci-soft-anime-unify`, `ui/soft-anime-luci-all`).
+
+### Changed
+- **Documentation & changelog package names unified**: README, install guides, user/developer docs, and refactor notes now consistently reference `luci-app-qmodem-next` as the only frontend package, with legacy-package notes for upgraders (device leftovers must be removed first).
+
 ## [1.2.0] - 2026-10-15
 
 ### Added

@@ -1,6 +1,14 @@
 # QModem Developer Guide
 
-This document provides a guide for developers looking to understand, extend, or adapt the `luci-app-qmodem` application.
+This document provides a guide for developers looking to understand, extend, or adapt the QModem frontend.
+
+> **Status: historical reference (legacy Lua stack)**. The `luci-app-qmodem` Lua MVC application
+> described here was deleted from the repository in 2026-10 and is neither compiled nor produced;
+> its backend scripts were folded into the all-in-one `qmodem` backend package, and the frontend
+> is the pure JavaScript `luci-app-qmodem-next`. This document is kept as historical reference —
+> where code paths, RPC methods, or adaptation steps conflict, the current source tree wins.
+> Authoritative docs live in [`docs/developer/`](developer/index.zh-cn.md) (entry index) and the
+> [rpcd interface reference](qmodem-rpcd-interface.md).
 
 ## 1. Project Structure
 

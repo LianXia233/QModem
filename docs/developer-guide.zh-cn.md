@@ -1,6 +1,13 @@
 # QModem 开发者指南
 
-本文档为希望理解、扩展或适配 `luci-app-qmodem` 应用程序的开发者提供指南。
+本文档为希望理解、扩展或适配 QModem 前端的开发者提供指南。
+
+> **状态：历史参考（旧 Lua 栈）**。本文描述的 `luci-app-qmodem`（Lua MVC）已于 2026-10
+> 从仓库删除，不再编译、不再产出；其后端脚本已下沉到 `qmodem` 一体化后端包，前端为纯
+> JavaScript 的 `luci-app-qmodem-next`。本文仅作历史参考，代码路径、RPC 方法与适配步骤
+> 冲突时以当前源码为准。当前权威文档见 [开发者文档入口](developer/index.zh-cn.md)、
+> [系统架构](developer/architecture.zh-cn.md)、[适配新模组](developer/modem-adaptation.zh-cn.md)
+> 与 [rpcd 接口](qmodem-rpcd-interface.zh-cn.md)。
 
 ## 1. 项目结构
 
