@@ -197,6 +197,8 @@ define Package/$(PKG_NAME)/conffiles
 /etc/config/qmodem_led
 /etc/config/qmodem_sms
 /etc/config/qmodem_ttl
+/etc/config/qmodem_hc_sim
+/etc/config/qmodem_mwan
 /etc/config/sms_forwarder
 /etc/config/ubus-at-daemon
 /etc/config/qmodem-atd
@@ -413,6 +415,8 @@ define Package/$(PKG_NAME)/install
 		./files/usr/share/qmodem/modem_hook.sh \
 		./files/usr/share/qmodem/modem_scan.sh \
 		./files/usr/share/qmodem/modem_util.sh \
+		./files/usr/share/qmodem/modem_sim.sh \
+		./files/usr/share/qmodem/modem_mwan.sh \
 		./files/usr/share/qmodem/qmodem_led_watch.sh $(1)/usr/share/qmodem/
 	$(INSTALL_DIR) $(1)/usr/share/qmodem/cmds
 	$(INSTALL_DATA) ./files/usr/share/qmodem/cmds/fibocom.sh \
@@ -465,11 +469,18 @@ define Package/$(PKG_NAME)/install
 		./files/etc/init.d/qmodem-stats-collect \
 		./files/etc/init.d/qmodem-modem-support \
 		./files/etc/init.d/qmodem-mt5700-fix \
-		./files/etc/init.d/qmodem_ttl $(1)/etc/init.d/
+		./files/etc/init.d/qmodem_ttl \
+		./files/etc/init.d/qmodem_hc_sim \
+		./files/etc/init.d/qmodem_mwan $(1)/etc/init.d/
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) ./files/etc/config/qmodem_ttl $(1)/etc/config/
+	$(INSTALL_CONF) ./files/etc/config/qmodem_ttl \
+		./files/etc/config/qmodem_hc_sim \
+		./files/etc/config/qmodem_mwan $(1)/etc/config/
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
-	$(INSTALL_BIN) ./files/etc/uci-defaults/99-qmodem-worker-bootstrap $(1)/etc/uci-defaults/
+	$(INSTALL_BIN) ./files/etc/uci-defaults/99-qmodem-worker-bootstrap \
+		./files/etc/uci-defaults/99-setup-mwan $(1)/etc/uci-defaults/
+	$(INSTALL_DIR) $(1)/etc/udhcpc.user.d
+	$(INSTALL_BIN) ./files/etc/udhcpc.user.d/01-reload-mwan3.dhcpscript $(1)/etc/udhcpc.user.d/
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/qmodem-stats-collect \
 		./files/usr/bin/qmodem-stats-loop \

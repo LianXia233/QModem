@@ -28,19 +28,13 @@
 
 ```text
 luci/
-├── luci-app-qmodem-next/      ★ 现代 JS 界面（重构主体，10 个 view）
-├── luci-app-qmodem-monitor/   ★ 监控配置（form.Map，复用 next 样式）
-├── luci-app-qmodem-voip/      ★ 语音（含设计系统自包含副本）
-├── luci-app-qmodem-ttlfw4/    TTL（JS，未接入设计系统，见 §6.2）
-├── luci-app-qmodem/           ✗ 旧 Lua 主界面（已废弃）
-├── luci-app-qmodem-hc/        ✗ 旧 Lua（已废弃）
-├── luci-app-qmodem-sms/       ✗ 旧 Lua（已废弃）
-├── luci-app-qmodem-ttl/       ✗ 旧 Lua（已废弃）
-└── luci-app-qmodem-mwan/      ✗ 旧 Lua（已废弃）
+├── luci-app-qmodem-next/      ★ 现代 JS 界面（重构主体，10 个 view，Soft Anime）
+├── luci-app-qmodem-monitor/   ★ 监控配置（form.Map，复用 next 样式 + 状态胶囊）
+├── luci-app-qmodem-voip/      ★ 语音（含 Soft Anime 设计系统自包含副本）
+└── luci-app-qmodem-ttlfw4/    ★ TTL（JS/fw4，含 Soft Anime 设计系统自包含副本）
 ```
 
-新旧互斥由 `luci/luci-app-qmodem/Makefile` 的 `LUCI_DEPENDS` 在**编译期**约束
-（`@(PACKAGE_luci-app-qmodem-next=n)`）；设备侧共存问题由 `e0296cd` 兜底，见 §5.3。
+旧 Lua 五包（qmodem, hc, sms, ttl, mwan）已全部退役删除，其关键后台守护及脚本已完整迁入 `application/qmodem` 后端包，彻底根除了同名菜单路由覆盖冲突。
 
 ## 3. 设计系统（`luci/luci-app-qmodem-next/htdocs/luci-static/resources/qmodem/qmodem-next.css`）
 
@@ -155,11 +149,11 @@ rm -f /tmp/luci-indexcache*
 /etc/init.d/rpcd restart && /etc/init.d/uhttpd restart
 ```
 
-## 6. 已知边界与遗留
+## 6. 已知边界与架构要点
 
-1. **旧 Lua 五包仅标记废弃未移除**：过渡期保留功能；计划未来版本删除。它们不参与设计系统（服务端渲染，与 next 互斥）。
-2. **`luci-app-qmodem-ttlfw4` 未接入设计系统**：无 next 依赖，跨包引用会 404。接入方式：复制设计系统副本 + 在 `Makefile` 增加依赖（同等体量 ≈32 KB）。
-3. **voip 设计系统为副本**：`soft-anime.css` 与 next 的 `qmodem-next.css` 内容同源，**改 token 需双处同步**。
+1. **旧 Lua 五包已彻底清理**：`luci/` 目录下仅存 4 个纯 JavaScript 现代包（next、monitor、voip、ttlfw4），旧版 Lua controller 与 next 的菜单路由覆盖冲突彻底消除。底层守护与规则已收编入 `application/qmodem`。
+2. **`luci-app-qmodem-ttlfw4` 已完整接入设计系统**：自带自包含 `soft-anime.css` 副本与按天缓存防呆机制，Pastel Glass 警示卡片已适配，独立安装零 404 风险。
+3. **voip 与 ttlfw4 设计系统副本维护**：`soft-anime.css` 与 next 的 `qmodem-next.css` 内容同源，确保各包独立安装时的完整视觉呈现。
 4. **`color-mix()` 依赖**：用于状态色边框/徽标调色，需 Chrome 111+ / Safari 16.2+；旧浏览器忽略该声明但保留基础配色（优雅降级）。
 5. **LuCI 主题兼容**：Bootstrap 主题未使用 ID 选择器定义 `.cbi-section`，无特异性冲突；若换用 Argon 等强主题，需复核是否存在 `!important` 覆盖。
 
@@ -169,10 +163,12 @@ rm -f /tmp/luci-indexcache*
 
 | 项 | 结果 |
 |---|---|
-| `node --check`（全部改动 JS） | PASS |
-| CSS 花括号平衡（3 个 CSS） | PASS |
+| `node --check`（全量 29 个 JS 文件） | PASS（29/29） |
+| CSS 花括号平衡（4 个 CSS） | PASS（4/4） |
 | `luci-app-qmodem-next/tests/test_sms_service.js` | PASS |
 | `luci-app-qmodem-voip/tests/{media,module-loader,reducer}.test.js` | PASS ×3 |
+| JSON 语法检查（全部 menu.d 与 acl.d） | PASS（8/8） |
+| `sh -n` 脚本语法检查（全部 shell / init.d / uci-defaults） | PASS |
 | CRLF 检查 | 全文件 LF |
 | 静态预览截图（浅色 / 暗色 / 390px / 360px） | 布局与配色符合预期，无横向溢出 |
 
@@ -223,9 +219,9 @@ grep -c qmodem-hero /www/luci-static/resources/view/qmodem/overview.js    # ≥1
 ls /usr/share/luci/menu.d/ | grep qmodem                                  # 仅 next 的 JSON
 ```
 
-### 8.3 待办清单
-
-1. 等 `e0296cd` 构建产物完成，装到 Airpi AP3000M（ImmortalWrt，网关 `192.168.10.1`）验证：hero 呈现、卡片栅格、暗色切换、SMS 气泡、拖拽排序。
-2. 复核 voip 页面（`admin/modem/qmodem-voip/*`）在新构建下的样式一致性。
-3. 若确认稳定，删除旧 Lua 五包（含 `root/` 下的 init/config 迁移确认）。
-4. 评估 `luci-app-qmodem-ttlfw4` 是否接入设计系统。
+### 8.3 进展与待办
+ 
+1. [x] **旧版 Lua 五包清理**：已彻底删除 `luci-app-qmodem`、`luci-app-qmodem-sms`、`luci-app-qmodem-ttl`、`luci-app-qmodem-hc`、`luci-app-qmodem-mwan`；后台硬件与路由脚本（`modem_sim.sh`、`modem_mwan.sh`、`qmodem_hc_sim`、`qmodem_mwan`、`99-setup-mwan`、`01-reload-mwan3.dhcpscript`）已平滑收编至 `application/qmodem`。
+2. [x] **`luci-app-qmodem-ttlfw4` 接入设计系统**：提供自包含 `soft-anime.css` 副本，TTL 页面接入 Soft Anime 样式，警示模块改造为 Pastel Glass 风格，init.d 脚本移除 bashism。
+3. [x] **`luci-app-qmodem-monitor` 状态胶囊化**：服务启用/运行状态全面接入 `.qmodem-chip` 与 `.qmodem-status-row` 状态胶囊徽章。
+4. [ ] 真机路由（如 Airpi AP3000M / ImmortalWrt）在实际连卡环境下的业务功能验收（SIM 热切换、语音呼叫流、短信收发）。

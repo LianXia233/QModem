@@ -157,9 +157,11 @@ return view.extend({
 			var enabled = status.enabled === true || status.enabled === 'true';
 			var running = status.running === true || status.running === 'true';
 			
-			return E('div', { id: 'rc-status-container' }, [
-				E('span', {}, _('Enabled') + ': ' + (enabled ? _('Yes') : _('No'))),
-				E('span', { 'style': 'margin-left: 12px;' }, _('Running') + ': ' + (running ? _('Yes') : _('No')))
+			return E('div', { id: 'rc-status-container', 'class': 'qmodem-status-row' }, [
+				E('span', { 'class': 'qmodem-chip ' + (enabled ? 'qmodem-chip-ok' : 'qmodem-chip-muted') },
+					_('Service') + ': ' + (enabled ? _('Enabled') : _('Disabled'))),
+				E('span', { 'class': 'qmodem-chip ' + (running ? 'qmodem-chip-ok' : 'qmodem-chip-muted') },
+					_('Status') + ': ' + (running ? _('Running') : _('Stopped')))
 			]);
 		}, this);
 
@@ -605,8 +607,11 @@ return view.extend({
 				var running = status.running === true || status.running === 'true';
 				
 				statusContainer.innerHTML = '';
-				statusContainer.appendChild(E('span', {}, _('Enabled') + ': ' + (enabled ? _('Yes') : _('No'))));
-				statusContainer.appendChild(E('span', { 'style': 'margin-left: 12px;' }, _('Running') + ': ' + (running ? _('Yes') : _('No'))));
+				statusContainer.className = 'qmodem-status-row';
+				statusContainer.appendChild(E('span', { 'class': 'qmodem-chip ' + (enabled ? 'qmodem-chip-ok' : 'qmodem-chip-muted') },
+					_('Service') + ': ' + (enabled ? _('Enabled') : _('Disabled'))));
+				statusContainer.appendChild(E('span', { 'class': 'qmodem-chip ' + (running ? 'qmodem-chip-ok' : 'qmodem-chip-muted') },
+					_('Status') + ': ' + (running ? _('Running') : _('Stopped'))));
 			}
 			
 			// Update control buttons
