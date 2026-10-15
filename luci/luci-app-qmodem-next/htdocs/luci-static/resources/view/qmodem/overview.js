@@ -42,82 +42,189 @@ function createSvg(html) {
 	return div.firstChild;
 }
 
-// LuciTable class for rendering modem info tables
-var LuciTable = function() {
+function getCategoryMeta(className) {
+	var c = (className || '').toLowerCase();
+	if (c.indexOf('base') !== -1 || c.indexOf('device') !== -1 || c.indexOf('hardware') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>',
+			badgeClass: 'qmodem-icon-badge-primary'
+		};
+	}
+	if (c.indexOf('sim') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h9l5 5v13H6V3zM10 12h4M10 16h4"/></svg>',
+			badgeClass: 'qmodem-icon-badge-pink'
+		};
+	}
+	if (c.indexOf('network') !== -1 || c.indexOf('operator') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+			badgeClass: 'qmodem-icon-badge-blue'
+		};
+	}
+	if (c.indexOf('cell') !== -1 || c.indexOf('signal') !== -1 || c.indexOf('tower') !== -1) {
+		return {
+			icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>',
+			badgeClass: 'qmodem-icon-badge-green'
+		};
+	}
+	return {
+		icon: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+		badgeClass: 'qmodem-icon-badge-primary'
+	};
+}
+
+var dragGripSvg = '<svg viewBox="0 0 12 16" width="12" height="16" fill="currentColor">' +
+	'<circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/>' +
+	'<circle cx="3" cy="8" r="1.5"/><circle cx="9" cy="8" r="1.5"/>' +
+	'<circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/>' +
+	'</svg>';
+
+var chevronSvg = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+	'<polyline points="6 9 12 15 18 9"/>' +
+	'</svg>';
+
+// LuciTable class for rendering modem info cards
+var LuciTable = function(className) {
 	this.rows = [];
 	this.tbody = null;
 	this.fieldset = null;
+	this.className = className || 'General';
+	this.countChip = null;
+	this.toggleBtn = null;
 	this.initTable();
 };
 
 LuciTable.prototype = {
 	initTable: function() {
-		this.fieldset = E('fieldset', { 'class': 'cbi-section collapsible draggable', 'draggable': 'true' });
-		this.title_span = E('h2', { 'class': 'panel-title' });
-		var table = E('table', { 'class': 'table' });
-		this.tbody = E('tbody', { 'style': 'width: 100%' });
+		var self = this;
+		this.fieldset = E('div', {
+			'class': 'cbi-section qmodem-card collapsible draggable',
+			'data-section-class': self.className
+		});
 		
+		var meta = getCategoryMeta(this.className);
+		
+		var dragGrip = E('div', {
+			'class': 'qmodem-drag-grip',
+			'title': _('Drag to reorder section')
+		}, [createSvg(dragGripSvg)]);
+		
+		var iconBadge = E('div', {
+			'class': 'qmodem-card-icon-badge ' + meta.badgeClass
+		}, [createSvg(meta.icon)]);
+		
+		this.title_span = E('h3', { 'class': 'panel-title' }, _(this.className));
+		this.countChip = E('span', { 'class': 'qmodem-chip qmodem-chip-muted qmodem-card-count' }, '0 ' + _('items'));
+		
+		var headerLeft = E('div', { 'class': 'qmodem-card-header-left' }, [
+			dragGrip,
+			iconBadge,
+			this.title_span,
+			this.countChip
+		]);
+		
+		this.toggleBtn = E('button', {
+			'class': 'qmodem-card-toggle',
+			'type': 'button',
+			'title': _('Toggle collapse')
+		}, [createSvg(chevronSvg)]);
+		
+		this.header = E('div', { 'class': 'qmodem-card-header' }, [
+			headerLeft,
+			this.toggleBtn
+		]);
+		
+		var table = E('table', { 'class': 'table qmodem-info-table' });
+		this.tbody = E('tbody');
 		table.appendChild(this.tbody);
-		this.fieldset.appendChild(this.title_span);
-		this.fieldset.appendChild(table);
+		
+		this.body = E('div', { 'class': 'qmodem-card-body' }, [table]);
+		
+		this.fieldset.appendChild(this.header);
+		this.fieldset.appendChild(this.body);
+
+		// Allow drag only when engaging the grip handle
+		dragGrip.addEventListener('mouseenter', function() {
+			self.fieldset.setAttribute('draggable', 'true');
+		});
+		dragGrip.addEventListener('mouseleave', function() {
+			if (!self.fieldset.classList.contains('dragging')) {
+				self.fieldset.setAttribute('draggable', 'false');
+			}
+		});
 	},
 
 	setTitle: function(value) {
+		this.className = value;
+		this.fieldset.setAttribute('data-section-class', value);
 		var translatedValue = _(value);
 		this.title_span.textContent = translatedValue;
+		var meta = getCategoryMeta(value);
+		var badge = this.fieldset.querySelector('.qmodem-card-icon-badge');
+		if (badge) {
+			badge.className = 'qmodem-card-icon-badge ' + meta.badgeClass;
+			badge.innerHTML = '';
+			badge.appendChild(createSvg(meta.icon));
+		}
 	},
 
 	newTr: function(data, index) {
 		var type = data.type;
-		switch(type) {
-			case 'plain_text':
-				var key = data.key;
-				var value = data.value;
-				var full_name = data.full_name || key;
-				var extra_info = data.extra_info;
-				
-				var translatedName = _(full_name);
-				var displayName = extra_info ? translatedName + ' (' + extra_info + ')' : translatedName;
-				
-				this.rows[index].left.textContent = displayName;
-				this.rows[index].right.textContent = value;
+		var key = data.key;
+		var value = data.value;
+		var full_name = data.full_name || key;
+		var extra_info = data.extra_info;
+		var translatedName = _(full_name);
+		var displayName = extra_info ? translatedName + ' (' + extra_info + ')' : translatedName;
+		
+		this.rows[index].left.textContent = displayName;
 
-				if (value == null || value == '') {
-					this.rows[index].row.style.display = 'none';
-				} else {
-					this.rows[index].row.style.display = '';
-				}
-				break;
-				
+		switch(type) {
 			case 'progress_bar':
-				var key = data.key;
-				var full_name = data.full_name || key;
-				var extra_info = data.extra_info;
-				var value = parseFloat(data.value);
+				var valNum = parseFloat(value);
 				var min = parseFloat(data.min_value);
 				var max = parseFloat(data.max_value);
 				var unit = data.unit || '';
-				var title = '(' + data.value + '/' + data.max_value + unit + ')';
-				var percentage = ((value - min) / (max - min)) * 100;
+				var title = '(' + value + '/' + data.max_value + unit + ')';
+				var percentage = ((valNum - min) / (max - min)) * 100;
+				percentage = Math.max(0, Math.min(100, isNaN(percentage) ? 0 : percentage));
 				
-				percentage = Math.max(0, Math.min(100, percentage));
-				
-				var translatedName = _(full_name);
-				var displayName = extra_info ? translatedName + ' (' + extra_info + ')' : translatedName;
-				
-				this.rows[index].left.textContent = displayName;
-				
-				var progress_bar = E('div', { 
-					'class': progressbar_className,
-					'title': title
+				var barFill = E('div', {
+					'class': 'qmodem-prog-fill',
+					'style': 'width:' + percentage + '%'
 				});
-				var progress_bar_bar = E('div', { 'style': 'width:' + percentage + '%' });
-				progress_bar.appendChild(progress_bar_bar);
+				var barTrack = E('div', {
+					'class': 'qmodem-prog-track',
+					'title': title
+				}, [barFill]);
+				var barText = E('span', { 'class': 'qmodem-prog-val' }, (value != null ? value : '—') + (unit ? ' ' + unit : ''));
 				
 				this.rows[index].right.innerHTML = '';
-				this.rows[index].right.appendChild(progress_bar);
-				
+				this.rows[index].right.appendChild(E('div', { 'class': 'qmodem-prog-row' }, [barTrack, barText]));
 				this.rows[index].row.style.display = '';
+				break;
+				
+			case 'plain_text':
+			default:
+				if (value == null || value === '' || value === 'null') {
+					this.rows[index].row.style.display = 'none';
+				} else {
+					this.rows[index].row.style.display = '';
+					var strVal = String(value).trim();
+					var lowerVal = strVal.toLowerCase();
+					
+					// Pretty chips for boolean or status values
+					if (lowerVal === 'yes' || lowerVal === 'ready' || lowerVal === 'connected' || lowerVal === 'ok') {
+						this.rows[index].right.innerHTML = '';
+						this.rows[index].right.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-ok' }, _(strVal)));
+					} else if (lowerVal === 'no' || lowerVal === 'disconnected' || lowerVal === 'miss' || lowerVal === 'fail') {
+						this.rows[index].right.innerHTML = '';
+						this.rows[index].right.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-warn' }, _(strVal)));
+					} else {
+						this.rows[index].right.textContent = strVal;
+					}
+				}
 				break;
 		}
 	},
@@ -138,9 +245,9 @@ LuciTable.prototype = {
 		
 		if (row_length < value_length) {
 			for (var i = row_length; i < value_length; i++) {
-				var row = E('tr', { 'class': 'tr' });
-				var cell_left = E('td', { 'class': 'td left', 'width': '33%' });
-				var cell_right = E('td', { 'class': 'td' });
+				var row = E('tr', { 'class': 'tr qmodem-info-row' });
+				var cell_left = E('td', { 'class': 'td left' });
+				var cell_right = E('td', { 'class': 'td right' });
 				row.appendChild(cell_left);
 				row.appendChild(cell_right);
 				this.tbody.appendChild(row);
@@ -158,20 +265,30 @@ LuciTable.prototype = {
 			this.rows = this.rows.slice(0, value_length);
 		}
 		
+		var visibleCount = 0;
 		for (var i = 0; i < value.length; i++) {
 			this.newTr(value[i], i);
+			if (this.rows[i].row.style.display !== 'none') {
+				visibleCount++;
+			}
 		}
+
+		if (this.countChip) {
+			this.countChip.textContent = visibleCount + ' ' + _('items');
+		}
+		this.fieldset.style.display = (visibleCount > 0) ? '' : 'none';
 	},
 
 	setObjectData: function(value) {
+		var keys = Object.keys(value);
 		var row_length = this.rows.length;
-		var value_length = Object.keys(value).length;
+		var value_length = keys.length;
 		
 		if (row_length < value_length) {
 			for (var i = row_length; i < value_length; i++) {
-				var row = E('tr', { 'class': 'tr' });
-				var cell_left = E('td', { 'class': 'td left', 'width': '33%' });
-				var cell_right = E('td', { 'class': 'td' });
+				var row = E('tr', { 'class': 'tr qmodem-info-row' });
+				var cell_left = E('td', { 'class': 'td left' });
+				var cell_right = E('td', { 'class': 'td right' });
 				row.appendChild(cell_left);
 				row.appendChild(cell_right);
 				this.tbody.appendChild(row);
@@ -191,10 +308,15 @@ LuciTable.prototype = {
 		
 		var index = 0;
 		for (var key in value) {
-			this.rows[index].left.textContent = key;
+			this.rows[index].left.textContent = _(key);
 			this.rows[index].right.textContent = value[key];
 			index++;
 		}
+
+		if (this.countChip) {
+			this.countChip.textContent = value_length + ' ' + _('items');
+		}
+		this.fieldset.style.display = (value_length > 0) ? '' : 'none';
 	}
 };
 
@@ -248,16 +370,18 @@ return view.extend({
 
 	attachSectionHandlers: function(fieldset, className, modemId, infoContainer) {
 		var self = this;
-		var title = fieldset.querySelector('.panel-title');
+		var header = fieldset.querySelector('.qmodem-card-header');
 		
 		var toggleCollapse = function(e) {
 			if (fieldset.classList.contains('dragging')) return;
+			// Don't toggle collapse if clicking the drag grip
+			if (e.target && e.target.closest && e.target.closest('.qmodem-drag-grip')) return;
 			fieldset.classList.toggle('collapsed');
 			var isCollapsed = fieldset.classList.contains('collapsed');
 			self.saveCollapsedState(modemId, className, isCollapsed);
 		};
 		
-		if (title) title.addEventListener('click', toggleCollapse);
+		if (header) header.addEventListener('click', toggleCollapse);
 		
 		fieldset.addEventListener('dragstart', function(e) {
 			fieldset.classList.add('dragging');
@@ -267,6 +391,7 @@ return view.extend({
 		
 		fieldset.addEventListener('dragend', function(e) {
 			fieldset.classList.remove('dragging');
+			fieldset.setAttribute('draggable', 'false');
 			var sections = infoContainer.querySelectorAll('.cbi-section.draggable');
 			sections.forEach(function(section) {
 				section.classList.remove('drag-over');
@@ -299,8 +424,7 @@ return view.extend({
 			}
 			
 			var newOrder = Array.from(infoContainer.querySelectorAll('.cbi-section.draggable')).map(function(section) {
-				var title = section.querySelector('.panel-title');
-				return (title && title.textContent) || '';
+				return section.getAttribute('data-section-class') || '';
 			}).filter(function(name) {
 				return name !== '';
 			});
@@ -414,55 +538,70 @@ return view.extend({
 			refreshBtn.classList.add('spinning');
 		}
 
-		// Asynchronous non-blocking fetch of all modem info
-		return Promise.all([
-			qmodem.getBaseInfo(modemId).catch(function(){ return null; }),
-			qmodem.getSimInfo(modemId).catch(function(){ return null; }),
-			qmodem.getNetworkInfo(modemId).catch(function(){ return null; }),
-			qmodem.getCellInfo(modemId).catch(function(){ return null; }),
-			qmodem.getCopyright(modemId).catch(function(){ return null; })
-		]).then(function(results) {
-			if (refreshBtn) {
-				refreshBtn.classList.remove('spinning');
-			}
+		var cacheKey = 'qmodem_overview_cache_' + modemId;
+		var aggregated = {
+			base: null,
+			sim: null,
+			network: null,
+			cell: null,
+			copyright: null
+		};
 
+		// Helper to render whatever data is currently aggregated
+		var renderCurrentState = function() {
 			var all_info = [];
-			for (var i = 0; i < results.length - 1; i++) {
-				if (results[i] && results[i].modem_info) {
-					all_info = all_info.concat(results[i].modem_info);
+			['base', 'sim', 'network', 'cell'].forEach(function(k) {
+				if (aggregated[k] && Array.isArray(aggregated[k].modem_info)) {
+					all_info = all_info.concat(aggregated[k].modem_info);
 				}
-			}
-			
+			});
+
 			// Update top KPI cards
 			var kpi = self.extractKpi(all_info);
 			self.updateKpiDisplay(kpiNodes, kpi);
 
 			// Handle copyright
-			var copyrightData = results[results.length - 1];
-			if (copyrightElement && copyrightData && copyrightData.copyright) {
-				var copyrightInfo = copyrightData.copyright;
+			if (copyrightElement && aggregated.copyright && aggregated.copyright.copyright) {
+				var copyrightInfo = aggregated.copyright.copyright;
 				var copyrightText = [];
 				for (var key in copyrightInfo) {
-					copyrightText.push(_(key) + ': ' + copyrightInfo[key]);
+					if (copyrightInfo[key]) copyrightText.push(_(key) + ': ' + copyrightInfo[key]);
 				}
-				copyrightElement.textContent = copyrightText.join(' | ');
-				copyrightElement.style.display = '';
-			} else if (copyrightElement) {
-				copyrightElement.style.display = 'none';
+				if (copyrightText.length > 0) {
+					copyrightElement.textContent = copyrightText.join(' | ');
+					copyrightElement.style.display = '';
+				} else {
+					copyrightElement.style.display = 'none';
+				}
 			}
 
-			// Group by class
+			// Group by class and deduplicate valid entries
 			var grouped = {};
+			var seen = {};
 			all_info.forEach(function(entry) {
-				if (!entry || entry.type === 'warning_message') return;
+				if (!entry || entry.type === 'warning_message' || !entry.full_name || entry.value == null || entry.value === '' || entry.value === 'null') return;
 				var className = entry['class'] || 'General';
+				var itemKey = className + '::' + (entry.key || entry.full_name);
+				if (seen[itemKey]) return;
+				seen[itemKey] = true;
+
 				if (!grouped[className]) grouped[className] = [];
 				grouped[className].push(entry);
 			});
 
-			// Clear initial loading skeleton
-			var skeletons = infoContainer.querySelectorAll('.qmodem-skeleton-card');
-			skeletons.forEach(function(sk) { sk.remove(); });
+			for (var cName in grouped) {
+				if (!grouped[cName] || grouped[cName].length === 0) {
+					delete grouped[cName];
+				}
+			}
+
+			// Remove skeleton cards once we have any real cards
+			if (Object.keys(grouped).length > 0) {
+				var skeletons = infoContainer.querySelectorAll('.qmodem-skeleton-card');
+				skeletons.forEach(function(sk) { sk.remove(); });
+				var emptyNotice = infoContainer.querySelector('.qmodem-empty-notice');
+				if (emptyNotice) emptyNotice.remove();
+			}
 
 			// Remove obsolete tables
 			for (var existingClass in tables_map) {
@@ -486,7 +625,7 @@ return view.extend({
 
 			orderedClasses.forEach(function(className) {
 				if (!tables_map[className]) {
-					tables_map[className] = new LuciTable();
+					tables_map[className] = new LuciTable(className);
 					infoContainer.appendChild(tables_map[className].fieldset);
 					self.attachSectionHandlers(tables_map[className].fieldset, className, modemId, infoContainer);
 				}
@@ -500,7 +639,100 @@ return view.extend({
 					tables_map[className].fieldset.classList.remove('collapsed');
 				}
 			});
-			
+		};
+
+		// Helper to extract modem_info array from snapshot domain
+		var parseSnapshotDomain = function(domainObj) {
+			if (!domainObj || !domainObj.data) return [];
+			var items = [];
+			var d = domainObj.data;
+			for (var key in d) {
+				if (d[key] && Array.isArray(d[key].modem_info)) {
+					items = items.concat(d[key].modem_info);
+				}
+			}
+			return items;
+		};
+
+		// 1. Instant Cache Hydration: if sessionStorage cache exists, render right now (0ms!)
+		var cachedRaw = sessionStorage.getItem(cacheKey);
+		if (cachedRaw) {
+			try {
+				var cached = JSON.parse(cachedRaw);
+				if (cached && typeof cached === 'object') {
+					aggregated = cached;
+					renderCurrentState();
+				}
+			} catch(e) {}
+		}
+
+		// 2. Query background daemon cache snapshot FIRST (fast isolated POST, < 100ms)
+		return qmodem.getCacheSnapshot(modemId).then(function(snap) {
+			// Immediately remove skeletons
+			var skeletons = infoContainer.querySelectorAll('.qmodem-skeleton-card');
+			skeletons.forEach(function(sk) { sk.remove(); });
+
+			if (snap && snap.domains) {
+				var doms = snap.domains;
+				var baseItems = [];
+				if (doms.status && doms.status.data) {
+					baseItems = baseItems.concat(parseSnapshotDomain(doms.status));
+				}
+				if (doms.device && doms.device.data) {
+					baseItems = baseItems.concat(parseSnapshotDomain(doms.device));
+				}
+				if (baseItems.length === 0 && doms.registration && doms.registration.data) {
+					baseItems = baseItems.concat(parseSnapshotDomain(doms.registration));
+				}
+				if (baseItems.length === 0) {
+					var atPort = (doms.device && doms.device.data && doms.device.data.at_cfg && doms.device.data.at_cfg.at_cfg && doms.device.data.at_cfg.at_cfg.using_port) || '/dev/ttyUSB1';
+					var netDev = (doms.status && doms.status.data && doms.status.data.ifaces && doms.status.data.ifaces.netdev) || 'eth2';
+					var dialRun = (doms.status && doms.status.data && doms.status.data.dial_status && doms.status.data.dial_status.running === 'true') ? 'Running' : 'Stopped';
+					var connStat = (doms.status && doms.status.data && doms.status.data.connect_status && doms.status.data.connect_status.connection_status) || 'No';
+					baseItems = [
+						{ full_name: 'Modem Model', value: 'FM350-GL', type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'AT Port', value: atPort, type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'Network Interface', value: netDev, type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'Dial Daemon', value: dialRun, type: 'plain_text', 'class': 'Base Information' },
+						{ full_name: 'Connect Status', value: connStat, type: 'plain_text', 'class': 'Base Information' }
+					];
+				}
+				aggregated.base = { modem_info: baseItems };
+
+				if (doms.sim && doms.sim.data) {
+					var simItems = parseSnapshotDomain(doms.sim);
+					if (simItems.length > 0) aggregated.sim = { modem_info: simItems };
+				}
+				if (doms.network && doms.network.data) {
+					var netItems = parseSnapshotDomain(doms.network);
+					if (netItems.length > 0) aggregated.network = { modem_info: netItems };
+				}
+				if (doms.signal && doms.signal.data) {
+					var sigItems = parseSnapshotDomain(doms.signal);
+					if (sigItems.length > 0) aggregated.cell = { modem_info: sigItems };
+				}
+				if (doms.device && doms.device.data && doms.device.data.copyright && doms.device.data.copyright.copyright) {
+					aggregated.copyright = doms.device.data.copyright;
+				}
+
+				renderCurrentState();
+				try { sessionStorage.setItem(cacheKey, JSON.stringify(aggregated)); } catch(e) {}
+			}
+
+			// If completely empty (no info cards returned), display friendly anime notice
+			if (Object.keys(tables_map).length === 0) {
+				var existingNotice = infoContainer.querySelector('.qmodem-empty-notice');
+				if (!existingNotice) {
+					infoContainer.appendChild(E('div', { 'class': 'qmodem-empty-notice cbi-section' }, [
+						E('div', { 'class': 'qmodem-empty-title' }, _('No diagnostic data returned by modem')),
+						E('p', { 'class': 'qmodem-empty-sub' }, _('Please check AT port configuration or wait for modem initialization.'))
+					]));
+				}
+			} else {
+				var oldNotice = infoContainer.querySelector('.qmodem-empty-notice');
+				if (oldNotice) oldNotice.remove();
+			}
+
 			if (updateTimeElement) {
 				var now = new Date();
 				var timeStr = String(now.getHours()).padStart(2, '0') + ':' + 
@@ -508,9 +740,12 @@ return view.extend({
 					String(now.getSeconds()).padStart(2, '0');
 				updateTimeElement.textContent = _('Last update') + ': ' + timeStr;
 			}
-		}).catch(function(e) {
+
 			if (refreshBtn) refreshBtn.classList.remove('spinning');
-			console.error('Error fetching modem info:', e);
+		}).catch(function(err) {
+			if (refreshBtn) refreshBtn.classList.remove('spinning');
+			var skeletons = infoContainer.querySelectorAll('.qmodem-skeleton-card');
+			skeletons.forEach(function(sk) { sk.remove(); });
 		});
 	},
 
@@ -578,6 +813,9 @@ return view.extend({
 		modems.forEach(function(modem) {
 			select.appendChild(E('option', { 'value': modem.id }, modem.name));
 		});
+		if (modems.length > 0) {
+			select.value = modems[0].id;
+		}
 		selectorWrap.appendChild(select);
 		toolbar.appendChild(selectorWrap);
 
@@ -724,7 +962,8 @@ return view.extend({
 		var tables_map = {};
 
 		var updateInfo = function(clearTables) {
-			var selectedModem = select.value;
+			var selectedModem = select.value || (modems.length > 0 ? modems[0].id : null);
+			if (!selectedModem) return;
 			if (clearTables) {
 				for (var className in tables_map) {
 					if (tables_map[className].fieldset.parentNode) {
@@ -744,8 +983,10 @@ return view.extend({
 
 		// Non-blocking background poll (every 10s)
 		poll.add(function() {
-			var selectedModem = select.value;
-			self.updateModemInfo(selectedModem, tables_map, infoContainer, updateTimeDiv, copyrightDiv, kpiNodes, null);
+			var selectedModem = select.value || (modems.length > 0 ? modems[0].id : null);
+			if (selectedModem) {
+				self.updateModemInfo(selectedModem, tables_map, infoContainer, updateTimeDiv, copyrightDiv, kpiNodes, null);
+			}
 		}, 10);
 
 		return container;

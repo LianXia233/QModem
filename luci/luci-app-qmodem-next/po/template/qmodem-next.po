@@ -3574,3 +3574,216 @@ msgstr ""
 #: view/qmodem/overview.js:489
 msgid "Signal, SIM and network overview. Drag cards to reorder, click a title to collapse."
 msgstr ""
+
+msgid "Active Modem"
+msgstr ""
+
+msgid "Active SIM Slot"
+msgstr ""
+
+msgid "Carrier Aggregation Idle"
+msgstr ""
+
+msgid "Cellular Carrier"
+msgstr ""
+
+msgid "Checking session..."
+msgstr ""
+
+msgid "Network Session"
+msgstr ""
+
+msgid "No Active Session"
+msgstr ""
+
+msgid "No signal data"
+msgstr ""
+
+msgid "Offline"
+msgstr ""
+
+msgid "Primary Band"
+msgstr ""
+
+msgid "RAT & Signal"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "Real-time signal diagnostics, carrier aggregation and hardware overview. Drag cards to reorder."
+msgstr ""
+
+msgid "Refresh modem data"
+msgstr ""
+
+msgid "SIM Card"
+msgstr ""
+
+msgid "Uplink Ready"
+msgstr ""
+
+msgid "Waiting for signal data"
+msgstr ""
+
+msgid "Checking status..."
+msgstr ""
+
+msgid "Configure auto-dial daemon, network preference, APN, interface bindings and multi-WAN routes."
+msgstr ""
+
+msgid "Global & Dial Rules"
+msgstr ""
+
+msgid "Network Configuration"
+msgstr ""
+
+msgid "AT Command Terminal"
+msgstr ""
+
+msgid "Copy Output"
+msgstr ""
+
+msgid "Execute 3GPP diagnostic commands, test cellular module responses, and inspect raw serial streams."
+msgstr ""
+
+msgid "Failed to copy output"
+msgstr ""
+
+msgid "Initializing AT interface for %s..."
+msgstr ""
+
+msgid "Interactive Modem Shell"
+msgstr ""
+
+msgid "No response content"
+msgstr ""
+
+msgid "Output copied to clipboard"
+msgstr ""
+
+msgid "Please enter an AT command"
+msgstr ""
+
+msgid "Quick Diagnostic Presets"
+msgstr ""
+
+msgid "Ready. Type an AT command below or click a diagnostic preset."
+msgstr ""
+
+msgid "Send Command"
+msgstr ""
+
+msgid "Serial Console"
+msgstr ""
+
+msgid "Serial Ready"
+msgstr ""
+
+msgid "Use Ubus AT Daemon (non-blocking)"
+msgstr ""
+
+msgid "[No response received]"
+msgstr ""
+
+msgid "Advanced Modem Configuration"
+msgstr ""
+
+msgid "Click "Scan Neighbor Cells" to search for nearby cell towers"
+msgstr ""
+
+msgid "Configure cell lock parameters. You can manually enter values or use the "Copy" button from scanned cells."
+msgstr ""
+
+msgid "Fine-tune radio access technologies, band locking, IMEI provisioning and cell lock parameters."
+msgstr ""
+
+msgid "Hardware Tuning"
+msgstr ""
+
+msgid "Conversations & Storage"
+msgstr ""
+
+msgid "Manage cellular SMS threads, compose new messages, adjust storage areas (ME/SM) and sync database."
+msgstr ""
+
+msgid "Configure hardware scanning workers, PCIe/USB bus discovery rules, LEDs and daemon worker timeouts."
+msgstr ""
+
+msgid "Daemon & Bus Scanning"
+msgstr ""
+
+msgid "QModem Core Settings"
+msgstr ""
+
+msgid "Active Slot"
+msgstr ""
+
+msgid "Click below to switch the active RF path to this slot."
+msgstr ""
+
+msgid "Current Active Slot"
+msgstr ""
+
+msgid "Currently Active"
+msgstr ""
+
+msgid "Error querying SIM switch capability: %s"
+msgstr ""
+
+msgid "Failed to switch SIM slot: %s"
+msgstr ""
+
+msgid "Hardware Slot Control"
+msgstr ""
+
+msgid "Hardware Support"
+msgstr ""
+
+msgid "Note:"
+msgstr ""
+
+msgid "Note: Some modems may take 10-30 seconds to re-register on cellular networks."
+msgstr ""
+
+msgid "Probing SIM slot capabilities for %s..."
+msgstr ""
+
+msgid "SIM Slot %s"
+msgstr ""
+
+msgid "SIM Slot Switcher"
+msgstr ""
+
+msgid "Standby"
+msgstr ""
+
+msgid "Switch to Slot %s"
+msgstr ""
+
+msgid "Switching active RF path to Slot %s..."
+msgstr ""
+
+msgid "This SIM card is currently serving cellular connections."
+msgstr ""
+
+msgid "This modem model or current firmware does not support software SIM switching."
+msgstr ""
+
+msgid "Toggle active SIM physical slots on dual-SIM cellular modems. Some modules may automatically re-register."
+msgstr ""
+
+msgid "Automatically relay inbound cellular SMS to Telegram Bot, Webhook, Feishu, ServerChan or PushDeer."
+msgstr ""
+
+msgid "Multi-Channel Push"
+msgstr ""
+
+msgid "Direct SIM Access"
+msgstr ""
+
+msgid "Inspect raw SMS records stored directly on SIM memory, view message indices, and perform cleanup."
+msgstr ""
+
+msgid "SIM Card SMS Storage"
+msgstr ""

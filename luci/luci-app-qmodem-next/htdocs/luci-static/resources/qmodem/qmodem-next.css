@@ -376,74 +376,273 @@ body.qmodem-dark {
 	min-width: 0;
 }
 
-/* Collapsible sections */
-.cbi-map .cbi-section.collapsible > legend,
-.cbi-map .cbi-section.collapsible > .panel-title {
+/* ============================================================
+ * Overview Dashboard Info Cards (cbi-section.collapsible.draggable)
+ * ============================================================ */
+.cbi-map .cbi-section.qmodem-card,
+.cbi-map fieldset.cbi-section.qmodem-card {
+	background: var(--qmd-card);
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-card);
+	box-shadow: var(--qmd-shadow-sm);
+	padding: 0;
+	margin: 0;
+	overflow: hidden;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.18s ease;
+}
+
+.cbi-map .cbi-section.qmodem-card:hover,
+.cbi-map fieldset.cbi-section.qmodem-card:hover {
+	border-color: color-mix(in srgb, var(--qmd-primary) 36%, var(--qmd-border));
+	box-shadow: var(--qmd-shadow-md);
+}
+
+/* Card Header */
+.qmodem-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	background: var(--qmd-card-2);
+	border-bottom: 1px solid var(--qmd-border);
 	cursor: pointer;
 	user-select: none;
-	position: relative;
-	padding-right: 30px;
+	transition: background 0.15s ease;
 }
 
-.cbi-map .cbi-section.collapsible > legend::after,
-.cbi-map .cbi-section.collapsible > .panel-title::after {
-	content: "";
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	width: 8px;
-	height: 8px;
-	transform: translateY(-65%) rotate(45deg);
-	border-right: 2px solid var(--qmd-text-3);
-	border-bottom: 2px solid var(--qmd-text-3);
-	transition: transform 0.18s ease;
+.qmodem-card-header:hover {
+	background: color-mix(in srgb, var(--qmd-primary-soft) 28%, var(--qmd-card-2));
 }
 
-.cbi-map .cbi-section.collapsible.collapsed > legend::after,
-.cbi-map .cbi-section.collapsible.collapsed > .panel-title::after {
-	transform: translateY(-50%) rotate(-45deg);
+.qmodem-card-header-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-width: 0;
+	flex: 1;
 }
 
-.cbi-map .cbi-section.collapsible.collapsed > table,
-.cbi-map .cbi-section.collapsible.collapsed > div:not(.panel-title):not(.qmodem-keep) {
+/* Drag Grip */
+.qmodem-drag-grip {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 26px;
+	color: var(--qmd-text-3);
+	cursor: grab;
+	border-radius: 6px;
+	transition: background 0.15s ease, color 0.15s ease;
+	flex: none;
+}
+
+.qmodem-drag-grip:hover {
+	background: var(--qmd-primary-soft);
+	color: var(--qmd-primary);
+}
+
+.qmodem-drag-grip:active {
+	cursor: grabbing;
+}
+
+/* Category Icon Badge */
+.qmodem-card-icon-badge {
+	width: 28px;
+	height: 28px;
+	border-radius: 9px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+}
+
+.qmodem-icon-badge-primary {
+	background: var(--qmd-primary-soft);
+	color: var(--qmd-primary);
+}
+
+.qmodem-icon-badge-pink {
+	background: var(--qmd-pink-soft);
+	color: var(--qmd-pink);
+}
+
+.qmodem-icon-badge-blue {
+	background: var(--qmd-blue-soft);
+	color: var(--qmd-blue);
+}
+
+.qmodem-icon-badge-green {
+	background: var(--qmd-green-soft);
+	color: var(--qmd-ok);
+}
+
+/* Title & Count */
+.cbi-map .qmodem-card .panel-title {
+	font-size: 14.5px;
+	font-weight: 600;
+	color: var(--qmd-text-1);
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.cbi-map .qmodem-card .panel-title::before {
+	display: none !important;
+}
+
+.qmodem-card-count {
+	font-size: 11px;
+	padding: 1px 8px;
+	flex: none;
+}
+
+/* Collapse Toggle Button */
+.qmodem-card-toggle {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	border: 1px solid var(--qmd-border);
+	background: var(--qmd-card);
+	color: var(--qmd-text-2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+	transition: background 0.15s ease, color 0.15s ease, transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+	flex: none;
+}
+
+.qmodem-card-toggle:hover {
+	background: var(--qmd-primary-soft);
+	color: var(--qmd-primary);
+	border-color: var(--qmd-primary);
+}
+
+.cbi-map .cbi-section.qmodem-card.collapsed .qmodem-card-toggle svg {
+	transform: rotate(-90deg);
+}
+
+/* Card Body & Table */
+.qmodem-card-body {
+	padding: 4px 0;
+}
+
+.cbi-map .cbi-section.qmodem-card.collapsed .qmodem-card-body {
 	display: none;
 }
 
-/* Draggable sections */
+.cbi-map .table.qmodem-info-table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	margin: 0;
+}
+
+.cbi-map .table.qmodem-info-table .tr {
+	transition: background 0.12s ease;
+}
+
+.cbi-map .table.qmodem-info-table .tr:hover {
+	background: var(--qmd-card-2);
+}
+
+.cbi-map .table.qmodem-info-table .td {
+	padding: 9px 18px;
+	font-size: 13px;
+	border-bottom: 1px dashed var(--qmd-divider);
+	vertical-align: middle;
+}
+
+.cbi-map .table.qmodem-info-table .tr:last-child .td {
+	border-bottom: none;
+}
+
+.cbi-map .table.qmodem-info-table .td.left {
+	width: 42%;
+	color: var(--qmd-text-2);
+	font-weight: 500;
+}
+
+.cbi-map .table.qmodem-info-table .td.right {
+	color: var(--qmd-text-1);
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	word-break: break-all;
+}
+
+/* Progress bar inside card */
+.qmodem-prog-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+}
+
+.qmodem-prog-track {
+	flex: 1;
+	height: 8px;
+	border-radius: 999px;
+	background: var(--qmd-border);
+	overflow: hidden;
+}
+
+.qmodem-prog-fill {
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--qmd-primary), var(--qmd-pink));
+	transition: width 0.3s ease;
+}
+
+.qmodem-prog-val {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--qmd-text-2);
+	white-space: nowrap;
+}
+
+/* Draggable & Dragging States */
 .cbi-map .cbi-section.draggable {
-	cursor: grab;
+	cursor: default;
 }
 
 .cbi-map .cbi-section.draggable.dragging {
-	opacity: 0.55;
+	opacity: 0.65;
 	cursor: grabbing;
-	box-shadow: var(--qmd-shadow-lg);
+	transform: scale(0.99);
+	box-shadow: 0 14px 28px rgba(136, 117, 232, 0.25);
+	border: 2px dashed var(--qmd-primary) !important;
 }
 
 .cbi-map .cbi-section.draggable.drag-over {
-	border-top: 3px solid var(--qmd-primary);
+	border-color: var(--qmd-primary) !important;
+	box-shadow: 0 0 0 2px var(--qmd-primary-soft);
+	background: var(--qmd-card-2);
 }
 
-.cbi-map .cbi-section.draggable > legend,
-.cbi-map .cbi-section.draggable > .panel-title {
-	padding-left: 24px;
-	position: relative;
+/* Empty state notice */
+.qmodem-empty-notice {
+	grid-column: 1 / -1;
+	padding: 32px 24px;
+	text-align: center;
+	background: var(--qmd-card);
+	border: 1px dashed var(--qmd-border);
+	border-radius: var(--qmd-r-card);
 }
 
-.cbi-map .cbi-section.draggable > legend::before,
-.cbi-map .cbi-section.draggable > .panel-title::before {
-	content: "";
-	position: absolute;
-	left: 8px;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 12px;
-	height: 10px;
-	background:
-		linear-gradient(var(--qmd-text-3), var(--qmd-text-3)) 0 1px / 12px 2px no-repeat,
-		linear-gradient(var(--qmd-text-3), var(--qmd-text-3)) 0 5px / 12px 2px no-repeat,
-		linear-gradient(var(--qmd-text-3), var(--qmd-text-3)) 0 9px / 12px 2px no-repeat;
-	opacity: 0.7;
+.qmodem-empty-title {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--qmd-text-1);
+	margin-bottom: 6px;
+}
+
+.qmodem-empty-sub {
+	font-size: 13px;
+	color: var(--qmd-text-3);
+	margin: 0;
 }
 
 /* Copyright footer */

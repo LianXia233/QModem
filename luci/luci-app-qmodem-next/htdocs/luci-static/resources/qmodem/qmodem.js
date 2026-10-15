@@ -255,7 +255,19 @@ var callSetSimSlot = rpc.declare({
 	expect: { }
 });
 
+var callCacheSnapshot = rpc.declare({
+	object: 'qmodem_cache',
+	method: 'snapshot',
+	params: ['config_section'],
+	expect: { }
+});
+
 return L.Class.extend({
+	// Get background cached snapshot (instantaneous)
+	getCacheSnapshot: function(section) {
+		return callCacheSnapshot(section);
+	},
+
 	// Get modem base information
 	getBaseInfo: function(section) {
 		return callBaseInfo(section);

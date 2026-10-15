@@ -39,3 +39,27 @@ msgstr "当 TTL 修改激活时，NSS ECM、SFE 和其他加速模块将被禁�
 
 msgid "Settings will take effect after saving and applying changes."
 msgstr "设置将在保存并应用更改后生效。"
+
+msgid "128 (Windows)"
+msgstr "128 (Windows 默认)"
+
+msgid "64 (Linux / Android / macOS)"
+msgstr "64 (Linux / Android / macOS 默认)"
+
+msgid "65 (Carrier Bypass +1)"
+msgstr "65 (热点绕过 +1)"
+
+msgid "Common Presets"
+msgstr "常用预设"
+
+msgid "Customize outgoing IPv4 Time-To-Live and IPv6 Hop Limit packets to bypass tethering and hotspot throttling."
+msgstr "自定义出站 IPv4 TTL 与 IPv6 跳数限制数据包，以绕过运营商热点共享限速与套餐限制。"
+
+msgid "Firewall4 / NFT"
+msgstr "防火墙 4 / NFT"
+
+msgid "Important Warning:"
+msgstr "重要警告："
+
+msgid "Packet TTL / Hop Limit Rules"
+msgstr "数据包 TTL / 跳数限制规则"
