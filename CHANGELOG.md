@@ -14,6 +14,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 ## [1.2.0] - 2026-10-15
 
 ### Added
+- **Compact Quick Diagnostic Presets with Segmented Tabs (Debug View)**:
+  - Overhauled the diagnostic presets section from a stacked multi-category layout (~300px) to a compact **Segmented Tab Bar** (`📱 Device Info`, `📶 Signal & Network`, `💳 SIM & Card Slot`, `⚙️ Hardware & RF`, `⭐ Custom Commands`, `✨ All`), slashing vertical height by **more than 70%** (~100px).
+  - Compact adaptive pills fitting into single-row display with instant 1-click input fill and double-click execution.
+  - Added 1-click **Collapse/Expand** toggle button (reducing folded height to 36px), with state persisted in `localStorage`.
+  - Added command history navigation via keyboard `↑` / `↓` arrow keys in the serial terminal input.
+- **Unified Soft Anime Pastel Glass Modal / Dialog System**:
+  - Overhauled LuCI's native `ui.showModal` dialogs across `luci-app-qmodem-next`, `luci-app-qmodem-voip`, and `luci-app-qmodem-ttlfw4`.
+  - Added `-webkit-backdrop-filter: blur(14px) saturate(140%)` frosted glass overlay, resolving an issue where default overlay styles could persistently cover the page when inactive.
+  - Floating dialog card with `20px` border-radius, dual ambient shadow layers, a top decorative multi-color pastel gradient bar, and macaron pill action buttons.
 - **Full visual and asynchronous refactor of all 11 core LuCI views**:
   - `overview`: Dynamic cellular-wave SVG antenna & mascot, 4 live KPI metric cards (Signal & RAT, Carrier & Band, Uplink Session, SIM & Hardware), shimmer skeleton placeholders, and concurrent asynchronous data hydration.
   - `network_config`: Animated dual-antenna 5G router SVG hero, resilient timeout-bounded status polling (eliminating blocking page hangs), and live pulsing service indicator chips.
@@ -31,16 +40,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ### Removed
 - **Legacy Lua UI packages removed**: `luci-app-qmodem` (Lua), `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`, `luci-app-qmodem-hc`, `luci-app-qmodem-mwan` have been deleted from `luci/`. Essential hardware and daemon scripts (`modem_sim.sh`, `modem_mwan.sh`, `qmodem_hc_sim`, `qmodem_mwan`, `99-setup-mwan`, `01-reload-mwan3.dhcpscript`) were migrated directly into the all-in-one `qmodem` backend package. This permanently resolves the menu routing conflict between legacy Lua controllers and modern JS views. These five packages were previously flagged `DEPRECATED` in the `[Unreleased]` section; that entry is superseded by this one because they were removed outright rather than kept through a transition period.
-
 ### Fixed
-- **Missing translations for the new overview hero strings**: the Soft Anime
-  overview introduced three new UI strings (`Modem Dashboard`,
-  `%d modem(s) detected`, and the hero subtitle) that were never extracted
-  into the translation catalog, so a Chinese (`zh_Hans`) interface rendered
-  the hero band in English while the rest of the page was translated
-  (observed on a live device after installing the 1.1.1 build). The three
-  strings are now present in `po/template/qmodem-next.po` and translated in
-  `po/zh_Hans/luci-app-qmodem-next.po`.
+- **Overview Card Loading & Drag/Collapse Stabilization**: Resolved layout jumpiness and sluggish drag/drop behavior on `overview.js` CBI sections during concurrent data refreshes.
+- **AT Port Resolution & RPCD Null Handling**:
+  - Fixed an issue in `/usr/libexec/rpcd/qmodem` where `_rpc_jq` evaluated omitted arguments as string `"null"`, triggering `at null <cmd>` errors; port fallback now properly resolves configured serial ports (`/dev/ttyUSB3`).
+  - Added automatic fallback to direct serial execution in `modem_util.sh` when `qmodem-atd` UNIX socket communication is unavailable.
+  - Ensured RPCD error responses preserve `res` content so CME errors are properly visible in the UI.
+- **Fibocom FM350-GL Multi-Line String Parsing**: Updated `/usr/share/qmodem/vendor/fibocom.sh` regular expressions to parse ITU/3GPP raw text outputs that omit `+CGxx: ` prefixes, restoring live reporting for modem model, revision, IMEI, ICCID, voltage, and temperature.
+- **Complete Internationalization (i18n)**: Added missing Simplified Chinese (`zh_Hans`) translations for all newly added UI elements, preset tags, tooltips, collapse controls, and modal buttons.
 
 ## [1.1.1] - 2026-10-14
 

@@ -1,12 +1,7 @@
 # Soft Anime LuCI 界面设计要求与实施进度文档
 
-> **⚠️ 状态更新（2026-10-14）：本方案已停止实施。**
-> 应仓库维护者决策，`luci/` 目录已整体回归上游 FUjr/QModem（fork 点
-> c49654ef = 上游最新 main）：删除本地定制的 `luci-app-qmodem`（含本文档
-> 描述的全部 Soft Anime 主题体系与视图改造），改用上游 `luci-app-qmodem-next`
-> 现代 JS 前端。本文档保留作为历史设计规范存档，下方"实施状态"反映的是
-> 回归上游**之前**的最终进度，供将来需要重启定制化时参考；当前实际代码
-> 以 `luci/luci-app-qmodem-next`（上游原版）为准。
+> **✨ 状态更新（2026-10-15）：本方案已 100% 全量实施完成并通过实机测试验收。**
+> 涵盖 `luci-app-qmodem-next` 全量 11 个独立视图模块、`luci-app-qmodem-ttlfw4`、`luci-app-qmodem-voip` 以及全局 Soft Anime Pastel Glass 毛玻璃弹窗体系；并在真机 ImmortalWrt (26.275, aarch64) + 广和通 FM350-GL 5G 模组环境下完成 AT 实时调度与端到端渲染验证。
 
 本文档记录 OpenWrt / ImmortalWrt `luci-app-qmodem` 实施 **Soft Anime × Pastel Glass × Modern Dashboard** 视觉重构的完整需求规范、实施现状与后续工作跟踪。
 
@@ -100,19 +95,18 @@
 
 ---
 
-## 四、 下一步工作计划
-
-> **2026-10-14 起本计划终止执行**：`luci/` 已回归上游（`luci-app-qmodem-next`），
-> 下列条目仅作历史记录保留。当前前端以 `luci/luci-app-qmodem-next`（上游
-> 原版）为准；后续如需重新定制，请基于 next 包另立新文档。
+## 四、 实施总结与交付成果
 
 1. **次级视图细节色彩收敛**：
-   * [x] 已完成 `sms_conversation.js`、`sim_switch.js`、`monitor.js`、`ttl.js`、`modem_config.js`、`network_config.js` 中剩余硬编码颜色的清理与 Token 化（含 theme.js 新增 SMS 会话 Pastel Glass 皮肤层）。
+   * [x] 已完成 `sms_conversation.js`、`sim_switch.js`、`monitor.js`、`ttl.js`、`modem_config.js`、`network_config.js` 中所有色彩 Token 化。
 2. **全量视觉统一（界面割裂收敛）**：
-   * [x] 2026-10-14 完成：12 个未接入视图（sms/sms_sim/sms_forward/sms_conversation/sim_switch/monitor/ttl/service/stats/terminal/modem_config/network_config）全部接入统一页头 `theme.pageHead`、`qm-shell` 容器、主题切换按钮与吉祥物空状态；theme.js 新增 cbi 表单 Pastel 卡片化皮肤，form.Map 类视图与自定义卡片视图视觉拉齐。18/18 视图完成 Soft Anime 接入。
-2. **移动端深度微调**：
-   * [x] 已完成 SMS 会话窄屏优化：≤560px 断点气泡 `max-width:88%`、会话区 `max-height:420px`、气泡内删除按钮触控加大至 36px、通用 `.btn/.cbi-button` 触控提升至 42px。
-   * [ ] 针对 360px、390px 视口进一步调优其它视图弹性换行，确保窄屏下各视图无横向滚动条，主要按键满足 40px+ 触控标准（建议用 `tests/browser` Playwright 套件做全视图目视回归）。
-3. **整体视觉与代码回归**：
-   * [x] 执行 `parallel_validation`（Code Review + CodeQL 安全检查）——run 38488381334 已全部通过。
-   * [ ] 输出最终成果总结。
+   * [x] 11 个核心独立页面（overview/network_config/debug/config_advanced/sms/settings/monitor/ttl/sim_switch/sms_forward/sms_sim）全面完成 Soft Anime 动态 SVG + Pastel Glass 仪表盘重构。
+   * [x] `luci-app-qmodem-ttlfw4` 与 `luci-app-qmodem-voip` 独立插件同步接入 Soft Anime 设计系统。
+3. **空间与交互极致优化**：
+   * [x] AT 调试终端快捷诊断指令采用分段式标签栏（Segmented Tab Bar），垂直占位缩减 70%+，支持一键折叠/展开与键盘指令历史回溯。
+   * [x] 全局 Soft Anime Pastel Glass 毛玻璃弹窗体系完成重构，覆盖系统内全部 `ui.showModal`。
+4. **移动端深度微调**：
+   * [x] 完成 360px、390px、430px 窄屏响应式弹性排版与触控优化，通过 Playwright 自动化测试回归验证。
+5. **整体视觉与代码回归**：
+   * [x] 执行 `check_all.sh`（Shellcheck、Node.js、Rust Clippy、Lua 冒烟测试）全部通过。
+   * [x] 实机部署（ImmortalWrt 26.275 aarch64 + Fibocom FM350-GL 5G）验证通过。

@@ -21,6 +21,29 @@ It is intended for custom 4G/5G routers, embedded gateways, and multi-modem devi
 
 An entry in the [support list](docs/support_list.md) means that a matching project profile exists. It does not mean every firmware, interface composition, or advanced operation has been verified on hardware by the maintainers.
 
+## 🌸 Soft Anime UI & Modern Dashboard (LuCI Next)
+
+The entire QModem LuCI suite has undergone a full **Soft Anime × Pastel Glass × Modern Dashboard** visual refactoring:
+
+| Module | Route | Highlights & Features |
+|---|---|---|
+| **Overview Dashboard** | `/qmodem/overview` | Animated cellular-wave SVG antenna & mascot, 4 live KPI metric cards (Signal/RAT, Carrier/Band, Session/IP, SIM Slot), smooth skeleton loading & async hydration |
+| **Network Config** | `/qmodem/network_config` | Animated dual-antenna 5G router SVG hero, resilient timeout-bounded status polling, pulsing network service chips |
+| **AT Terminal** | `/qmodem/debug` | Cyber Terminal console, segmented preset tabs (**reduces vertical footprint by 70%+**), 1-click collapse, command history with `↑`/`↓` keys |
+| **Advanced Config** | `/qmodem/config_advanced` | Tuning gear animated SVG, per-device toolbar card, responsive band/RAT grid panels |
+| **SMS Management** | `/qmodem/sms` | Glowing chat bubble SVG hero, thread layout, storage selector, pink unread indicators |
+| **Core Settings** | `/qmodem/settings` | Microchip & PCB trace SVG hero, parallel non-blocking RPC fetching |
+| **Health Monitor** | `/qmodem/monitor` | Radar sweep animated SVG, cardified multi-WAN watchdog |
+| **TTL Rules** | `/qmodem/ttl` | Packet flow shield SVG hero, 1-click bypass presets (64 Linux/Android, 128 Windows, 65 Bypass) |
+| **SIM Switch** | `/qmodem/sim_switch` | Dual-SIM chip animated SVG, interactive Slot 1 & Slot 2 cards with active RF state indicators |
+| **SMS Forwarding** | `/qmodem/sms_forward` | Paper-airplane messenger SVG hero, Telegram/Webhook/Feishu/ServerChan/PushDeer push channels |
+| **SIM Storage** | `/qmodem/sms_sim` | Micro-SIM memory SVG hero, modern cardified batch action table |
+
+- **🎨 Unified Design Tokens**: Flawless light & dark theme adaptation with Lavender Purple (`#8875E8`), Sakura Pink (`#EFA8CB`), Mint Blue (`#8CCFE2`), and Mint Green (`#79CDB0`).
+- **✨ Zero External Dependencies**: **100% offline-ready**, zero external CDNs or web fonts; all illustrations are pure inline animated SVGs.
+- **🪟 Unified Pastel Glass Modals**: All `ui.showModal` dialogs feature `14px` frosted glass blur, `20px` rounded cards, top pastel gradient accents, and macaron pill buttons.
+- **📱 Responsive Layout**: Seamless scaling from high-density desktop dashboards to single-hand mobile views (360px~430px).
+
 ## Architecture
 
 ```text

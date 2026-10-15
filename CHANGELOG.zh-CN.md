@@ -14,6 +14,15 @@
 ## [1.2.0] - 2026-10-15
 
 ### 新增（Added）
+- **AT 调试终端轻量化与分段式诊断标签栏（Debug Quick Presets Segmented Tabs）**：
+  - 彻底重构 AT 调试页面的快捷诊断指令排版，由原本 4~5 个垂直铺陈的类别卡片升级为现代轻量级**分段标签栏（Segmented Tab Bar）**（`📱 设备信息`、`📶 信号与网络`、`💳 SIM与卡槽`、`⚙️ 硬件与射频`、`⭐ 自定义`、`✨ 全部`）。
+  - 纵向占位节省超过 70%，整行预设仅占一行横向空间，支持单击自动填入、双击即刻发送。
+  - 增加一键折叠（Collapse/Expand）切换开关，最小化高度仅 36px，状态持久化至 `localStorage`。
+  - 终端输入框新增键盘 `↑` / `↓` 方向键循环调用历史发送过的 AT 指令记录。
+- **全局 Soft Anime 毛玻璃弹窗体系（Unified Soft Anime Pastel Glass Modals）**：
+  - 全面接管并重构 LuCI 原生 `ui.showModal` 弹窗体系，统一覆盖 `luci-app-qmodem-next`、`luci-app-qmodem-voip` 与 `luci-app-qmodem-ttlfw4`。
+  - 采用 `14px` 毛玻璃虚化背景（`backdrop-filter: blur(14px) saturate(140%)`），修复遮罩层在无弹窗时常驻画面的异常。
+  - 弹窗采用 `20px` 圆角、细腻双层淡紫环境光阴影、顶部三色柔光渐变条与马卡龙胶囊操作按钮。
 - **全量 11 个核心页面 Soft Anime 视觉与动态 SVG 重构**：
   - `overview`（仪表盘）：新增蜂窝波动态 SVG 天线与吉祥物、4 核心指标卡（信号强度/RAT、运营商/频段、网络会话/IP、SIM 卡槽位）、闪烁骨架屏与极速并行异步水合。
   - `network_config`（网络配置）：新增双天线 5G 路由器动态 SVG Hero 头图，优化异步加载超时策略（避免拨号阻塞整页渲染），RC 服务状态升级为脉冲呼吸点胶囊。
@@ -30,11 +39,13 @@
 - **`luci-app-qmodem-monitor` 状态指示体验升级**：服务启用/运行状态全面接入 `.qmodem-chip` 与 `.qmodem-status-row` 状态胶囊徽章。
 
 ### 修复（Fixed）
-- **补齐概览页 Hero 区缺失的中文翻译**：Soft Anime 概览页新增的三条 UI 文案
-  （`Modem Dashboard`、`%d modem(s) detected` 与 Hero 副标题）从未被提取进翻译
-  目录，导致简体中文界面下 Hero 区仍显示英文，而页面其余部分已翻译（实机安装
-  1.1.1 构建后观察到）。三条文案现已加入 `po/template/qmodem-next.po`，
-  并在 `po/zh_Hans/luci-app-qmodem-next.po` 中完成翻译。
+- **概览页卡片加载重排与折叠拖拽优化**：修复 Overview 页面中原生 CBI Section 折叠拖拽卡片在刷新与并发加载时的突兀重排跳动，增加平滑淡入动效并优化异步水合链路。
+- **AT 指令调度降级与 RPCD 参数兼容**：
+  - 修复 `/usr/libexec/rpcd/qmodem` 中 `_rpc_jq` 提取缺失参数为 `"null"` 导致后端调用 `at null <cmd>` 的问题，恢复自动回退至已配置 AT 端口。
+  - 增强 `modem_util.sh` 中的 AT 调度逻辑，当 `qmodem-atd` socket 通信异常时自动平滑降级至非阻塞串口直调，保障指令 100% 成功执行。
+  - RPCD 错误响应保留 `res` 字段，确保 CME ERROR 等错误信息能完整显示在前端终端。
+- **广和通 FM350-GL 模组多行纯文本数据解析**：修复 `vendor/fibocom.sh` 中因 FM350-GL 固件输出缺少 `+CGxx: ` 前缀导致正则提取为空的问题，恢复设备名称、厂商、固件版本、IMEI、ICCID、电压、温度等实时数据的正确读取。
+- **补齐核心页面与诊断标签中文翻译**：补齐所有新增界面文本（包括总览卡片、诊断指令预设标签、操作提示、折叠按钮、弹窗控件）的简体中文翻译，并编译更新 `.lmo`。
 
 ### 移除（Removed）
 - **正式移除旧版 Lua 界面五包**：`luci-app-qmodem`（Lua 版）、`luci-app-qmodem-sms`、`luci-app-qmodem-ttl`、`luci-app-qmodem-hc`、`luci-app-qmodem-mwan` 从 `luci/` 目录彻底清理。其承载的核心硬件控制与守护脚本（`modem_sim.sh`、`modem_mwan.sh`、`qmodem_hc_sim`、`qmodem_mwan`、`99-setup-mwan`、`01-reload-mwan3.dhcpscript）已全量迁移并入 `qmodem` 一体化后端包。彻底消除了与现代 JS 视图之间的同名菜单路由覆盖冲突。
