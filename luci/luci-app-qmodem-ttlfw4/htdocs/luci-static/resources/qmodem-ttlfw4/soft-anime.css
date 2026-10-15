@@ -1254,6 +1254,184 @@ body > #modal_overlay .modal .btn,
 }
 
 /* ============================================================
+ * 13b. Dynamic SVGs, Micro-interactions & Special Components
+ * ============================================================ */
+@keyframes qmd-pulse-glow {
+	0%, 100% { transform: scale(1); opacity: 0.92; }
+	50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 6px var(--qmd-primary)); }
+}
+
+@keyframes qmd-signal-wave {
+	0% { opacity: 0.25; stroke-width: 1.5; }
+	50% { opacity: 1; stroke-width: 2.2; stroke: var(--qmd-primary); }
+	100% { opacity: 0.25; stroke-width: 1.5; }
+}
+
+@keyframes qmd-spin-slow {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+@keyframes qmd-radar-sweep {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+@keyframes qmd-cursor-blink {
+	0%, 49% { opacity: 1; }
+	50%, 100% { opacity: 0; }
+}
+
+@keyframes qmd-shimmer {
+	0% { background-position: -200% 0; }
+	100% { background-position: 200% 0; }
+}
+
+@keyframes qmd-float {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-4px); }
+}
+
+.qmd-anim-float {
+	animation: qmd-float 4s ease-in-out infinite;
+}
+
+.qmd-anim-pulse {
+	animation: qmd-pulse-glow 2.4s ease-in-out infinite;
+}
+
+.qmd-anim-spin {
+	animation: qmd-spin-slow 8s linear infinite;
+}
+
+.qmd-anim-sweep {
+	transform-origin: center;
+	animation: qmd-radar-sweep 3s linear infinite;
+}
+
+/* Quick KPI Grid */
+.qmodem-kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: var(--qmd-sp-4);
+	margin-bottom: var(--qmd-sp-4);
+}
+
+.qmodem-kpi-card {
+	background: var(--qmd-card);
+	border: 1px solid var(--qmd-border);
+	border-radius: var(--qmd-r-card);
+	box-shadow: var(--qmd-shadow-sm);
+	padding: var(--qmd-sp-4);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	position: relative;
+	overflow: hidden;
+	transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+}
+
+.qmodem-kpi-card::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: linear-gradient(90deg, var(--qmd-primary), var(--qmd-pink));
+	opacity: 0.85;
+}
+
+.qmodem-kpi-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--qmd-shadow-md);
+	border-color: color-mix(in srgb, var(--qmd-primary) 40%, var(--qmd-border));
+}
+
+.qmodem-kpi-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: var(--qmd-sp-2);
+}
+
+.qmodem-kpi-title {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--qmd-text-2);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.qmodem-kpi-icon {
+	width: 28px;
+	height: 28px;
+	border-radius: var(--qmd-r-sm);
+	background: var(--qmd-primary-soft);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+}
+
+.qmodem-kpi-icon svg {
+	width: 18px;
+	height: 18px;
+}
+
+.qmodem-kpi-val {
+	font-size: 24px;
+	font-weight: 700;
+	color: var(--qmd-text-1);
+	font-variant-numeric: tabular-nums;
+	line-height: 1.2;
+	margin: 4px 0;
+}
+
+.qmodem-kpi-sub {
+	font-size: 12px;
+	color: var(--qmd-text-3);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+/* Skeleton Loading */
+.qmodem-skeleton {
+	background: linear-gradient(90deg, var(--qmd-bg-2) 25%, color-mix(in srgb, var(--qmd-primary) 12%, var(--qmd-bg-2)) 50%, var(--qmd-bg-2) 75%);
+	background-size: 200% 100%;
+	animation: qmd-shimmer 1.5s infinite;
+	border-radius: var(--qmd-r-sm);
+}
+
+/* Preset Buttons */
+.qmodem-preset-btn {
+	background: var(--qmd-bg-2);
+	border: 1px solid var(--qmd-border);
+	color: var(--qmd-text-1);
+	border-radius: var(--qmd-r-pill);
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.qmodem-preset-btn:hover {
+	background: var(--qmd-primary-soft);
+	color: var(--qmd-primary);
+	border-color: var(--qmd-primary);
+	transform: translateY(-1px);
+}
+
+/* ============================================================
  * 14. Responsive - tablet (<=1024px)
  * ============================================================ */
 @media (max-width: 1024px) {

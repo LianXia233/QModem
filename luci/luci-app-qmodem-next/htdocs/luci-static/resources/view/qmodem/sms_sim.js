@@ -31,39 +31,45 @@ return view.extend({
 			return container;
 		}
 
-		// Modem selector
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
-		
+		// Soft Anime Hero
+		var hero = E('div', { 'class': 'qmodem-hero' }, [
+			E('h1', { 'class': 'qmodem-hero-title' }, [
+				_('SIM Card SMS Storage'),
+				E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Direct SIM Access'))
+			]),
+			E('p', { 'class': 'qmodem-hero-sub' },
+				_('Inspect raw SMS records stored directly on SIM memory, view message indices, and perform cleanup.'))
+		]);
+		var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+		heroIcon.innerHTML =
+			'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+			'<path d="M18 10 L48 10 L58 20 L58 50 L18 50 Z" fill="#FFFFFF" stroke="#8875E8" stroke-width="2.5" stroke-linejoin="round"/>' +
+			'<rect x="26" y="22" width="24" height="20" rx="3" stroke="#EFA8CB" stroke-width="2"/>' +
+			'<line x1="38" y1="22" x2="38" y2="42" stroke="#EFA8CB" stroke-width="2"/>' +
+			'<line x1="26" y1="32" x2="50" y2="32" stroke="#EFA8CB" stroke-width="2"/>' +
+			'<circle cx="58" cy="18" r="3.5" fill="#36AD87" class="qmd-anim-pulse"/>' +
+			'</svg>';
+		hero.appendChild(heroIcon);
+		container.appendChild(hero);
+
+		// Modern Toolbar Card
+		var selectorSection = E('div', {
+			'class': 'cbi-section',
+			'style': 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 12px 18px;'
+		});
+		var leftBar = E('div', { 'style': 'display: flex; align-items: center; gap: 10px; flex-wrap: wrap;' });
+		leftBar.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-muted', 'style': 'font-weight: 600;' }, _('Active Modem')));
 		var select = E('select', {
 			'class': 'cbi-input-select',
-			'id': 'sms_sim_modem_selector'
+			'id': 'sms_sim_modem_selector',
+			'style': 'min-width: 220px;'
 		});
-		
 		modems.forEach(function(modem) {
 			select.appendChild(E('option', { 'value': modem.id }, modem.name));
 		});
-		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
-		selectorTable.appendChild(selectorBody);
-		selectorSection.appendChild(selectorTable);
+		leftBar.appendChild(select);
+		selectorSection.appendChild(leftBar);
 		container.appendChild(selectorSection);
-
-		// Title
-		var title = E('h2', { 'name': 'content' }, _('SIM Card SMS Management'));
-		container.appendChild(title);
-
-		// Description
-		var desc = E('div', { 'class': 'cbi-map-descr' }, 
-			_('View and delete SMS messages stored on SIM card. These are raw messages before being processed into conversations.'));
-		container.appendChild(desc);
 
 		// Main content area
 		var contentArea = E('div', { 'id': 'sms-sim-content' });

@@ -55,6 +55,26 @@ return view.extend({
 			return container;
 		}
 
+		// Soft Anime Hero
+		var hero = E('div', { 'class': 'qmodem-hero' }, [
+			E('h1', { 'class': 'qmodem-hero-title' }, [
+				_('SMS Messages'),
+				E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Conversations & Storage'))
+			]),
+			E('p', { 'class': 'qmodem-hero-sub' },
+				_('Manage cellular SMS threads, compose new messages, adjust storage areas (ME/SM) and sync database.'))
+		]);
+		var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+		heroIcon.innerHTML =
+			'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+			'<path d="M12 14 C12 8 64 8 64 14 L64 36 C64 42 24 42 18 48 L18 42 L12 42 Z" fill="#FFFFFF" stroke="#8875E8" stroke-width="2.5" stroke-linejoin="round"/>' +
+			'<circle cx="28" cy="26" r="3.2" fill="#EFA8CB" class="qmd-anim-pulse"/>' +
+			'<circle cx="38" cy="26" r="3.2" fill="#8875E8" class="qmd-anim-pulse" style="animation-delay: 0.25s;"/>' +
+			'<circle cx="48" cy="26" r="3.2" fill="#8CCFE2" class="qmd-anim-pulse" style="animation-delay: 0.5s;"/>' +
+			'</svg>';
+		hero.appendChild(heroIcon);
+		container.appendChild(hero);
+
 		// Modem selector
 		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
 		var selectorTable = E('table', { 'class': 'table' });

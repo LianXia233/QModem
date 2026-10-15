@@ -73,15 +73,22 @@ document.head.appendChild(E('link', {
 
 return view.extend({
 	load: function() {
+		var safeRpc = function(fn) {
+			return Promise.race([
+				fn().catch(function() { return null; }),
+				new Promise(function(r) { setTimeout(function(){ r(null); }, 1500); })
+			]);
+		};
+
 		return Promise.all([
 			uci.load('qmodem'),
-			callSystemBoard(),
-			callGetPcieDevices(),
-			callGetUsbDevices(),
-			callGetLeds(),
-			callGetNetworkInterfaces(),
-			callGetTtyPorts(),
-			callGetAvailableDevices()
+			safeRpc(callSystemBoard),
+			safeRpc(callGetPcieDevices),
+			safeRpc(callGetUsbDevices),
+			safeRpc(callGetLeds),
+			safeRpc(callGetNetworkInterfaces),
+			safeRpc(callGetTtyPorts),
+			safeRpc(callGetAvailableDevices)
 		]).then(L.bind(function(results) {
 			this.pcieDevices = results[2] && results[2].devices ? results[2].devices : [];
 			this.usbDevices = results[3] && results[3].devices ? results[3].devices : [];
@@ -540,9 +547,35 @@ return view.extend({
 
 	o = s.option(form.Value, 'gpio_up', _('GPIO Value(Modem Power Up)'));
 	o.depends({gpio: /./ } );
-	o.placeholder = _('e.g.') + ' 1';
-	o.modalonly = true;
-
-		return m.render();
+		return m.render().then(function(rendered) {
+			var hero = E('div', { 'class': 'qmodem-hero' }, [
+				E('h1', { 'class': 'qmodem-hero-title' }, [
+					_('QModem Core Settings'),
+					E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Daemon & Bus Scanning'))
+				]),
+				E('p', { 'class': 'qmodem-hero-sub' },
+					_('Configure hardware scanning workers, PCIe/USB bus discovery rules, LEDs and daemon worker timeouts.'))
+			]);
+			var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+			heroIcon.innerHTML =
+				'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+				'<rect x="20" y="14" width="36" height="32" rx="5" fill="#FFFFFF" stroke="#8875E8" stroke-width="2.5"/>' +
+				'<rect x="28" y="22" width="20" height="16" rx="3" fill="#EEE9FF"/>' +
+				'<circle cx="38" cy="30" r="3" fill="#36AD87" class="qmd-anim-pulse"/>' +
+				'<line x1="12" y1="20" x2="20" y2="20" stroke="#8875E8" stroke-width="2" stroke-linecap="round"/>' +
+				'<line x1="12" y1="30" x2="20" y2="30" stroke="#8875E8" stroke-width="2" stroke-linecap="round"/>' +
+				'<line x1="12" y1="40" x2="20" y2="40" stroke="#8875E8" stroke-width="2" stroke-linecap="round"/>' +
+				'<line x1="56" y1="20" x2="64" y2="20" stroke="#8875E8" stroke-width="2" stroke-linecap="round"/>' +
+				'<line x1="56" y1="30" x2="64" y2="30" stroke="#8875E8" stroke-width="2" stroke-linecap="round"/>' +
+				'<line x1="56" y1="40" x2="64" y2="40" stroke="#8875E8" stroke-width="2" stroke-linecap="round"/>' +
+				'</svg>';
+			hero.appendChild(heroIcon);
+			if (rendered.firstChild) {
+				rendered.insertBefore(hero, rendered.firstChild);
+			} else {
+				rendered.appendChild(hero);
+			}
+			return rendered;
+		});
 	}
 });

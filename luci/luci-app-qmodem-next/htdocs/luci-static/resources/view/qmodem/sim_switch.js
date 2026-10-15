@@ -4,12 +4,18 @@
 'require dom';
 'require qmodem.qmodem as qmodem';
 
-// Load shared QModem Soft Anime design system
+// Load shared QModem Soft Anime design system with daily cache-bust
 document.head.appendChild(E('link', {
 	'rel': 'stylesheet',
 	'type': 'text/css',
 	'href': L.resource('qmodem/qmodem-next.css') + '?v=' + new Date().toISOString().slice(0, 10)
 }));
+
+function createSvg(html) {
+	var div = document.createElement('div');
+	div.innerHTML = html.trim();
+	return div.firstChild;
+}
 
 return view.extend({
 	load: function() {
@@ -23,61 +29,66 @@ return view.extend({
 		}
 
 		var container = E('div', { 'class': 'cbi-map' });
-		var title = E('h2', { 'class': 'cbi-map-caption' }, _('SIM Switch'));
-		container.appendChild(title);
 
-		var desc = E('div', { 'class': 'cbi-map-descr' }, 
-			_('Switch between SIM card slots. Note: Some modems may require a reboot after switching SIM slots.'));
-		container.appendChild(desc);
+		// Soft Anime Hero
+		var hero = E('div', { 'class': 'qmodem-hero' }, [
+			E('h1', { 'class': 'qmodem-hero-title' }, [
+				_('SIM Slot Switcher'),
+				E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, _('Hardware Slot Control'))
+			]),
+			E('p', { 'class': 'qmodem-hero-sub' },
+				_('Toggle active SIM physical slots on dual-SIM cellular modems. Some modules may automatically re-register.'))
+		]);
 
-		// Create modem selector section
-		var selectorSection = E('fieldset', { 'class': 'cbi-section' });
-		var selectorTable = E('table', { 'class': 'table' });
-		var selectorBody = E('tbody', {});
-		var selectorRow = E('tr', { 'class': 'tr' });
-		var labelCell = E('td', { 'class': 'td left', 'width': '33%' }, _('Modem Name'));
-		var selectCell = E('td', { 'class': 'td' });
-		
-		// Create select dropdown
+		// Animated Dual-SIM Card SVG
+		var heroIcon = E('div', { 'class': 'qmodem-mascot qmd-anim-float', 'aria-hidden': 'true' });
+		heroIcon.innerHTML =
+			'<svg viewBox="0 0 76 60" width="76" height="60" fill="none">' +
+			'<rect x="10" y="14" width="24" height="34" rx="4" fill="#FFFFFF" stroke="#8875E8" stroke-width="2.2"/>' +
+			'<rect x="42" y="14" width="24" height="34" rx="4" fill="#FFFFFF" stroke="#EFA8CB" stroke-width="2.2"/>' +
+			'<circle cx="22" cy="31" r="3" fill="#36AD87" class="qmd-anim-pulse"/>' +
+			'<circle cx="54" cy="31" r="3" fill="#8875E8"/>' +
+			'<path d="M26 10 L50 10" stroke="#8875E8" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 3"/>' +
+			'</svg>';
+		hero.appendChild(heroIcon);
+		container.appendChild(hero);
+
+		// Modern Toolbar Card
+		var selectorSection = E('div', {
+			'class': 'cbi-section',
+			'style': 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 12px 18px;'
+		});
+
+		var leftBar = E('div', { 'style': 'display: flex; align-items: center; gap: 10px; flex-wrap: wrap;' });
+		leftBar.appendChild(E('span', { 'class': 'qmodem-chip qmodem-chip-muted', 'style': 'font-weight: 600;' }, _('Active Modem')));
 		var select = E('select', {
 			'class': 'cbi-input-select',
-			'id': 'modem_selector'
+			'id': 'modem_selector',
+			'style': 'min-width: 220px;'
 		});
-		
 		modems.forEach(function(modem) {
 			if (modem.enabled) {
 				select.appendChild(E('option', { 'value': modem.id }, modem.name));
 			}
 		});
-		
-		selectCell.appendChild(select);
-		selectorRow.appendChild(labelCell);
-		selectorRow.appendChild(selectCell);
-		selectorBody.appendChild(selectorRow);
-		selectorTable.appendChild(selectorBody);
-		selectorSection.appendChild(selectorTable);
+		leftBar.appendChild(select);
+		selectorSection.appendChild(leftBar);
 		container.appendChild(selectorSection);
 
-		// Create SIM switch interface container
+		// SIM switch interface container
 		var interfaceContainer = E('div', { 'id': 'sim_switch_container' });
 		container.appendChild(interfaceContainer);
 
 		var self = this;
-		
-		// Update function to show selected modem's interface
 		var updateInterface = function() {
 			var selectedId = select.value;
 			var selectedModem = modems.find(function(m) { return m.id === selectedId; });
-			
 			if (selectedModem) {
 				dom.content(interfaceContainer, self.createSimSwitchInterface(selectedModem));
 			}
 		};
 
-		// Selector change handler
 		select.addEventListener('change', updateInterface);
-
-		// Initial display
 		updateInterface();
 
 		return container;
@@ -85,144 +96,169 @@ return view.extend({
 
 	createSimSwitchInterface: function(modem) {
 		var self = this;
-		var container = E('div', { 'class': 'cbi-section-node' });
+		var wrap = E('div', {});
 
-		// Status section - shows support and current slot
-		var statusSection = E('div', { 'class': 'cbi-value' });
-		statusSection.appendChild(E('label', { 'class': 'cbi-value-title' }, _('SIM Switch Status')));
-		var statusField = E('div', { 'class': 'cbi-value-field' });
-		statusField.appendChild(E('div', { 'class': 'spinning' }, _('Loading...')));
-		statusSection.appendChild(statusField);
-		container.appendChild(statusSection);
+		var loadingCard = E('div', { 'class': 'cbi-section qmodem-skeleton-card', 'style': 'padding: 24px; text-align: center;' }, [
+			E('div', { 'class': 'spinning' }, _('Probing SIM slot capabilities for %s...').format(modem.name))
+		]);
+		wrap.appendChild(loadingCard);
 
-		// SIM slot buttons container
-		var buttonsSection = E('div', { 'class': 'cbi-value' });
-		buttonsSection.appendChild(E('label', { 'class': 'cbi-value-title' }, _('Select SIM Slot')));
-		var buttonsField = E('div', { 'class': 'cbi-value-field' });
-		buttonsSection.appendChild(buttonsField);
-		container.appendChild(buttonsSection);
+		var resultSection = E('div', { 'id': 'sim_result_section_' + modem.id, 'style': 'display: none; margin-bottom: 16px;' });
+		wrap.appendChild(resultSection);
 
-		// Result section
-		var resultSection = E('div', { 'class': 'cbi-value', 'id': 'sim_result_section_' + modem.id, 'style': 'display: none;' });
-		resultSection.appendChild(E('label', { 'class': 'cbi-value-title' }, _('Result')));
-		var resultField = E('div', { 'class': 'cbi-value-field', 'id': 'sim_result_' + modem.id });
-		resultSection.appendChild(resultField);
-		container.appendChild(resultSection);
-
-		// Load SIM switch support and current slot
+		// Load SIM switch support and current slot concurrently
 		Promise.all([
 			qmodem.callGetSimSwitchCapabilities(modem.id),
 			qmodem.getSimSlot(modem.id)
 		]).then(function(results) {
+			wrap.removeChild(loadingCard);
+
 			var supportResult = results[0];
 			var slotResult = results[1];
-			
 			var supported = supportResult && supportResult.supportSwitch === '1';
 			var currentSlot = slotResult && slotResult.sim_slot ? slotResult.sim_slot : 'N/A';
-			var slots = (supportResult && Array.isArray(supportResult.simSlots)) ? supportResult.simSlots : [];
-			var hideButtons = !supported || currentSlot === 'N/A' || slots.length === 0;
-			
-			// Update status
-			var statusInfo = [];
-			statusInfo.push(E('div', {}, [
-				E('strong', {}, _('Support') + ': '),
-				E('span', { 'class': supported ? 'label-success' : 'label-warning' }, 
-					supported ? _('Supported') : _('Not Supported'))
-			]));
-			statusInfo.push(E('div', { 'style': 'margin-top: 5px;' }, [
-				E('strong', {}, _('Current SIM Slot') + ': '),
-				E('span', {}, self.formatSlotDisplay(currentSlot))
-			]));
-			
-			dom.content(statusField, statusInfo);
-			
-			// Create SIM slot buttons dynamically based on capabilities
-			var btns = [];
-			if (!hideButtons) {
-				slots.forEach(function(slotVal, idx) {
-					var label = _('Slot %s').format(slotVal);
-					var btn = E('button', {
-						'class': 'btn cbi-button' + (currentSlot == slotVal ? ' cbi-button-positive' : ' cbi-button-action'),
-						'data-slot': slotVal,
-						'click': supported ? function() { self.switchSimSlot(modem.id, slotVal, btns); } : null,
-						'style': (!supported ? 'opacity: 0.5; cursor: not-allowed;' : '') + (idx > 0 ? ' margin-left: 10px;' : '')
-					}, label);
-					btns.push(btn);
-				});
-			}
-			dom.content(buttonsField, btns);
-			
-			if (!supported) {
-				buttonsField.appendChild(E('div', { 'class': 'qmodem-help-text' },
-					_('This modem does not support SIM switching.')));
-			}
-			
-			// Display ExtraInfo if available
-			var extraInfo = supportResult && supportResult.ExtraInfo;
-			if (extraInfo) {
-				statusInfo.push(E('div', { 'class': 'qmodem-note-warn' }, [
-					E('strong', {}, _('Note') + ': '),
-					E('span', {}, _(extraInfo))
+			var slots = (supportResult && Array.isArray(supportResult.simSlots)) ? supportResult.simSlots : ['1', '2'];
+
+			// Status & Note Header
+			var statusCard = E('div', { 'class': 'cbi-section', 'style': 'margin-bottom: 16px; padding: 14px 18px;' });
+			var statusRow = E('div', { 'class': 'qmodem-status-row' }, [
+				E('span', { 'class': 'qmodem-chip ' + (supported ? 'qmodem-chip-ok' : 'qmodem-chip-warn') }, [
+					E('span', { 'class': 'qmodem-dot ' + (supported ? 'qmodem-dot-ok' : 'qmodem-dot-warn') }),
+					_('Hardware Support') + ': ' + (supported ? _('Supported') : _('Not Supported'))
+				]),
+				E('span', { 'class': 'qmodem-chip qmodem-chip-info' }, [
+					_('Current Active Slot') + ': ' + self.formatSlotDisplay(currentSlot)
+				])
+			]);
+			statusCard.appendChild(statusRow);
+
+			if (supportResult && supportResult.ExtraInfo) {
+				statusCard.appendChild(E('div', { 'class': 'qmodem-inline-warning', 'style': 'margin-top: 12px;' }, [
+					E('div', { 'class': 'qmodem-warn-title' }, [
+						E('span', { 'class': 'qmodem-dot qmodem-dot-warn' }),
+						E('strong', {}, _('Note:'))
+					]),
+					E('span', {}, _(supportResult.ExtraInfo))
 				]));
-				dom.content(statusField, statusInfo);
 			}
-			
+			wrap.appendChild(statusCard);
+
+			if (!supported) {
+				wrap.appendChild(E('div', { 'class': 'alert-message warning' },
+					_('This modem model or current firmware does not support software SIM switching.')));
+				return;
+			}
+
+			// Interactive SIM Slot Visual Cards
+			var slotsGrid = E('div', { 'class': 'qmodem-sim-slot-grid' });
+			var slotButtons = [];
+
+			slots.forEach(function(slotVal) {
+				var isActive = (String(currentSlot) === String(slotVal));
+				
+				var card = E('div', {
+					'class': 'qmodem-sim-slot-card' + (isActive ? ' active' : ''),
+					'id': 'sim_card_slot_' + slotVal
+				});
+
+				var cardHeader = E('div', { 'style': 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;' }, [
+					E('div', { 'style': 'display: flex; align-items: center; gap: 8px;' }, [
+						createSvg('<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--qmd-primary)" stroke-width="2"><path d="M6 3h9l5 5v13H6V3zM10 12h4M10 16h4"/></svg>'),
+						E('span', { 'style': 'font-size: 16px; font-weight: 700; color: var(--qmd-text-1);' }, _('SIM Slot %s').format(slotVal))
+					]),
+					E('span', {
+						'class': 'qmodem-chip ' + (isActive ? 'qmodem-chip-ok' : 'qmodem-chip-muted'),
+						'id': 'sim_chip_slot_' + slotVal
+					}, [
+						isActive ? E('span', { 'class': 'qmodem-dot qmodem-dot-ok' }) : null,
+						isActive ? _('Active Slot') : _('Standby')
+					])
+				]);
+
+				var switchBtn = E('button', {
+					'class': 'cbi-button ' + (isActive ? 'cbi-button-positive' : 'cbi-button-action'),
+					'type': 'button',
+					'style': 'width: 100%; min-height: 40px; font-weight: 600; margin-top: 10px;',
+					'disabled': isActive,
+					'data-slot': slotVal,
+					'click': function() {
+						self.switchSimSlot(modem.id, slotVal, slotButtons, wrap);
+					}
+				}, isActive ? _('Currently Active') : _('Switch to Slot %s').format(slotVal));
+
+				slotButtons.push(switchBtn);
+
+				card.appendChild(cardHeader);
+				card.appendChild(E('p', { 'style': 'font-size: 12.5px; color: var(--qmd-text-2); margin-bottom: 12px;' },
+					isActive ? _('This SIM card is currently serving cellular connections.') : _('Click below to switch the active RF path to this slot.')));
+				card.appendChild(switchBtn);
+				slotsGrid.appendChild(card);
+			});
+
+			wrap.appendChild(slotsGrid);
+
 		}).catch(function(e) {
-			dom.content(statusField, E('span', { 'class': 'error' }, 
-				_('Error loading SIM switch information: %s').format(e.message)));
-			
-			// No buttons on error; show info only
-			dom.content(buttonsField, []);
+			wrap.removeChild(loadingCard);
+			wrap.appendChild(E('div', { 'class': 'alert-message error' },
+				_('Error querying SIM switch capability: %s').format(e.message)));
 		});
 
-		return container;
+		return wrap;
 	},
 
 	formatSlotDisplay: function(slot) {
-		if (!slot)
-			return 'N/A';
+		if (!slot) return 'N/A';
 		return _('Slot %s').format(slot);
 	},
 
-	switchSimSlot: function(modemId, slot, buttons) {
-		var self = this;
+	switchSimSlot: function(modemId, slot, buttons, wrap) {
 		var resultSection = document.getElementById('sim_result_section_' + modemId);
-		var resultField = document.getElementById('sim_result_' + modemId);
-		
-		// Show loading state
-		resultSection.style.display = '';
-		dom.content(resultField, E('div', { 'class': 'spinning' }, _('Switching SIM slot...')));
-		
-		// Disable buttons during switch
-		(buttons || []).forEach(function(b){ b.disabled = true; b.style.opacity = '0.5'; });
-		
+		if (resultSection) {
+			resultSection.style.display = '';
+			dom.content(resultSection, E('div', { 'class': 'cbi-section qmodem-skeleton-card', 'style': 'padding: 18px; text-align: center;' }, [
+				E('div', { 'class': 'spinning' }, _('Switching active RF path to Slot %s...').format(slot))
+			]));
+		}
+
+		(buttons || []).forEach(function(b) { b.disabled = true; });
+
 		qmodem.setSimSlot(modemId, slot).then(function(result) {
-			// Re-enable buttons
-			(buttons || []).forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
-			
-			if (result && result.success === true) {
-				dom.content(resultField, E('div', { 'class': 'alert-message success' }, [
-					E('span', {}, _('SIM slot switched to Slot %s successfully.').format(slot)),
-					E('br'),
-					E('span', { 'style': 'font-size: 0.9em;' }, 
-						_('Note: Some modems may require a reboot for the change to take effect.'))
+			(buttons || []).forEach(function(b) {
+				var bs = b.getAttribute('data-slot');
+				var isTarget = (String(bs) === String(slot));
+				b.disabled = isTarget;
+				b.className = 'cbi-button ' + (isTarget ? 'cbi-button-positive' : 'cbi-button-action');
+				b.textContent = isTarget ? _('Currently Active') : _('Switch to Slot %s').format(bs);
+
+				var card = document.getElementById('sim_card_slot_' + bs);
+				if (card) {
+					if (isTarget) card.classList.add('active');
+					else card.classList.remove('active');
+				}
+
+				var chip = document.getElementById('sim_chip_slot_' + bs);
+				if (chip) {
+					chip.className = 'qmodem-chip ' + (isTarget ? 'qmodem-chip-ok' : 'qmodem-chip-muted');
+					dom.content(chip, [
+						isTarget ? E('span', { 'class': 'qmodem-dot qmodem-dot-ok' }) : null,
+						isTarget ? _('Active Slot') : _('Standby')
+					]);
+				}
+			});
+
+			if (resultSection) {
+				dom.content(resultSection, E('div', { 'class': 'alert-message success' }, [
+					E('strong', {}, _('SIM slot switched to Slot %s successfully.').format(slot)),
+					E('div', { 'style': 'font-size: 12px; margin-top: 4px;' },
+						_('Note: Some modems may take 10-30 seconds to re-register on cellular networks.'))
 				]));
-				
-				// Update button styles to reflect new slot
-				(buttons || []).forEach(function(b){
-					var bs = b.getAttribute('data-slot');
-					b.className = 'btn cbi-button' + (bs == slot ? ' cbi-button-positive' : ' cbi-button-action');
-				});
-			} else {
-				dom.content(resultField, E('div', { 'class': 'alert-message warning' }, 
-					_('Failed to switch SIM slot. Please check modem status.')));
 			}
 		}).catch(function(e) {
-			// Re-enable buttons
-			(buttons || []).forEach(function(b){ b.disabled = false; b.style.opacity = ''; });
-			
-			dom.content(resultField, E('div', { 'class': 'alert-message error' }, 
-				_('Error switching SIM slot: %s').format(e.message)));
+			(buttons || []).forEach(function(b) { b.disabled = false; });
+			if (resultSection) {
+				dom.content(resultSection, E('div', { 'class': 'alert-message error' },
+					_('Failed to switch SIM slot: %s').format(e.message)));
+			}
 		});
 	},
 

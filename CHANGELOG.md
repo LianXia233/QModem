@@ -12,10 +12,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 ## [Unreleased]
 
 ### Added
+- **Full visual and asynchronous refactor of all 11 core LuCI views**:
+  - `overview`: Dynamic cellular-wave SVG antenna & mascot, 4 live KPI metric cards (Signal & RAT, Carrier & Band, Uplink Session, SIM & Hardware), shimmer skeleton placeholders, and concurrent asynchronous data hydration.
+  - `network_config`: Animated dual-antenna 5G router SVG hero, resilient timeout-bounded status polling (eliminating blocking page hangs), and live pulsing service indicator chips.
+  - `debug`: Rebuilt as a macOS/Anime-inspired Cyber Terminal (`.qmodem-terminal-frame`), animated terminal SVG mascot, diagnostic command preset chips, 1-click clipboard copy, and Enter-key async execution.
+  - `config_advanced`: Dynamic tuning gear SVG hero, streamlined modem selection toolbar, and fluid responsive tab panels.
+  - `sms`: Animated glowing chat bubble SVG hero, redesigned message thread and storage preference panels.
+  - `settings`: Animated microchip & PCB trace SVG hero, resilient timeout-safe parallel RPC fetching preventing cold-start stalls.
+  - `monitor`: Animated radar sweep & heartbeat wave SVG hero, cardified watchdog metrics.
+  - `ttl`: Animated packet shield SVG hero, 1-click presets for common carrier bypass rules (64 Linux/Android, 128 Windows, 65 Bypass).
+  - `sim_switch`: Animated dual-SIM chip SVG hero, visual interactive slot cards (Slot 1 & Slot 2) with active RF state badges.
+  - `sms_forward`: Animated paper-airplane messenger SVG hero, multi-channel push configuration cards.
+  - `sms_sim`: Animated Micro-SIM memory SVG hero, modern toolbar card, and batch action tables.
 - **Soft Anime design system for `luci-app-qmodem-ttlfw4`**: self-contained `soft-anime.css`, Pastel Glass warning cards, daily cache-busting, and bashism cleanup.
 - **Enhanced service status chips for `luci-app-qmodem-monitor`**: unified `.qmodem-chip` and `.qmodem-status-row` pill badges for service state.
 
-### Removed
 - **Legacy Lua UI packages removed**: `luci-app-qmodem` (Lua), `luci-app-qmodem-sms`, `luci-app-qmodem-ttl`, `luci-app-qmodem-hc`, `luci-app-qmodem-mwan` have been deleted from `luci/`. Essential hardware and daemon scripts (`modem_sim.sh`, `modem_mwan.sh`, `qmodem_hc_sim`, `qmodem_mwan`, `99-setup-mwan`, `01-reload-mwan3.dhcpscript`) were migrated directly into the all-in-one `qmodem` backend package. This permanently resolves the menu routing conflict between legacy Lua controllers and modern JS views. These five packages were previously flagged `DEPRECATED` in the `[Unreleased]` section; that entry is superseded by this one because they were removed outright rather than kept through a transition period.
 
 ### Fixed
