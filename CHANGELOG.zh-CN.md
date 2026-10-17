@@ -11,6 +11,18 @@
 
 ## [Unreleased]
 
+### 新增（Added）
+- **多上行负载均衡管理器（独立可选包）**：移植上游 `FUjr/QModem` 的 `qmodem-uplink-manager`（`application/qmodem_uplink_manager`）及其 LuCI 前端 `luci-app-qmodem-uplink`——加权多上行 IPv4 负载均衡、各上行链路独立健康探测、路由幂等恢复、rpcd ucode 后端与 ACL。
+- **受管 IPv4 生命周期发布**：新增 netifd proto 处理器 `files/lib/netifd/proto/qmodem_runtime.sh`、辅助脚本 `files/usr/libexec/qmodem-ipv4-event`、共享归属判定库 `files/usr/share/qmodem/instance.sh` 与 `files/usr/share/qmodem/modem_netdev.sh`；`qmodem` 包的安装清单已全部纳入。
+
+### 变更（Changed）
+- **同步上游 `FUjr/QModem` 核心逻辑**（6 个提交，涵盖模组生命周期隔离、netifd 受管 IPv4 发布、上行加权负载均衡），并在保持本仓库单包整合结构的前提下落地：上游改动均折叠进 `application/qmodem`（`modem_dial.sh`、`qmodem_network`、`modem_ctrl.sh`、`modem_scan`、`quectel_CM_5G_M`），未重新拆分为多包。
+- **AT 端口访问串行化**：`modem_util.sh` 的 `at()`/`fastat()` 现对 `/var/lock/qmodem-at-<port>.lock` 加排他 `flock`；`modem_scand.c` 内的 UCI/配置访问统一改用 `config_lock()`/`config_unlock()` 串行化。
+- CI 包清单（`main.yml`、`openwrt_package.config`、`qmodem_package_generic`）新增 `qmodem-uplink-manager` 与 `luci-app-qmodem-uplink`。
+
+### 移除（Removed）
+- 移除 `modem_scand.c` 中遗留的探测前 `ubus call at-daemon close` 调用（上游随生命周期隔离一并删除）；保留本仓库的 `valid_port_name()` 输入校验。
+
 ## [1.2.0] - 2026-10-15
 
 ### 新增（Added）
