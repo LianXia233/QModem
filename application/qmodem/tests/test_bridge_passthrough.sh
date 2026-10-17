@@ -95,10 +95,11 @@ set -e
 
 network_handlers="$(extract_function set_if)
 $(extract_function flush_if)"
-[ "$(printf '%s\n' "$network_handlers" | grep -cF '/etc/init.d/network restart')" -eq 2 ]
-if printf '%s\n' "$network_handlers" | grep -qF '/etc/init.d/network reload'; then
-	exit 1
-fi
+# Count real invocations only; hardened `logger ... "... restart failed"` lines
+# also contain the literal path and must not be mistaken for a call.
+[ "$(printf '%s\n' "$network_handlers" | grep -F '/etc/init.d/network restart' | grep -vcF 'logger ')" -eq 2 ]
+# Bridge topology still needs restart; ordinary modem cleanup now reloads.
+[ "$(printf '%s\n' "$network_handlers" | grep -F '/etc/init.d/network reload' | grep -vcF 'logger ')" -eq 1 ]
 [ "$(printf '%s\n' "$network_handlers" | grep -cF 'external_bridge_manager')" -ge 3 ]
 
 echo 'bridge passthrough tests passed'

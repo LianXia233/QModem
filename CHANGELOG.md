@@ -11,6 +11,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versio
 
 ## [Unreleased]
 
+### Added
+- **Uplink load-balancing manager (independent optional package)**: ported upstream `FUjr/QModem`'s `qmodem-uplink-manager` (`application/qmodem_uplink_manager`) and its LuCI client `luci-app-qmodem-uplink` — weighted multi-uplink IPv4 balancing, per-uplink health probing, route/idempotent restore, rpcd ucode backend and ACL.
+- **Managed-IPv4 lifecycle publishing**: new netifd proto handler `files/lib/netifd/proto/qmodem_runtime.sh`, helper `files/usr/libexec/qmodem-ipv4-event`, shared ownership helpers `files/usr/share/qmodem/instance.sh` and `files/usr/share/qmodem/modem_netdev.sh`; the `qmodem` package install list now ships all four.
+- New regression workflow `.github/workflows/uplink-runtime.yml` plus unit tests `application/qmodem/tests/modem_scan/test_scheduler.c` and `application/qmodem/tests/quectel_CM_5G_M/test_managed_ipv4.c`.
+
+### Changed
+- **Synced core logic from upstream `FUjr/QModem`** (6 commits covering modem lifecycle isolation, netifd managed-IPv4 publication and uplink weighted balancing) while keeping this fork's single-package consolidation: upstream hunks were folded into `application/qmodem` (`modem_dial.sh`, `qmodem_network`, `modem_ctrl.sh`, `modem_scan`, `quectel_CM_5G_M`) rather than re-introducing the split packages.
+- **AT-port serialization**: `modem_util.sh` `at()`/`fastat()` now hold an exclusive `flock` on `/var/lock/qmodem-at-<port>.lock`; UCI/config access inside `modem_scand.c` is serialized through `config_lock()`/`config_unlock()`.
+- CI package lists (`main.yml`, `openwrt_package.config`, `qmodem_package_generic`) now include `qmodem-uplink-manager` and `luci-app-qmodem-uplink`.
+
+### Removed
+- Dropped the legacy `ubus call at-daemon close` pre-probe call in `modem_scand.c` (upstream removed it together with lifecycle isolation); the fork's `valid_port_name()` input guard is retained.
+
 ## [1.2.0] - 2026-10-15
 
 ### Added

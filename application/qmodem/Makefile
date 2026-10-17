@@ -349,6 +349,7 @@ define Package/$(PKG_NAME)/install
 		./files/usr/share/qmodem/monitor_recovery.sh $(1)/usr/share/qmodem/
 	$(INSTALL_DIR) $(1)/lib/netifd/proto $(1)/lib/netifd
 	$(INSTALL_BIN) ./files/lib/netifd/proto/rmnet.sh ./files/lib/netifd/proto/rmnet6.sh \
+		./files/lib/netifd/proto/qmodem_runtime.sh \
 		$(1)/lib/netifd/proto/
 	$(INSTALL_BIN) ./files/lib/netifd/rmnet.script ./files/lib/netifd/rmnet6.script \
 		$(1)/lib/netifd/
@@ -399,6 +400,8 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/libexec/rpcd
 	$(INSTALL_BIN) ./files/usr/libexec/rpcd/modem_ctrl $(1)/usr/libexec/rpcd/
 	$(INSTALL_BIN) ./files/usr/libexec/rpcd/qmodem $(1)/usr/libexec/rpcd/
+	$(INSTALL_DIR) $(1)/usr/libexec
+	$(INSTALL_BIN) ./files/usr/libexec/qmodem-ipv4-event $(1)/usr/libexec/
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) ./files/usr/sbin/qmodem_collect $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/usr/share/qmodem
@@ -409,9 +412,11 @@ define Package/$(PKG_NAME)/install
 		./files/usr/share/qmodem/modem_support.json \
 		./files/usr/share/qmodem/usage_stats.sh $(1)/usr/share/qmodem/
 	$(INSTALL_BIN) ./files/usr/share/qmodem/generic.sh \
+		./files/usr/share/qmodem/instance.sh \
 		./files/usr/share/qmodem/modem_ctrl.sh \
 		./files/usr/share/qmodem/modem_dial.sh \
 		./files/usr/share/qmodem/modem_hook.sh \
+		./files/usr/share/qmodem/modem_netdev.sh \
 		./files/usr/share/qmodem/modem_scan.sh \
 		./files/usr/share/qmodem/modem_util.sh \
 		./files/usr/share/qmodem/modem_sim.sh \

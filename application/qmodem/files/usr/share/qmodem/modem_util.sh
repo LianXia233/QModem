@@ -310,7 +310,12 @@ qmodem_fastat_dispatch()
 }
 
 at()
-{
+(
+	local port_key
+	port_key=$(printf '%s' "$1" | tr -c 'A-Za-z0-9_' '_')
+	[ -n "$port_key" ] || exit 2
+	mkdir -p /var/lock
+	exec 6>"/var/lock/qmodem-at-$port_key.lock"; flock -x 6 || exit 1
 	local at_port=$1
 	local new_str="${2/[$]/$}"
 	local atcmd="${new_str/\"/\"}"
@@ -330,10 +335,15 @@ at()
 		return $rc
 	fi
 	qmodem_at_dispatch "$at_port" "$atcmd"
-}
+)
 
 fastat()
-{
+(
+	local port_key
+	port_key=$(printf '%s' "$1" | tr -c 'A-Za-z0-9_' '_')
+	[ -n "$port_key" ] || exit 2
+	mkdir -p /var/lock
+	exec 6>"/var/lock/qmodem-at-$port_key.lock"; flock -x 6 || exit 1
 	local at_port=$1
 	local new_str="${2/[$]/$}"
 	local atcmd="${new_str/\"/\"}"
@@ -352,7 +362,7 @@ fastat()
 		return $rc
 	fi
 	qmodem_fastat_dispatch "$at_port" "$atcmd"
-}
+)
 
 log2file()
 {
