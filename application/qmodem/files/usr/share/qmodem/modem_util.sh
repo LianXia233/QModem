@@ -309,13 +309,25 @@ qmodem_fastat_dispatch()
 	esac
 }
 
-at()
-(
+# Per-port AT serialization: at() and fastat() take an exclusive flock on
+# /var/lock/qmodem-at-<port>.lock, so concurrent callers on the same port
+# queue up instead of interleaving on the wire.
+#
+# Kept as a plain lock/unlock wrapper instead of upstream's subshell form so
+# the body runs in the caller shell: callers (and test stubs) observe the
+# variable side effects of the dispatch helpers. The lock fd is always
+# released before returning.
+_qmodem_at_lock() {
 	local port_key
 	port_key=$(printf '%s' "$1" | tr -c 'A-Za-z0-9_' '_')
-	[ -n "$port_key" ] || exit 2
+	[ -n "$port_key" ] || return 2
 	mkdir -p /var/lock
-	exec 6>"/var/lock/qmodem-at-$port_key.lock"; flock -x 6 || exit 1
+	exec 6>"/var/lock/qmodem-at-$port_key.lock" || return 1
+	flock -x 6 || { exec 6>&-; return 1; }
+	return 0
+}
+
+_qmodem_at_locked() {
 	local at_port=$1
 	local new_str="${2/[$]/$}"
 	local atcmd="${new_str/\"/\"}"
@@ -335,15 +347,9 @@ at()
 		return $rc
 	fi
 	qmodem_at_dispatch "$at_port" "$atcmd"
-)
+}
 
-fastat()
-(
-	local port_key
-	port_key=$(printf '%s' "$1" | tr -c 'A-Za-z0-9_' '_')
-	[ -n "$port_key" ] || exit 2
-	mkdir -p /var/lock
-	exec 6>"/var/lock/qmodem-at-$port_key.lock"; flock -x 6 || exit 1
+_qmodem_fastat_locked() {
 	local at_port=$1
 	local new_str="${2/[$]/$}"
 	local atcmd="${new_str/\"/\"}"
@@ -362,7 +368,25 @@ fastat()
 		return $rc
 	fi
 	qmodem_fastat_dispatch "$at_port" "$atcmd"
-)
+}
+
+at() {
+	local rc
+	_qmodem_at_lock "$1" || return $?
+	_qmodem_at_locked "$@"
+	rc=$?
+	exec 6>&-
+	return $rc
+}
+
+fastat() {
+	local rc
+	_qmodem_at_lock "$1" || return $?
+	_qmodem_fastat_locked "$@"
+	rc=$?
+	exec 6>&-
+	return $rc
+}
 
 log2file()
 {
